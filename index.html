@@ -87,7 +87,62 @@
       #wpanel-6 > *:not(#reportPreviewCard) { display: none !important; }
       #printableReportMount { box-shadow: none !important; border: none !important; padding: 0 !important; }
     }
-  </style>
+  
+    /* ============ AI 实验设计方案 · 全景展示区 ============ */
+    .ai-sc { font-size: 13px; line-height: 1.65; }
+    .ai-sc-hero { background: linear-gradient(135deg,#052a25 0%,#0b4a40 55%,#12695c 100%); }
+    .ai-sec-title { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:800; color:#0a3630; margin:0 0 10px; }
+    .ai-sec-title .ai-sec-idx { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:8px; background:#0a3630; color:#fff; font-size:11px; font-weight:800; flex:none; }
+    .ai-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; background:#f1f6f4; border:1px solid #d7e8e2; color:#0f5c54; }
+    .ai-innov { background:linear-gradient(100deg,#fffbeb,#fef3c7); border:1px solid #fcd34d; border-radius:14px; padding:11px 14px; }
+    .ai-flow-wrap { overflow-x:auto; padding:4px 2px 12px; }
+    .ai-flow { display:flex; align-items:stretch; min-width:760px; }
+    .ai-flow-node { flex:1 1 0; min-width:112px; position:relative; border:1.5px solid #d9e8e3; border-radius:16px; padding:11px 10px; background:#fff; cursor:pointer; text-align:left; transition:transform .25s,box-shadow .25s,border-color .25s; animation:aiNodeIn .55s ease both; }
+    .ai-flow-node:hover { transform:translateY(-3px); box-shadow:0 10px 22px rgba(10,54,48,.13); }
+    .ai-flow-node.active { border-color:#0f7a68; background:linear-gradient(160deg,#f0fbf7,#fff); box-shadow:0 0 0 3px rgba(15,122,104,.14),0 10px 22px rgba(10,54,48,.15); }
+    .ai-flow-node .ai-n-num { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:#0a3630; color:#fff; font-size:11px; font-weight:800; margin-bottom:7px; }
+    .ai-flow-node.active .ai-n-num { animation:aiPulse 1.9s ease-in-out infinite; }
+    .ai-flow-node .ai-n-stage { font-size:10px; font-weight:800; color:#0f7a68; letter-spacing:.04em; text-transform:uppercase; }
+    .ai-flow-node .ai-n-title { font-size:12px; font-weight:800; color:#0f172a; margin-top:3px; line-height:1.4; }
+    .ai-flow-node .ai-n-meta { font-size:10px; color:#64748b; margin-top:5px; }
+    .ai-flow-arrow { flex:0 0 26px; display:flex; align-items:center; justify-content:center; position:relative; }
+    .ai-flow-arrow::before { content:''; height:2px; width:100%; background:linear-gradient(90deg,#8fd4c2,#0f7a68,#8fd4c2); background-size:200% 100%; animation:aiFlowDash 1.5s linear infinite; }
+    .ai-flow-arrow::after { content:'›'; position:absolute; right:-1px; top:50%; transform:translateY(-52%); color:#0f7a68; font-size:18px; font-weight:800; line-height:1; }
+    @keyframes aiFlowDash { from{background-position:0 0} to{background-position:200% 0} }
+    @keyframes aiFlowDashV { from{background-position:0 0} to{background-position:0 200%} }
+    @keyframes aiNodeIn { from{opacity:0;transform:translateY(14px) scale(.96)} to{opacity:1;transform:none} }
+    @keyframes aiPulse { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5)} 50%{box-shadow:0 0 0 9px rgba(16,185,129,0)} }
+    .ai-step-card { border:1px solid #e2e8f0; border-radius:16px; background:#fff; overflow:hidden; }
+    .ai-step-card .ai-step-hd { display:flex; align-items:center; gap:9px; padding:10px 13px; background:linear-gradient(90deg,#f2f8f6,#fff); border-bottom:1px solid #edf2f0; }
+    .ai-step-badge { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:7px; background:#0a3630; color:#fff; font-size:11px; font-weight:800; flex:none; }
+    .ai-kv { display:flex; gap:8px; padding:7px 13px; border-top:1px dashed #eef2f1; }
+    .ai-kv .ai-k { flex:0 0 66px; font-size:11px; font-weight:800; color:#0f5c54; }
+    .ai-kv .ai-v { flex:1; font-size:12px; color:#475569; }
+    .ai-sop-item { display:flex; gap:10px; padding:9px 12px; border:1px solid #e6eeeb; border-radius:12px; background:#fbfdfc; }
+    .ai-sop-no { flex:none; width:22px; height:22px; border-radius:50%; background:#dff3ec; color:#0a3630; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .ai-ref-item { padding:9px 12px; border-left:3px solid #0f7a68; background:#f7faf9; border-radius:0 10px 10px 0; font-size:12px; color:#475569; }
+    .ai-ref-item.ai-ref-rec { border-left-color:#d97706; background:#fffbeb; }
+    .ai-trouble { padding:9px 12px; border-radius:12px; background:#fffbeb; border:1px solid #fde68a; font-size:12px; }
+    .ai-concl { padding:12px 14px; border-radius:14px; background:#0a3630; color:#d1fae5; font-size:12px; }
+    .ai-scroll-hint { font-size:10px; color:#94a3b8; }
+    .ai-sec-anchor { scroll-margin-top: 92px; }
+    @media (max-width:640px){
+      .ai-kv .ai-v, .ai-sop-item span:last-child { font-size:12.5px; }
+      .ai-flow-node .ai-n-title { font-size:13px; }
+      .ai-ref-item, .ai-concl, .ai-innov { font-size:12.5px; }
+      .ai-flow { flex-direction:column; min-width:0; }
+      .ai-flow-node { min-width:0; width:100%; }
+      .ai-flow-arrow { flex:0 0 22px; width:2px; margin:0 auto; }
+      .ai-flow-arrow::before { width:2px; height:100%; background:linear-gradient(180deg,#8fd4c2,#0f7a68,#8fd4c2); background-size:100% 200%; animation:aiFlowDashV 1.5s linear infinite; }
+      .ai-flow-arrow::after { content:'⌄'; right:auto; top:auto; bottom:-6px; transform:none; }
+      .ai-kv .ai-k { flex-basis:58px; }
+    }
+    /* 装置图轻量动态效果 */
+    .rig-live svg { animation:aiRigFloat 4.5s ease-in-out infinite; }
+    @keyframes aiRigFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+    .ai-live-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981; animation:aiPulse 1.9s ease-in-out infinite; }
+    @media print { #aiPlanShowcase { break-inside:avoid; } .ai-sc .no-print { display:none !important; } }
+</style>
 </head>
 <body class="min-h-screen flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
 
@@ -391,7 +446,7 @@
         </div>
 
         <!-- 自动化执行进度与回执 -->
-        <div id="qwenExecReceipt" class="hidden rounded-2xl bg-gradient-to-br from-emerald-50/80 to-white border border-emerald-200/80 p-3.5 space-y-2.5 text-xs">
+        <div id="qwenExecReceipt" class="hidden rounded-2xl bg-gradient-to-br from-emerald-50/80 to-white border border-emerald-200/80 p-3.5 space-y-2.5 text-[13px]">
           <div class="flex items-center justify-between gap-2">
             <div class="font-extrabold text-[#0a3630] flex items-center gap-1.5">
               <span id="qwenReceiptBadge" class="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -400,11 +455,11 @@
             <button id="btnCloseQwenReceipt" type="button" class="text-slate-400 hover:text-slate-700 font-bold">×</button>
           </div>
           <p id="qwenReceiptAdvice" class="text-slate-700 leading-relaxed"></p>
-          <div id="qwenReceiptChecks" class="flex flex-wrap gap-1.5 text-[11px]"></div><div id="qwenDeepCards" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-0.5"></div>
+          <div id="qwenReceiptChecks" class="flex flex-wrap gap-1.5 text-[12px]"></div><div id="qwenDeepCards" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-0.5"></div>
           <div class="flex flex-wrap gap-2 pt-1">
             <button type="button" data-qwen-jump="3" class="px-3 py-1.5 rounded-xl bg-[#0a3630] text-white text-[11px] font-bold hover:bg-[#062420] transition">查看第 3 步原理与方案 →</button>
             <button type="button" data-qwen-jump="4" class="px-3 py-1.5 rounded-xl bg-white border border-teal-200 text-[#0f5c54] text-[11px] font-bold hover:bg-teal-50 transition">查看第 4 步动态装置 →</button>
-            <button type="button" data-qwen-jump="6" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold hover:bg-amber-100 transition">直达第 6 步预览报告 →</button><button id="btnOpenBankFromReceipt" type="button" class="ml-auto px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold transition">📚 查看已更新题库</button>
+            <button type="button" data-qwen-jump="6" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold hover:bg-amber-100 transition">直达第 6 步预览报告 →</button><button id="btnShowFullPlan" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition">🧩 展开完整实验方案</button><button id="btnOpenBankFromReceipt" type="button" class="ml-auto px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold transition">📚 查看已更新题库</button>
           </div>
         </div>
 
@@ -422,6 +477,11 @@
             <button id="btnSendQwenChat" type="submit" class="px-3.5 py-2 rounded-xl bg-[#0a3630] text-white text-xs font-bold hover:bg-[#062420]">发送</button>
           </form>
         </div>
+      </section>
+
+      <!-- ===== AI 实验设计方案 · 全景展示区（编排后自动展开） ===== -->
+      <section id="aiPlanShowcase" class="hidden no-print ai-sc rounded-3xl bg-white/95 backdrop-blur-md border border-emerald-200/90 shadow-lg overflow-hidden">
+        <div id="aiPlanMount"></div>
       </section>
 
       <!-- ==================== STEP 1: 选材 ==================== -->
@@ -2632,7 +2692,7 @@
       <div class="p-3.5 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 space-y-1">
         <div class="flex items-center justify-between"><span class="px-2 py-0.5 rounded-full bg-[#0a3630] text-emerald-200 text-[10px] font-bold">${u.univ}</span><a href="${u.url}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-[#0f5c54] underline">参考 ↗</a></div>
         <div class="text-xs font-bold text-slate-900 pt-0.5">${u.title}</div>
-        <p class="text-[11px] text-slate-600 leading-relaxed">${u.desc}</p>
+        <p class="text-[12px] text-slate-600 leading-relaxed">${u.desc}</p>
       </div>`).join('');
 
     // 4. 《中药化学》课程 10 大章节知识库
@@ -2782,15 +2842,15 @@
       spGrid.innerHTML = `
         <div class="p-3.5 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 space-y-1">
           <div class="text-xs font-extrabold text-[#0a3630]">生物合成途径</div>
-          <p class="text-[11px] text-slate-600 leading-relaxed">${sp.biosyn}</p>
+          <p class="text-[12px] text-slate-600 leading-relaxed">${sp.biosyn}</p>
         </div>
         <div class="p-3.5 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 space-y-1">
           <div class="text-xs font-extrabold text-amber-800">紫外光谱（UV · 第13章§3）</div>
-          <p class="text-[11px] text-slate-600 leading-relaxed">${sp.uv}</p>
+          <p class="text-[12px] text-slate-600 leading-relaxed">${sp.uv}</p>
         </div>
         <div class="p-3.5 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 space-y-1">
           <div class="text-xs font-extrabold text-[#0f5c54]">核磁共振（NMR · 第13章§5）</div>
-          <p class="text-[11px] text-slate-600 leading-relaxed">${sp.nmr}</p>
+          <p class="text-[12px] text-slate-600 leading-relaxed">${sp.nmr}</p>
         </div>`;
     }
     const btnOpenCh = document.getElementById('btnOpenChaptersFromStep3');
@@ -2804,9 +2864,11 @@
 
     document.getElementById('classicRouteBanner').textContent = t.steps.map(s => s.title).join(' → ');
     document.getElementById('classicStepsGrid').innerHTML = t.steps.map((s, i) => `
-      <div class="p-3.5 rounded-2xl bg-[#f7f7f4] border border-slate-200/70 space-y-1">
-        <div class="text-xs font-bold text-slate-900">${i + 1}. ${s.title}</div>
-        <p class="text-xs text-slate-600 leading-relaxed">${s.principle}</p>
+      <div class="p-3.5 rounded-2xl bg-[#f7f7f4] border border-slate-200/70 space-y-1.5">
+        <div class="flex items-center gap-2"><span class="inline-flex items-center justify-center w-5 h-5 rounded-lg bg-[#0a3630] text-white text-[10px] font-extrabold shrink-0">${i + 1}</span><div class="text-xs font-bold text-slate-900">${aiEsc(s.title)}</div></div>
+        <p class="text-[12px] text-slate-600 leading-relaxed"><strong class="text-[#0f5c54]">原理：</strong>${aiEsc(s.principle)}</p>
+        ${s.operation ? `<p class="text-[11px] text-slate-700 leading-relaxed"><strong class="text-[#0f5c54]">操作：</strong>${aiEsc(s.operation)}${s.duration ? ' <span class="text-slate-400">（' + aiEsc(s.duration) + '）</span>' : ''}</p>` : ''}
+        ${s.qc ? `<p class="text-[11px] text-amber-800 leading-relaxed"><strong>质控：</strong>${aiEsc(s.qc)}</p>` : ''}
       </div>`).join('');
 
     const diagEl = document.getElementById('diySanityCheck');
@@ -2840,7 +2902,7 @@
     document.getElementById('rigDiagramTitle').textContent = rig.title;
     document.getElementById('rigAssemblyOrder').innerHTML = `<strong>搭建顺序：</strong>${rig.order}`;
     document.getElementById('rigVideoSearchLink').href = `https://search.bilibili.com/all?keyword=${encodeURIComponent(rig.videoKw)}`;
-    const sw = document.getElementById('rigSvgWrapper'); sw.innerHTML = rig.svg;
+    const sw = document.getElementById('rigSvgWrapper'); sw.innerHTML = rig.svg; sw.classList.add('rig-live');
     sw.querySelectorAll('[data-hotspot]').forEach(g => g.addEventListener('click', () => { ws.activeHotspot = Number(g.dataset.hotspot); saveState(); renderStep4(t, ws); }));
 
     const hs = rig.hotspots.find(h => h.id === ws.activeHotspot) || rig.hotspots[0];
@@ -3313,7 +3375,221 @@
     };
   }
 
-  function applyAiPlanToWorkbench(plan, usedRealQwen) {
+  /* ============ AI 实验设计方案 · 全景展示渲染 ============ */
+  function aiEsc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+  function aiArr(v) { return Array.isArray(v) ? v.filter(x => x != null) : []; }
+  function aiTxt(v, fb) { return (v == null || String(v).trim() === '') ? (fb || '') : String(v); }
+  function aiRefText(r) {
+    if (r == null) return '';
+    if (typeof r === 'string') return r;
+    return aiTxt(r.text, aiTxt(r.title, aiTxt(r.name, '')));
+  }
+  function aiSopText(x) {
+    if (x == null) return '';
+    if (typeof x === 'string') return x;
+    return aiTxt(x.text, aiTxt(x.step, aiTxt(x.title, '')));
+  }
+  function aiStepDerived(plan, st, i, rig, ws) {
+    const cfg = plan.cfg || {};
+    const rigTitle = (typeof LAB_RIGS !== 'undefined' && LAB_RIGS[rig]) ? LAB_RIGS[rig].title : rig;
+    const durDefault = Number(ws.time || cfg.time || 60) + ' min';
+    return {
+      stage: aiTxt(st.stage, ['提取', '分离', '纯化', '检识'][i] || ('阶段 ' + (i + 1))),
+      title: aiTxt(st.title, '实验步骤 ' + (i + 1)),
+      principle: aiTxt(st.principle, '依据目标成分理化性质实现该阶段分离富集。'),
+      operation: aiTxt(st.operation || st.detail || st.howto, ''),
+      reagents: aiTxt(st.reagents || st.reagent, ''),
+      apparatus: aiTxt(st.apparatus || st.device, ''),
+      duration: aiTxt(st.duration || st.time, ''),
+      qc: aiTxt(st.qc || st.quality, '按《中国药典》通则控制平行 3 批 RSD < 5%。'),
+      rigTitle: rigTitle,
+      durDefault: durDefault,
+      solvent: aiTxt(ws.solventType || cfg.solventType, '70%乙醇')
+    };
+  }
+
+  function renderAiPlanShowcase(plan, meta) {
+    const mount = document.getElementById('aiPlanMount');
+    const box = document.getElementById('aiPlanShowcase');
+    if (!mount || !box) return;
+    const rig = meta.rig, ws = meta.ws || {}, rag = meta.ragCtx || {};
+    const usedAI = !!meta.usedRealQwen;
+    const steps = aiArr(plan.steps).filter(x => typeof x === 'object');
+    const derived = steps.map((st, i) => aiStepDerived(plan, st, i, rig, ws));
+    const herb = aiTxt(plan.herb, '自定义药材');
+    const compound = aiTxt(plan.compound, '目标活性成分');
+    const category = aiTxt(plan.category, '中药化学');
+    const title = aiTxt(plan.formalTitle, herb + '中' + compound + '的提取分离与检识实验设计');
+    const rigTitle = (typeof LAB_RIGS !== 'undefined' && LAB_RIGS[rig]) ? LAB_RIGS[rig].title : rig;
+    const cfg = plan.cfg || {};
+    const mass = aiTxt(ws.mass || cfg.mass, '50'), ratio = aiTxt(ws.ratio || cfg.ratio, '10'), temp = aiTxt(ws.temp || cfg.temp, '75'), time = aiTxt(ws.time || cfg.time, '60');
+    const solvent = aiTxt(ws.solventType || cfg.solventType, '70%乙醇'), ph = aiTxt(ws.ph || cfg.ph, '中性 7.0');
+    const innovation = aiTxt(plan.innovation, aiTxt(plan.integrative, '本方案结合站内题库与文献，围绕「' + herb + ' · ' + compound + '」在本科常规实验室条件下完成绿色、可重复的提取分离与多维检识设计。'));
+
+    // 流程节点：准备 → 各工艺步骤 → 报告
+    const nodes = [{
+      stage: '准备', title: '药材前处理与称量', meta: mass + 'g · ' + aiTxt(ws.mesh || cfg.mesh, '中粉(40目)'),
+      detail: '将' + herb + '净选、干燥、粉碎至' + aiTxt(ws.mesh || cfg.mesh, '中粉(40目)') + '，精密称取 ' + mass + ' g，按料液比 1:' + ratio + ' 加入' + solvent + '（' + ph + '）预浸润，备用。'
+    }].concat(derived.map((d, i) => ({
+      stage: d.stage, title: d.title, meta: (d.duration || d.durDefault) + ' · ' + (i === 0 ? temp + '℃' : '按质控执行'),
+      detail: (d.operation || d.principle) + (d.qc ? '　【质控】' + d.qc : '')
+    }))).concat([{
+      stage: '报告', title: '数据整理与报告导出', meta: '3 批收率 / RSD / TLC',
+      detail: '录入 3 批粗提物与精制品质量，计算收率、精制率与 RSD，完成 TLC 比移值对照与显色检识记录，勾选章节后一键导出 A4 实验报告或高清长图。'
+    }]);
+
+    const kpiChips = [
+      ['投料量', mass + ' g'], ['料液比', '1:' + ratio], ['提取溶剂', solvent],
+      ['温度', temp + ' ℃'], ['时长', time + ' min'], ['pH', ph], ['装置', rigTitle]
+    ];
+
+    const bankList = aiArr(rag.matchedTopics);
+    const litList = aiArr(rag.matchedLit);
+    const aiRefs = aiArr(plan.recommendedRefs).concat(aiArr(plan.citedLiterature));
+    const citedBank = aiArr(plan.citedBank);
+
+    const html = `
+      <div class="ai-sc-hero text-white px-5 py-5 sm:px-7 sm:py-6">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div class="min-w-0 flex-1">
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/12 border border-white/20 text-[10px] font-bold tracking-widest text-emerald-200">
+              <span class="ai-live-dot"></span> AI EXPERIMENT DESIGN · 实验方案全景解读
+            </div>
+            <h2 class="text-lg sm:text-2xl font-extrabold mt-2.5 leading-snug">${aiEsc(title)}</h2>
+            <p class="text-[11px] sm:text-xs text-teal-100/90 mt-1.5">${aiEsc(herb)} · ${aiEsc(compound)} · ${aiEsc(category)} ｜ 由 ${usedAI ? '通义千问 ' + aiEsc(getActiveQwenModel()) : '本地智算演练引擎'} 自动生成</p>
+          </div>
+          <div class="no-print flex gap-1.5 shrink-0">
+            <button type="button" id="aiCopyPlan" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-[11px] font-bold transition">复制方案全文</button>
+            <button type="button" id="aiHidePlan" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-[11px] font-bold transition">收起</button>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-1.5 mt-4">
+          ${kpiChips.map(c => `<span class="px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 text-[10px] sm:text-[11px] font-bold text-white">${aiEsc(c[0])} <span class="text-emerald-200">${aiEsc(c[1])}</span></span>`).join('')}
+        </div>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          ${[['1', '创新设计'], ['2', '流程图'], ['3', '步骤详解'], ['4', 'SOP 规程'], ['5', '文献题库'], ['6', '排障结论']].map(x => `<button type="button" data-ai-sec="${x[0]}" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/25 border border-white/15 text-[10px] font-bold text-white/95 transition">${x[0]}. ${x[1]}</button>`).join('')}
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-6">
+
+        <div id="aiSec1" class="ai-sec-anchor">
+          <div class="ai-sec-title"><span class="ai-sec-idx">1</span>创新设计说明</div>
+          <div class="ai-innov text-[12px] sm:text-[13px] text-amber-950 leading-relaxed"><strong class="text-amber-900">✦ 设计亮点：</strong>${aiEsc(innovation)}</div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2.5">
+            ${[
+              ['基原与性味', plan.origin], ['核心理化性质', plan.chemistry],
+              ['药典质控要求', plan.pharmacopoeia], ['薄层检识系统', plan.tlcSystem]
+            ].map(x => `<div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[10px] font-extrabold text-[#0f5c54] mb-1">${aiEsc(x[0])}</div><div class="text-[12px] text-slate-600 leading-relaxed">${aiEsc(aiTxt(x[1], '按《中国药典》及课程要求执行。'))}</div></div>`).join('')}
+          </div>
+        </div>
+
+        <div id="aiSec2" class="ai-sec-anchor">
+          <div class="ai-sec-title"><span class="ai-sec-idx">2</span>动态实验流程图 <span class="ai-scroll-hint font-normal">· 点击任一节点查看该步操作</span></div>
+          <div class="ai-flow-wrap">
+            <div class="ai-flow">
+              ${nodes.map((n, i) => `${i ? '<div class="ai-flow-arrow"></div>' : ''}<button type="button" data-ai-node="${i}" class="ai-flow-node ${i === 0 ? 'active' : ''}" style="animation-delay:${(i * 0.14).toFixed(2)}s"><span class="ai-n-num">${i + 1}</span><div class="ai-n-stage">${aiEsc(n.stage)}</div><div class="ai-n-title">${aiEsc(n.title)}</div><div class="ai-n-meta">${aiEsc(n.meta)}</div></button>`).join('')}
+            </div>
+          </div>
+          <div id="aiNodeDetail" class="mt-2 p-3.5 rounded-2xl border border-teal-200 bg-teal-50/50 text-[12px] text-slate-700 leading-relaxed"></div>
+        </div>
+
+        <div id="aiSec3" class="ai-sec-anchor">
+          <div class="ai-sec-title"><span class="ai-sec-idx">3</span>实验步骤详解 <span class="ai-scroll-hint font-normal">· 原理 / 操作方法 / 试剂仪器 / 质控</span></div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            ${derived.map((d, i) => `
+              <div class="ai-step-card" id="aiStepCard${i}">
+                <div class="ai-step-hd"><span class="ai-step-badge">${i + 1}</span><div class="min-w-0"><div class="text-[10px] font-extrabold text-[#0f7a68]">${aiEsc(d.stage)}</div><div class="text-[12px] sm:text-[13px] font-extrabold text-slate-900 leading-snug">${aiEsc(d.title)}</div></div></div>
+                <div class="ai-kv"><span class="ai-k">化学原理</span><span class="ai-v">${aiEsc(d.principle)}</span></div>
+                <div class="ai-kv"><span class="ai-k">操作方法</span><span class="ai-v">${aiEsc(d.operation || ('按「' + d.title + '」执行：' + d.principle + ' 全程控温 ' + temp + ' ℃，控时 ' + (d.duration || d.durDefault) + '，' + d.qc))}</span></div>
+                <div class="ai-kv"><span class="ai-k">试剂用量</span><span class="ai-v">${aiEsc(d.reagents || (solvent + '（料液比 1:' + ratio + '，' + ph + '），投料 ' + mass + ' g'))}</span></div>
+                <div class="ai-kv"><span class="ai-k">仪器设备</span><span class="ai-v">${aiEsc(d.apparatus || (d.rigTitle + '、分析天平、抽滤装置、旋转蒸发仪、硅胶 G 薄层板'))}</span></div>
+                <div class="ai-kv"><span class="ai-k">时长 / 质控</span><span class="ai-v"><strong class="text-[#0f5c54]">${aiEsc(d.duration || d.durDefault)}</strong> ｜ ${aiEsc(d.qc)}</span></div>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <div id="aiSec4" class="ai-sec-anchor">
+          <div class="ai-sec-title"><span class="ai-sec-idx">4</span>标准操作规程 SOP <span class="ai-scroll-hint font-normal">· 可按实验进度逐条勾选</span></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            ${(aiArr(plan.sop).length ? aiArr(plan.sop) : ['药材前处理与称量', '按设定参数组装装置并提取', '分离纯化富集目标成分', '浓缩干燥称重并计算收率', '显色反应与 TLC 对照检识', '整理数据并导出实验报告']).map((x, i) => `<label class="ai-sop-item cursor-pointer"><span class="ai-sop-no">${i + 1}</span><input type="checkbox" data-ai-sop="${i}" class="mt-1 accent-[#0a3630]" /><span class="text-[12px] text-slate-700 flex-1">${aiEsc(aiSopText(x))}</span></label>`).join('')}
+          </div>
+        </div>
+
+        <div id="aiSec5" class="ai-sec-anchor">
+          <div class="ai-sec-title"><span class="ai-sec-idx">5</span>题库与文献参考 <span class="ai-scroll-hint font-normal">· 站内检索 + AI 推荐</span></div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <div>
+              <div class="text-[11px] font-extrabold text-[#0f5c54] mb-1.5">站内精编题库引用 ${citedBank.length ? '· AI 指定引用 ' + citedBank.length + ' 项' : ''}</div>
+              ${(citedBank.length ? citedBank.slice(0, 4).map(x => `<div class="ai-ref-item ai-ref-rec mb-1.5">✦ ${aiEsc(aiRefText(x))} <span class="text-[10px] text-amber-700 font-bold">（AI 指定）</span></div>`) : '')}
+              ${(bankList.length ? bankList.slice(0, 4).map(x => `<div class="ai-ref-item mb-1.5">📚 ${aiEsc(aiTxt(x.title, aiTxt(x.herb, '站内课题')))} <span class="text-[10px] text-slate-400">· ${aiEsc(aiTxt(x.source, '站内精编题库'))}</span></div>`).join('') : '<div class="ai-ref-item mb-1.5 text-slate-400">本次为全新课题，AI 已将其作为创新课题收录进网站题库。</div>')}
+            </div>
+            <div>
+              <div class="text-[11px] font-extrabold text-[#0f5c54] mb-1.5">文献参考（GB/T 7714 格式）</div>
+              ${(aiRefs.length ? aiRefs.slice(0, 4).map(x => `<div class="ai-ref-item ai-ref-rec mb-1.5">📖 ${aiEsc(aiRefText(x))} <span class="text-[10px] text-amber-700 font-bold">· AI 推荐</span></div>`).join('') : '')}
+              ${(litList.length ? litList.slice(0, 4).map(x => `<div class="ai-ref-item mb-1.5">📄 ${aiEsc(aiTxt(x.text, aiRefText(x)))} <span class="text-[10px] text-slate-400">· ${aiEsc(aiTxt(x.tag, '站内文献库'))}</span></div>`).join('') : '<div class="ai-ref-item mb-1.5 text-slate-400">可在右侧「文献库」按 GB/T 7714 录入参考文献。</div>')}
+            </div>
+          </div>
+        </div>
+
+        <div id="aiSec6" class="ai-sec-anchor">
+          <div class="ai-sec-title"><span class="ai-sec-idx">6</span>异常排障 · 预期结论 · 导师点评</div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <div>
+              <div class="text-[11px] font-extrabold text-amber-800 mb-1.5">⚠ 常见异常与对策</div>
+              ${(aiArr(plan.troubleshoot).length ? aiArr(plan.troubleshoot).slice(0, 4).map(tr => `<div class="ai-trouble mb-1.5"><strong>${aiEsc(aiTxt(tr.issue, '异常'))}</strong>：${aiEsc(aiTxt(tr.cause, ''))} <span class="text-[#0f5c54] font-bold">→ ${aiEsc(aiTxt(tr.fix, '按质控要点复核'))}</span></div>`).join('') : '<div class="ai-trouble">收率偏低时优先核查药材粒度、料液比与提取温度；TLC 拖尾可在展开剂中加入 0.5%~1% 甲酸抑制解离。</div>')}
+            </div>
+            <div class="space-y-2">
+              <div class="ai-concl"><div class="font-extrabold text-emerald-200 mb-1 text-[11px]">📊 预期结果与工艺讨论</div>${aiEsc(aiTxt(plan.aiConclusion || plan.discussion || plan.expectedYield, '按 ' + mass + ' g 投料、' + solvent + ' 于 ' + temp + ' ℃ 提取 ' + time + ' min，预期获得足量粗提物与精制品；以 3 批平行数据核算收率与 RSD（要求 < 5%），并结合 TLC/UV 完成结构确证。'))}</div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[12px] text-slate-700 leading-relaxed"><strong class="text-[#0a3630]">👩‍🏫 导师点评：</strong>${aiEsc(aiTxt(plan.aiAdvice, '注意全程通风、佩戴护目镜；有机溶剂远离明火，废液分类回收。'))}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="no-print flex flex-wrap gap-2 pt-1 border-t border-slate-100">
+          <button type="button" data-qwen-jump="3" class="px-3 py-1.5 rounded-xl bg-[#0a3630] text-white text-[11px] font-bold hover:bg-[#062420] transition">查看第 3 步原理与方案 →</button>
+          <button type="button" data-qwen-jump="4" class="px-3 py-1.5 rounded-xl bg-white border border-teal-200 text-[#0f5c54] text-[11px] font-bold hover:bg-teal-50 transition">查看第 4 步动态装置 →</button>
+          <button type="button" data-qwen-jump="6" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold hover:bg-amber-100 transition">直达第 6 步预览报告 →</button>
+          <button type="button" id="aiOpenBank2" class="ml-auto px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold transition">📚 查看已更新题库</button>
+        </div>
+      </div>`;
+
+    mount.innerHTML = html;
+    box.classList.remove('hidden');
+
+    // 流程节点联动
+    const detail = document.getElementById('aiNodeDetail');
+    const setNode = (i) => {
+      const n = nodes[i] || nodes[0];
+      if (detail) detail.innerHTML = `<div class="font-extrabold text-[#0a3630] mb-1">步骤 ${i + 1} · ${aiEsc(n.stage)} — ${aiEsc(n.title)} <span class="text-[10px] font-normal text-slate-500">（${aiEsc(n.meta)}）</span></div><div>${aiEsc(n.detail)}</div>`;
+      mount.querySelectorAll('[data-ai-node]').forEach(b => b.classList.toggle('active', Number(b.dataset.aiNode) === i));
+    };
+    setNode(0);
+    mount.querySelectorAll('[data-ai-node]').forEach(b => b.addEventListener('click', () => {
+      const i = Number(b.dataset.aiNode); setNode(i);
+      const card = document.getElementById('aiStepCard' + (i - 1));
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }));
+    // 按钮绑定
+    const bind = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
+    bind('aiCopyPlan', () => copyText(mount.innerText, '已复制 AI 实验方案全文'));
+    mount.querySelectorAll('[data-ai-sec]').forEach(b => b.addEventListener('click', () => {
+      const el = document.getElementById('aiSec' + b.dataset.aiSec);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }));
+    bind('aiHidePlan', () => box.classList.add('hidden'));
+    bind('aiOpenBank2', () => openRightDrawer('bank'));
+    mount.querySelectorAll('[data-qwen-jump]').forEach(b => b.addEventListener('click', () => {
+      state.step = Number(b.dataset.qwenJump); saveState(); renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }));
+    mount.querySelectorAll('[data-ai-sop]').forEach(chk => chk.addEventListener('change', () => {
+      chk.parentElement.querySelector('span:last-child').style.textDecoration = chk.checked ? 'line-through' : '';
+    }));
+    try { box.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+  }
+
+  function applyAiPlanToWorkbench(plan, usedRealQwen, ragCtx) {
     const validRigs = ['steam', 'reflux', 'soxhlet', 'ultrasound', 'filter', 'funnel', 'column'];
     const rig = validRigs.includes(plan.defaultRig) ? plan.defaultRig : 'reflux';
     let targetId = plan.matchedId && FEATURED_PRESETS[plan.matchedId] ? plan.matchedId : null;
@@ -3391,9 +3667,10 @@
         `✓ 切换动态装置：${rig}`,
         '✓ 同步 4 步工艺、SOP 与第 6 步 A4 报告'
       ];
-      document.getElementById('qwenReceiptChecks').innerHTML = checks.map(c => `<span class="px-2 py-0.5 rounded-full bg-white border border-emerald-200 text-emerald-900 font-semibold">${c}</span>`).join(''); const bankBadge = document.getElementById('qwenBankStatusBadge'); if (bankBadge) bankBadge.textContent = createdNewInBank ? '✨ 已作为新课题自动收录进网站题库' : '📚 已引用并优化站内题库课题'; const deepEl = document.getElementById('qwenDeepCards'); if (deepEl) { const refTxt = (Array.isArray(plan.recommendedRefs) && plan.recommendedRefs.length) ? plan.recommendedRefs.slice(0, 3).join('；') : (plan.integrative || `已关联课题：${plan.herb} · ${plan.compound}`); const prinTxt = plan.principle || plan.mechanism || plan.aiAdvice || `装置：${rig}（${ws.solventType} / ${ws.temp}℃ / ${ws.time}min）`; const concTxt = plan.aiConclusion || ws.aiConclusion || `已完成 ${plan.herb}（${plan.compound}）实验编排，预期结论已同步写入报告。`; deepEl.innerHTML = [{ t: '📚 题库与文献引用', b: refTxt }, { t: '⚗️ 原理与动态装置解析', b: prinTxt }, { t: '📊 AI 预期结论（已写入报告）', b: concTxt }].map(c => `<div class="p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm"><div class="text-[11px] font-bold text-slate-800 mb-1">${c.t}</div><div class="text-[11px] text-slate-600 leading-relaxed">${c.b}</div></div>`).join(''); } const bOpenBank = document.getElementById('btnOpenBankFromReceipt'); if (bOpenBank) bOpenBank.onclick = () => openRightDrawer('bank');
+      document.getElementById('qwenReceiptChecks').innerHTML = checks.map(c => `<span class="px-2 py-0.5 rounded-full bg-white border border-emerald-200 text-emerald-900 font-semibold">${c}</span>`).join(''); const bankBadge = document.getElementById('qwenBankStatusBadge'); if (bankBadge) bankBadge.textContent = createdNewInBank ? '✨ 已作为新课题自动收录进网站题库' : '📚 已引用并优化站内题库课题'; const deepEl = document.getElementById('qwenDeepCards'); if (deepEl) { const refTxt = (Array.isArray(plan.recommendedRefs) && plan.recommendedRefs.length) ? plan.recommendedRefs.slice(0, 3).join('；') : (plan.integrative || `已关联课题：${plan.herb} · ${plan.compound}`); const prinTxt = plan.principle || plan.mechanism || plan.aiAdvice || `装置：${rig}（${ws.solventType} / ${ws.temp}℃ / ${ws.time}min）`; const concTxt = plan.aiConclusion || ws.aiConclusion || `已完成 ${plan.herb}（${plan.compound}）实验编排，预期结论已同步写入报告。`; deepEl.innerHTML = [{ t: '📚 题库与文献引用', b: refTxt }, { t: '⚗️ 原理与动态装置解析', b: prinTxt }, { t: '📊 AI 预期结论（已写入报告）', b: concTxt }].map(c => `<div class="p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm"><div class="text-[12px] font-bold text-slate-800 mb-1">${c.t}</div><div class="text-[12px] text-slate-600 leading-relaxed">${c.b}</div></div>`).join(''); } const bOpenBank = document.getElementById('btnOpenBankFromReceipt'); if (bOpenBank) bOpenBank.onclick = () => openRightDrawer('bank');
     }
-    showToast(`AI 已自动编排「${plan.herb}」全工作台！`);
+    renderAiPlanShowcase(plan, { usedRealQwen: usedRealQwen, rig: rig, ws: ws, ragCtx: ragCtx || {} });
+    showToast(`AI 已自动编排「${plan.herb}」全工作台，方案全景已展开！`);
   }
 
   // Bind Qwen Config Modal & Command Bar events
@@ -3488,6 +3765,11 @@
     });
     const bCloseRec = document.getElementById('btnCloseQwenReceipt');
     if (bCloseRec) bCloseRec.addEventListener('click', () => document.getElementById('qwenExecReceipt').classList.add('hidden'));
+    const bShowPlan = document.getElementById('btnShowFullPlan');
+    if (bShowPlan) bShowPlan.addEventListener('click', () => {
+      const sb = document.getElementById('aiPlanShowcase');
+      if (sb) { sb.classList.remove('hidden'); try { sb.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }
+    });
 
     // Main Automation Submit
     const autoForm = document.getElementById('qwenAutoForm');
@@ -3500,9 +3782,10 @@
         const btnEl = document.getElementById('btnRunQwenAuto');
         btnEl.disabled = true;
         btnTxt.textContent = qwenCfg.apiKey ? '千问深度规划中...' : '智算编排中...';
+        const ragCtx = searchSiteKnowledge(prompt);
         try {
           if (isQwenReady()) {
-            const ragCtx = searchSiteKnowledge(prompt); const ragText = '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '\n【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '\n要求严格返回JSON，必须包含字段: matchedId(若命中站内题库则填其id，否则null), isNewTopic(未命中站内题库则为true), citedBank(数组,引用题库标题), citedLiterature(数组,引用文献), recommendedRefs(数组,每项含{tag,text,url}), spectra({chapter,uv,nmr,pathway}生物合成/UV/NMR解析), rigAnalysis(原理与动态装置解析文本), aiConclusion(AI预期结论与工艺讨论)。\n'; const sysPrompt = ragText + `你是中国高校《中药化学》实验设计专家，负责将学生的实验想法转化为可直接驱动实验工作台自动化的严格 JSON。要求方案在大多数高校本科常规实验室即可实现，有明确理论依据。必须且仅输出合法 JSON，字段如下：
+            const ragText = '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '\n【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '\n请务必结合上述站内题库与文献做有理论依据的创新设计（不要照抄常规四步模板）；严格输出合法 JSON，不要包含 markdown 代码块。\n'; const sysPrompt = ragText + `你是中国高校《中药化学》实验设计专家与创新实验课程导师，负责把学生的实验想法转化为可直接驱动实验工作台自动化的严格 JSON。要求：①方案在本科常规实验室可落地、有明确理论依据；②必须结合上文【站内检索题库】与【站内检索文献】做创新延伸（如绿色溶剂替代、一材双提、低温防氧化、活性评价延伸、对照实验等），不得照抄通用四步模板；③每一步都要给出可执行的操作方法、试剂用量、仪器与时长；④推荐 2 条以上与课题相关的 GB/T 7714 格式参考文献。必须且仅输出合法 JSON，字段如下：
 {
   "herb": "中药名",
   "compound": "目标有效成分",
@@ -3516,20 +3799,28 @@
   "chemistry": "核心结构特征与理化性质",
   "pharmacopoeia": "药典质控与重复性要求",
   "integrative": "中西医结合或绿色创新延伸思路",
+  "innovation": "本方案相对常规教学实验的创新点（结合站内题库/文献，60字内）",
+  "citedBank": ["引用的站内精编题库课题标题"],
+  "citedLiterature": ["引用的站内文献或经典文献标题"],
+  "recommendedRefs": ["[1] 作者. 题名[J]. 期刊, 年, 卷(期): 页码.", "[2] 作者. 题名[J]. 期刊, 年, 卷(期): 页码."],
+  "spectra": { "chapter": "课程章节", "uv": "UV 特征吸收解析", "nmr": "NMR 特征信号解析" },
+  "rigAnalysis": "所选装置的原理与动态运行解析",
   "defaultRig": "从以下选一：steam|reflux|soxhlet|ultrasound|filter|funnel|column",
   "defaultExtract": "从以下选一：steam|reflux|soxhlet|ultrasound|acid_water|boil_enzyme",
   "defaultSep": "从以下选一：freeze|acid_precip|salting_out|resin|extract|column|precip",
   "cfg": { "mass": 50, "ratio": 10, "temp": 75, "time": 60, "mesh": "中粉(40目)", "cycles": "2", "solventType": "70%乙醇", "ph": "中性 7.0" },
   "tlcSystem": "薄层色谱展开剂与显色方法",
   "steps": [
-    { "stage": "提取", "title": "步骤名", "principle": "化学原理", "qc": "质控要点" },
-    { "stage": "分离", "title": "步骤名", "principle": "化学原理", "qc": "质控要点" },
-    { "stage": "纯化", "title": "步骤名", "principle": "化学原理", "qc": "质控要点" },
-    { "stage": "检识", "title": "步骤名", "principle": "化学原理", "qc": "质控要点" }
+    { "stage": "提取", "title": "步骤名", "principle": "化学原理", "operation": "详细操作方法：含试剂用量、仪器、手法、温度与时长，45字内", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 60 min", "qc": "质控要点" },
+    { "stage": "分离", "title": "步骤名", "principle": "化学原理", "operation": "详细操作方法", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 40 min", "qc": "质控要点" },
+    { "stage": "纯化", "title": "步骤名", "principle": "化学原理", "operation": "详细操作方法", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 45 min", "qc": "质控要点" },
+    { "stage": "检识", "title": "步骤名", "principle": "化学原理", "operation": "详细操作方法", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 30 min", "qc": "质控要点" }
   ],
-  "sop": ["操作1", "操作2", "操作3", "操作4", "操作5"],
+  "sop": ["6~8 条具体可执行操作指令（含数值）", "操作2", "操作3", "操作4", "操作5", "操作6"],
   "troubleshoot": [{ "issue": "常见异常", "cause": "原因", "fix": "对策" }],
   "chemTests": [{ "name": "特征显色1", "passed": true }, { "name": "TLC对照", "passed": true }],
+  "expectedYield": "按投料量估算的预期收率范围与依据",
+  "aiConclusion": "AI 预期结论与工艺讨论（含收率、RSD、结构确证要点）",
   "aiAdvice": "给学生的核心导师点评、课时安排与安全提醒(80字内)"
 }`;
             const raw = await callQwenAPI([
@@ -3538,16 +3829,16 @@
             ], true);
             const cleaned = raw.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
             const parsed = JSON.parse(cleaned);
-            applyAiPlanToWorkbench(parsed, true);
+            applyAiPlanToWorkbench(parsed, true, ragCtx);
           } else {
             await new Promise(r => setTimeout(r, 380));
             const plan = localSmartPlan(prompt);
-            applyAiPlanToWorkbench(plan, false);
+            applyAiPlanToWorkbench(plan, false, ragCtx);
           }
         } catch (err) {
           const fallback = localSmartPlan(prompt);
           fallback.aiAdvice = `通义千问接口调用异常（${err.message}），已自动回退至本地智算引擎完成全工作台编排。可点击「⚙ 配置千问 API」核对密钥与域名。`;
-          applyAiPlanToWorkbench(fallback, false);
+          applyAiPlanToWorkbench(fallback, false, ragCtx);
         } finally {
           btnEl.disabled = false;
           btnTxt.textContent = '调度千问 · 自动编排';
