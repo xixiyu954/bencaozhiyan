@@ -1342,18 +1342,44 @@
   function loadState() {
     try {
       const current = localStorage.getItem(STORAGE_KEY);
-      const legacy = localStorage.getItem('lnutcm_tcm_chem_wizard_v4');
-      const raw = current || legacy;
+      const wizard = localStorage.getItem('lnutcm_tcm_chem_wizard_v4');
+      const raw = current || wizard;
       if (raw) {
         const p = JSON.parse(raw);
         if (p && typeof p === 'object' && !Array.isArray(p)) state = { ...state, ...p, meta: { ...state.meta, ...(p.meta || {}) } };
+      }
+      let migratedConsole = false;
+      if (!current && !wizard) {
+        const consoleRaw = localStorage.getItem('lnutcm_tcm_chem_console_v1');
+        if (consoleRaw) {
+          const old = JSON.parse(consoleRaw);
+          const aliases = { mentha: 'mint' };
+          const oldId = old.activeProjectId || 'mentha';
+          const targetId = aliases[oldId] || oldId;
+          state.activeTopicId = targetId;
+          if (typeof old.classGroup === 'string' && old.classGroup.trim()) state.meta.className = old.classGroup;
+          if (Array.isArray(old.team) && old.team.length) state.meta.members = old.team;
+          const oldBatches = old.batchesByProj && Array.isArray(old.batchesByProj[oldId]) ? old.batchesByProj[oldId] : [];
+          const oldTlc = old.tlcByProj && old.tlcByProj[oldId] ? old.tlcByProj[oldId] : {};
+          const oldChecks = old.checksByProj && Array.isArray(old.checksByProj[oldId]) ? old.checksByProj[oldId] : [];
+          const oldRefs = old.refsByProj && Array.isArray(old.refsByProj[oldId]) ? old.refsByProj[oldId] : [];
+          state.topicStates[targetId] = {
+            mass: Number(old.scaleMass) || undefined,
+            ratio: Number(old.scaleRatio) || undefined,
+            batches: oldBatches.map(b => ({ mass: Number(b.mass) || 0, crude: Number(b.crude) || 0, refined: Number(b.refined !== undefined ? b.refined : b.pure) || 0, mp: Number(b.mp) || 0 })),
+            tlc: { front: Number(oldTlc.front !== undefined ? oldTlc.front : oldTlc.l0) || 0, sample: Number(oldTlc.sample !== undefined ? oldTlc.sample : oldTlc.lSample) || 0, ref: Number(oldTlc.ref !== undefined ? oldTlc.ref : oldTlc.lRef) || 0 },
+            chemTests: oldChecks.map(x => ({ name: String(x.name || '理化检识'), passed: x.passed !== undefined ? !!x.passed : !!x.pass })),
+            extraRefs: oldRefs.filter(x => x && x.text).map(x => ({ text: String(x.text), url: String(x.url || '') }))
+          };
+          migratedConsole = true;
+        }
       }
       if (!state.customTopics || typeof state.customTopics !== 'object' || Array.isArray(state.customTopics)) state.customTopics = {};
       if (!state.topicStates || typeof state.topicStates !== 'object' || Array.isArray(state.topicStates)) state.topicStates = {};
       if (!Array.isArray(state.meta.members) || !state.meta.members.length) state.meta.members = [{ role: '组长', name: '', studentId: '', duty: '方案设计与报告统筹' }];
       state.step = Math.max(1, Math.min(6, Number(state.step) || 1));
       if (!state.activeTopicId) state.activeTopicId = 'mint';
-      if (!current && legacy) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (!current && (wizard || migratedConsole)) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (e) { console.warn('本地存档读取失败，已使用默认状态。', e); }
   }
   function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
@@ -1365,19 +1391,30 @@
   }
 
   function getWorkState(t) {
-    if (!state.topicStates[t.id]) {
-      state.topicStates[t.id] = {
-        trackId: 'comprehensive', formalTitle: `${t.herb}中${t.compound}的提取、分离与多维检识综合实验设计`,
-        limitVal: t.limitVal, mass: t.scaling.defaultMass, ratio: t.scaling.defaultRatio,
-        schemeMode: 'classic', diyExtract: t.defaultExtract || 'steam', diySeparate: t.defaultSep || 'freeze',
-        diyDetects: [DIY_DETECT_LIST[0], DIY_DETECT_LIST[1]], diyNotes: '', customVideoUrl: '',
-        activeRig: t.defaultRig || 'steam', activeHotspot: 1,
-        sopDone: t.sop.map(() => false), batches: JSON.parse(JSON.stringify(t.demoBatches)),
-        tlc: { ...t.tlcDefault }, chemTests: JSON.parse(JSON.stringify(t.chemTests)), extraRefs: [],
-        reportModules: REPORT_MODULES.reduce((acc, m) => { acc[m.id] = true; return acc; }, {})
-      };
-    }
-    return state.topicStates[t.id];
+    const defaults = {
+      trackId: 'comprehensive', formalTitle: t.herb + '中' + t.compound + '的提取、分离与多维检识综合实验设计',
+      limitVal: t.limitVal, mass: t.scaling.defaultMass, ratio: t.scaling.defaultRatio,
+      schemeMode: 'classic', diyExtract: t.defaultExtract || 'steam', diySeparate: t.defaultSep || 'freeze',
+      diyDetects: [DIY_DETECT_LIST[0], DIY_DETECT_LIST[1]], diyNotes: '', customVideoUrl: '',
+      activeRig: t.defaultRig || 'steam', activeHotspot: 1,
+      sopDone: t.sop.map(() => false), batches: JSON.parse(JSON.stringify(t.demoBatches)),
+      tlc: { ...t.tlcDefault }, chemTests: JSON.parse(JSON.stringify(t.chemTests)), extraRefs: [],
+      reportModules: REPORT_MODULES.reduce((acc, m) => { acc[m.id] = true; return acc; }, {})
+    };
+    const existing = state.topicStates[t.id] && typeof state.topicStates[t.id] === 'object' && !Array.isArray(state.topicStates[t.id]) ? state.topicStates[t.id] : {};
+    const ws = { ...defaults, ...existing };
+    ws.mass = Number(ws.mass) || defaults.mass; ws.ratio = Number(ws.ratio) || defaults.ratio; ws.limitVal = Number(ws.limitVal) || defaults.limitVal;
+    ws.formalTitle = String(ws.formalTitle || defaults.formalTitle);
+    ws.schemeMode = ws.schemeMode === 'diy' ? 'diy' : 'classic';
+    ws.tlc = { ...defaults.tlc, ...(existing.tlc && typeof existing.tlc === 'object' ? existing.tlc : {}) };
+    ws.reportModules = { ...defaults.reportModules, ...(existing.reportModules && typeof existing.reportModules === 'object' ? existing.reportModules : {}) };
+    ws.sopDone = t.sop.map((_, i) => !!(Array.isArray(existing.sopDone) && existing.sopDone[i]));
+    ws.batches = Array.isArray(existing.batches) && existing.batches.length ? existing.batches.map(b => ({ mass: Number(b.mass) || 0, crude: Number(b.crude) || 0, refined: Number(b.refined !== undefined ? b.refined : b.pure) || 0, mp: Number(b.mp) || 0 })) : defaults.batches;
+    ws.chemTests = Array.isArray(existing.chemTests) && existing.chemTests.length ? existing.chemTests.map(x => ({ name: String(x.name || '理化检识'), passed: x.passed !== undefined ? !!x.passed : !!x.pass })) : defaults.chemTests;
+    ws.extraRefs = Array.isArray(existing.extraRefs) ? existing.extraRefs.filter(x => x && x.text).map(x => ({ text: String(x.text), url: String(x.url || '') })) : [];
+    ws.diyDetects = Array.isArray(existing.diyDetects) ? existing.diyDetects : defaults.diyDetects;
+    state.topicStates[t.id] = ws;
+    return ws;
   }
 
   function showToast(msg, type = 'success') {
