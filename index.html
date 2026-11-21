@@ -3165,7 +3165,7 @@
   }
 
   // ==================== 通义千问 (Qwen) AI 接入与工作台全自动化调度引擎 ====================
-  const PUBLIC_QWEN_PROXY_URL = 'https://tcm-qwen-proxy.chenovo495666.workers.dev';
+  const PUBLIC_QWEN_PROXY_URL = ''; // 公共 Worker 代理在国内不可达，已禁用；未配 Key 时直接走本地智算，配 Key 则直连阿里云百炼
   const QWEN_CFG_KEY = 'tcm_qwen_cfg_v1';
   let qwenCfg = {
     apiKey: '',
@@ -3210,11 +3210,24 @@
       temperature: expectJson ? 0.35 : 0.65
     };
     if (expectJson) body.response_format = { type: 'json_object' };
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: useProxy ? { 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json', 'Authorization': `Bearer ${qwenCfg.apiKey.trim()}` },
-      body: JSON.stringify(body)
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+    let res;
+    try {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: useProxy ? { 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json', 'Authorization': `Bearer ${qwenCfg.apiKey.trim()}` },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+    } catch (err) {
+      if (err && err.name === 'AbortError') {
+        throw new Error('请求 20 秒超时：公共代理在当前网络不可达，请在「配置千问 API」中填入自己的阿里云百炼 Key');
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
+    }
     if (!res.ok) {
       const errTxt = await res.text().catch(() => '');
       throw new Error(`HTTP ${res.status} ${errTxt.slice(0, 120)}`);
@@ -3483,10 +3496,7 @@
         btnTxt.textContent = qwenCfg.apiKey ? '千问深度规划中...' : '智算编排中...';
         try {
           if (isQwenReady()) {
-            const ragCtx = searchSiteKnowledge(prompt); const ragText = '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '
-【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '
-要求严格返回JSON，必须包含字段: matchedId(若命中站内题库则填其id，否则null), isNewTopic(未命中站内题库则为true), citedBank(数组,引用题库标题), citedLiterature(数组,引用文献), recommendedRefs(数组,每项含{tag,text,url}), spectra({chapter,uv,nmr,pathway}生物合成/UV/NMR解析), rigAnalysis(原理与动态装置解析文本), aiConclusion(AI预期结论与工艺讨论)。
-'; const sysPrompt = ragText + `你是中国高校《中药化学》实验设计专家，负责将学生的实验想法转化为可直接驱动实验工作台自动化的严格 JSON。要求方案在大多数高校本科常规实验室即可实现，有明确理论依据。必须且仅输出合法 JSON，字段如下：
+            const ragCtx = searchSiteKnowledge(prompt); const ragText = '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '\n【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '\n要求严格返回JSON，必须包含字段: matchedId(若命中站内题库则填其id，否则null), isNewTopic(未命中站内题库则为true), citedBank(数组,引用题库标题), citedLiterature(数组,引用文献), recommendedRefs(数组,每项含{tag,text,url}), spectra({chapter,uv,nmr,pathway}生物合成/UV/NMR解析), rigAnalysis(原理与动态装置解析文本), aiConclusion(AI预期结论与工艺讨论)。\n'; const sysPrompt = ragText + `你是中国高校《中药化学》实验设计专家，负责将学生的实验想法转化为可直接驱动实验工作台自动化的严格 JSON。要求方案在大多数高校本科常规实验室即可实现，有明确理论依据。必须且仅输出合法 JSON，字段如下：
 {
   "herb": "中药名",
   "compound": "目标有效成分",
