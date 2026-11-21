@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="面向中药化学课程实验的选题、工艺设计、数据统计与报告生成工作台" />
+  <meta name="theme-color" content="#0b4f3d" />
   <title>辽宁中医药大学 · 中药化学智能实验控制台</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
       background-color: #f4f7f5;
@@ -49,6 +51,199 @@
       body { background: #fff !important; }
     }
   </style>
+
+<style id="polished-theme">
+  :root {
+    --brand-950: #062f26;
+    --brand-900: #083f32;
+    --brand-800: #0b4f3d;
+    --brand-700: #0f654d;
+    --brand-600: #178064;
+    --brand-100: #dff0e8;
+    --brand-50: #eef7f2;
+    --ink: #17251f;
+    --muted: #64746c;
+    --line: #dfe8e2;
+    --canvas: #f3f6f2;
+    --gold: #b98a3e;
+    --shadow-sm: 0 1px 2px rgba(17, 48, 36, .03), 0 5px 18px rgba(17, 48, 36, .035);
+    --shadow-md: 0 14px 36px -18px rgba(17, 48, 36, .22);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    background-color: var(--canvas);
+    background-image:
+      radial-gradient(circle at 8% 0%, rgba(29, 113, 83, .055), transparent 28rem),
+      radial-gradient(circle at 96% 16%, rgba(185, 138, 62, .045), transparent 25rem);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: #cce7da; color: var(--brand-950); }
+  .max-w-7xl { max-width: 90rem !important; }
+  .tcm-gradient {
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(circle at 78% -120%, rgba(147, 210, 179, .22), transparent 35rem),
+      linear-gradient(115deg, var(--brand-950) 0%, var(--brand-800) 56%, #14654e 100%);
+    box-shadow: 0 1px 0 rgba(255,255,255,.08), 0 10px 28px -20px rgba(4, 40, 30, .8);
+  }
+  .tcm-gradient::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: .12;
+    background-image: linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(90deg, transparent, #000 70%);
+  }
+  header .tcm-gradient, header.tcm-gradient { backdrop-filter: blur(18px); }
+  header > div:first-child { padding-top: 1rem; padding-bottom: 1rem; }
+  header h1 { font-size: 1.12rem; letter-spacing: .01em; }
+  header .w-10.h-10 { border-radius: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,.16); }
+  .save-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-right: 4px;
+    color: rgba(231, 246, 238, .82);
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .save-dot { width: 6px; height: 6px; border-radius: 999px; background: #8bd8b6; box-shadow: 0 0 0 4px rgba(139,216,182,.1); }
+  header .bg-white\/15 { background: rgba(255,255,255,.1); }
+  header button, header label { min-height: 34px; }
+  header button:hover, header label:hover { transform: translateY(-1px); background: rgba(255,255,255,.18); }
+  header .bg-white\/95 {
+    background: rgba(255,255,255,.94);
+    backdrop-filter: blur(18px) saturate(150%);
+    border-bottom-color: rgba(19, 77, 57, .1);
+  }
+  .tab-btn {
+    position: relative;
+    min-height: 40px;
+    font-size: 13px;
+    letter-spacing: .01em;
+    border: 1px solid transparent;
+  }
+  .tab-btn.active-tab {
+    background: linear-gradient(135deg, var(--brand-800), var(--brand-700));
+    box-shadow: 0 6px 16px -8px rgba(8, 63, 50, .8);
+  }
+  .tab-btn:not(.active-tab):hover { background: var(--brand-50); color: var(--brand-800); border-color: #e3eee7; }
+  main { padding-top: 1.8rem; padding-bottom: 2rem; }
+  main .text-xs { font-size: .8125rem; line-height: 1.4rem; }
+  main [class*="text-[11px]"] { font-size: .75rem; line-height: 1.15rem; }
+  main .bg-white.rounded-2xl {
+    border-color: var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow-sm);
+  }
+  #panel-select > .bg-white:first-child {
+    background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(252,254,252,.98));
+    box-shadow: var(--shadow-md);
+  }
+  main h2 { letter-spacing: -.015em; }
+  main h3 { letter-spacing: -.01em; }
+  #project-cards-grid > button {
+    position: relative;
+    min-height: 156px;
+    overflow: hidden;
+    border-radius: 14px;
+    box-shadow: 0 1px 0 rgba(15, 66, 48, .02);
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  #project-cards-grid > button::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 16px;
+    bottom: 16px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--brand-600);
+    opacity: 0;
+    transform: scaleY(.5);
+    transition: .2s ease;
+  }
+  #project-cards-grid > button:hover { transform: translateY(-3px); border-color: #9ecab6; box-shadow: 0 12px 25px -16px rgba(12, 79, 58, .45); }
+  #project-cards-grid > button[class*="bg-emerald-50"] { background: linear-gradient(145deg, #f1f9f4, #e5f3eb); }
+  #project-cards-grid > button[class*="bg-emerald-50"]::before { opacity: 1; transform: scaleY(1); }
+  #sel-title { font-size: 1.3rem; line-height: 1.55; color: #132c22; }
+  #sel-pharmacopoeia { line-height: 1.55; box-shadow: inset 0 1px 0 rgba(255,255,255,.7); }
+  #sel-origin, #sel-constituents, #sel-bioactivity { font-size: 13px; line-height: 1.85; }
+  #advisor-output { background: linear-gradient(145deg, #f5f8f5, #f0f5f1); border-color: #dce7df; }
+  #advisor-output > div { line-height: 1.7; }
+  input:not([type="range"]):not([type="checkbox"]):not([type="file"]), select {
+    min-height: 36px;
+    color: #263a31;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  input:not([type="range"]):not([type="checkbox"]):not([type="file"]):hover, select:hover { border-color: #b8cfc2; }
+  input:focus, select:focus { border-color: #68a98d !important; box-shadow: 0 0 0 3px rgba(23,128,100,.1) !important; outline: none; }
+  input[type="range"] { cursor: pointer; }
+  button, a, label { -webkit-tap-highlight-color: transparent; }
+  button { transition-property: color, background-color, border-color, box-shadow, transform, opacity; transition-duration: .18s; }
+  button:active { transform: translateY(1px); }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(32, 143, 105, .28); outline-offset: 2px; }
+  .flow-node { position: relative; overflow: hidden; border-radius: 14px; }
+  .flow-node::after { content: ''; position: absolute; inset: auto 0 0; height: 2px; background: var(--brand-600); opacity: 0; }
+  .flow-node:hover { transform: translateY(-3px); border-color: #b7d2c4; box-shadow: 0 12px 22px -16px rgba(13,74,56,.42); }
+  .flow-node.active-node { background: linear-gradient(145deg, #f0f8f3, #e9f4ed); border-color: #6fa88f; box-shadow: 0 0 0 3px rgba(13,74,56,.08); }
+  .flow-node.active-node::after { opacity: 1; }
+  #scale-results { background: linear-gradient(135deg, #edf7f0, #f5f9f5); }
+  #scale-results > div { padding: 4px 2px; }
+  #references-list > div, #search-queries-box > div { transition: border-color .18s ease, background .18s ease; }
+  #references-list > div:hover { border-color: #bed4c7; background: #f7faf7; }
+  #panel-analysis > .grid:first-child > div {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(145deg, #fff, #fafcfa);
+  }
+  #panel-analysis > .grid:first-child > div::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 3px; background: linear-gradient(var(--brand-600), #91bda8); opacity: .7; }
+  #panel-analysis > .grid:first-child > div > div:first-child { color: #596b62; }
+  #batches-tbody tr, #team-table-body tr { transition: background .15s ease; }
+  #batches-tbody tr:hover, #team-table-body tr:hover { background: rgba(238,247,242,.5); }
+  #qual-checks-list > div { transition: border-color .18s ease, transform .18s ease; }
+  #qual-checks-list > div:hover { transform: translateX(2px); }
+  #tlc-svg { filter: drop-shadow(0 10px 14px rgba(36,63,51,.08)); }
+  #conclusion-report-body pre { font-size: 13px; line-height: 1.9; }
+  #lib-grid > div { border-radius: 14px; box-shadow: 0 1px 0 rgba(15,66,48,.02); }
+  #lib-grid > div:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -18px rgba(12,79,58,.5); }
+  #toast { border: 1px solid rgba(255,255,255,.12); box-shadow: 0 16px 40px -12px rgba(0,0,0,.35); backdrop-filter: blur(12px); }
+  footer { background: rgba(255,255,255,.65); backdrop-filter: blur(12px); }
+  .analysis-note { display: flex; align-items: flex-start; gap: 10px; padding: 12px 15px; border: 1px solid #d9e7de; border-radius: 14px; background: rgba(237,246,240,.72); color: #476456; font-size: 12px; line-height: 1.7; }
+  .analysis-note strong { color: var(--brand-800); white-space: nowrap; }
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-thumb { background: #c7d5cc; border: 2px solid transparent; border-radius: 999px; background-clip: padding-box; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  @media (max-width: 767px) {
+    body { font-size: 14px; }
+    .save-indicator { display: none; }
+    header > div:first-child { padding-top: .8rem; padding-bottom: .8rem; }
+    header h1 { font-size: .95rem; }
+    main { padding-top: 1.15rem; }
+    main .text-xs { font-size: .78rem; line-height: 1.35rem; }
+    #sel-title { font-size: 1.08rem; }
+    #project-cards-grid > button { min-height: 138px; }
+    .analysis-note { flex-direction: column; gap: 2px; }
+    .tab-btn { min-height: 38px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+  @media print {
+    main { max-width: none !important; padding: 0 !important; }
+    main .bg-white.rounded-2xl { box-shadow: none !important; border-color: #bbb !important; }
+    #conclusion-report-body pre { white-space: pre-wrap; font-size: 11pt; }
+  }
+</style>
 </head>
 <body class="min-h-screen flex flex-col">
 
@@ -64,11 +259,12 @@
             <h1 class="text-base sm:text-lg font-bold tracking-tight truncate">辽宁中医药大学 · 中药化学智能实验控制台</h1>
             <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-200 border border-amber-300/30">中药制药专业版</span>
           </div>
-          <p class="text-xs text-emerald-100/85 truncate">选材定项 · 理论支撑 · 流程换算 · 文献检索 · 数据分析与结论生成</p>
+          <p class="text-xs text-emerald-100/85 truncate">从课程选题到实验报告，一站式完成工艺设计、数据分析与质量评价</p>
         </div>
       </div>
 
       <div class="flex items-center gap-2 flex-wrap">
+        <span class="save-indicator" title="修改会自动保存在当前浏览器"><span class="save-dot"></span>本地自动保存</span>
         <button id="btn-deploy-guide" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-medium transition border border-white/20">
           <i data-lucide="globe" class="w-3.5 h-3.5"></i>
           <span>HTTPS 公开部署</span>
@@ -134,9 +330,9 @@
           <div>
             <h2 class="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
               <i data-lucide="layers" class="w-5 h-5 text-emerald-700"></i>
-              经典《中药化学》课程课题库
+              选择实验课题
             </h2>
-            <p class="text-xs text-slate-500 mt-0.5">点击下方任意课题即可全局切换工艺流程、药典标准、参考文献与数据计算模板</p>
+            <p class="text-xs text-slate-500 mt-0.5">从经典方案开始，或前往课题总库探索 45 项实验选题；切换后全流程数据同步更新</p>
           </div>
           <span id="tab1-lib-badge" class="text-xs text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full font-medium">已内置辽宁道地“关药”及经典教学课题</span>
         </div>
@@ -492,6 +688,7 @@
 
     <!-- ==================== TAB 4: 数据收集与统计分析 ==================== -->
     <section id="panel-analysis" class="tab-panel hidden space-y-6">
+      <div class="analysis-note"><strong>指标口径说明</strong><span>粗提收率用于评价工艺稳定性，并与本课题预设收率区间比较；《中国药典》含量或挥发油指标应按相应测定方法独立检验，二者不直接等同。</span></div>
       <!-- KPI Summary Cards -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
@@ -547,7 +744,7 @@
                   <th class="py-2 px-2 font-semibold">精制品 (g)</th>
                   <th class="py-2 px-2 font-semibold">实测熔点 (°C)</th>
                   <th class="py-2 px-2 font-semibold">粗提收率 (%)</th>
-                  <th class="py-2 px-2 font-semibold">判定</th>
+                  <th class="py-2 px-2 font-semibold">工艺评价</th>
                   <th class="py-2 px-2 font-semibold w-10"></th>
                 </tr>
               </thead>
@@ -563,9 +760,9 @@
           <div class="mb-3">
             <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
               <i data-lucide="bar-chart-2" class="w-4 h-4 text-emerald-700"></i>
-              批次收率与药典限度对比图
+              批次收率与预期工艺区间对比图
             </h3>
-            <p class="text-[11px] text-slate-500 mt-0.5">绿色柱为实测收率，琥珀色虚线为《中国药典》最低限度</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">绿色柱为实测粗提收率，琥珀色虚线为本课题预设工艺下限</p>
           </div>
           <div class="relative h-64 w-full">
             <canvas id="yield-chart"></canvas>
@@ -730,7 +927,7 @@
           <i data-lucide="globe" class="w-5 h-5 text-emerald-700"></i>
           如何让全校师生通过 HTTPS 公开访问？
         </h3>
-        <button id="btn-close-deploy" type="button" class="p-1 rounded-lg hover:bg-slate-100 text-slate-500">
+        <button id="btn-close-deploy" type="button" aria-label="关闭部署说明" class="p-1 rounded-lg hover:bg-slate-100 text-slate-500">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
@@ -750,7 +947,7 @@
   </div>
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2">
+  <div id="toast" role="status" aria-live="polite" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2">
     <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
     <span id="toast-msg">操作成功</span>
   </div>
@@ -1260,8 +1457,10 @@
       document.querySelectorAll('.tab-btn').forEach(btn => {
         if (btn.getAttribute('data-tab') === tabId) {
           btn.classList.add('active-tab');
+          btn.setAttribute('aria-current', 'page');
         } else {
           btn.classList.remove('active-tab');
+          btn.removeAttribute('aria-current');
         }
       });
 
@@ -1304,7 +1503,7 @@
         grid.innerHTML = all.map(p => {
           const isActive = p.id === proj.id;
           return `
-            <button type="button" data-select-proj="${escapeHtml(p.id)}" class="text-left p-4 rounded-xl border transition flex flex-col justify-between gap-2 ${isActive ? 'border-emerald-700 bg-emerald-50/70 ring-2 ring-emerald-700/20' : 'border-slate-200 hover:border-emerald-400 bg-white'}">
+            <button type="button" data-select-proj="${escapeHtml(p.id)}" aria-pressed="${isActive}" class="text-left p-4 rounded-xl border transition flex flex-col justify-between gap-2 ${isActive ? 'border-emerald-700 bg-emerald-50/70 ring-2 ring-emerald-700/20' : 'border-slate-200 hover:border-emerald-400 bg-white'}">
               <div>
                 <div class="flex items-center justify-between gap-1 mb-1">
                   <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${isActive ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-600'}">${escapeHtml(p.category)}</span>
@@ -1541,7 +1740,7 @@
         const py = mass > 0 ? (pure / mass) * 100 : 0;
         if (mass > 0) { yields.push(y); pureYields.push(py); }
         if (mp > 0) mps.push(mp);
-        const passLimit = y >= proj.limitValue;
+        const passLimit = y >= proj.expectedCrudeYield[0];
         return `
           <tr>
             <td class="py-2 px-2 font-semibold text-slate-700">${escapeHtml(b.name)}</td>
@@ -1552,11 +1751,11 @@
             <td class="py-2 px-2 font-bold ${passLimit ? 'text-emerald-700' : 'text-rose-600'}">${y.toFixed(2)}%</td>
             <td class="py-2 px-2">
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${passLimit ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700'}">
-                ${passLimit ? '符合药典' : '低于限度'}
+                ${passLimit ? '达到预期' : '低于预期'}
               </span>
             </td>
             <td class="py-2 px-1 text-center">
-              ${batches.length > 1 ? `<button type="button" data-del-batch="${idx}" class="text-slate-400 hover:text-rose-600 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
+              ${batches.length > 1 ? `<button type="button" data-del-batch="${idx}" aria-label="删除${escapeHtml(b.name)}" class="text-slate-400 hover:text-rose-600 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
             </td>
           </tr>
         `;
@@ -1566,13 +1765,13 @@
       const yStats = calcStats(yields);
       const pStats = calcStats(pureYields);
       const mpStats = calcStats(mps);
-      const meanPass = yStats.mean >= proj.limitValue;
+      const meanPass = yStats.mean >= proj.expectedCrudeYield[0];
 
       document.getElementById('kpi-mean-yield').textContent = yStats.mean.toFixed(2) + '%';
       const limitEl = document.getElementById('kpi-limit-status');
       limitEl.textContent = meanPass
-        ? `达标（药典限度 ≥ ${proj.limitValue}%）`
-        : `未达标（低于药典 ${proj.limitValue}%）`;
+        ? `达到预期（工艺下限 ≥ ${proj.expectedCrudeYield[0]}%）`
+        : `低于预期（工艺下限 ${proj.expectedCrudeYield[0]}%）`;
       limitEl.className = 'text-[11px] font-semibold mt-1 ' + (meanPass ? 'text-emerald-700' : 'text-rose-600');
 
       document.getElementById('kpi-purified-yield').textContent = pStats.mean.toFixed(2) + '%';
@@ -1639,7 +1838,7 @@
         yieldChartInstance.destroy();
       }
       const labels = batches.map(b => b.name);
-      const limitLine = batches.map(() => proj.limitValue);
+      const limitLine = batches.map(() => proj.expectedCrudeYield[0]);
 
       yieldChartInstance = new Chart(ctx, {
         type: 'bar',
@@ -1654,7 +1853,7 @@
               maxBarThickness: 42
             },
             {
-              label: `药典最低限度 (${proj.limitValue}%)`,
+              label: `预期收率下限 (${proj.expectedCrudeYield[0]}%)`,
               data: limitLine,
               type: 'line',
               borderColor: '#d97706',
@@ -1706,7 +1905,7 @@
 
       const passChecks = checks.filter(c => c.pass).length;
       const mpInRange = mpStats.mean >= (proj.mpRange[0] - 1.5) && mpStats.mean <= (proj.mpRange[1] + 1.5);
-      const yieldPass = yStats.mean >= proj.limitValue;
+      const yieldPass = yStats.mean >= proj.expectedCrudeYield[0];
       const rsdGood = yStats.rsd <= 5.0;
 
       const membersStr = state.team
@@ -1722,10 +1921,10 @@
           `【辽宁中医药大学 · 中药制药专业《中药化学》实验结论报告】`,
           `课题名称：${proj.title}`,
           `班级/组别：${state.classGroup || '未填写'} | 成员：${membersStr}`,
-          `1. 提取与分离收率评价：共完成 ${batches.length} 组平行实验，粗提物平均收率为 ${yStats.mean.toFixed(2)}%（SD = ${yStats.sd.toFixed(3)}%，RSD = ${yStats.rsd.toFixed(2)}%），精制品平均得率为 ${pStats.mean.toFixed(2)}%。对照《中国药典》（2020年版一部）${proj.pharmacopoeiaText} 规定，本工艺收率${yieldPass ? '达到药典标准' : '低于药典最低限度，需优化提取时间/料液比或排查药材品质'}；批次间 RSD 为 ${yStats.rsd.toFixed(2)}%，工艺重复性${rsdGood ? '良好（RSD ≤ 5%）' : '偏大（RSD > 5%），建议标准化粉碎粒度与控温操作'}。`,
-          `2. 物理常数与纯度评价：精制品实测平均熔点为 ${mpStats.mean.toFixed(1)} °C（理论熔程 ${proj.mpRange[0]}~${proj.mpRange[1]} °C），${mpInRange ? '与理论范围吻合，表明产物结晶纯度较高' : '与理论值存在一定偏差，建议增加一次重结晶或排查干燥残留溶剂'}。`,
+          `1. 提取与分离收率评价：共完成 ${batches.length} 组平行实验，粗提物平均收率为 ${yStats.mean.toFixed(2)}%（SD = ${yStats.sd.toFixed(3)}%，RSD = ${yStats.rsd.toFixed(2)}%），精制品平均得率为 ${pStats.mean.toFixed(2)}%。对照本课题预设粗提收率区间 ${proj.expectedCrudeYield[0]}%～${proj.expectedCrudeYield[1]}%，本工艺收率${yieldPass ? '达到预期区间' : '低于预设下限，需优化提取时间、料液比或排查药材品质'}；药典指标“${proj.pharmacopoeiaText}”仍须按相应含量测定方法独立检验；批次间 RSD 为 ${yStats.rsd.toFixed(2)}%，工艺重复性${rsdGood ? '良好（RSD ≤ 5%）' : '偏大（RSD > 5%），建议标准化粉碎粒度与控温操作'}。`,
+          `2. 物理常数与纯度评价：精制品实测平均熔点为 ${mpStats.mean.toFixed(1)} °C（理论熔程 ${proj.mpRange[0]}~${proj.mpRange[1]} °C），${mpInRange ? '与理论范围吻合，提示结晶纯度较好，仍需结合色谱结果综合判断' : '与理论值存在一定偏差，建议增加一次重结晶或排查干燥残留溶剂'}。`,
           `3. 理化与色谱检识结论：${checks.length} 项理化/化学检识中 ${passChecks} 项呈预期阳性；薄层色谱（TLC）测定供试品 Rf = ${rfS.toFixed(3)}，对照品 Rf = ${rfR.toFixed(3)}，|ΔRf| = ${rfDiff.toFixed(3)}（${tlcMatch ? '≤ 0.03，定性一致，确证所得目标产物' : '> 0.03，存在偏差，建议核查展开剂配比与饱和时间'}）。`,
-          `4. 综合结论：${yieldPass && tlcMatch && passChecks === checks.length ? `本实验所设计的“${proj.flow.extract[0].title} → ${proj.flow.separate[0].title} → 多维检识”技术路线科学可行，产物真伪确证且符合质量要求。` : '实验路线基本可行，但部分量化指标或检识项存在偏差，建议依据上述诊断意见优化关键工艺参数后复测。'}`
+          `4. 综合结论：${yieldPass && tlcMatch && passChecks === checks.length && rsdGood && mpInRange ? `本实验所设计的“${proj.flow.extract[0].title} → ${proj.flow.separate[0].title} → 多维检识”技术路线科学可行，产物定性一致，并达到本课题预设的工艺评价要求。` : '实验路线基本可行，但部分量化指标或检识项存在偏差，建议依据上述诊断意见优化关键工艺参数后复测。'}`
         ].join('\n')
       };
     }
@@ -1733,13 +1932,13 @@
     function renderConclusionTab() {
       const c = buildConclusionText();
       const body = document.getElementById('conclusion-report-body');
-      const overallPass = c.yieldPass && c.tlcMatch && c.passChecks === c.totalChecks;
+      const overallPass = c.yieldPass && c.tlcMatch && c.passChecks === c.totalChecks && c.rsdGood && c.mpInRange;
 
       body.innerHTML = `
         <div class="p-4 rounded-xl border ${overallPass ? 'bg-emerald-50/70 border-emerald-200' : 'bg-amber-50/70 border-amber-200'} flex flex-wrap items-center justify-between gap-3">
           <div>
             <div class="text-xs font-semibold ${overallPass ? 'text-emerald-700' : 'text-amber-700'}">综合实验判定结论</div>
-            <div class="text-base font-bold text-slate-900 mt-0.5">${overallPass ? '工艺路线可行 · 产物定性确证 · 收率符合药典标准' : '部分指标需优化 · 请重点核查下方诊断建议'}</div>
+            <div class="text-base font-bold text-slate-900 mt-0.5">${overallPass ? '工艺路线可行 · 产物定性确证 · 收率达到预期区间' : '部分指标需优化 · 请重点核查下方诊断建议'}</div>
           </div>
           <span class="text-xs font-bold px-3 py-1 rounded-full ${overallPass ? 'bg-emerald-700 text-white' : 'bg-amber-600 text-white'}">${escapeHtml(c.proj.herb)} · ${escapeHtml(c.proj.category)}</span>
         </div>
@@ -2195,12 +2394,12 @@
           const batches = state.batchesByProj[proj.id];
           const b = batches[i];
           const y = b.mass > 0 ? (b.crude / b.mass) * 100 : 0;
-          const passLimit = y >= proj.limitValue;
+          const passLimit = y >= proj.expectedCrudeYield[0];
           const tr = e.target.closest('tr');
           if (tr && tr.children.length >= 7) {
             tr.children[5].textContent = y.toFixed(2) + '%';
             tr.children[5].className = 'py-2 px-2 font-bold ' + (passLimit ? 'text-emerald-700' : 'text-rose-600');
-            tr.children[6].innerHTML = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${passLimit ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700'}">${passLimit ? '符合药典' : '低于限度'}</span>`;
+            tr.children[6].innerHTML = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${passLimit ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700'}">${passLimit ? '达到预期' : '低于预期'}</span>`;
           }
           const yields = batches.filter(x => x.mass > 0).map(x => (x.crude / x.mass) * 100);
           const pureYields = batches.filter(x => x.mass > 0).map(x => (x.pure / x.mass) * 100);
@@ -2208,10 +2407,10 @@
           const yStats = calcStats(yields);
           const pStats = calcStats(pureYields);
           const mpStats = calcStats(mps);
-          const meanPass = yStats.mean >= proj.limitValue;
+          const meanPass = yStats.mean >= proj.expectedCrudeYield[0];
           document.getElementById('kpi-mean-yield').textContent = yStats.mean.toFixed(2) + '%';
           const limitEl = document.getElementById('kpi-limit-status');
-          limitEl.textContent = meanPass ? `达标（药典限度 ≥ ${proj.limitValue}%）` : `未达标（低于药典 ${proj.limitValue}%）`;
+          limitEl.textContent = meanPass ? `达到预期（工艺下限 ≥ ${proj.expectedCrudeYield[0]}%）` : `低于预期（工艺下限 ${proj.expectedCrudeYield[0]}%）`;
           limitEl.className = 'text-[11px] font-semibold mt-1 ' + (meanPass ? 'text-emerald-700' : 'text-rose-600');
           document.getElementById('kpi-purified-yield').textContent = pStats.mean.toFixed(2) + '%';
           document.getElementById('kpi-mp-avg').textContent = `平均熔点：${mpStats.mean.toFixed(1)} °C（理论 ${proj.mpRange[0]}~${proj.mpRange[1]} °C）`;
@@ -2325,6 +2524,7 @@
               state = Object.assign(state, parsed);
               saveState();
               renderAll();
+              switchTab(state.activeTab || 'select');
               showToast('已成功导入实验存档');
             } else {
               showToast('存档格式无效');
