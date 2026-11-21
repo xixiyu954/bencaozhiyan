@@ -1566,7 +1566,7 @@
     });
 
     const hs = rig.hotspots.find(h => h.id === ws.activeHotspot) || rig.hotspots[0];
-    document.getElementById('hotspotBadge').textContent = `组件 ①②③④⑤`.slice(0, 3) + ` ${hs.id}`;
+    document.getElementById('hotspotBadge').textContent = `组件 ${['①', '②', '③', '④', '⑤'][hs.id - 1] || hs.id}`;
     document.getElementById('hotspotTitle').textContent = hs.name;
     document.getElementById('hotspotDesc').textContent = hs.desc;
     document.getElementById('hotspotWarn').textContent = hs.warn;
