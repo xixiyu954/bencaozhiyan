@@ -3165,10 +3165,11 @@
   }
 
   // ==================== 通义千问 (Qwen) AI 接入与工作台全自动化调度引擎 ====================
+  const PUBLIC_QWEN_PROXY_URL = 'https://tcm-qwen-proxy.chenovo495666.workers.dev';
   const QWEN_CFG_KEY = 'tcm_qwen_cfg_v1';
   let qwenCfg = {
     apiKey: '',
-    baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    baseUrl: PUBLIC_QWEN_PROXY_URL,
     model: 'qwen-plus',
     customModel: ''
   };
@@ -3177,9 +3178,11 @@
     if (savedQ) qwenCfg = Object.assign(qwenCfg, JSON.parse(savedQ));
   } catch (e) {}
 
+  function isUsingPublicProxy() { return !(qwenCfg.apiKey && qwenCfg.apiKey.trim()) && !!PUBLIC_QWEN_PROXY_URL; }
   function getActiveQwenModel() {
     return qwenCfg.model === 'custom' && qwenCfg.customModel.trim() ? qwenCfg.customModel.trim() : (qwenCfg.model || 'qwen-plus');
   }
+  function isQwenReady() { return !!(qwenCfg.apiKey && qwenCfg.apiKey.trim()) || !!PUBLIC_QWEN_PROXY_URL; }
 
   function updateQwenStatusUI() {
     const hasKey = !!(qwenCfg.apiKey && qwenCfg.apiKey.trim());
@@ -3189,17 +3192,18 @@
       if (hasKey) {
         pill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
         pill.textContent = `已接入通义千问 · ${getActiveQwenModel()}`;
-      } else {
+      } else if (PUBLIC_QWEN_PROXY_URL) { pill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200'; pill.textContent = `已直连通义千问 · ${getActiveQwenModel()}（免配置）`; } 
+      else {
         pill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200';
         pill.textContent = '本地智算演练 · 可接入千问 API';
       }
     }
-    if (hdrLabel) hdrLabel.textContent = hasKey ? `千问·${getActiveQwenModel().replace('qwen-', '')}` : '千问 AI';
+    if (hdrLabel) hdrLabel.textContent = (hasKey || !!PUBLIC_QWEN_PROXY_URL) ? `千问·${getActiveQwenModel().replace('qwen-', '')}` : '千问 AI';
   }
 
   async function callQwenAPI(messages, expectJson = false) {
-    const base = (qwenCfg.baseUrl || 'https://dashscope.aliyuncs.com/compatible-mode/v1').replace(/\/+$/, '');
-    const url = base.endsWith('/chat/completions') ? base : `${base}/chat/completions`;
+    const useProxy = isUsingPublicProxy(); const base = (useProxy ? PUBLIC_QWEN_PROXY_URL : (qwenCfg.baseUrl || 'https://dashscope.aliyuncs.com/compatible-mode/v1')).replace(/\/+$/, '');
+    const url = useProxy ? PUBLIC_QWEN_PROXY_URL : (base.endsWith('/chat/completions') ? base : `${base}/chat/completions`);
     const body = {
       model: getActiveQwenModel(),
       messages,
@@ -3208,10 +3212,7 @@
     if (expectJson) body.response_format = { type: 'json_object' };
     const res = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${qwenCfg.apiKey.trim()}`
-      },
+      headers: useProxy ? { 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json', 'Authorization': `Bearer ${qwenCfg.apiKey.trim()}` },
       body: JSON.stringify(body)
     });
     if (!res.ok) {
@@ -3345,15 +3346,15 @@
     if (plan.defaultSep) ws.diySeparate = plan.defaultSep;
     if (plan.integrative || plan.aiAdvice) ws.diyNotes = `[千问AI自动规划] ${plan.aiAdvice || plan.integrative}`;
     if (plan.cfg) {
-      ws.cfg = Object.assign(ws.cfg || {}, {
-        mass: Number(plan.cfg.mass) || ws.cfg.mass,
-        ratio: Number(plan.cfg.ratio) || ws.cfg.ratio,
-        temp: Number(plan.cfg.temp) || ws.cfg.temp,
-        time: Number(plan.cfg.time) || ws.cfg.time,
-        mesh: plan.cfg.mesh || ws.cfg.mesh,
-        cycles: String(plan.cfg.cycles || ws.cfg.cycles),
-        solventType: plan.cfg.solventType || ws.cfg.solventType,
-        ph: plan.cfg.ph || ws.cfg.ph
+      Object.assign(ws, {
+        mass: Number(plan.cfg.mass) || ws.mass,
+        ratio: Number(plan.cfg.ratio) || ws.ratio,
+        temp: Number(plan.cfg.temp) || ws.temp,
+        time: Number(plan.cfg.time) || ws.time,
+        mesh: plan.cfg.mesh || ws.mesh,
+        cycles: String(plan.cfg.cycles || ws.cycles),
+        solventType: plan.cfg.solventType || ws.solventType,
+        ph: plan.cfg.ph || ws.ph
       });
     }
     saveState();
@@ -3367,7 +3368,7 @@
       document.getElementById('qwenReceiptAdvice').textContent = plan.aiAdvice || plan.integrative || `已为你自动配置「${plan.herb} · ${plan.compound}」全流程实验方案。`;
       const checks = [
         `✓ 锁定课题：${plan.herb} · ${plan.compound}`,
-        `✓ 写入左侧参数：${ws.cfg.mass}g / ${ws.cfg.solventType} / ${ws.cfg.temp}℃ / ${ws.cfg.time}min`,
+        `✓ 写入左侧参数：${ws.mass}g / ${ws.solventType} / ${ws.temp}℃ / ${ws.time}min`,
         `✓ 切换动态装置：${rig}`,
         '✓ 同步 4 步工艺、SOP 与第 6 步 A4 报告'
       ];
@@ -3481,7 +3482,7 @@
         btnEl.disabled = true;
         btnTxt.textContent = qwenCfg.apiKey ? '千问深度规划中...' : '智算编排中...';
         try {
-          if (qwenCfg.apiKey && qwenCfg.apiKey.trim()) {
+          if (isQwenReady()) {
             const sysPrompt = `你是中国高校《中药化学》实验设计专家，负责将学生的实验想法转化为可直接驱动实验工作台自动化的严格 JSON。要求方案在大多数高校本科常规实验室即可实现，有明确理论依据。必须且仅输出合法 JSON，字段如下：
 {
   "herb": "中药名",
@@ -3559,10 +3560,10 @@
 
         const t = getTopicDef();
         const ws = getWorkState(t);
-        const ctx = `当前实验课题：${t.herb}（${t.compound}，类别：${t.category}）。左侧参数：投料${ws.cfg.mass}g、料液比1:${ws.cfg.ratio}、溶剂${ws.cfg.solventType}、温度${ws.cfg.temp}℃、时间${ws.cfg.time}min、pH:${ws.cfg.ph}。薄层系统：${t.tlcSystem}。`;
+        const ctx = `当前实验课题：${t.herb}（${t.compound}，类别：${t.category}）。左侧参数：投料${ws.mass}g、料液比1:${ws.ratio}、溶剂${ws.solventType}、温度${ws.temp}℃、时间${ws.time}min、pH:${ws.ph}。薄层系统：${t.tlcSystem}。`;
         let ans = '';
         try {
-          if (qwenCfg.apiKey && qwenCfg.apiKey.trim()) {
+          if (isQwenReady()) {
             ans = await callQwenAPI([
               { role: 'system', content: `你是专业的中药化学实验指导教师，回答简洁实用、有理论依据。${ctx}` },
               { role: 'user', content: q }
@@ -3570,9 +3571,9 @@
           } else {
             await new Promise(r => setTimeout(r, 300));
             if (/拖尾|TLC|薄层|斑点/.test(q)) ans = `【${t.herb} TLC 优化建议】拖尾通常由酸碱解离引起：酸性成分（黄酮/酚酸/蒽醌）展开剂加 0.5%~1% 甲酸或冰醋酸抑制电离；生物碱则改用 1%~2% NaOH 碱板或氨蒸气饱和。当前推荐系统：${t.tlcSystem}`;
-            else if (/收率|偏低|提高/.test(q)) ans = `【${t.herb} 收率排查】依据菲克第一扩散定律，建议核查：①药材粒度（当前 ${ws.cfg.mesh}）；②溶剂浓度与 pH（当前 ${ws.cfg.solventType} / ${ws.cfg.ph}）；③是否因温度过高（当前 ${ws.cfg.temp}℃）引起热敏降解或挥发损失。`;
-            else if (/讨论|报告|结论/.test(q)) ans = `【${t.herb} 实验讨论参考】本实验以${ws.cfg.solventType}在${ws.cfg.temp}℃下提取${ws.cfg.time} min，成功获得${t.compound}。工艺设计符合「${t.category}」理化规律，后续可通过正交试验考察料液比与提取时间交互作用以进一步降低平行批 RSD。`;
-            else ans = `【本地智算提示】已读取当前「${t.herb} · ${t.compound}」上下文（${ws.cfg.solventType}，${ws.cfg.temp}℃）。你可以点击右上角「⚙ 配置千问 API」填入阿里云百炼 Key，即可开启通义千问大模型深度自由问答！`;
+            else if (/收率|偏低|提高/.test(q)) ans = `【${t.herb} 收率排查】依据菲克第一扩散定律，建议核查：①药材粒度（当前 ${ws.mesh}）；②溶剂浓度与 pH（当前 ${ws.solventType} / ${ws.ph}）；③是否因温度过高（当前 ${ws.temp}℃）引起热敏降解或挥发损失。`;
+            else if (/讨论|报告|结论/.test(q)) ans = `【${t.herb} 实验讨论参考】本实验以${ws.solventType}在${ws.temp}℃下提取${ws.time} min，成功获得${t.compound}。工艺设计符合「${t.category}」理化规律，后续可通过正交试验考察料液比与提取时间交互作用以进一步降低平行批 RSD。`;
+            else ans = `【本地智算提示】已读取当前「${t.herb} · ${t.compound}」上下文（${ws.solventType}，${ws.temp}℃）。你可以点击右上角「⚙ 配置千问 API」填入阿里云百炼 Key，即可开启通义千问大模型深度自由问答！`;
           }
         } catch (err) {
           ans = `通义千问请求失败（${err.message}），请检查 API Key 或网络跨域设置。`;
