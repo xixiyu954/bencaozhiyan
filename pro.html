@@ -2,8 +2,16 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>辽宁中医药大学 · 中药化学智能实验设计工坊 Pro</title>
+  <meta name="description" content="中药化学实验选材、工艺设计、动态装置、数据统计与实验报告导出工具。" />
+  <meta name="theme-color" content="#062420" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
@@ -101,12 +109,22 @@
     .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
     .custom-scroll::-webkit-scrollbar-track { background: transparent; }
     .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.45); border-radius: 999px; }
+    :focus-visible { outline: 3px solid #c58a32; outline-offset: 3px; }
+    [role="dialog"] { overscroll-behavior: contain; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+    }
+    @media (pointer: coarse) {
+      .step-chip, .side-tab-btn, .rig-tab-btn { min-height: 40px; }
+    }
+    @page { size: A4; margin: 14mm; }
     @media print {
       .no-print { display: none !important; }
       body { background: #ffffff !important; background-image: none !important; }
       main > *:not(#wpanel-6) { display: none !important; }
       #wpanel-6 > *:not(#reportPreviewCard) { display: none !important; }
       #printableReportMount { box-shadow: none !important; border: none !important; padding: 0 !important; }
+      #printableReportMount tr, #printableReportMount table, #printableReportMount h4 { break-inside: avoid; }
     }
   </style>
 </head>
@@ -247,7 +265,7 @@
           </div>
         </div>
 
-        <nav id="wizardNav" class="flex items-center gap-1.5 overflow-x-auto custom-scroll pb-0.5">
+        <nav id="wizardNav" aria-label="实验设计步骤" class="flex items-center gap-1.5 overflow-x-auto custom-scroll pb-0.5">
           <button type="button" data-wstep="1" class="step-chip active shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600">1. 选材与创新DIY</button>
           <span class="text-slate-300 text-xs">›</span>
           <button type="button" data-wstep="2" class="step-chip shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600">2. 确定题目</button>
@@ -696,7 +714,7 @@
   </div>
 
   <!-- 弹窗：创建创新 DIY 中药药材工坊 -->
-  <div id="diyHerbModal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/55 backdrop-blur-xs p-4">
+  <div id="diyHerbModal" role="dialog" aria-modal="true" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/55 backdrop-blur-xs p-4">
     <div class="bg-white rounded-3xl border border-slate-200 max-w-xl w-full max-h-[90vh] overflow-y-auto custom-scroll shadow-2xl">
       <div class="px-6 py-4 bg-gradient-to-r from-[#062420] to-[#0f5c54] text-white flex items-center justify-between sticky top-0">
         <div>
@@ -747,11 +765,11 @@
   </div>
 
   <!-- 弹窗：网页直邮作者 -->
-  <div id="feedbackModal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/55 backdrop-blur-xs p-4">
+  <div id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/55 backdrop-blur-xs p-4">
     <div class="bg-white rounded-3xl border border-slate-200 max-w-lg w-full shadow-2xl overflow-hidden">
       <div class="px-6 py-4 bg-gradient-to-r from-[#062420] to-[#0f5c54] text-white flex items-center justify-between">
         <div>
-          <h3 class="text-base font-bold flex items-center gap-2"><i data-lucide="send" class="w-4 h-4 text-emerald-300"></i>网页直邮作者 · 建议与投诉</h3>
+          <h3 id="feedbackTitle" class="text-base font-bold flex items-center gap-2"><i data-lucide="send" class="w-4 h-4 text-emerald-300"></i>网页直邮作者 · 建议与投诉</h3>
           <p class="text-[11px] text-teal-100 mt-0.5">直发目标邮箱：<span class="font-mono font-bold text-amber-300">Chenovo495666@163.com</span></p>
         </div>
         <button id="btnCloseFeedback" type="button" class="p-1.5 rounded-lg text-teal-100 hover:bg-white/15"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -764,22 +782,23 @@
           <label class="cursor-pointer"><input type="radio" name="fbType" value="问题投诉" class="peer hidden" /><span class="block text-center py-2 rounded-xl border border-slate-200 text-xs font-bold peer-checked:bg-rose-600 peer-checked:text-white">问题投诉</span></label>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <input id="fbSender" type="text" placeholder="你的称呼/班级（选填）" class="px-3.5 py-2.5 text-sm rounded-xl border border-slate-200" />
-          <input id="fbReplyEmail" type="email" placeholder="你的回复邮箱（选填）" class="px-3.5 py-2.5 text-sm rounded-xl border border-slate-200" />
+          <input id="fbSender" type="text" maxlength="80" autocomplete="nickname" placeholder="你的称呼/班级（选填）" class="px-3.5 py-2.5 text-sm rounded-xl border border-slate-200" />
+          <input id="fbReplyEmail" type="email" maxlength="254" autocomplete="email" placeholder="你的回复邮箱（选填）" class="px-3.5 py-2.5 text-sm rounded-xl border border-slate-200" />
         </div>
-        <textarea id="fbContent" required rows="4" placeholder="请写下建议或投诉内容，提交后直接从网页投递至作者 163 邮箱..." class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 resize-none focus:outline-none focus:border-[#0f5c54]"></textarea>
-        <div id="fbStatusBox" class="hidden p-3 rounded-xl text-xs leading-relaxed"></div>
+        <textarea id="fbContent" required maxlength="5000" rows="4" placeholder="请写下建议或投诉内容；若直投失败，可一键改用邮件客户端或复制备用。" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 resize-none focus:outline-none focus:border-[#0f5c54]"></textarea>
+        <div id="fbStatusBox" role="status" aria-live="polite" class="hidden p-3 rounded-xl text-xs leading-relaxed"></div>
         <div class="flex flex-col sm:flex-row gap-2.5">
           <button id="btnSubmitFeedback" type="submit" class="flex-1 py-2.5 px-4 rounded-xl bg-[#0a3630] text-white text-xs sm:text-sm font-bold hover:bg-[#062420] transition">网页直接发送至作者邮箱</button>
           <button id="btnCopyFeedbackMail" type="button" class="py-2.5 px-4 rounded-xl bg-slate-100 text-slate-700 text-xs sm:text-sm font-semibold">复制备用</button>
+          <a id="btnMailtoFeedback" href="mailto:Chenovo495666@163.com" class="py-2.5 px-4 rounded-xl bg-amber-100 text-amber-900 border border-amber-200 text-xs sm:text-sm font-bold text-center">打开邮件客户端</a>
         </div>
-        <p class="text-[11px] text-slate-400 leading-relaxed">说明：通过 FormSubmit 公开加密通道发往 <span class="font-mono">Chenovo495666@163.com</span>（首次收到测试信时作者在 163 邮箱点一次 Activate Form 激活即可永久直收）。</p>
+        <p class="text-[11px] text-slate-400 leading-relaxed">说明：网页直投依赖 FormSubmit 第三方转发服务，内容会经过该服务，请勿填写敏感信息。首次使用时，作者需在 163 邮箱完成一次 Activate Form 激活；未激活或网络受限时，可改用邮件客户端或复制备用。</p>
       </form>
     </div>
   </div>
 
   <!-- 弹窗：高清报告长图 -->
-  <div id="imageExportModal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/65 backdrop-blur-xs p-3 sm:p-6">
+  <div id="imageExportModal" role="dialog" aria-modal="true" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/65 backdrop-blur-xs p-3 sm:p-6">
     <div class="bg-white rounded-3xl border border-slate-200 max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between gap-2">
         <div><h3 class="text-base font-bold text-slate-900">高清实验报告长图（微信/手机长按直接保存）</h3><p class="text-xs text-slate-500">长按图片保存至相册或转发文件传输助手；电脑端点击右下角下载。</p></div>
@@ -794,7 +813,7 @@
   </div>
 
   <!-- 弹窗：新增文献 -->
-  <div id="addRefModal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
+  <div id="addRefModal" role="dialog" aria-modal="true" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
     <div class="bg-white rounded-3xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between"><h3 class="text-base font-bold text-slate-900">新增 GB/T 7714 参考文献</h3><button id="btnCloseAddRef" type="button" class="p-1 rounded-lg text-slate-400"><i data-lucide="x" class="w-4 h-4"></i></button></div>
       <form id="formAddRef" class="space-y-3">
@@ -812,7 +831,7 @@
   </div>
 
   <!-- 弹窗：确认重置 -->
-  <div id="confirmModal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/45 backdrop-blur-xs p-4">
+  <div id="confirmModal" role="dialog" aria-modal="true" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/45 backdrop-blur-xs p-4">
     <div class="bg-white rounded-2xl border border-slate-200 max-w-sm w-full p-5 shadow-xl space-y-4">
       <h4 id="confirmTitle" class="text-base font-bold text-slate-900">确认操作</h4>
       <p id="confirmMessage" class="text-sm text-slate-600"></p>
@@ -823,7 +842,7 @@
     </div>
   </div>
 
-  <div id="toastContainer" class="no-print fixed bottom-16 lg:bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <div id="toastContainer" role="status" aria-live="polite" class="no-print fixed bottom-16 lg:bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
 <script>
 (function () {
@@ -1320,7 +1339,23 @@
   let yieldChartInstance = null, pendingConfirmAction = null, timerSeconds = 240 * 60, timerInterval = null;
   let walkIdx = 0, walkTimer = null;
 
-  function loadState() { try { const r = localStorage.getItem(STORAGE_KEY); if (r) { const p = JSON.parse(r); if (p && typeof p === 'object') state = { ...state, ...p, meta: { ...state.meta, ...(p.meta || {}) } }; } } catch (e) {} }
+  function loadState() {
+    try {
+      const current = localStorage.getItem(STORAGE_KEY);
+      const legacy = localStorage.getItem('lnutcm_tcm_chem_wizard_v4');
+      const raw = current || legacy;
+      if (raw) {
+        const p = JSON.parse(raw);
+        if (p && typeof p === 'object' && !Array.isArray(p)) state = { ...state, ...p, meta: { ...state.meta, ...(p.meta || {}) } };
+      }
+      if (!state.customTopics || typeof state.customTopics !== 'object' || Array.isArray(state.customTopics)) state.customTopics = {};
+      if (!state.topicStates || typeof state.topicStates !== 'object' || Array.isArray(state.topicStates)) state.topicStates = {};
+      if (!Array.isArray(state.meta.members) || !state.meta.members.length) state.meta.members = [{ role: '组长', name: '', studentId: '', duty: '方案设计与报告统筹' }];
+      state.step = Math.max(1, Math.min(6, Number(state.step) || 1));
+      if (!state.activeTopicId) state.activeTopicId = 'mint';
+      if (!current && legacy) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) { console.warn('本地存档读取失败，已使用默认状态。', e); }
+  }
   function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
 
   function getTopicDef() {
@@ -1384,7 +1419,7 @@
     return { limit, avgCrude, avgRefined, avgMp, sd, rsd, sampleRf, refRf, deltaRf, tlcOk, passedTests, totalTests, passRate: totalTests > 0 ? passedTests / totalTests * 100 : 0, meets: avgCrude >= limit, count: valid.length };
   }
 
-  function goStep(n) { state.step = Math.max(1, Math.min(6, n)); stopWalkthrough(); saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  function goStep(n) { state.step = Math.max(1, Math.min(6, n)); stopWalkthrough(); saveState(); renderAll(); window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }
   function setSideTab(tab) {
     state.sideTab = tab;
     document.querySelectorAll('.side-tab-btn').forEach(b => { const a = b.dataset.sideTab === tab; b.className = `side-tab-btn py-1.5 rounded-lg transition ${a ? 'bg-white text-[#062420] font-bold' : 'text-teal-100/75 hover:text-white'}`; });
@@ -1755,7 +1790,7 @@
 
     document.querySelectorAll('#wizardNav .step-chip').forEach(btn => {
       const n = Number(btn.dataset.wstep); btn.classList.remove('active', 'done');
-      if (n === state.step) btn.classList.add('active'); else if (n < state.step) btn.classList.add('done');
+      if (n === state.step) { btn.classList.add('active'); btn.setAttribute('aria-current', 'step'); } else { btn.removeAttribute('aria-current'); if (n < state.step) btn.classList.add('done'); }
     });
     document.querySelectorAll('.wpanel').forEach(p => p.classList.add('hidden'));
     const curP = document.getElementById(`wpanel-${state.step}`);
@@ -1797,10 +1832,25 @@
   }
   function openMobileSidebar() { document.getElementById('leftSidebar').classList.remove('-translate-x-full'); document.getElementById('sidebarBackdrop').classList.remove('hidden'); }
   function closeMobileSidebar() { document.getElementById('leftSidebar').classList.add('-translate-x-full'); document.getElementById('sidebarBackdrop').classList.add('hidden'); }
-  function openDiyHerbModal() { const m = document.getElementById('diyHerbModal'); m.classList.remove('hidden'); m.classList.add('flex'); }
-  function closeDiyHerbModal() { const m = document.getElementById('diyHerbModal'); m.classList.add('hidden'); m.classList.remove('flex'); }
-  function openFeedbackModal() { document.getElementById('fbStatusBox').classList.add('hidden'); const m = document.getElementById('feedbackModal'); m.classList.remove('hidden'); m.classList.add('flex'); }
-  function closeFeedbackModal() { const m = document.getElementById('feedbackModal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+  let modalReturnFocus = null;
+  function openModalElement(m, focusSelector) {
+    if (!m) return;
+    modalReturnFocus = document.activeElement;
+    m.classList.remove('hidden'); m.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => { const target = focusSelector ? m.querySelector(focusSelector) : m.querySelector('button, input, textarea, a[href]'); if (target) target.focus(); });
+  }
+  function closeModalElement(m) {
+    if (!m) return;
+    m.classList.add('hidden'); m.classList.remove('flex');
+    if (!document.querySelector('.fixed.inset-0.z-50.flex')) document.body.style.overflow = '';
+    if (modalReturnFocus && modalReturnFocus.isConnected && typeof modalReturnFocus.focus === 'function') modalReturnFocus.focus();
+    modalReturnFocus = null;
+  }
+  function openDiyHerbModal() { openModalElement(document.getElementById('diyHerbModal'), '#dhName'); }
+  function closeDiyHerbModal() { closeModalElement(document.getElementById('diyHerbModal')); }
+  function openFeedbackModal() { document.getElementById('fbStatusBox').classList.add('hidden'); openModalElement(document.getElementById('feedbackModal'), '#fbContent'); }
+  function closeFeedbackModal() { closeModalElement(document.getElementById('feedbackModal')); }
 
   function initEvents() {
     if (IS_WECHAT) document.getElementById('wechatNoticeBanner').classList.remove('hidden');
@@ -1875,9 +1925,13 @@
       }
     });
     document.getElementById('btnSaveCustomVideo').addEventListener('click', () => {
-      const url = document.getElementById('customVideoUrlInput').value.trim();
-      getWorkState(getTopicDef()).customVideoUrl = url; saveState(); renderStep3(getTopicDef(), getWorkState(getTopicDef()));
-      showToast(url ? '已绑定教学视频链接' : '已清除绑定链接');
+      const raw = document.getElementById('customVideoUrlInput').value.trim();
+      if (raw) {
+        try { const parsed = new URL(raw); if (!['https:', 'http:'].includes(parsed.protocol)) throw new Error('protocol'); }
+        catch (err) { showToast('仅支持有效的 http:// 或 https:// 视频链接', 'error'); return; }
+      }
+      getWorkState(getTopicDef()).customVideoUrl = raw; saveState(); renderStep3(getTopicDef(), getWorkState(getTopicDef()));
+      showToast(raw ? '已绑定教学视频链接' : '已清除绑定链接');
     });
 
     // Step 4 六大装置与计时器
@@ -1920,38 +1974,72 @@
     ['metaClass', 'metaGroup', 'metaDate', 'metaTeacher'].forEach(id => { const mp = { metaClass: 'className', metaGroup: 'groupName', metaDate: 'date', metaTeacher: 'teacher' }; document.getElementById(id).addEventListener('change', e => { state.meta[mp[id]] = e.target.value; saveState(); renderAll(); }); });
     document.getElementById('btnAddMember').addEventListener('click', () => { state.meta.members.push({ role: '组员', name: '', studentId: '', duty: '' }); saveState(); renderAll(); });
 
-    // 网页直邮作者
+    // 网页直邮作者：真实状态反馈 + 超时 + 双兜底
     ['btnOpenFeedbackSide', 'btnOpenFeedbackTop', 'btnOpenFeedbackFooter'].forEach(id => document.getElementById(id).addEventListener('click', openFeedbackModal));
     document.getElementById('btnCloseFeedback').addEventListener('click', closeFeedbackModal);
     document.getElementById('feedbackModal').addEventListener('click', e => { if (e.target.id === 'feedbackModal') closeFeedbackModal(); });
-    ['btnCopyEmailSide', 'btnCopyEmailFooter'].forEach(id => document.getElementById(id).addEventListener('click', () => copyText(AUTHOR_EMAIL, `已复制作者邮箱：${AUTHOR_EMAIL}`)));
-    document.getElementById('feedbackForm').addEventListener('submit', async e => {
-      e.preventDefault();
+    ['btnCopyEmailSide', 'btnCopyEmailFooter'].forEach(id => document.getElementById(id).addEventListener('click', () => copyText(AUTHOR_EMAIL, '已复制作者邮箱：' + AUTHOR_EMAIL)));
+    function getFeedbackData() {
       const type = (document.querySelector('input[name="fbType"]:checked') || {}).value || '功能建议';
-      const sender = document.getElementById('fbSender').value.trim() || '匿名同学', replyEmail = document.getElementById('fbReplyEmail').value.trim(), content = document.getElementById('fbContent').value.trim();
-      const topic = `${getTopicDef().herb} · ${getTopicDef().compound}`;
-      if (!content) { showToast('请填写内容', 'error'); return; }
-      const btn = document.getElementById('btnSubmitFeedback'), statusBox = document.getElementById('fbStatusBox');
-      btn.disabled = true; btn.textContent = '正在投递至作者邮箱...'; statusBox.classList.add('hidden');
-      try {
-        const res = await fetch(`https://formsubmit.co/ajax/${AUTHOR_EMAIL}`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ _subject: `【中药化学实验工坊-${type}】${topic}`, _template: 'table', _captcha: 'false', 反馈类型: type, 反馈人: sender, 回复邮箱: replyEmail || '未填', 涉及课题: topic, 具体内容: content })
-        });
-        const data = await res.json();
-        if (res.ok && (data.success === 'true' || data.success === true)) {
-          statusBox.className = 'p-3 rounded-xl text-xs bg-emerald-50 border border-emerald-200 text-emerald-800';
-          statusBox.textContent = `发送成功！已投递至 ${AUTHOR_EMAIL}。`; statusBox.classList.remove('hidden');
-          document.getElementById('fbContent').value = ''; showToast('反馈已真实发送至作者邮箱！');
-        } else throw new Error(data.message || 'err');
-      } catch (err) {
-        statusBox.className = 'p-3 rounded-xl text-xs bg-amber-50 border border-amber-200 text-amber-900';
-        statusBox.innerHTML = `当前预览网络受限（部署到 GitHub Pages 后即可直接发送）。请先点右侧「复制备用」后发送至 <strong>${AUTHOR_EMAIL}</strong>。`; statusBox.classList.remove('hidden');
-      } finally { btn.disabled = false; btn.textContent = '网页直接发送至作者邮箱'; }
+      const sender = document.getElementById('fbSender').value.trim() || '匿名同学';
+      const replyEmail = document.getElementById('fbReplyEmail').value.trim();
+      const content = document.getElementById('fbContent').value.trim();
+      const topic = getTopicDef().herb + ' · ' + getTopicDef().compound;
+      const subject = '【中药化学实验工坊-' + type + '】' + topic;
+      const body = ['反馈类型：' + type, '反馈人：' + sender, '回复邮箱：' + (replyEmail || '未填'), '涉及课题：' + topic, '来源页面：' + location.href, '', '具体内容：', content || '（请补充）'].join('\n');
+      return { type, sender, replyEmail, content, topic, subject, body };
+    }
+    function updateFeedbackMailto() {
+      const d = getFeedbackData();
+      document.getElementById('btnMailtoFeedback').href = 'mailto:' + AUTHOR_EMAIL + '?subject=' + encodeURIComponent(d.subject) + '&body=' + encodeURIComponent(d.body);
+    }
+    function setFeedbackStatus(kind, message) {
+      const box = document.getElementById('fbStatusBox');
+      const tones = { success: 'bg-emerald-50 border border-emerald-200 text-emerald-800', warning: 'bg-amber-50 border border-amber-200 text-amber-900', error: 'bg-rose-50 border border-rose-200 text-rose-800', info: 'bg-slate-50 border border-slate-200 text-slate-700' };
+      box.className = 'p-3 rounded-xl text-xs leading-relaxed ' + (tones[kind] || tones.info);
+      box.textContent = message; box.classList.remove('hidden');
+    }
+    ['fbSender', 'fbReplyEmail', 'fbContent'].forEach(id => document.getElementById(id).addEventListener('input', updateFeedbackMailto));
+    document.querySelectorAll('input[name="fbType"]').forEach(el => el.addEventListener('change', updateFeedbackMailto));
+    updateFeedbackMailto();
+    document.getElementById('btnMailtoFeedback').addEventListener('click', e => {
+      if (!getFeedbackData().content) { e.preventDefault(); showToast('请先填写反馈内容', 'error'); document.getElementById('fbContent').focus(); return; }
+      updateFeedbackMailto(); setFeedbackStatus('info', '已尝试调起你的默认邮件客户端。请在邮件客户端中确认收件人与内容后手动点击发送。');
     });
     document.getElementById('btnCopyFeedbackMail').addEventListener('click', () => {
-      const type = (document.querySelector('input[name="fbType"]:checked') || {}).value || '功能建议';
-      copyText(`收件人：${AUTHOR_EMAIL}\n主题：【中药化学实验工坊-${type}】${getTopicDef().herb}\n\n${document.getElementById('fbContent').value.trim() || '（请补充）'}`, '已复制作者邮箱与反馈正文');
+      const d = getFeedbackData();
+      if (!d.content) { showToast('请先填写反馈内容', 'error'); document.getElementById('fbContent').focus(); return; }
+      copyText('收件人：' + AUTHOR_EMAIL + '\n主题：' + d.subject + '\n\n' + d.body, '已复制收件人、主题与完整反馈正文');
+    });
+    document.getElementById('feedbackForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const d = getFeedbackData();
+      if (!d.content) { showToast('请填写内容', 'error'); document.getElementById('fbContent').focus(); return; }
+      if (!navigator.onLine) { setFeedbackStatus('warning', '当前设备处于离线状态，内容已保留。联网后可重试，也可使用邮件客户端或复制备用。'); return; }
+      const btn = document.getElementById('btnSubmitFeedback');
+      if (btn.disabled) return;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      btn.disabled = true; btn.textContent = '正在通过 FormSubmit 投递...';
+      setFeedbackStatus('info', '正在连接第三方邮件转发服务，请稍候；最长等待 15 秒。');
+      try {
+        const res = await fetch('https://formsubmit.co/ajax/' + AUTHOR_EMAIL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({ _subject: d.subject, _template: 'table', _captcha: 'false', 反馈类型: d.type, 反馈人: d.sender, 回复邮箱: d.replyEmail || '未填', 涉及课题: d.topic, 来源页面: location.href, 提交时间: new Date().toLocaleString('zh-CN'), 具体内容: d.content }), signal: controller.signal });
+        const raw = await res.text();
+        let data = {};
+        try { data = JSON.parse(raw); } catch (parseError) { throw new Error('服务返回了非 JSON 响应（HTTP ' + res.status + '）'); }
+        const succeeded = res.ok && (data.success === true || data.success === 'true');
+        if (succeeded) {
+          setFeedbackStatus('success', 'FormSubmit 已接收本次反馈，将转发至 ' + AUTHOR_EMAIL + '。若长时间未收到回复，也可通过邮件客户端再次联系。');
+          document.getElementById('fbContent').value = ''; updateFeedbackMailto(); showToast('反馈已由邮件转发服务接收');
+        } else {
+          const serverMessage = String(data.message || '').trim();
+          if (/activat|激活/i.test(serverMessage)) setFeedbackStatus('warning', 'FormSubmit 尚未完成目标邮箱激活，因此本次未能直投。作者需先在 163 邮箱点击 Activate Form；你的内容已保留，请改用邮件客户端或复制备用。');
+          else { const reason = serverMessage ? '服务返回：' + serverMessage.slice(0, 180) : 'HTTP ' + res.status; setFeedbackStatus('error', '本次未能通过 FormSubmit 投递（' + reason + '）。你的内容已保留，请稍后重试，或使用邮件客户端 / 复制备用。'); }
+        }
+      } catch (err) {
+        if (err && err.name === 'AbortError') setFeedbackStatus('warning', '第三方邮件服务响应超过 15 秒，本次已停止等待。你的内容已保留，请重试，或使用邮件客户端 / 复制备用。');
+        else { const detail = err && err.message ? err.message.slice(0, 180) : '未知错误'; setFeedbackStatus('error', '直投请求失败：' + detail + '。可能是网络、浏览器拦截或第三方服务不可用；你的内容已保留，请使用邮件客户端或复制备用。'); }
+      } finally { clearTimeout(timeoutId); btn.disabled = false; btn.textContent = '网页直接发送至作者邮箱'; }
     });
 
     // 存档与重置
@@ -1966,8 +2054,19 @@
     });
     document.getElementById('inputImportJson').addEventListener('change', e => {
       const f = e.target.files[0]; if (!f) return;
+      if (f.size > 2 * 1024 * 1024) { showToast('存档超过 2 MB，请检查文件是否正确', 'error'); e.target.value = ''; return; }
       const r = new FileReader();
-      r.onload = () => { try { const p = JSON.parse(r.result); if (!p.activeTopicId) throw 1; state = { ...state, ...p }; saveState(); renderAll(); showToast('存档已恢复'); } catch { showToast('存档格式无效', 'error'); } };
+      r.onload = () => {
+        try {
+          const p = JSON.parse(r.result);
+          if (!p || typeof p !== 'object' || Array.isArray(p) || !p.activeTopicId) throw new Error('invalid');
+          if (p.topicStates && (typeof p.topicStates !== 'object' || Array.isArray(p.topicStates))) throw new Error('invalid');
+          if (p.customTopics && (typeof p.customTopics !== 'object' || Array.isArray(p.customTopics))) throw new Error('invalid');
+          state = { ...state, ...p, meta: { ...state.meta, ...(p.meta || {}) } };
+          saveState(); renderAll(); showToast('存档已恢复');
+        } catch (err) { showToast('存档格式无效，未修改当前数据', 'error'); }
+      };
+      r.onerror = () => showToast('存档读取失败，请重试', 'error');
       r.readAsText(f); e.target.value = '';
     });
     document.getElementById('btnResetTopic').addEventListener('click', () => {
@@ -1980,6 +2079,21 @@
     document.getElementById('btnConfirmCancel').addEventListener('click', () => { const m = document.getElementById('confirmModal'); m.classList.add('hidden'); m.classList.remove('flex'); });
     document.getElementById('btnConfirmOk').addEventListener('click', () => { if (pendingConfirmAction) pendingConfirmAction(); const m = document.getElementById('confirmModal'); m.classList.add('hidden'); m.classList.remove('flex'); });
   }
+
+  document.addEventListener('keydown', e => {
+    const openModals = [...document.querySelectorAll('.fixed.inset-0.z-50.flex')].filter(m => !m.classList.contains('hidden'));
+    const activeModal = openModals[openModals.length - 1];
+    if (!activeModal) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeModalElement(activeModal); return; }
+    if (e.key !== 'Tab') return;
+    const focusables = [...activeModal.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])')].filter(el => el.offsetParent !== null);
+    if (!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  window.addEventListener('offline', () => showToast('网络已断开；实验数据仍保存在本机，邮件直投暂不可用', 'info'));
+  window.addEventListener('online', () => showToast('网络已恢复，可以重试邮件直投', 'info'));
 
   loadState();
   initEvents();
