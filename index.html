@@ -395,16 +395,16 @@
           <div class="flex items-center justify-between gap-2">
             <div class="font-extrabold text-[#0a3630] flex items-center gap-1.5">
               <span id="qwenReceiptBadge" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span id="qwenReceiptTitle">千问 AI 自动化编排完成</span>
+              <span id="qwenReceiptTitle">千问 AI 自动化编排完成</span><span id="qwenBankStatusBadge" class="px-2 py-0.5 rounded-full bg-teal-100 text-[#0a3630] text-[10px] font-bold"></span>
             </div>
             <button id="btnCloseQwenReceipt" type="button" class="text-slate-400 hover:text-slate-700 font-bold">×</button>
           </div>
           <p id="qwenReceiptAdvice" class="text-slate-700 leading-relaxed"></p>
-          <div id="qwenReceiptChecks" class="flex flex-wrap gap-1.5 text-[11px]"></div>
+          <div id="qwenReceiptChecks" class="flex flex-wrap gap-1.5 text-[11px]"></div><div id="qwenDeepCards" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-0.5"></div>
           <div class="flex flex-wrap gap-2 pt-1">
             <button type="button" data-qwen-jump="3" class="px-3 py-1.5 rounded-xl bg-[#0a3630] text-white text-[11px] font-bold hover:bg-[#062420] transition">查看第 3 步原理与方案 →</button>
             <button type="button" data-qwen-jump="4" class="px-3 py-1.5 rounded-xl bg-white border border-teal-200 text-[#0f5c54] text-[11px] font-bold hover:bg-teal-50 transition">查看第 4 步动态装置 →</button>
-            <button type="button" data-qwen-jump="6" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold hover:bg-amber-100 transition">直达第 6 步预览报告 →</button>
+            <button type="button" data-qwen-jump="6" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold hover:bg-amber-100 transition">直达第 6 步预览报告 →</button><button id="btnOpenBankFromReceipt" type="button" class="ml-auto px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold transition">📚 查看已更新题库</button>
           </div>
         </div>
 
@@ -454,7 +454,7 @@
             <div class="inline-flex flex-wrap items-center gap-1 p-1 rounded-2xl bg-slate-100/90 border border-slate-200/70" id="step1TabBar">
               <button type="button" data-s1-tab="innovative" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition bg-[#0a3630] text-white shadow-xs">✨ 创新拓展 (24项)</button>
               <button type="button" data-s1-tab="class" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900">★ 经典精选 (19项)</button>
-              <button type="button" data-s1-tab="all" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900">全部精编 (47项)</button>
+              <button type="button" data-s1-tab="all" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900">全部精编 (47项)</button><button type="button" data-s1-tab="ai_custom" id="btnStep1AiTab" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900">🤖 AI/自建 (0)</button>
             </div>
             <div class="relative flex-1 min-w-[200px] max-w-xs">
               <input id="step1QuickSearch" type="text" placeholder="快速筛选药材、成分或工艺..." class="w-full pl-3.5 pr-8 py-1.5 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:border-[#0f5c54] transition" />
@@ -2689,7 +2689,7 @@
 
     const listIds = tab === 'class' ? CLASS_ORDER : tab === 'innovative' ? INNO_ORDER : [...INNO_ORDER, ...CLASS_ORDER, 'phellodendron', 'rheum', 'artemisia', 'ephedra'];
     const seen = new Set();
-    const baseCards = listIds.filter(id => !seen.has(id) && seen.add(id)).map(id => FEATURED_PRESETS[id]).filter(Boolean);
+    const aiCustomList = Object.values(state.customTopics || {}).reverse(); const aiTabBtn = document.getElementById('btnStep1AiTab'); if (aiTabBtn) aiTabBtn.textContent = '🤖 AI/自建 (' + aiCustomList.length + ')'; const baseCards = tab === 'ai_custom' ? aiCustomList : listIds.filter(id => !seen.has(id) && seen.add(id)).map(id => FEATURED_PRESETS[id]).filter(Boolean);
 
     const catPillsEl = document.getElementById('step1CatPills');
     if (catPillsEl) {
@@ -2706,7 +2706,7 @@
 
     el.innerHTML = cards.map(p => {
       const sel = state.activeTopicId === p.id;
-      const badge = p.isInnovative
+      const badge = p.isAiGenerated ? '<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-teal-100 text-[#0a3630]">AI新创</span>' : p.isInnovative
         ? '<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-900">创新</span>'
         : p.isClassGroup
           ? '<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-900">经典</span>'
@@ -2775,7 +2775,7 @@
     }).join('');
 
     document.getElementById('integrativePerspective').textContent = t.integrative;
-    const sp = SPECTRA_BY_CAT[t.category] || SPECTRA_BY_CAT['黄酮'];
+    const sp = t.spectra ? Object.assign({}, SPECTRA_BY_CAT[t.category] || SPECTRA_BY_CAT['黄酮'], t.spectra) : SPECTRA_BY_CAT[t.category] || SPECTRA_BY_CAT['黄酮'];
     const chBadge = document.getElementById('s3ChapterBadge');
     const spGrid = document.getElementById('s3SpectraGrid');
     if (chBadge) chBadge.textContent = sp.chapter;
@@ -2938,7 +2938,7 @@
     if (mod.scaling) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">五、SOP 执行记录</h4><ul class="list-disc pl-5 text-xs">${t.sop.map((s, i) => `<li>[${ws.sopDone[i] ? '✓' : '○'}] ${s}</li>`).join('')}</ul></div>`;
     if (mod.data) html += `<div class="space-y-1.5"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">六、平行数据统计与 TLC 检识</h4><table class="w-full text-xs border-collapse border border-slate-300"><thead><tr class="bg-slate-100"><th class="border border-slate-300 px-2 py-1">批次</th><th class="border border-slate-300 px-2 py-1">投料(g)</th><th class="border border-slate-300 px-2 py-1">粗提(${t.crudeUnit})</th><th class="border border-slate-300 px-2 py-1">精制(g)</th><th class="border border-slate-300 px-2 py-1">熔点(℃)</th><th class="border border-slate-300 px-2 py-1">收率</th></tr></thead><tbody>${ws.batches.map((b, i) => `<tr><td class="border border-slate-300 px-2 py-1">#${i + 1}</td><td class="border border-slate-300 px-2 py-1">${b.mass}</td><td class="border border-slate-300 px-2 py-1">${b.crude}</td><td class="border border-slate-300 px-2 py-1">${b.refined}</td><td class="border border-slate-300 px-2 py-1">${b.mp}</td><td class="border border-slate-300 px-2 py-1 font-bold">${(Number(b.mass) > 0 ? (b.crude / b.mass * 100).toFixed(2) : '0.00')}%</td></tr>`).join('')}</tbody></table><p class="text-xs">平均粗提收率 ${stats.avgCrude.toFixed(2)}%${stats.count > 1 ? `（SD ±${stats.sd.toFixed(3)}%，RSD ${stats.rsd.toFixed(2)}%）` : ''}；TLC 供试品 Rf = ${stats.sampleRf.toFixed(3)}，对照品 Rf = ${stats.refRf.toFixed(3)}，|ΔRf| = ${stats.deltaRf.toFixed(3)}。</p></div>`;
     if (mod.troubleshoot) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">七、异常排障讨论</h4><ul class="list-disc pl-5 text-xs">${t.troubleshoot.map(tr => `<li><strong>${tr.issue}：</strong>${tr.cause} 对策：${tr.fix}</li>`).join('')}</ul></div>`;
-    if (mod.conclusion) html += `<div class="space-y-1.5"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">八、实验结论与参考文献</h4><p class="text-xs leading-relaxed">本实验以${t.herb}为原料，按设定工艺完成 ${stats.count} 批次平行试验，平均收率 ${stats.avgCrude.toFixed(2)}%（${stats.meets ? '达到' : '低于'}限度 ${stats.limit}%），检识通过率 ${stats.passRate.toFixed(0)}%，${stats.meets && stats.passRate === 100 ? '工艺稳定可行，满足课程与质量控制要求。' : '建议结合排障分析进一步优化参数。'}</p><div class="text-[11px] space-y-0.5 pt-1">${allRefs.map((r, i) => `<p>[${i + 1}] ${r.text}</p>`).join('')}</div></div>`;
+    if (mod.conclusion) html += `<div class="space-y-1.5"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">八、实验结论与参考文献</h4><p class="text-xs leading-relaxed">本实验以${t.herb}为原料，按设定工艺完成 ${stats.count} 批次平行试验，平均收率 ${stats.avgCrude.toFixed(2)}%（${stats.meets ? '达到' : '低于'}限度 ${stats.limit}%），检识通过率 ${stats.passRate.toFixed(0)}%，${stats.meets && stats.passRate === 100 ? '工艺稳定可行，满足课程与质量控制要求。' : '建议结合排障分析进一步优化参数。'}</p>${ws.aiConclusion ? `<p class="text-xs leading-relaxed bg-emerald-50/60 p-2 rounded border border-emerald-200/70"><strong>AI 深度结论与工艺讨论：</strong>${ws.aiConclusion}</p>` : ''}<div class="text-[11px] space-y-0.5 pt-1">${allRefs.map((r, i) => `<p>[${i + 1}] ${r.text}</p>`).join('')}</div></div>`;
     return html || '<p class="text-center text-slate-400 py-8">请勾选至少 1 个章节</p>';
   }
 
@@ -3225,7 +3225,7 @@
     return content;
   }
 
-  function localSmartPlan(prompt) {
+  function searchSiteKnowledge(prompt) { const q = String(prompt || '').trim(); const tokens = q.split(/[\s,，、。;；+＋/]+/).filter(s => s.length >= 2); const scoreText = (txt) => { const t = String(txt || ''); let sc = 0; if (q && t.includes(q)) sc += 5; tokens.forEach(tk => { if (t.includes(tk)) sc += 2; }); return sc; }; const topicMap = Object.assign({}, FEATURED_PRESETS || {}, state.customTopics || {}); const catExtra = Array.isArray(CATALOG_45) ? CATALOG_45 : []; const allTopics = Object.values(topicMap).concat(catExtra.filter(c => c && !topicMap[c.id])); const matchedTopics = allTopics.map(t => ({ item: t, score: scoreText([t.id, t.herb, t.compound, t.category, t.title, t.principle, t.routeSummary, (t.reagents || []).join(' ')].join(' ')) })).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 6).map(x => ({ id: x.item.id, herb: x.item.herb, compound: x.item.compound, category: x.item.category, title: x.item.title, route: x.item.routeSummary || '', source: state.customTopics && state.customTopics[x.item.id] ? 'AI/自建题库' : '站内精编题库' })); const allLit = (Array.isArray(GLOBAL_LITERATURE) ? GLOBAL_LITERATURE : []).concat(state.extraGlobalRefs || []); const matchedLit = allLit.map(l => ({ item: l, score: scoreText((l.tag || '') + ' ' + (l.text || '')) })).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 6).map(x => x.item); return { matchedTopics, matchedLit: matchedLit.length ? matchedLit : allLit.slice(0, 4) }; } function localSmartPlan(prompt) {
     const txt = prompt.trim();
     const allKnown = [...Object.values(FEATURED_PRESETS), ...CATALOG_45];
     let matched = allKnown.find(x => txt.includes(x.herb) || (x.compound && txt.includes(x.compound.split('（')[0].split('/')[0])));
@@ -3299,7 +3299,7 @@
     const rig = validRigs.includes(plan.defaultRig) ? plan.defaultRig : 'reflux';
     let targetId = plan.matchedId && FEATURED_PRESETS[plan.matchedId] ? plan.matchedId : null;
 
-    if (!targetId) {
+    const createdNewInBank = !targetId || plan.isNewTopic === true; if (createdNewInBank) {
       targetId = 'qwen_' + Date.now();
       state.customTopics[targetId] = {
         id: targetId,
@@ -3307,7 +3307,7 @@
         compound: plan.compound || '目标活性成分',
         latin: plan.latin || 'AI 辅助设计基原',
         category: plan.category || '黄酮',
-        isCustom: true,
+        isCustom: true, isAiGenerated: true, spectra: plan.spectra || null,
         defaultRig: rig,
         defaultExtract: plan.defaultExtract || (rig === 'steam' ? 'steam' : rig === 'ultrasound' ? 'ultrasound' : 'reflux'),
         defaultSep: plan.defaultSep || 'resin',
@@ -3357,7 +3357,7 @@
         ph: plan.cfg.ph || ws.ph
       });
     }
-    saveState();
+    if (plan.aiConclusion) ws.aiConclusion = plan.aiConclusion; if (Array.isArray(plan.recommendedRefs)) { plan.recommendedRefs.slice(0, 3).forEach(r => { if (r && !state.extraGlobalRefs.some(x => x.text === r)) state.extraGlobalRefs.unshift({ tag: 'AI推荐', text: r, url: '' }); }); } if (createdNewInBank) state.step1Tab = 'ai_custom'; saveState();
     renderAll();
 
     // Render automation receipt
@@ -3372,7 +3372,7 @@
         `✓ 切换动态装置：${rig}`,
         '✓ 同步 4 步工艺、SOP 与第 6 步 A4 报告'
       ];
-      document.getElementById('qwenReceiptChecks').innerHTML = checks.map(c => `<span class="px-2 py-0.5 rounded-full bg-white border border-emerald-200 text-emerald-900 font-semibold">${c}</span>`).join('');
+      document.getElementById('qwenReceiptChecks').innerHTML = checks.map(c => `<span class="px-2 py-0.5 rounded-full bg-white border border-emerald-200 text-emerald-900 font-semibold">${c}</span>`).join(''); const bankBadge = document.getElementById('qwenBankStatusBadge'); if (bankBadge) bankBadge.textContent = createdNewInBank ? '✨ 已作为新课题自动收录进网站题库' : '📚 已引用并优化站内题库课题'; const deepEl = document.getElementById('qwenDeepCards'); if (deepEl) { const refTxt = (Array.isArray(plan.recommendedRefs) && plan.recommendedRefs.length) ? plan.recommendedRefs.slice(0, 3).join('；') : (plan.integrative || `已关联课题：${plan.herb} · ${plan.compound}`); const prinTxt = plan.principle || plan.mechanism || plan.aiAdvice || `装置：${rig}（${ws.solventType} / ${ws.temp}℃ / ${ws.time}min）`; const concTxt = plan.aiConclusion || ws.aiConclusion || `已完成 ${plan.herb}（${plan.compound}）实验编排，预期结论已同步写入报告。`; deepEl.innerHTML = [{ t: '📚 题库与文献引用', b: refTxt }, { t: '⚗️ 原理与动态装置解析', b: prinTxt }, { t: '📊 AI 预期结论（已写入报告）', b: concTxt }].map(c => `<div class="p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm"><div class="text-[11px] font-bold text-slate-800 mb-1">${c.t}</div><div class="text-[11px] text-slate-600 leading-relaxed">${c.b}</div></div>`).join(''); } const bOpenBank = document.getElementById('btnOpenBankFromReceipt'); if (bOpenBank) bOpenBank.onclick = () => openRightDrawer('bank');
     }
     showToast(`AI 已自动编排「${plan.herb}」全工作台！`);
   }
@@ -3483,7 +3483,10 @@
         btnTxt.textContent = qwenCfg.apiKey ? '千问深度规划中...' : '智算编排中...';
         try {
           if (isQwenReady()) {
-            const sysPrompt = `你是中国高校《中药化学》实验设计专家，负责将学生的实验想法转化为可直接驱动实验工作台自动化的严格 JSON。要求方案在大多数高校本科常规实验室即可实现，有明确理论依据。必须且仅输出合法 JSON，字段如下：
+            const ragCtx = searchSiteKnowledge(prompt); const ragText = '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '
+【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '
+要求严格返回JSON，必须包含字段: matchedId(若命中站内题库则填其id，否则null), isNewTopic(未命中站内题库则为true), citedBank(数组,引用题库标题), citedLiterature(数组,引用文献), recommendedRefs(数组,每项含{tag,text,url}), spectra({chapter,uv,nmr,pathway}生物合成/UV/NMR解析), rigAnalysis(原理与动态装置解析文本), aiConclusion(AI预期结论与工艺讨论)。
+'; const sysPrompt = ragText + `你是中国高校《中药化学》实验设计专家，负责将学生的实验想法转化为可直接驱动实验工作台自动化的严格 JSON。要求方案在大多数高校本科常规实验室即可实现，有明确理论依据。必须且仅输出合法 JSON，字段如下：
 {
   "herb": "中药名",
   "compound": "目标有效成分",
