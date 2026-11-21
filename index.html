@@ -3212,7 +3212,7 @@
     if (expectJson) body.response_format = { type: 'json_object' };
     if (/^qwen[34]/.test(body.model)) body.enable_thinking = false;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000);
+    const timeoutId = setTimeout(() => controller.abort(), 90000);
     let res;
     try {
       res = await fetch(url, {
@@ -3223,7 +3223,7 @@
       });
     } catch (err) {
       if (err && err.name === 'AbortError') {
-        throw new Error('请求 60 秒超时：网络异常或响应过慢，请检查网络连接与 API 配置');
+        throw new Error('请求 90 秒超时：网络异常或响应过慢，请检查网络连接与 API 配置');
       }
       throw err;
     } finally {
