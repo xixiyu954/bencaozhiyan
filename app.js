@@ -1591,6 +1591,39 @@
     });
   }
 
+  // ============ 合并 v3.0 旗舰扩展数据（11套装置 / 100+题库 / 62篇文献 / 26项院校药企案例） ============
+  const V3_DATA = window.TCM_V3_DATA || {};
+  if (V3_DATA.V3_RIGS) {
+    Object.assign(LAB_RIGS, V3_DATA.V3_RIGS);
+  }
+  if (V3_DATA.V3_PRESETS) {
+    Object.entries(V3_DATA.V3_PRESETS).forEach(([k, preset]) => {
+      FEATURED_PRESETS[k] = preset;
+      if (!CATALOG_45.some(c => c.id === k)) {
+        CATALOG_45.push({
+          id: preset.id,
+          isInnovative: !!preset.isInnovative,
+          isClassGroup: !!preset.isClassGroup,
+          featured: true,
+          herb: preset.herb,
+          compound: preset.compound,
+          category: preset.category,
+          sourceTag: preset.sourceTag || ''
+        });
+      }
+    });
+  }
+  if (Array.isArray(V3_DATA.V3_LITERATURE)) {
+    V3_DATA.V3_LITERATURE.forEach(item => {
+      if (!GLOBAL_LITERATURE.some(x => x.text === item.text)) GLOBAL_LITERATURE.push(item);
+    });
+  }
+  if (Array.isArray(V3_DATA.V3_UNIV_CASES)) {
+    V3_DATA.V3_UNIV_CASES.forEach(item => {
+      if (!UNIV_CASES.some(x => x.title === item.title)) UNIV_CASES.push(item);
+    });
+  }
+
   // 精准短词 B站链接生成器（1~2 词高命中，解决检索词过多导致视频偏题问题）
   function biliUrl(kw) {
     const clean = String(kw || '中药化学实验').replace(/[（）()\[\]【】、,，。；;：:]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -2031,7 +2064,7 @@
   function renderStep1(t) {
     const el = document.getElementById('step1HerbCards');
     const CLASS_ORDER = ['coptis','ginkgo_flav','forsythia','sophora','cassia','mint','senna','sedum','lonicera','phellodendron_flav','salvia','scutellaria','glycyrrhiza','andrographis','panax','pueraria','armeniaca','polygonum','panax_quinquefolius'];
-    const EXTRA_INNO_IDS = Object.keys(EXTRA_DATA.EXTRA_PRESETS || {});
+    const EXTRA_INNO_IDS = [...Object.keys(V3_DATA.V3_PRESETS || {}), ...Object.keys(EXTRA_DATA.EXTRA_PRESETS || {})];
     const INNO_ORDER = [...EXTRA_INNO_IDS, 'clove','cnidium','carthamus','sophora_flavescens','epimedium','bupleurum','astragalus','angelica_dahurica','paeonia_lactiflora','prunella','citrus','curcuma_longa','magnolia','schisandra','notoginseng','lycium','corydalis','gardenia','fraxinus','tea_caffeine','paeonia_moutan','star_anise','periploca','anemarrhena'];
     const tab = state.step1Tab || 'innovative';
     document.querySelectorAll('[data-s1-tab]').forEach(btn => {
@@ -2063,7 +2096,7 @@
 
     const q = (state.step1Query || '').trim().toLowerCase();
     const curCat = state.step1Cat || '全部';
-    const RIG_SHORT = { steam: '水蒸气蒸馏', reflux: '加热回流', soxhlet: '索氏提取', ultrasound: '低温超声', filter: '减压抽滤', extract: '液-液萃取', column: '硅胶柱层析', rotavap: '旋转蒸发', resin: '大孔树脂' };
+    const RIG_SHORT = { steam: '水蒸气蒸馏', reflux: '加热回流', soxhlet: '索氏提取', ultrasound: '低温超声', filter: '减压抽滤', extract: '液-液萃取', column: '硅胶柱层析', rotavap: '旋转蒸发', resin: '大孔树脂', tlc: '薄层检视', percolation: '渗漉提取' };
     const totalTopicsCount = CATALOG_45.length + Object.keys(state.customTopics || {}).length;
     const innoCount = INNO_ORDER.filter(id => FEATURED_PRESETS[id]).length;
     const classCount = CLASS_ORDER.filter(id => FEATURED_PRESETS[id]).length;
@@ -2075,7 +2108,7 @@
     setTxt('bannerBankPill', `${totalTopicsCount} 项药材题库`);
     setTxt('bannerRigPill', `${Object.keys(LAB_RIGS).length} 套动态实验装置`);
     setTxt('bannerLitPill', `${GLOBAL_LITERATURE.length + state.extraGlobalRefs.length} 篇实证文献`);
-    setTxt('navHubCount', Object.keys(LAB_RIGS).length);
+    setTxt('navHubCount', Object.keys(LAB_RIGS).length); setTxt('step4HubCnt', Object.keys(LAB_RIGS).length);
     const tInno = document.querySelector('[data-s1-tab="innovative"]'); if (tInno) tInno.textContent = `✨ 创新拓展 (${innoCount}项)`;
     const tClass = document.querySelector('[data-s1-tab="class"]'); if (tClass) tClass.textContent = `★ 经典精选 (${classCount}项)`;
     const tAll = document.querySelector('[data-s1-tab="all"]'); if (tAll) tAll.textContent = `全部精编 (${allFeaturedCount}项)`;
@@ -2403,7 +2436,7 @@
 
     const tabsEl = document.getElementById('step4ApplicableRigTabs');
     if (tabsEl) {
-      const RIG_LABELS = { steam: '水蒸气蒸馏', reflux: '加热回流', soxhlet: '索氏提取', ultrasound: '低温超声', filter: '减压抽滤', extract: '分液液-液萃取', column: '硅胶柱层析', rotavap: '旋转蒸发浓缩', resin: '大孔树脂纯化' };
+      const RIG_LABELS = { steam: '水蒸气蒸馏', reflux: '加热回流', soxhlet: '索氏提取', ultrasound: '低温超声', filter: '减压抽滤', extract: '分液液-液萃取', column: '硅胶柱层析', rotavap: '旋转蒸发浓缩', resin: '大孔树脂纯化', tlc: 'TLC 展开检视', percolation: '渗漉连续提取' };
       tabsEl.innerHTML = applicable.map(item => {
         const active = item.key === rigKey;
         return `<button type="button" data-app-rig="${item.key}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-extrabold border transition ${active ? 'bg-[#0a3630] text-white border-[#0a3630] shadow-md' : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-[#0f5c54] hover:bg-teal-50/50'}">
@@ -2470,17 +2503,18 @@
     sopEl.querySelectorAll('[data-sop-i]').forEach(chk => chk.addEventListener('change', () => { ws.sopDone[Number(chk.dataset.sopI)] = chk.checked; saveState(); renderStep4(t, ws); }));
 
     document.getElementById('troubleshootList').innerHTML = t.troubleshoot.map(tr => `<div class="p-3 rounded-2xl bg-amber-50/60 border border-amber-200/70 text-xs space-y-1"><div class="font-bold text-amber-950">${tr.issue}</div><div class="text-slate-600">成因：${tr.cause}</div><div class="text-[#0f5c54] font-bold">对策：${tr.fix}</div></div>`).join('');
+    if (window.TCMToolsV3) window.TCMToolsV3.renderSafetyMatrix(document.getElementById('step4SafetyMatrix'), t, ws, copyText);
   }
 
   // ============ 独立板块：动态流程与实验装置总览库渲染 ============
   let hubHotspotId = 1;
   function renderHub() {
     const RIG_CATS = {
-      steam: '提取装置', reflux: '提取装置', soxhlet: '提取装置', ultrasound: '提取装置',
+      steam: '提取装置', reflux: '提取装置', soxhlet: '提取装置', ultrasound: '提取装置', percolation: '提取装置',
       extract: '分离纯化', column: '分离纯化', resin: '分离纯化',
-      rotavap: '浓缩与固液分离', filter: '浓缩与固液分离'
+      rotavap: '浓缩与检识', filter: '浓缩与检识', tlc: '浓缩与检识'
     };
-    const catList = ['全部', '提取装置', '分离纯化', '浓缩与固液分离'];
+    const catList = ['全部', '提取装置', '分离纯化', '浓缩与检识'];
     const curCat = state.hubCat || '全部';
     const pillsEl = document.getElementById('hubFilterPills');
     if (pillsEl) {
@@ -2671,6 +2705,13 @@
       const copyBtn = document.getElementById('btnCopyStep5Draft');
       if (copyBtn) copyBtn.onclick = () => { ws.aiConclusion = draftPara; saveState(); copyText(draftPara, '已复制并同步写入第 6 步报告结论'); };
     }
+    if (window.TCMToolsV3) {
+      window.TCMToolsV3.renderTlcTuner(document.getElementById('step5TlcTunerCard'), t);
+      window.TCMToolsV3.renderOrthogonalTool(document.getElementById('step5OrthoCard'), t, ws, copyText, (txt) => {
+        ws.aiConclusion = (ws.aiConclusion ? ws.aiConclusion + '\n' : '') + txt;
+        saveState();
+      });
+    }
   }
 
   function buildReportInnerHtml(t, ws, stats) {
@@ -2700,6 +2741,7 @@
   }
 
   function renderStep6(t, ws, stats) {
+    if (window.TCMToolsV3) window.TCMToolsV3.renderDefenseQuiz(document.getElementById('step6DefenseQuizCard'), t, ws, getApplicableRigs(t, ws), LAB_RIGS);
     const modEl = document.getElementById('diyReportModulesList');
     modEl.innerHTML = REPORT_MODULES.map(m => {
       const on = !!ws.reportModules[m.id];
@@ -3648,8 +3690,8 @@
   "recommendedRefs": ["[1] 作者. 题名[J]. 期刊, 年, 卷(期): 页码.", "[2] 作者. 题名[J]. 期刊, 年, 卷(期): 页码."],
   "spectra": { "chapter": "对应教材章节", "uv": "UV最大吸收波长与带型解析", "nmr": "1H-NMR/13C-NMR特征化学位移解析" },
   "rigAnalysis": "所选实验装置的传质传热原理与安全运行要点",
-  "defaultRig": "steam|reflux|soxhlet|ultrasound|filter|extract|column|rotavap|resin",
-  "applicableRigs": ["steam|reflux|soxhlet|ultrasound|filter|extract|column|rotavap|resin", "第2适用装置"],
+  "defaultRig": "steam|reflux|soxhlet|ultrasound|percolation|filter|extract|column|rotavap|resin|tlc",
+  "applicableRigs": ["steam|reflux|soxhlet|ultrasound|percolation|filter|extract|column|rotavap|resin|tlc", "第2适用装置"],
   "defaultExtract": "steam|reflux|soxhlet|ultrasound|acid_water|boil_enzyme",
   "defaultSep": "freeze|acid_precip|salting_out|resin|extract|column|precip",
   "cfg": { "mass": 50, "ratio": 10, "temp": 75, "time": 60, "mesh": "中粉(40目)", "cycles": "2", "solventType": "70%乙醇", "ph": "中性 7.0" },

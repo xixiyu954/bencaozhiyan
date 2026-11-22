@@ -27,7 +27,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <link rel="stylesheet" href="./styles.css?v=6" />
+  <link rel="stylesheet" href="./styles.css?v=7" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
@@ -614,7 +614,7 @@
             <p id="step4ContextHint" class="text-xs text-slate-500 mt-0.5">已根据当前选材与实验设计自动筛选适用装置，避免无关装置干扰。</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <button id="btnJumpHubFromStep4" type="button" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-300/80 text-amber-900 text-xs font-bold hover:bg-amber-100 transition">⚙️ 浏览全部 9 套装置库 →</button>
+            <button id="btnJumpHubFromStep4" type="button" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-300/80 text-amber-900 text-xs font-bold hover:bg-amber-100 transition">⚙️ 浏览全部 <span id="step4HubCnt">11</span> 套装置库 →</button>
             <a id="rigVideoSearchLink" target="_blank" rel="noopener noreferrer" class="bili-pill">▶ B站看本装置搭建 ↗</a>
           </div>
         </div>
@@ -679,6 +679,9 @@
           </div>
           <div id="rigSubStepsBox" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
         </div>
+
+        <!-- v3.0 新增：智能试剂安全 MSDS 与废液分类助手（0-Token 自动识别） -->
+        <div id="step4SafetyMatrix" class="lab-card rounded-3xl p-5 sm:p-6 space-y-3.5"></div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-7 lab-card rounded-3xl p-5 space-y-3.5">
@@ -759,6 +762,12 @@
 
         <!-- 新增：0-Token 本地智能数据诊断与报告讨论草稿 -->
         <div id="step5AutoDiagCard" class="lab-card rounded-3xl p-5 space-y-3 border-l-4 border-l-[#0f5c54]"></div>
+
+        <!-- v3.0 新增：TLC 展开剂极性调优器与 10 种溶剂极性速查 -->
+        <div id="step5TlcTunerCard" class="lab-card rounded-3xl p-5 sm:p-6 space-y-3.5"></div>
+
+        <!-- v3.0 新增：L9(3^4) 正交实验设计与极差 R 自动分析器 -->
+        <div id="step5OrthoCard" class="lab-card rounded-3xl p-5 sm:p-6 space-y-4"></div>
 
         <!-- 新增：数据指标与检识小白通俗拆解指南 -->
         <div id="step5AnalyticsGuide" class="lab-card rounded-3xl p-5 space-y-3.5 bg-gradient-to-br from-white via-teal-50/20 to-amber-50/30">
@@ -857,6 +866,9 @@
           </div>
         </div>
 
+        <!-- v3.0 新增：实验答辩与考核高频 5 问速测卡 -->
+        <div id="step6DefenseQuizCard" class="no-print lab-card rounded-3xl p-5 sm:p-6 space-y-3.5"></div>
+
         <div id="reportPreviewCard" class="space-y-2">
           <div class="no-print flex items-center justify-between px-1"><span class="text-xs font-bold text-slate-600">A4 实时预览</span><span id="reportModuleCount" class="text-xs font-bold text-[#0f5c54]"></span></div>
           <div id="printableReportMount" class="a4-paper rounded-2xl p-6 sm:p-10 text-slate-900 space-y-5 text-xs sm:text-sm leading-7"></div>
@@ -876,7 +888,7 @@
               STANDALONE HUB · APPARATUS &amp; PROCESS LIBRARY
             </div>
             <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">动态流程与实验装置总览库</h2>
-            <p class="text-xs sm:text-sm text-teal-100/90 leading-relaxed">无需先走完选材步骤，直接在此一站式查阅全部 9 套动态交互实验装置、组件安全热点、4 步可操作小分支、精准 B站实操视频及对应代表药材。</p>
+            <p class="text-xs sm:text-sm text-teal-100/90 leading-relaxed">无需先走完选材步骤，直接在此一站式查阅全部 11 套动态交互实验装置（含 TLC 展开检视与渗漉提取）、组件安全热点、4 步可操作小分支、精准 B站实操视频及对应代表药材。</p>
           </div>
           <button type="button" id="btnBackToWorkflow" class="shrink-0 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-extrabold transition">← 返回 6 步实验工作台</button>
         </div>
@@ -1039,8 +1051,10 @@
 
   <div id="toastContainer" class="no-print fixed top-4 left-1/2 -translate-x-1/2 items-center z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-<script src="./lab-data-extra.js?v=6"></script>
-<script src="./cloud-ai.js?v=6"></script>
-<script src="./app.js?v=6"></script>
+<script src="./lab-data-extra.js?v=7"></script>
+<script src="./lab-data-v3.js?v=7"></script>
+<script src="./lab-tools-v3.js?v=7"></script>
+<script src="./cloud-ai.js?v=7"></script>
+<script src="./app.js?v=7"></script>
 </body>
 </html>
