@@ -64,12 +64,88 @@
     { univ: '广东省药检/广陈皮研究', title: '广陈皮橙皮苷、川陈皮素与橘皮素含量比值道地性鉴别', desc: '将二氢黄酮苷与多甲氧基黄酮分级提取与 UPLC 特征比值结合，实现道地药材精准质控。', url: 'https://html.rhhz.net/ywfxzz/html/20170103.htm' }
   ];
 
-  // 核心物理化学与药学公式库（按成分大类自动匹配核心公式）
+  // 核心物理化学与药学公式库（按成分大类自动匹配核心公式，配齐严谨公式与通俗大白话拆解）
   const FORMULA_BANK = {
-    distill: { name: '道尔顿分压定律（水蒸气蒸馏）', eq: '<span class="whitespace-nowrap">P总</span> = <span class="whitespace-nowrap">P水</span> + <span class="whitespace-nowrap">P油</span> = <span class="whitespace-nowrap">P₀</span> ； <span class="whitespace-nowrap">m油</span> / <span class="whitespace-nowrap">m水</span> = (<span class="whitespace-nowrap">P油</span>·<span class="whitespace-nowrap">M油</span>) / (<span class="whitespace-nowrap">P水</span>·<span class="whitespace-nowrap">M水</span>)', desc: '挥发油与水互不相溶，混合体系总蒸气压等于各组分饱和蒸气压之和，因此在低于 100℃ 时即可共沸馏出，保护热敏萜类。' },
-    diffusion: { name: '菲克第一扩散定律（固液浸提传质）', eq: 'dM / dt = − D · F · (dC / dx)', desc: '浸提速率与扩散系数 D（受温度、超声空化影响）、药材表面积 F（粉碎粒度）及浓度梯度 dC/dx（料液比与提取次数）成正比。' },
-    henderson: { name: 'Henderson-Hasselbalch 酸碱解离方程', eq: 'pH = pKa + lg([A⁻] / [HA])', desc: '指导生物碱酸水成盐提取、黄酮/蒽醌碱溶酸沉与大黄 pH 梯度萃取的精准酸碱窗口设定。' },
-    qc: { name: '收率、重复性(RSD)与薄层比移值(Rf)', eq: '收率(%) = (<span class="whitespace-nowrap">m提取物</span>/<span class="whitespace-nowrap">m药材</span>)×100% ； RSD = (S / <span class="whitespace-nowrap">x̄</span>)×100% ； Rf = <span class="whitespace-nowrap">L斑点</span> / <span class="whitespace-nowrap">L₀</span>', desc: '定量评价提取效率、平行批次工艺稳健性（一般要求 RSD < 5%）及薄层定性一致性（|ΔRf| ≤ 0.03）。' }
+    distill: {
+      name: '道尔顿分压定律（水蒸气蒸馏）',
+      category: '挥发油与热敏萜类',
+      eq: '<span class="whitespace-nowrap">P总</span> = <span class="whitespace-nowrap">P水</span> + <span class="whitespace-nowrap">P油</span> = <span class="whitespace-nowrap">P₀</span> ； <span class="whitespace-nowrap">m油</span> / <span class="whitespace-nowrap">m水</span> = (<span class="whitespace-nowrap">P油</span>·<span class="whitespace-nowrap">M油</span>) / (<span class="whitespace-nowrap">P水</span>·<span class="whitespace-nowrap">M水</span>)',
+      desc: '挥发油与水互不相溶，混合体系总蒸气压等于各组分饱和蒸气压之和，因此在低于 100℃ 时即可共沸馏出，保护热敏萜类。',
+      plain: '【小白秒懂比喻】水和挥发油像两个互不相融的小伙伴，在烧瓶里“合力抬箱子”，各自拼命向外蒸发。只要它们两者的蒸气压之和达到 1 个大气压，混合液就会“提前沸腾”！所以通常在 95~98℃（不到 100℃）时，沸水蒸汽就化身为高速列车，顺便把挥发油分子“打包托运”到冷凝管里。这样既能蒸出香气成分，又完全不用担心高温把药材烤焦或破坏热敏有效成分！',
+      breakdown: [
+        { term: 'P总 = P水 + P油', expl: '水和油各自贡献一份蒸气压，凑满 1 个大气压（P₀）即共沸，沸点永远低于水的 100℃。' },
+        { term: 'm油 / m水', expl: '馏出液中油与水的比例。虽然水蒸气很多，但挥发油萜类分子量大（150~300），因而能顺带蒸出可观药油。' }
+      ],
+      pitfalls: '加水比例建议为药材的 8~10 倍；务必加入 2~3 粒沸石防暴沸；蒸馏速度以每秒 2~3 滴为宜，冷凝水必须下进上出且充分对流！',
+      examPoints: '适用条件：具挥发性、能随水蒸气馏出、与水不发生化学反应且在水中难溶或不溶的成分（如薄荷脑、丁香酚）。'
+    },
+    diffusion: {
+      name: '菲克第一扩散定律（固液浸提传质）',
+      category: '溶剂提取动力学',
+      eq: 'dM / dt = − D · F · (dC / dx)',
+      desc: '浸提速率与扩散系数 D（受温度、超声空化影响）、药材表面积 F（粉碎粒度）及浓度梯度 dC/dx（料液比与提取次数）成正比。',
+      plain: '【小白秒懂比喻】这其实就是“科学泡茶指南”：① 表面积 F：把药材切碎成粗中粉，水能接触的表面积成倍增大，成分跑出来更快；但千万别磨成极细面糊，否则会把滤纸筛孔死死堵住！② 扩散系数 D：热茶泡得快（温度高分子热运动剧烈），超声波震荡直接震破细胞壁，扩散系数 D 飙升；③ 浓度梯度 dC/dx：茶汤泡浓了之后“内外浓度差”变小，成分就泡不出来了。所以做实验必须分 2~3 次提取，每次倒掉浓液换上新鲜溶剂，始终维持最大的“渗透吸力”！',
+      breakdown: [
+        { term: 'dM / dt', expl: '提取速度：单位时间内有多少毫克成分从药材细胞内部“逃逸”溶入到外面的溶剂中。' },
+        { term: 'D (扩散系数)', expl: '扩散活力：温度升高或超声波空化震碎细胞壁，溶剂黏度下降，D 大幅提升。' },
+        { term: 'F (表面积)', expl: '接触面积：切段/粗粉接触面积大。本科常规实验推荐 20~40 目粗中粉。' },
+        { term: 'dC / dx (浓度差)', expl: '内外贫富差距：细胞内成分极多，外面新鲜溶剂为零。分 2~3 次提取比一次死煮效率高 35% 以上！' }
+      ],
+      pitfalls: '切忌打成 100 目以上超细粉！药材淀粉与黏液质遇水吸胀成面糊，抽滤时数小时都滴不出一滴！',
+      examPoints: '影响固液提取的 4 大核心参数：粉碎粒度（F）、浸提温度与超声（D）、料液比与提取次数（dC/dx）、溶剂极性与选择性。'
+    },
+    henderson: {
+      name: 'Henderson-Hasselbalch 酸碱解离方程',
+      category: '生物碱/黄酮/有机酸定向解离',
+      eq: 'pH = pKa + lg([A⁻] / [HA])',
+      desc: '指导生物碱酸水成盐提取、黄酮/蒽醌碱溶酸沉与大黄 pH 梯度萃取的精准酸碱窗口设定。',
+      plain: '【小白秒懂比喻】生物碱和酸性酚类成分就像“会变装的双面间谍”：① 生物碱是个“亲酸的小孩”，一遇酸水就穿上带电荷的马甲变成盐（亲水性大增，乖乖钻进水相里）；加碱脱掉马甲恢复游离态（带电荷消失，变身脂溶性，只喜欢钻进有机溶剂）。利用“一酸一碱、进水进油”，就能把不吃酸碱这套的淀粉、色素彻底甩掉！② 羟基蒽醌/黄酮则相反，本身显弱酸性，遇碱成酚钠盐溶于水，加酸又沉淀析出，这就是“碱溶酸沉法”！',
+      breakdown: [
+        { term: 'pH 与 pKa', expl: '当溶液 pH = pKa 时，解离型（离子）与非解离型（分子态）各占 50%。' },
+        { term: '酸沉/游离窗口', expl: '让生物碱 99% 成盐溶于水需调节至 pH < pKa - 2；完全游离沉淀需调节至 pH > pKa + 2。' }
+      ],
+      pitfalls: '碱溶酸沉时加酸速度不可过猛！局部过酸会导致两性成分（如小檗碱、黄酮苷）重新溶掉，或引起热敏苷类发生酸催化水解破坏！',
+      examPoints: '大黄蒽醌 pH 梯度萃取顺序（酸性由强到弱）：含-COOH（NaHCO₃）> 2个以上β-OH（Na₂CO₃）> 1个β-OH（1% NaOH）> 2个α-OH（5% NaOH）。'
+    },
+    qc: {
+      name: '收率、重复性(RSD)与薄层比移值(Rf)',
+      category: '实验定量评价与质控',
+      eq: '收率(%) = (<span class="whitespace-nowrap">m提取物</span>/<span class="whitespace-nowrap">m药材</span>)×100% ； RSD = (S / <span class="whitespace-nowrap">x̄</span>)×100% ； Rf = <span class="whitespace-nowrap">L斑点</span> / <span class="whitespace-nowrap">L₀</span>',
+      desc: '定量评价提取效率、平行批次工艺稳健性（一般要求 RSD < 5%）及薄层定性一致性（|ΔRf| ≤ 0.03）。',
+      plain: '【小白秒懂比喻】这三组指标是导师给实验打分的依据：① 收率：你投了 100g 药材最终拿出多少克真金白银？对照药典标准看工艺是否及格；② RSD（相对标准偏差）：做 3 次平行实验，数据是整齐划一（RSD < 3% 优秀）还是忽上忽下（RSD > 10% 重新做）？评价实验操作规范性；③ Rf 比移值：硅胶板上的赛跑比赛！供试品斑点必须与标准品在同一水平线上（|ΔRf| ≤ 0.03），颜色荧光一致，才能证明你提取出的确是目标成分！',
+      breakdown: [
+        { term: '粗提收率 vs 精制收率', expl: '粗提物含有浸膏和少量杂质，精制得率则是重结晶或柱层析后的高纯度结晶。' },
+        { term: 'Rf 黄金区间 (0.2~0.8)', expl: '理想展开斑点的 Rf 应在 0.3~0.5 之间。若 Rf < 0.2 说明展开剂极性太小跑不动；若 Rf > 0.8 说明极性太大全冲到顶了。' }
+      ],
+      pitfalls: 'TLC 点样量切忌过大！样品过浓或斑点直径超过 3mm 会导致严重拖尾超载；层析缸必须提前贴滤纸密封饱和 20 分钟消除边缘效应！',
+      examPoints: '中国药典鉴别规范：供试品色谱中，在与对照品色谱相应的位置上，显相同颜色的斑点或荧光斑点，|ΔRf| ≤ 0.03。'
+    },
+    adsorption: {
+      name: '极性吸附与洗脱动力学（柱层析/树脂）',
+      category: '色谱纯化分离',
+      eq: '吸附力 ∝ 极性强度； 洗脱力 ∝ 溶剂极性梯度',
+      desc: '硅胶正相吸附极性物质，大孔树脂反相吸附亲脂性物质，通过极性梯度洗脱实现高纯度逐级分离。',
+      plain: '【小白秒懂比喻】柱层析就像“赛跑通道”：硅胶柱（正相）表面布满亲水的硅羟基，好比一个“极度热情的亲水磁铁”。极性大的成分（如黄酮苷、皂苷）一进柱子就被硅胶死死拉住；而极性小的成分（如挥发油、游离苷元）和硅胶没有共同语言，跟着洗脱液一溜烟最先流出来。随后我们把洗脱剂的极性一点点加大（如氯仿-甲醇比例从 95:5 加到 80:20），硬生生把紧抱的成分给“冲洗”下来，实现逐级纯化！',
+      breakdown: [
+        { term: '硅胶正相层析', expl: '极性小者先洗脱出柱，极性大者后出柱。展开洗脱剂极性增大，洗脱能力随之增强。' },
+        { term: '大孔吸附树脂', expl: '通过范德华力与氢键吸附；水洗脱去糖类、无机盐等水溶杂质，乙醇浓度由低到高梯度洗脱目标苷类与黄酮。' }
+      ],
+      pitfalls: '装柱严禁产生气泡或断层干柱！一旦干柱，样品流速不匀、色带倾斜，分离彻底失败，必须倒出重新装柱！',
+      examPoints: '吸附强弱规律：化合物分子中形成氢键能力越强、极性基团越多（-COOH > -OH > -NH₂ > -CHO > -C=O），吸附越牢固。'
+    },
+    nernst: {
+      name: '能斯特分配定律（液-液萃取）',
+      category: '分液漏斗萃取分离',
+      eq: 'K = C有机 / C水 ； Wn = W0 · [V水 / (K·V有 + V水)]ⁿ',
+      desc: '利用溶质在两互不相溶溶剂中溶解度的差异，通过分液漏斗多次少量萃取实现高富集。',
+      plain: '【小白秒懂比喻】为什么做分液萃取时，老师总强调“多次少量”？公式告诉你：假设你有 60 mL 萃取溶剂，如果一口气把 60 mL 全倒进去萃取 1 次，只能提取走约 70% 的成分；但如果你把 60 mL 分成 3 次（每次用 20 mL）萃取，最终提取率可以飙升到 96% 以上！这跟洗衣服漂洗一个道理：用一小盆清水漂洗两遍，绝对比一大桶水泡着漂一遍干净得多！',
+      breakdown: [
+        { term: '分配系数 K', expl: 'K 值越大，溶质越偏爱留在有机相中，萃取越轻松。' },
+        { term: '萃取次数 n', expl: '残留在水里的量 Wn 随着次数 n 呈几何级数急剧衰减，3 次萃取基本达到 95% 以上提取率。' }
+      ],
+      pitfalls: '分液漏斗震摇时必须随时倒置打开旋塞放气！特别是乙醚、二氯甲烷等低沸点挥发溶剂，气压极高，不放气会直接顶飞塞子发生喷溅安全事故！',
+      examPoints: '液-液萃取乳化破乳 4 大绝招：长时间静置、加氯化钠电解质盐析、滴加数滴无水乙醇、离心或电吹风局部微温加热。'
+    }
   };
 
   // 《中药化学》通用核心 10 大章节知识库（第2~9、12~13章）
@@ -246,6 +322,7 @@
     steam: {
       title: '水蒸气蒸馏挥发油提取装置', videoKw: '中药化学 水蒸气蒸馏 挥发油测定器',
       order: '电热套 → 圆底烧瓶(加沸石与10倍水) → 挥发油测定器(注水调零) → 球形冷凝管(下进上出冷水)。',
+      plainTheory: '【水蒸气共沸·挥发油便车法】挥发油常温是液体、沸点多在 180~250℃，如果直接高温干烧会严重焦化分解。利用水蒸气分压原理，当水与油共沸时，沸点降低至 100℃ 以下。水蒸气带着微小油滴一起升华进入冷凝管，遇冷液化后在测定管中利用密度差自动油水分层（比水轻浮在上层，比水重沉在下层），轻松分离纯油。',
       equipment: ['1000mL圆底烧瓶', '调温电热套', '挥发油测定器', '球形冷凝管', '铁架台双夹', '沸石'],
       hotspots: [
         { id: 1, name: '圆底烧瓶与电热套', desc: '装液不超容积 2/3，加 3~5 粒沸石防暴沸。', warn: '先通水后通电，微沸防乳化。' },
@@ -259,6 +336,7 @@
     reflux: {
       title: '有机溶剂加热回流提取装置', videoKw: '加热回流提取装置 球形冷凝管 搭建',
       order: '水浴锅就位 → 圆底烧瓶固定 → 加料、溶剂与沸石 → 垂直装球形冷凝管(顶端敞口) → 通冷水后加热。',
+      plainTheory: '【恒温循环·防烧干无限浸出法】用乙醇等有机溶剂提取时，溶剂极易挥发且易燃。烧瓶上方垂直连接球形冷凝管，溶剂沸腾汽化升腾，遇冷水重新冷凝为液体回流到烧瓶中。这样即使连续加热数小时，溶剂总量基本不减，始终在恒定沸点温度下连续、高效地把药材内部成分浸提出来。',
       equipment: ['500mL圆底烧瓶', '恒温水浴锅', '球形冷凝管', '铁架台双夹', '沸石'],
       hotspots: [
         { id: 1, name: '恒温水浴锅', desc: '易燃有机溶剂优先水浴加热，控温平稳。', warn: '严禁明火，开启通风橱。' },
@@ -271,6 +349,7 @@
     soxhlet: {
       title: '索氏连续提取器（Soxhlet 虹吸循环）', videoKw: '索氏提取器 搭建 使用方法',
       order: '水浴锅 → 烧瓶装低沸点溶剂 → 滤纸筒装药(不超虹吸管顶) → 球形冷凝管通冷水。',
+      plainTheory: '【全自动虹吸·极省溶剂榨干法】普通浸润需要耗费数倍的新鲜溶剂。索氏提取器利用虹吸管原理：烧瓶中溶剂汽化经侧管上升，冷凝后滴入装有药材的滤纸筒中浸泡；当液面涨到虹吸管弯折处顶点时，瞬间触发虹吸，把浸出液“哗啦”一下子全抽回烧瓶底！溶剂再次汽化循环，有效成分留在烧瓶，用极少量的溶剂就能完成 6~10 次反复新鲜浸提。',
       equipment: ['250mL烧瓶', '索氏提取筒', '滤纸筒与脱脂棉', '球形冷凝管', '恒温水浴锅'],
       hotspots: [
         { id: 1, name: '溶剂蒸发烧瓶', desc: '石油醚/乙醚低温汽化上升。', warn: '热敏成分严控水浴温度。' },
@@ -283,6 +362,7 @@
     ultrasound: {
       title: '超声波辅助低温提取装置', videoKw: '超声波辅助提取 中药成分 实验操作',
       order: '超声槽注水至液位线 → 具塞锥形瓶加料与溶剂 → 置网篮中 → 设 40kHz / 300W 定时提取。',
+      plainTheory: '【微观声波空化·低温瞬间破壁法】热敏成分（如青蒿素、多糖、苷类）受热易氧化或降解失活。超声波以每秒 20000~40000 次的高频震荡，在液体中瞬间产生数以亿计的微气泡（空化效应），气泡急剧闭合破裂释放瞬间强冲击波和微射流，像无数微型小锤子把植物细胞壁“震破”，常温下 20~30 分钟即可高效率溶出有效成分。',
       equipment: ['数控超声提取机', '250mL具塞锥形瓶', '不锈钢网篮', '温度探头'],
       hotspots: [
         { id: 1, name: '压电换能器与空化效应', desc: '40 kHz 微气泡破裂破碎细胞壁，大幅提速。', warn: '严禁无水空载开机！' },
@@ -294,6 +374,7 @@
     filter: {
       title: '减压抽滤精制与析晶收集装置', videoKw: '减压抽滤 布氏漏斗 安全瓶 搭建',
       order: '裁剪滤纸润湿贴紧布氏漏斗 → 漏斗斜口背向支管 → 串联安全缓冲瓶 → 连接真空泵。',
+      plainTheory: '【布氏漏斗·真空负压强力抽滤法】中药提取液常伴有大量细小残渣和黏性胶质，如果用普通漏斗重力过滤，滴得很慢甚至堵死滤纸。减压抽滤将布氏漏斗密封在厚壁抽滤瓶上，连接真空泵抽走瓶内空气形成负压，外界 1 个大气压强行把液体快速压过滤纸，几秒钟即可完成固液分离，得到干爽紧实的残渣或结晶。',
       equipment: ['布氏漏斗与滤纸', '500mL抽滤瓶', '安全防倒吸瓶', '循环水真空泵', '厚壁真空管'],
       hotspots: [
         { id: 1, name: '布氏漏斗', desc: '滤纸盖住全部微孔，先润湿贴紧。', warn: '防卷边致结晶穿滤。' },
@@ -305,6 +386,7 @@
     column: {
       title: '硅胶柱层析梯度洗脱装置', videoKw: '硅胶柱层析 装柱 洗脱 中药化学实验',
       order: '柱底塞脱脂棉排气泡 → 湿法匀浆装200~300目硅胶 → 干/湿法上样 → 极性由小到大梯度洗脱。',
+      plainTheory: '【硅胶正相吸附·微观赛跑分离法】混合物中各种成分性质接近，无法用简单过滤分离。柱子里装满高极性固体硅胶（像一张布满亲水抓手的网），当混合物随洗脱剂流过时，极性越大的成分被硅胶抓得越紧、走得越慢（排在后排）；极性小的成分吸附弱、走得飞快（排在前排）。洗脱剂极性逐步调大，各成分就能被拉开距离、分段收集。',
       equipment: ['玻璃层析柱', '200~300目硅胶', '脱脂棉与海砂', '梯度洗脱剂', '接收试管架'],
       hotspots: [
         { id: 1, name: '梯度洗脱剂', desc: '沿壁缓加防冲散柱头，极性由小到大。', warn: '全过程严禁干柱！' },
@@ -316,6 +398,7 @@
     extract: {
       title: '分液漏斗液-液萃取与 pH 梯度分离装置', videoKw: '分液漏斗 液液萃取 放气 乳化处理 中药化学实验',
       order: '分液漏斗试漏涂凡士林 → 铁圈固定 → 倒入水相与萃取溶剂 → 双手握紧倒置轻摇并及时开塞放气 → 静置分层后下层从下口放出、上层从上口倒出。',
+      plainTheory: '【分液漏斗·水油选边站分配法】向提取液中加入互不相溶的有机溶剂（如水与乙酸乙酯），在分液漏斗中剧烈振摇。目标成分遵循“相似相溶”，若脂溶性好就会成群结队钻入有机层，而水溶性淀粉、鞣质等留在水层。静置分层后旋开活塞放出下层、倒出上层，遵循“多次少量”（每次 20mL 分 3 次提取远优于一次用 60mL）实现高效富集。',
       equipment: ['500mL梨形分液漏斗', '铁架台与铁圈', '250mL锥形瓶', 'pH精密试纸', '无水硫酸钠'],
       hotspots: [
         { id: 1, name: '磨口玻璃塞（倒置放气）', desc: '右手食指顶住瓶塞、左手握活塞；每轻摇 2~3 下立即倒置开活塞放气。', warn: '使用氯仿、乙醚或酸碱中和产气时，不放气极易冲塞喷液！' },
@@ -1500,7 +1583,7 @@
 
   function createDefaultState() {
     return {
-      step: 1, rTab: 'bank', litFilter: '全部', activeTopicId: 'mint', sideQuery: '', sideCat: '全部', step1Tab: 'innovative', step1Query: '', step1Cat: '全部',
+      step: 1, rTab: 'bank', litFilter: '全部', activeTopicId: 'mint', sideQuery: '', sideCat: '全部', step1Tab: 'innovative', step1Query: '', step1Cat: '全部', theoryView: 'plain', drawerWide: false,
       customTopics: {}, topicStates: {}, extraGlobalRefs: [],
       meta: {
         className: '药学 / 中药学专业', groupName: '实验设计组', date: new Date().toISOString().slice(0, 10), teacher: '',
@@ -1588,9 +1671,10 @@
     const base = createDefaultState(), source = isRecord(raw) ? raw : {}, next = { ...base, ...source };
     const step = Number(source.step);
     next.step = Number.isInteger(step) && step >= 1 && step <= 6 ? step : base.step;
-    ['rTab', 'litFilter', 'sideQuery', 'sideCat', 'step1Tab', 'step1Query', 'step1Cat'].forEach(key => {
+    ['rTab', 'litFilter', 'sideQuery', 'sideCat', 'step1Tab', 'step1Query', 'step1Cat', 'theoryView'].forEach(key => {
       next[key] = typeof source[key] === 'string' ? source[key] : base[key];
     });
+    next.drawerWide = Boolean(source.drawerWide);
     next.customTopics = {};
     if (isRecord(source.customTopics)) Object.entries(source.customTopics).forEach(([id, entry]) => {
       const topic = normalizeCustomTopic(entry, id);
@@ -1682,7 +1766,9 @@
   // 右侧抽屉开关
   function openRightDrawer(tab = null) {
     if (tab) setRightTab(tab);
-    const d = document.getElementById('rightDrawer'); d.classList.remove('hidden'); void d.offsetWidth; d.classList.remove('translate-x-full'); d.classList.add('translate-x-0');
+    const d = document.getElementById('rightDrawer');
+    if (state.drawerWide) d.classList.add('drawer-wide'); else d.classList.remove('drawer-wide');
+    d.classList.remove('hidden'); void d.offsetWidth; d.classList.remove('translate-x-full'); d.classList.add('translate-x-0');
     document.getElementById('drawerBackdrop').classList.remove('hidden');
   }
   function closeRightDrawer() {
@@ -1877,7 +1963,16 @@
         </div>
       </button>`;
     }).join('') || '<div class="col-span-full text-center text-xs text-slate-400 py-8">未找到匹配课题，可清空筛选或点击上方「创建创新 DIY 药材」</div>';
-    el.querySelectorAll('[data-s1-pick]').forEach(btn => btn.addEventListener('click', () => { if (autoRunning) cancelActiveAI(); state.activeTopicId = btn.dataset.s1Pick; walkIdx = 0; saveState(); renderAll(); showToast(`已锁定：${getTopicDef().herb}`); }));
+    el.querySelectorAll('[data-s1-pick]').forEach(btn => btn.addEventListener('click', () => {
+      if (autoRunning) cancelActiveAI();
+      state.activeTopicId = btn.dataset.s1Pick;
+      walkIdx = 0;
+      saveState();
+      renderAll();
+      showToast(`已锁定：${getTopicDef().herb}`);
+      const profileCard = document.getElementById('s1HerbTitle');
+      if (profileCard) profileCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }));
 
     document.getElementById('s1HerbTitle').textContent = `${t.herb} · ${t.compound}`;
     document.getElementById('s1HerbLatin').textContent = t.latin;
@@ -1918,14 +2013,146 @@
 
   function renderStep3(t, ws) {
     const fKeys = t.formulas || ['diffusion', 'qc'];
+    const view = state.theoryView || 'plain';
+
+    // 渲染理论公式/小白速懂模式切换按钮状态
+    const btnPlain = document.getElementById('btnTheoryTabPlain');
+    const btnFormula = document.getElementById('btnTheoryTabFormula');
+    if (btnPlain && btnFormula) {
+      if (view === 'plain') {
+        btnPlain.className = 'theory-mode-btn px-3 py-1.5 rounded-lg bg-white text-[#0a3630] font-bold shadow-xs transition';
+        btnFormula.className = 'theory-mode-btn px-3 py-1.5 rounded-lg text-slate-600 font-medium hover:text-slate-900 transition';
+      } else {
+        btnFormula.className = 'theory-mode-btn px-3 py-1.5 rounded-lg bg-white text-[#0a3630] font-bold shadow-xs transition';
+        btnPlain.className = 'theory-mode-btn px-3 py-1.5 rounded-lg text-slate-600 font-medium hover:text-slate-900 transition';
+      }
+      btnPlain.onclick = () => { state.theoryView = 'plain'; saveState(); renderStep3(t, ws); };
+      btnFormula.onclick = () => { state.theoryView = 'classic'; saveState(); renderStep3(t, ws); };
+    }
+
+    // 渲染核心公式/白话卡片
     document.getElementById('theoryFormulasGrid').innerHTML = fKeys.map(k => {
-      const f = FORMULA_BANK[k];
-      return `<div class="p-4 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 space-y-2">
-        <div class="text-xs font-extrabold text-[#0a3630]">${f.name}</div>
-        <div class="formula-box px-3 py-2 rounded-xl bg-white border border-teal-100 text-xs sm:text-sm font-bold text-[#0f5c54] overflow-x-auto">${f.eq}</div>
-        <p class="text-xs text-slate-600 leading-relaxed">${f.desc}</p>
+      const f = FORMULA_BANK[k] || FORMULA_BANK['diffusion'];
+      return `
+      <div class="rounded-3xl bg-white border border-teal-100 shadow-xs p-5 space-y-3.5 transition hover:shadow-md">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-teal-50 text-[#0f5c54] flex items-center justify-center font-bold text-xs">⚗️</span>
+            <h4 class="text-sm font-extrabold text-slate-900">${f.name}</h4>
+          </div>
+          <span class="px-2 py-0.5 rounded-full bg-teal-50 text-[#0f5c54] text-[10px] font-bold">${f.category || '核心原理'}</span>
+        </div>
+
+        ${view === 'plain' ? `
+        <!-- 小白通俗大白话区域 -->
+        <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-2">
+          <div class="flex items-center gap-1.5 text-xs font-extrabold text-amber-900">
+            <span>💡</span><span>小白通俗大白话解读（生活比喻）</span>
+          </div>
+          <p class="text-xs text-amber-950 leading-relaxed">${f.plain || f.desc}</p>
+        </div>
+        ` : `
+        <!-- 经典学术公式区域 -->
+        <div class="space-y-2">
+          <div class="formula-box px-3.5 py-2.5 rounded-xl bg-[#062420] text-emerald-300 font-mono text-xs sm:text-sm font-bold overflow-x-auto shadow-inner tracking-wide">
+            ${f.eq}
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed"><strong class="text-[#0a3630]">标准定义：</strong>${f.desc}</p>
+        </div>
+        `}
+
+        ${f.breakdown && f.breakdown.length ? `
+        <div class="space-y-1.5 pt-1">
+          <div class="text-[11px] font-bold text-slate-700 flex items-center gap-1"><span>🔍</span><span>参数在实验室里代表什么？（为什么要这样设定）</span></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            ${f.breakdown.map(b => `
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-[11px] space-y-0.5">
+                <div class="font-bold text-[#0f5c54]">${b.term}</div>
+                <div class="text-slate-600 leading-relaxed">${b.expl}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>` : ''}
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-xs">
+          ${f.pitfalls ? `
+          <div class="p-2.5 rounded-xl bg-rose-50/70 border border-rose-200 text-rose-950 text-[11px] leading-relaxed">
+            <strong class="font-bold text-rose-800">⚠️ 实验避坑提醒：</strong>${f.pitfalls}
+          </div>` : ''}
+          ${f.examPoints ? `
+          <div class="p-2.5 rounded-xl bg-indigo-50/70 border border-indigo-200 text-indigo-950 text-[11px] leading-relaxed">
+            <strong class="font-bold text-indigo-800">🎓 核心考点速记：</strong>${f.examPoints}
+          </div>` : ''}
+        </div>
       </div>`;
     }).join('');
+
+    // 新增：新手常见 4 问 4 答（为什么这个实验要这么做？）
+    const faqMount = document.getElementById('step3DesignFaq');
+    if (faqMount) {
+      faqMount.innerHTML = `
+        <div class="p-4 rounded-2xl bg-teal-50/60 border border-teal-200/80 space-y-3">
+          <div class="flex items-center gap-2 text-xs font-extrabold text-[#0a3630]">
+            <span>🤔</span><span>新手研学快问快答 · 为什么本课题要这么设计？</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+            <div class="p-3 rounded-xl bg-white border border-teal-100 space-y-1">
+              <div class="font-bold text-[#0f5c54]">Q1: 为什么选「${ws.solventType || '特定溶剂'}」作为提取溶剂？</div>
+              <div class="text-[11px] text-slate-600 leading-relaxed">根据“相似相溶”原则：目标成分【${t.compound}】属【${t.category}】，该溶剂极性与有效成分高度吻合，既能高效溶解目标物，又最大程度减少水溶性大分子淀粉与树脂共提。</div>
+            </div>
+            <div class="p-3 rounded-xl bg-white border border-teal-100 space-y-1">
+              <div class="font-bold text-[#0f5c54]">Q2: 为什么控制提取温度在 ${ws.temp}℃、时长 ${ws.time}min？</div>
+              <div class="text-[11px] text-slate-600 leading-relaxed">该温度区间可加速分子热运动扩散，但又低于有效成分的受热分解阈值（${t.mpRef || '热敏区间'}），防止高温导致氧化异构化或挥发损失。</div>
+            </div>
+            <div class="p-3 rounded-xl bg-white border border-teal-100 space-y-1">
+              <div class="font-bold text-[#0f5c54]">Q3: 为什么分 ${ws.cycles} 次提取而不是煮一次？</div>
+              <div class="text-[11px] text-slate-600 leading-relaxed">根据菲克第一扩散定律，提取速率由药材细胞内外的“浓度梯度”决定。分次提取每次更换新鲜溶剂，保持极高浓度差，提取效率比一次性单浸高 30% 以上。</div>
+            </div>
+            <div class="p-3 rounded-xl bg-white border border-teal-100 space-y-1">
+              <div class="font-bold text-[#0f5c54]">Q4: 实验万一收率偏低或点样拖尾怎么办？</div>
+              <div class="text-[11px] text-slate-600 leading-relaxed">检查粉碎粒度是否过粗导致提取不透；TLC 拖尾多由点样过浓或展开剂未充分预饱和引起，可用毛细管快速微量多次点样，并在层析缸内贴滤纸密封饱和 20 分钟。</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 新增：本课题配套文献与中药化学章节速览卡片
+    const litMount = document.getElementById('step3LiteratureInline');
+    if (litMount) {
+      const allLit = [...GLOBAL_LITERATURE, ...state.extraGlobalRefs];
+      const matched = allLit.filter(l => l.text.includes(t.herb) || l.text.includes(t.compound.split('、')[0])).slice(0, 3);
+      const displayLit = matched.length ? matched : allLit.slice(0, 3);
+      litMount.innerHTML = `
+        <div class="p-4 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 text-xs font-extrabold text-[#0a3630]">
+              <span>📚</span><span>本课题关联文献与实证研究（GB/T 7714 规范）</span>
+            </div>
+            <button id="btnOpenFullLitFromStep3" type="button" class="text-xs font-bold text-[#0f5c54] hover:underline">查看全部 34 篇文献库 ↗</button>
+          </div>
+          <div class="space-y-2">
+            ${displayLit.map((item, idx) => `
+              <div class="p-2.5 rounded-xl bg-white border border-slate-200/70 text-xs flex items-start justify-between gap-2">
+                <div class="space-y-0.5">
+                  <span class="inline-block px-1.5 py-0.5 rounded bg-teal-50 text-[#0f5c54] text-[10px] font-bold">${item.tag}</span>
+                  <div class="text-slate-700 leading-relaxed text-[11px]">${item.text}</div>
+                </div>
+                <button type="button" data-inline-copy-lit="${idx}" class="shrink-0 text-[11px] text-[#0f5c54] font-bold hover:underline">复制</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      litMount.querySelectorAll('[data-inline-copy-lit]').forEach(btn => {
+        btn.onclick = () => {
+          const idx = Number(btn.dataset.inlineCopyLit);
+          if (displayLit[idx]) copyText(displayLit[idx].text, '已复制文献引用');
+        };
+      });
+      const bOpenFull = document.getElementById('btnOpenFullLitFromStep3');
+      if (bOpenFull) bOpenFull.onclick = () => openRightDrawer('lit');
+    }
 
     document.getElementById('integrativePerspective').textContent = t.integrative;
     const sp = t.spectra ? Object.assign({}, SPECTRA_BY_CAT[t.category] || SPECTRA_BY_CAT['黄酮'], t.spectra) : SPECTRA_BY_CAT[t.category] || SPECTRA_BY_CAT['黄酮'];
@@ -1996,6 +2223,8 @@
     document.querySelectorAll('.rig-tab-btn').forEach(b => { const a = b.dataset.rig === rigKey; b.classList.remove('bg-[#0a3630]', 'text-white', 'bg-white', 'text-slate-600', 'shadow-sm', 'ring-2', 'ring-teal-500'); b.className = `rig-tab-btn shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition ${a ? 'bg-[#0a3630] text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'}`; b.setAttribute('aria-pressed', a ? 'true' : 'false'); }); const applyBtn = document.getElementById('applyRigToReportBtn'); if (applyBtn) { const applied = (ws.reportRig || rigKey) === rigKey; applyBtn.textContent = applied ? '已应用到报告 ✓' : '应用到报告'; }
     document.getElementById('rigDiagramTitle').textContent = rig.title;
     document.getElementById('rigAssemblyOrder').innerHTML = `<strong>搭建顺序：</strong>${rig.order}`;
+    const rigPt = document.getElementById('rigPlainTheoryText');
+    if (rigPt) rigPt.textContent = rig.plainTheory || '利用理化性质差异实现成分高效富集。';
     document.getElementById('rigVideoSearchLink').href = `https://search.bilibili.com/all?keyword=${encodeURIComponent(rig.videoKw)}`;
     const sw = document.getElementById('rigSvgWrapper'); sw.innerHTML = rig.svg; sw.classList.add('rig-live');
     sw.querySelectorAll('[data-hotspot]').forEach(g => g.addEventListener('click', () => { ws.activeHotspot = Number(g.dataset.hotspot); saveState(); renderStep4(t, ws); }));
@@ -2125,9 +2354,11 @@
       document.getElementById('headerStepTag').textContent = meta.tag;
       document.getElementById('headerTitle').textContent = meta.title;
       document.getElementById('topLinearProgress').style.width = `${(state.step / 6 * 100).toFixed(1)}%`;
-      document.getElementById('mobStepIndicator').textContent = `${state.step} / 6`;
+      document.getElementById('mobStepIndicator').textContent = `0${state.step}/06 · ${meta.title}`;
       document.getElementById('btnMobPrev').disabled = state.step <= 1;
       document.getElementById('btnMobNext').disabled = state.step >= 6;
+      document.getElementById('btnMobPrev').textContent = state.step > 1 ? `← ${STEP_META[state.step - 1]?.title || '上一步'}` : '← 上一步';
+      document.getElementById('btnMobNext').textContent = state.step < 6 ? `${STEP_META[state.step + 1]?.title || '下一步'} →` : '已完成报告';
 
       document.querySelectorAll('#wizardNav .step-chip').forEach(btn => {
         const n = Number(btn.dataset.wstep); btn.classList.remove('active', 'done');
@@ -2188,6 +2419,16 @@
     document.getElementById('btnOpenLitFromStep3').addEventListener('click', () => openRightDrawer('lit'));
     document.getElementById('btnCloseRightDrawer').addEventListener('click', closeRightDrawer);
     document.getElementById('drawerBackdrop').addEventListener('click', closeRightDrawer);
+    const btnWide = document.getElementById('btnToggleDrawerWide');
+    if (btnWide) {
+      btnWide.addEventListener('click', () => {
+        state.drawerWide = !state.drawerWide;
+        saveState();
+        const d = document.getElementById('rightDrawer');
+        if (state.drawerWide) d.classList.add('drawer-wide'); else d.classList.remove('drawer-wide');
+        showToast(state.drawerWide ? '已开启资料抽屉宽屏阅读模式' : '已恢复标准抽屉模式');
+      });
+    }
 
     document.querySelectorAll('.rtab-btn').forEach(b => b.addEventListener('click', () => setRightTab(b.dataset.rtab)));
     document.getElementById('sideSearch').addEventListener('input', e => { state.sideQuery = e.target.value; renderRightDrawer(getTopicDef(), getWorkState(getTopicDef())); });

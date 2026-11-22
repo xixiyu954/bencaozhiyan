@@ -151,15 +151,23 @@
   </aside>
 
   <!-- ==================== 右侧可拉出/折叠抽屉栏：题库 + 海量中医药/中西医结合文献 + 高校实验库 ==================== -->
-  <aside id="rightDrawer" class="no-print fixed inset-y-0 right-0 z-40 w-80 sm:w-96 max-w-[92vw] bg-white border-l border-slate-200 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 hidden">
+  <aside id="rightDrawer" class="no-print fixed inset-y-0 right-0 z-40 w-full sm:w-[500px] md:w-[620px] lg:w-[720px] max-w-[96vw] bg-white border-l border-slate-200 shadow-2xl flex flex-col transform translate-x-full transition-all duration-300 hidden">
     <div class="px-5 py-4 border-b border-slate-200 bg-[#f7f7f4] flex items-center justify-between gap-2">
       <div>
-        <div class="text-sm font-extrabold text-slate-900">资源抽屉 · 题库与文献</div>
-        <div class="text-[11px] text-slate-500">随时拉出查阅，点击右侧收起不占空间</div>
+        <div class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+          <span>📚 研学资料库</span>
+          <span class="px-2 py-0.5 rounded-full bg-teal-100 text-[#0f5c54] text-[10px] font-bold">题库 / 章节 / 文献</span>
+        </div>
+        <div class="text-[11px] text-slate-500">涵盖 79 药材题库、10 大章节知识与 34 篇 GB/T 7714 规范文献</div>
       </div>
-      <button id="btnCloseRightDrawer" type="button" class="p-2 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-900" title="折叠收起">
-        <i data-lucide="panel-right-close" class="w-4 h-4"></i>
-      </button>
+      <div class="flex items-center gap-1.5">
+        <button id="btnToggleDrawerWide" type="button" class="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-[#0f5c54] text-xs font-bold transition flex items-center gap-1" title="切换宽屏/标准屏">
+          <i data-lucide="maximize-2" class="w-4 h-4"></i><span class="hidden sm:inline text-[11px]">宽屏</span>
+        </button>
+        <button id="btnCloseRightDrawer" type="button" class="p-2 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-900" title="折叠收起">
+          <i data-lucide="panel-right-close" class="w-4 h-4"></i>
+        </button>
+      </div>
     </div>
 
     <!-- 右抽屉 4 标签 -->
@@ -433,8 +441,9 @@
           </div>
         </div>
 
-        <div class="hidden lg:flex justify-end">
-          <button type="button" data-go-step="2" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#0a3630] text-white text-sm font-bold shadow-md">下一步：定题 <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-slate-200/80 mt-6">
+          <div class="text-xs text-slate-500 font-medium">已锁定当前药材，前往配置正式题目与基础参数</div>
+          <button type="button" data-go-step="2" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#0a3630] hover:bg-[#062420] text-white text-sm font-bold shadow-md transition">下一步：02 确定实验题目与DIY参数 <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
         </div>
       </section>
 
@@ -459,9 +468,9 @@
           </div>
         </div>
 
-        <div class="hidden lg:flex items-center justify-between">
-          <button type="button" data-go-step="1" class="px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 text-sm font-semibold">← 上一步</button>
-          <button type="button" data-go-step="3" class="px-6 py-3 rounded-2xl bg-[#0a3630] text-white text-sm font-bold shadow-md">下一步：原理与方案 →</button>
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-slate-200/80 mt-6">
+          <button type="button" data-go-step="1" class="px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">← 上一步：01 重新选材</button>
+          <button type="button" data-go-step="3" class="px-6 py-3 rounded-2xl bg-[#0a3630] hover:bg-[#062420] text-white text-sm font-bold shadow-md transition flex items-center gap-2">下一步：03 查看原理与方案设计 <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
         </div>
       </section>
 
@@ -480,12 +489,27 @@
 
         <!-- 独立板块 1：核心化学理论与数学公式（彻底取代繁琐页码占位） -->
         <div class="lab-card rounded-3xl p-6 space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-base font-extrabold text-slate-900">核心理论与公式原理</h3>
-            <span class="text-xs text-slate-500">物理化学 · 药学计算依据</span>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-teal-100 text-[#0f5c54] flex items-center justify-center font-bold text-xs">📖</span>
+                <h3 class="text-base font-extrabold text-slate-900">核心提取分离原理 · 白话速懂与公式</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">基础不好也能轻松看懂：生活通俗比喻 + 实验室参数拆解 + 考点避坑指南</p>
+            </div>
+            <div class="inline-flex p-1 rounded-xl bg-slate-100 text-xs font-bold shrink-0">
+              <button id="btnTheoryTabPlain" type="button" class="theory-mode-btn px-3 py-1.5 rounded-lg bg-white text-[#0a3630] font-bold shadow-xs transition">👶 小白通俗大白话版</button>
+              <button id="btnTheoryTabFormula" type="button" class="theory-mode-btn px-3 py-1.5 rounded-lg text-slate-600 font-medium hover:text-slate-900 transition">🔬 经典学术公式版</button>
+            </div>
           </div>
-          <div id="theoryFormulasGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5"></div>
+          <div id="theoryFormulasGrid" class="space-y-4"></div>
         </div>
+
+        <!-- 独立板块 1.5：新手研学常见 4 问 4 答 -->
+        <div id="step3DesignFaq"></div>
+
+        <!-- 独立板块 1.8：本课题关联文献与实证速查 -->
+        <div id="step3LiteratureInline"></div>
 
         <!-- 独立板块 2：中西医结合转化与高校研究视角 -->
         <div class="lab-card rounded-3xl p-6 space-y-3 border-l-4 border-l-[#0f5c54]">
@@ -544,9 +568,9 @@
           </div>
         </div>
 
-        <div class="hidden lg:flex items-center justify-between">
-          <button type="button" data-go-step="2" class="px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 text-sm font-semibold">← 上一步</button>
-          <button type="button" data-go-step="4" class="px-6 py-3 rounded-2xl bg-[#0a3630] text-white text-sm font-bold shadow-md">下一步：装置与流程 →</button>
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-slate-200/80 mt-6">
+          <button type="button" data-go-step="2" class="px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">← 上一步：02 微调题目与参数</button>
+          <button type="button" data-go-step="4" class="px-6 py-3 rounded-2xl bg-[#0a3630] hover:bg-[#062420] text-white text-sm font-bold shadow-md transition flex items-center gap-2">下一步：04 进入动态实验装置与流程 <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
         </div>
       </section>
 
@@ -579,6 +603,9 @@
               </div>
               <div id="rigSvgWrapper" class="w-full flex items-center justify-center py-2"></div>
               <div id="rigAssemblyOrder" class="text-[11px] text-[#0a3630] bg-white/85 rounded-xl px-3 py-2 border border-teal-100 mt-2"></div>
+              <div id="rigPlainTheoryBox" class="text-[11px] text-amber-950 bg-amber-50/85 rounded-xl px-3 py-2 border border-amber-200 mt-2">
+                <span class="font-extrabold text-amber-900">💡 装置原理大白话：</span><span id="rigPlainTheoryText"></span>
+              </div>
             </div>
 
             <div class="lg:col-span-5 flex flex-col justify-between gap-3">
@@ -617,9 +644,9 @@
           <div class="lg:col-span-5 lab-card rounded-3xl p-5 space-y-3"><h3 class="text-base font-extrabold text-slate-900">异常排障</h3><div id="troubleshootList" class="space-y-2.5"></div></div>
         </div>
 
-        <div class="hidden lg:flex items-center justify-between">
-          <button type="button" data-go-step="3" class="px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 text-sm font-semibold">← 上一步</button>
-          <button type="button" data-go-step="5" class="px-6 py-3 rounded-2xl bg-[#0a3630] text-white text-sm font-bold shadow-md">下一步：数据 →</button>
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-slate-200/80 mt-6">
+          <button type="button" data-go-step="3" class="px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">← 上一步：03 审视原理与工艺</button>
+          <button type="button" data-go-step="5" class="px-6 py-3 rounded-2xl bg-[#0a3630] hover:bg-[#062420] text-white text-sm font-bold shadow-md transition flex items-center gap-2">下一步：05 录入平行数据与TLC检识 <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
         </div>
       </section>
 
@@ -685,9 +712,58 @@
           <div class="lg:col-span-6 lab-card rounded-3xl p-5 space-y-3"><h3 class="text-sm font-extrabold text-slate-900">理化检识记录</h3><div id="chemTestsList" class="space-y-2"></div></div>
         </div>
 
-        <div class="hidden lg:flex items-center justify-between">
-          <button type="button" data-go-step="4" class="px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 text-sm font-semibold">← 上一步</button>
-          <button type="button" data-go-step="6" class="px-6 py-3 rounded-2xl bg-[#0a3630] text-white text-sm font-bold shadow-md">下一步：报告 →</button>
+        <!-- 新增：数据指标与检识小白通俗拆解指南 -->
+        <div id="step5AnalyticsGuide" class="lab-card rounded-3xl p-5 space-y-3.5 bg-gradient-to-br from-white via-teal-50/20 to-amber-50/30">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-teal-50 text-[#0f5c54] flex items-center justify-center font-bold text-xs">💡</span>
+              <h3 class="text-sm font-extrabold text-slate-900">小白数据分析与质控指标通俗精讲</h3>
+            </div>
+            <span class="text-[11px] text-[#0f5c54] font-bold">考点与报告必写</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div class="p-3.5 rounded-2xl bg-white border border-slate-200/80 space-y-1.5 shadow-2xs">
+              <div class="font-extrabold text-[#0a3630] flex items-center gap-1.5">
+                <span class="px-1.5 py-0.5 rounded bg-teal-100 text-[#0a3630] text-[10px] font-bold">1</span>
+                <span>收率 (Yield) 计算公式</span>
+              </div>
+              <div class="p-2 rounded-xl bg-slate-50 font-mono text-[11px] text-teal-900 font-bold">
+                收率(%) = (粗提物质量 g ÷ 药材投料 g) × 100%
+              </div>
+              <p class="text-[11px] text-slate-600 leading-relaxed">
+                <strong class="text-slate-800">小白大白话：</strong>相当于 100 克干药材最后被你榨出了几克有效提取物。若收率低于药典限度，通常是料液比不足、提取次数少或溶剂挥发太快。
+              </p>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-white border border-slate-200/80 space-y-1.5 shadow-2xs">
+              <div class="font-extrabold text-indigo-900 flex items-center gap-1.5">
+                <span class="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-900 text-[10px] font-bold">2</span>
+                <span>RSD 相对标准偏差 (平行性)</span>
+              </div>
+              <div class="p-2 rounded-xl bg-slate-50 font-mono text-[11px] text-indigo-900 font-bold">
+                RSD(%) = (标准偏差 SD ÷ 平均收率) × 100%
+              </div>
+              <p class="text-[11px] text-slate-600 leading-relaxed">
+                <strong class="text-slate-800">小白大白话：</strong>考核你“手艺稳不稳”。如果 3 批收率非常接近，SD 小、RSD &lt; 3%，说明你的实验手法稳定可靠；如果忽高忽低（RSD &gt; 5%），说明批次间有漏液或温度波动。
+              </p>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-white border border-slate-200/80 space-y-1.5 shadow-2xs">
+              <div class="font-extrabold text-amber-900 flex items-center gap-1.5">
+                <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 text-[10px] font-bold">3</span>
+                <span>TLC 比移值 Rf 与判断标准</span>
+              </div>
+              <div class="p-2 rounded-xl bg-slate-50 font-mono text-[11px] text-amber-900 font-bold">
+                Rf = 斑点中心位移 L ÷ 展开前沿 L₀
+              </div>
+              <p class="text-[11px] text-slate-600 leading-relaxed">
+                <strong class="text-slate-800">小白大白话：</strong>像赛跑，展开剂带成分往上爬。极性大的被硅胶抱得紧跑得慢，极性小的跑得快。供试品斑点与对照品斑点跑在同一高度（|ΔRf| ≤ 0.03）且显色一致，即定性证实含有该成分！
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-slate-200/80 mt-6">
+          <button type="button" data-go-step="4" class="px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">← 上一步：04 装置与SOP清单</button>
+          <button type="button" data-go-step="6" class="px-6 py-3 rounded-2xl bg-[#0a3630] hover:bg-[#062420] text-white text-sm font-bold shadow-md transition flex items-center gap-2">下一步：06 预览并导出实验报告 <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
         </div>
       </section>
 
@@ -736,6 +812,11 @@
         <div id="reportPreviewCard" class="space-y-2">
           <div class="no-print flex items-center justify-between px-1"><span class="text-xs font-bold text-slate-600">A4 实时预览</span><span id="reportModuleCount" class="text-xs font-bold text-[#0f5c54]"></span></div>
           <div id="printableReportMount" class="a4-paper rounded-2xl p-6 sm:p-10 text-slate-900 space-y-5 text-xs sm:text-sm leading-7"></div>
+        </div>
+
+        <div class="no-print flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-slate-200/80 mt-6">
+          <button type="button" data-go-step="5" class="px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">← 上一步：修改数据与检识</button>
+          <button type="button" data-go-step="1" class="px-5 py-2.5 rounded-2xl bg-emerald-50 text-[#0f5c54] border border-emerald-200 text-sm font-bold hover:bg-emerald-100 transition">↺ 返回第 01 步探索新课题</button>
         </div>
       </section>
     </main>
