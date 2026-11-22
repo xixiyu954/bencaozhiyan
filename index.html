@@ -27,10 +27,24 @@
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <link rel="stylesheet" href="./styles.css?v=11" />
+  <link rel="stylesheet" href="./styles.css?v=14" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
+  <!-- 动态本草分子几何氛围层（GPU 轻量化漂浮，不遮挡交互） -->
+  <div id="ambientLabBg" class="no-print" aria-hidden="true">
+    <svg class="ambient-hex-1" viewBox="0 0 200 200" fill="none">
+      <polygon points="100,14 174,56 174,144 100,186 26,144 26,56" stroke="#0f5c54" stroke-width="2.5"/>
+      <polygon points="100,34 156,66 156,134 100,166 44,134 44,66" stroke="#10b981" stroke-width="1.5" stroke-dasharray="6 6"/>
+      <circle cx="100" cy="14" r="5" fill="#10b981"/><circle cx="174" cy="56" r="5" fill="#d99b26"/>
+      <circle cx="174" cy="144" r="5" fill="#0f5c54"/><circle cx="26" cy="144" r="5" fill="#10b981"/>
+    </svg>
+    <svg class="ambient-hex-2" viewBox="0 0 200 200" fill="none">
+      <polygon points="75,25 135,25 165,77 135,129 75,129 45,77" stroke="#d99b26" stroke-width="2.2"/>
+      <polygon points="135,77 178,77 198,114 178,151 135,151 115,114" stroke="#0f5c54" stroke-width="2"/>
+      <circle cx="75" cy="25" r="4.5" fill="#d99b26"/><circle cx="165" cy="77" r="4.5" fill="#10b981"/>
+    </svg>
+  </div>
 
   <!-- ==================== 左侧固定栏：专属「实验配置单 & 精细 DIY 小参数」 ==================== -->
   <aside id="leftSidebar" class="no-print fixed inset-y-0 left-0 z-40 w-72 bg-[#062420] text-teal-50 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 shadow-2xl lg:shadow-none">
@@ -258,66 +272,77 @@
       <button id="btnDismissWechat" type="button" class="font-bold px-1.5">×</button>
     </div>
 
-    <!-- 极简顶栏 -->
+    <!-- v8.0 独立分区顶栏：工作区板块切换 + 独立连线 6 步进度条 -->
     <header class="no-print sticky top-0 z-20 bg-[#f4f3ee]/92 backdrop-blur-md border-b border-slate-200/80">
-      <div class="h-1 w-full bg-slate-200/70"><div id="topLinearProgress" class="h-full bg-gradient-to-r from-[#0a3630] to-emerald-500 transition-all duration-300" style="width: 16.6%"></div></div>
-      <div class="max-w-4xl mx-auto px-4 sm:px-8 py-3 space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+      <div class="h-1 w-full bg-slate-200/70"><div id="topLinearProgress" class="h-full bg-gradient-to-r from-[#0a3630] via-emerald-500 to-amber-400 transition-all duration-300" style="width: 16.6%"></div></div>
+      <div class="max-w-[1620px] mx-auto px-4 sm:px-6 xl:px-8 py-2.5 space-y-2.5">
+        <!-- 第一分区：当前状态 + 三大功能区独立切换 + 工具快捷组 -->
+        <div class="flex flex-wrap items-center justify-between gap-2.5">
           <div class="flex items-center gap-2.5 min-w-0">
             <button id="btnOpenLeftMobile" type="button" class="lg:hidden p-2 rounded-xl bg-white border border-slate-200 text-slate-700" title="打开左侧配置单"><i data-lucide="sliders" class="w-4 h-4"></i></button>
-            <div class="min-w-0">
-              <div class="flex items-center gap-2">
-                <span id="headerStepTag" class="px-2 py-0.5 rounded-md bg-[#0a3630] text-emerald-200 text-[10px] font-bold">01 / 06</span>
-                <h1 id="headerTitle" class="text-base sm:text-lg font-extrabold text-slate-900 truncate">选材</h1>
-              </div>
+            <div class="min-w-0 flex items-center gap-2">
+              <span id="headerStepTag" class="px-2.5 py-0.5 rounded-lg bg-[#0a3630] text-emerald-200 text-[10px] font-extrabold tracking-wide">01 / 06</span>
+              <h1 id="headerTitle" class="text-base sm:text-lg font-extrabold text-slate-900 truncate">选材</h1>
             </div>
           </div>
 
-          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 shrink-0 max-w-full">
-            <button id="btnToggleDarkLab" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#0f5c54] text-slate-700 text-xs font-bold transition" title="切换深色护眼实验室模式">🌙 护眼暗色</button>
-            <button id="btnOpenCmdPalette" type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#0f5c54] text-slate-700 text-xs font-bold transition" title="全局极速搜索 (Ctrl+K)">
-              <span>⌘K 极速搜索</span>
+          <!-- 独立板块切换器：实验设计工坊 vs 动态流程与装置库 vs 研学资料库 -->
+          <div id="workspaceZoneBar" class="workspace-zone-bar order-3 2xl:order-2 w-full sm:w-auto overflow-x-auto">
+            <button type="button" id="zoneTabWorkflow" class="zone-tab active">
+              <span>🧪 实验设计工坊</span>
             </button>
-            <button id="btnOpenCompareTop" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-teal-50 border border-teal-200 hover:bg-teal-100 text-[#0a3630] text-xs font-extrabold transition" title="任意两项课题十维度横向对比">
-              <span>⚖️ 课题对比</span>
+            <button type="button" id="btnOpenApparatusHub" data-go-step="hub" class="zone-tab zone-tab-hub">
+              <span>⚙️ 动态流程与装置库</span>
+              <span id="navHubCount" class="zone-badge">15</span>
             </button>
-            <button id="btnOpenQwenCfgTop" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-100 to-emerald-50 border border-emerald-300/80 text-[#062420] text-xs font-extrabold hover:shadow-xs transition">
+            <button id="btnOpenRightBank" type="button" class="zone-tab">
+              <i data-lucide="book-open" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>研学资料库</span>
+            </button>
+          </div>
+
+          <!-- 右侧精简工具栏 -->
+          <div class="flex flex-wrap items-center gap-1.5 shrink-0 order-2 2xl:order-3">
+            <button id="btnOpenCmdPalette" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#0f5c54] text-slate-700 text-xs font-bold transition" title="全局极速搜索 (Ctrl+K)">⌘K 搜索</button>
+            <button id="btnOpenCompareTop" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-teal-50 border border-teal-200 hover:bg-teal-100 text-[#0a3630] text-xs font-extrabold transition" title="任意两项课题十维度横向对比">⚖️ 对比</button>
+            <button id="btnOpenQwenCfgTop" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-100 to-emerald-50 border border-emerald-300/80 text-[#062420] text-xs font-extrabold hover:shadow-xs transition">
               <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i><span id="qwenHeaderBtnLabel">智谱 AI</span>
             </button>
-            <button id="btnOpenRightBank" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0a3630] text-white text-xs font-bold hover:bg-[#062420] transition shadow-xs">
-              <i data-lucide="panel-right-open" class="w-3.5 h-3.5 text-emerald-300"></i><span>题库 / 章节 / 文献</span>
-            </button>
-            <button id="btnOpenFeedbackTop" type="button" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-amber-300/80 text-amber-900 text-xs font-bold hover:bg-amber-50">
+            <button id="btnToggleVisualDock" type="button" class="studio-dock-toggle-btn items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-emerald-900 text-xs font-bold transition" title="展开/收起右侧动态可视化驾驶舱">📊 驾驶舱</button>
+            <button id="btnToggleDarkLab" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#0f5c54] text-slate-700 text-xs font-bold transition" title="切换深色护眼实验室模式">🌙 护眼暗色</button>
+            <button id="btnOpenFeedbackTop" type="button" class="hidden md:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-amber-300/80 text-amber-900 text-xs font-bold hover:bg-amber-50">
               <i data-lucide="mail" class="w-3.5 h-3.5 text-amber-600"></i>反馈
             </button>
-            <a href="https://github.com/xixiyu954/tcm-chemistry-lab" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition" title="访问 GitHub 开源项目">
+            <a href="https://github.com/xixiyu954/tcm-chemistry-lab" target="_blank" rel="noopener noreferrer" class="hidden md:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition" title="访问 GitHub 开源项目">
               <i data-lucide="github" class="w-3.5 h-3.5"></i>GitHub
             </a>
-            <button id="btnResetTopic" type="button" class="p-2 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-rose-600" title="重置"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+            <button id="btnResetTopic" type="button" class="p-1.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-rose-600" title="重置"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
           </div>
         </div>
 
-        <!-- 极简 6 步导航（短词清晰） -->
-        <nav id="wizardNav" class="flex flex-wrap items-center gap-1.5 pb-0.5">
-          <button type="button" data-wstep="1" class="step-chip active shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600">01 选材</button>
-          <span class="text-slate-300 text-xs">›</span>
-          <button type="button" data-wstep="2" class="step-chip shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600">02 定题</button>
-          <span class="text-slate-300 text-xs">›</span>
-          <button type="button" data-wstep="3" class="step-chip shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600">03 原理与方案</button>
-          <span class="text-slate-300 text-xs">›</span>
-          <button type="button" data-wstep="4" class="step-chip shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600">04 装置与流程</button>
-          <span class="text-slate-300 text-xs">›</span>
-          <button type="button" data-wstep="5" class="step-chip shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600">05 数据</button>
-          <span class="text-slate-300 text-xs">›</span>
-          <button type="button" data-wstep="6" class="step-chip shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600">06 报告</button>
-          <span class="hidden sm:inline-block h-4 w-px bg-slate-300 mx-1"></span>
-          <button type="button" id="btnOpenApparatusHub" data-wstep="hub" class="hub-nav-pill shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold inline-flex items-center gap-1">⚙️ 动态流程与装置库 <span id="navHubCount" class="px-1.5 py-0.2 rounded-full bg-amber-900/15 text-[10px]">9</span></button>
-        </nav>
+        <!-- 第二分区：独立连线 6 步实验进度条（仅在工坊模式展示，告别拥挤） -->
+        <div id="stepperZoneBar">
+          <nav id="wizardNav" class="stepper-track">
+            <button type="button" data-wstep="1" class="step-chip active"><span class="step-num-dot">01</span><span>选材</span></button>
+            <div class="stepper-conn"></div>
+            <button type="button" data-wstep="2" class="step-chip"><span class="step-num-dot">02</span><span>定题</span></button>
+            <div class="stepper-conn"></div>
+            <button type="button" data-wstep="3" class="step-chip"><span class="step-num-dot">03</span><span>原理与方案</span></button>
+            <div class="stepper-conn"></div>
+            <button type="button" data-wstep="4" class="step-chip"><span class="step-num-dot">04</span><span>装置与流程</span></button>
+            <div class="stepper-conn"></div>
+            <button type="button" data-wstep="5" class="step-chip"><span class="step-num-dot">05</span><span>数据</span></button>
+            <div class="stepper-conn"></div>
+            <button type="button" data-wstep="6" class="step-chip"><span class="step-num-dot">06</span><span>报告</span></button>
+          </nav>
+        </div>
       </div>
     </header>
 
     <!-- 主舞台内容（居中清爽宽度 max-w-4xl） -->
-    <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-8 py-6 space-y-6">
+    <main class="relative z-10 flex-1 max-w-[1620px] w-full mx-auto px-4 sm:px-6 xl:px-8 py-6">
+      <div class="studio-layout-grid">
+        <div id="studioMainCol" class="flex-1 min-w-0 w-full space-y-6">
       <!-- ==================== 公共 AI 实验总控台（自然语言调度全工作台自动化） ==================== -->
       <section id="qwenCommandBar" class="no-print rounded-3xl bg-white/95 backdrop-blur-md border border-emerald-200/90 shadow-md p-4 sm:p-5 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
@@ -930,10 +955,14 @@
         <!-- 选中装置全景交互舞台 -->
         <div id="hubRigDetailMount" class="space-y-5"></div>
       </section>
+        </div>
+        <!-- 右侧常驻：v8.0 实时化学萃取动态视窗 & 五维工艺雷达驾驶舱 -->
+        <aside id="rightVisualDock" class="no-print studio-right-dock"></aside>
+      </div>
     </main>
 
     <footer class="no-print mt-auto border-t border-slate-200/80 bg-white/75">
-      <div class="max-w-4xl mx-auto px-4 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+      <div class="max-w-[1620px] mx-auto px-4 sm:px-6 xl:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
         <div>本草智研 · 《中药化学》智能实验设计工作台（公开通用版）</div>
         <div class="flex items-center gap-2">
           <a href="https://github.com/xixiyu954/tcm-chemistry-lab" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-700 underline font-semibold">GitHub 仓库</a>
@@ -1083,7 +1112,11 @@
 <script src="./lab-tools-v3.js?v=8"></script>
 <script src="./lab-v6-pro.js?v=11"></script>
 <script src="./lab-v7-media-pro.js?v=11"></script>
-<script src="./cloud-ai.js?v=11"></script>
-<script src="./app.js?v=11"></script>
+<script src="./lab-v9-data.js?v=14"></script>
+<script src="./lab-v8-studio.js?v=14"></script>
+<script src="./lab-v9-visuals.js?v=14"></script>
+<script src="./lab-v10-sandbox.js?v=14"></script>
+<script src="./cloud-ai.js?v=14"></script>
+<script src="./app.js?v=14"></script>
 </body>
 </html>

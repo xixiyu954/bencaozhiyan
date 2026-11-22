@@ -1630,6 +1630,9 @@
   if (V4_DATA.V4_RIGS) {
     Object.assign(LAB_RIGS, V4_DATA.V4_RIGS);
   }
+  if (window.TCM_V10_SANDBOX && window.TCM_V10_SANDBOX.V10_EXTRA_RIGS) {
+    Object.assign(LAB_RIGS, window.TCM_V10_SANDBOX.V10_EXTRA_RIGS);
+  }
   if (V5_DATA.V5_PRESETS) {
     Object.entries(V5_DATA.V5_PRESETS).forEach(([k, preset]) => {
       FEATURED_PRESETS[k] = preset;
@@ -1657,6 +1660,36 @@
       if (!UNIV_CASES.some(x => x.title === item.title)) UNIV_CASES.push(item);
     });
   }
+  // ============ 合并 v9.0 扩充题库、规范文献与高校案例 ============
+  const V9_DATA = window.TCM_V9_DATA || {};
+  if (V9_DATA.V9_PRESETS) {
+    Object.entries(V9_DATA.V9_PRESETS).forEach(([k, preset]) => {
+      FEATURED_PRESETS[k] = preset;
+      if (!CATALOG_45.some(c => c.id === k)) {
+        CATALOG_45.push({
+          id: preset.id,
+          isInnovative: !!preset.isInnovative,
+          isClassGroup: !!preset.isClassGroup,
+          featured: true,
+          herb: preset.herb,
+          compound: preset.compound,
+          category: preset.category,
+          sourceTag: preset.sourceTag || ''
+        });
+      }
+    });
+  }
+  if (Array.isArray(V9_DATA.V9_LITERATURE)) {
+    V9_DATA.V9_LITERATURE.forEach(item => {
+      if (!GLOBAL_LITERATURE.some(x => x.text === item.text)) GLOBAL_LITERATURE.push(item);
+    });
+  }
+  if (Array.isArray(V9_DATA.V9_UNIV_CASES)) {
+    V9_DATA.V9_UNIV_CASES.forEach(item => {
+      if (!UNIV_CASES.some(x => x.title === item.title)) UNIV_CASES.push(item);
+    });
+  }
+
 
   // 精准短词 B站链接生成器（1~2 词高命中，解决检索词过多导致视频偏题问题）
   function biliUrl(kw) {
@@ -2840,6 +2873,9 @@
       if (state.step === 5) renderStep5(t, ws, stats);
       if (state.step === 6) renderStep6(t, ws, stats);
     if (state.step === 'hub') renderHub();
+      if (window.TCM_STUDIO_V8) window.TCM_STUDIO_V8.sync(t, ws, stats, state.step);
+      if (window.TCM_V9) window.TCM_V9.sync(t, ws, stats, state.step);
+      if (window.TCM_V10_SANDBOX) window.TCM_V10_SANDBOX.sync(t, ws, stats, state.step);
       if (typeof lucide !== 'undefined') lucide.createIcons();
     } catch (error) {
       console.error('工作台渲染失败，请检查存档或刷新重试。', error);
