@@ -446,7 +446,7 @@
         </div>
 
         <!-- 自动化执行进度与回执 -->
-        <div id="qwenExecReceipt" class="hidden rounded-2xl bg-gradient-to-br from-emerald-50/80 to-white border border-emerald-200/80 p-3.5 space-y-2.5 text-[13px]">
+        <div id="qwenProgressBox" class="hidden rounded-2xl bg-slate-50 border border-teal-200/80 p-3.5 space-y-2 text-[12px]"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2 font-bold text-[#0a3630]"><span class="w-2 h-2 rounded-full bg-teal-500 animate-ping"></span><span id="qwenProgressStageText">正在检索题库文献...</span></div><span id="qwenProgressTimer" class="font-mono text-[11px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">0.0s</span></div><div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden"><div id="qwenProgressBar" class="h-full bg-gradient-to-r from-[#0a3630] to-teal-500 transition-all duration-300" style="width:15%"></div></div><div class="grid grid-cols-4 gap-1 text-[10px] text-slate-400 font-medium"><span id="qwenStep1" class="text-teal-700 font-bold">① 检索题库文献</span><span id="qwenStep2">② 调用通义千问</span><span id="qwenStep3">③ 同步工作台参数与装置</span><span id="qwenStep4">④ 写入报告与入库</span></div></div> <div id="qwenExecReceipt" class="hidden rounded-2xl bg-gradient-to-br from-emerald-50/80 to-white border border-emerald-200/80 p-3.5 space-y-2.5 text-[13px]">
           <div class="flex items-center justify-between gap-2">
             <div class="font-extrabold text-[#0a3630] flex items-center gap-1.5">
               <span id="qwenReceiptBadge" class="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -3022,7 +3022,7 @@
     memEl.querySelectorAll('[data-del-m]').forEach(b => b.addEventListener('click', () => { if (state.meta.members.length <= 1) return; state.meta.members.splice(Number(b.dataset.delM), 1); saveState(); renderStep6(t, ws, stats); }));
   }
 
-  function renderAll() {
+  function renderAll() { const aiBox = document.getElementById('aiPlanShowcase'); if (aiBox && aiBox.dataset.topicId && aiBox.dataset.topicId !== state.activeTopicId) aiBox.classList.add('hidden');
     const t = getTopicDef(), ws = getWorkState(t), stats = computeStats(t, ws);
     const meta = STEP_META[state.step] || STEP_META[1];
     document.getElementById('headerStepTag').textContent = meta.tag;
@@ -3259,7 +3259,7 @@
       if (hasKey) {
         pill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
         pill.textContent = `已接入通义千问 · ${getActiveQwenModel()}`;
-      } else if (PUBLIC_QWEN_PROXY_URL) { pill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200'; pill.textContent = `已直连通义千问 · ${getActiveQwenModel()}（免配置）`; } 
+      } else if (PUBLIC_QWEN_PROXY_URL) { pill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200'; pill.textContent = `内置公共通道就绪（免配置） · ${getActiveQwenModel()}``; } 
       else {
         pill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200';
         pill.textContent = '本地智算演练 · 可接入千问 API';
@@ -3306,7 +3306,7 @@
     return content;
   }
 
-  function searchSiteKnowledge(prompt) { const q = String(prompt || '').trim(); const tokens = q.split(/[\s,，、。;；+＋/]+/).filter(s => s.length >= 2); const scoreText = (txt) => { const t = String(txt || ''); let sc = 0; if (q && t.includes(q)) sc += 5; tokens.forEach(tk => { if (t.includes(tk)) sc += 2; }); return sc; }; const topicMap = Object.assign({}, FEATURED_PRESETS || {}, state.customTopics || {}); const catExtra = Array.isArray(CATALOG_45) ? CATALOG_45 : []; const allTopics = Object.values(topicMap).concat(catExtra.filter(c => c && !topicMap[c.id])); const matchedTopics = allTopics.map(t => ({ item: t, score: scoreText([t.id, t.herb, t.compound, t.category, t.title, t.principle, t.routeSummary, (t.reagents || []).join(' ')].join(' ')) })).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 6).map(x => ({ id: x.item.id, herb: x.item.herb, compound: x.item.compound, category: x.item.category, title: x.item.title, route: x.item.routeSummary || '', source: state.customTopics && state.customTopics[x.item.id] ? 'AI/自建题库' : '站内精编题库' })); const allLit = (Array.isArray(GLOBAL_LITERATURE) ? GLOBAL_LITERATURE : []).concat(state.extraGlobalRefs || []); const matchedLit = allLit.map(l => ({ item: l, score: scoreText((l.tag || '') + ' ' + (l.text || '')) })).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 6).map(x => x.item); return { matchedTopics, matchedLit: matchedLit.length ? matchedLit : allLit.slice(0, 4) }; } function localSmartPlan(prompt) {
+  function searchSiteKnowledge(prompt) { const q = String(prompt || '').trim(); const tokens = q.split(/[\s,，、。;；+＋/]+/).filter(s => s.length >= 2); const scoreText = (txt) => { const t = String(txt || ''); let sc = 0; if (q && t.includes(q)) sc += 5; tokens.forEach(tk => { if (t.includes(tk)) sc += 2; }); return sc; }; const topicMap = Object.assign({}, FEATURED_PRESETS || {}, state.customTopics || {}); const catExtra = Array.isArray(CATALOG_45) ? CATALOG_45 : []; const allTopics = Object.values(topicMap).concat(catExtra.filter(c => c && !topicMap[c.id])); const matchedTopics = allTopics.map(t => ({ item: t, score: scoreText([t.id, t.herb, t.compound, t.category, t.title, t.principle, t.routeSummary, (t.reagents || []).join(' ')].join(' ')) })).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 6).map(x => ({ id: x.item.id, herb: x.item.herb, compound: x.item.compound, category: x.item.category, title: x.item.title, route: x.item.routeSummary || '', source: state.customTopics && state.customTopics[x.item.id] ? 'AI/自建题库' : '站内精编题库' })); const allLit = (Array.isArray(GLOBAL_LITERATURE) ? GLOBAL_LITERATURE : []).concat(state.extraGlobalRefs || []); const matchedLit = allLit.map(l => ({ item: l, score: scoreText((l.tag || '') + ' ' + (l.text || '')) })).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 6).map(x => x.item); return { matchedTopics, matchedLit: matchedLit }; } function localSmartPlan(prompt) {
     const txt = prompt.trim();
     const allKnown = [...Object.values(FEATURED_PRESETS), ...CATALOG_45];
     let matched = allKnown.find(x => txt.includes(x.herb) || (x.compound && txt.includes(x.compound.split('（')[0].split('/')[0])));
@@ -3471,7 +3471,7 @@
         </div>
       </div>
 
-      <div class="p-4 sm:p-6 space-y-6">
+      <div id="aiInsightBody" class="p-4 sm:p-6 space-y-6">
 
         <div id="aiSec1" class="ai-sec-anchor">
           <div class="ai-sec-title"><span class="ai-sec-idx">1</span>创新设计说明</div>
@@ -3527,7 +3527,7 @@
             <div>
               <div class="text-[11px] font-extrabold text-[#0f5c54] mb-1.5">文献参考（GB/T 7714 格式）</div>
               ${(aiRefs.length ? aiRefs.slice(0, 4).map(x => `<div class="ai-ref-item ai-ref-rec mb-1.5">📖 ${aiEsc(aiRefText(x))} <span class="text-[10px] text-amber-700 font-bold">· AI 推荐</span></div>`).join('') : '')}
-              ${(litList.length ? litList.slice(0, 4).map(x => `<div class="ai-ref-item mb-1.5">📄 ${aiEsc(aiTxt(x.text, aiRefText(x)))} <span class="text-[10px] text-slate-400">· ${aiEsc(aiTxt(x.tag, '站内文献库'))}</span></div>`).join('') : '<div class="ai-ref-item mb-1.5 text-slate-400">可在右侧「文献库」按 GB/T 7714 录入参考文献。</div>')}
+              ${((() => { const _s = new Set(aiRefs.slice(0, 4).map(x => aiRefText(x).slice(0, 16))); const _f = litList.filter(x => !_s.has(aiTxt(x.text, aiRefText(x)).slice(0, 16))); return _f.length ? _f.slice(0, 4).map(x => `<div class="ai-ref-item mb-1.5">📄 ${aiEsc(aiTxt(x.text, aiRefText(x)))} <span class="text-[10px] text-slate-400">· ${aiEsc(aiTxt(x.tag, '站内文献库'))}</span></div>`).join('') : (!aiRefs.length ? '<div class="ai-ref-item mb-1.5 text-slate-400">可在右侧「文献库」按 GB/T 7714 录入参考文献。</div>' : ''); })())}
             </div>
           </div>
         </div>
@@ -3554,7 +3554,7 @@
         </div>
       </div>`;
 
-    mount.innerHTML = html;
+    mount.innerHTML = html; box.dataset.topicId = state.activeTopicId;
     box.classList.remove('hidden');
 
     // 流程节点联动
@@ -3577,7 +3577,7 @@
       const el = document.getElementById('aiSec' + b.dataset.aiSec);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }));
-    bind('aiHidePlan', () => box.classList.add('hidden'));
+    bind('aiHidePlan', () => { const bd = document.getElementById('aiInsightBody'); const btn = document.getElementById('aiHidePlan'); if (!bd) return; const c = bd.classList.toggle('hidden'); if (btn) btn.textContent = c ? '展开' : '收起'; });
     bind('aiOpenBank2', () => openRightDrawer('bank'));
     mount.querySelectorAll('[data-qwen-jump]').forEach(b => b.addEventListener('click', () => {
       state.step = Number(b.dataset.qwenJump); saveState(); renderAll();
@@ -3664,7 +3664,7 @@
       const checks = [
         `✓ 锁定课题：${plan.herb} · ${plan.compound}`,
         `✓ 写入左侧参数：${ws.mass}g / ${ws.solventType} / ${ws.temp}℃ / ${ws.time}min`,
-        `✓ 切换动态装置：${rig}`,
+        `✓ 切换动态装置：${({ ultrasound: '超声提取装置', steam: '水蒸气蒸馏装置', reflux: '热回流提取装置', extract: '液-液萃取装置', soxhlet: '索氏提取装置', percolation: '渗漉提取装置', filter: '减压抽滤装置', funnel: '分液漏斗萃取装置', column: '柱层析分离装置', rotary: '旋转蒸发浓缩装置' })[rig] || rig}`,
         '✓ 同步 4 步工艺、SOP 与第 6 步 A4 报告'
       ];
       document.getElementById('qwenReceiptChecks').innerHTML = checks.map(c => `<span class="px-2 py-0.5 rounded-full bg-white border border-emerald-200 text-emerald-900 font-semibold">${c}</span>`).join(''); const bankBadge = document.getElementById('qwenBankStatusBadge'); if (bankBadge) bankBadge.textContent = createdNewInBank ? '✨ 已作为新课题自动收录进网站题库' : '📚 已引用并优化站内题库课题'; const deepEl = document.getElementById('qwenDeepCards'); if (deepEl) { const refTxt = (Array.isArray(plan.recommendedRefs) && plan.recommendedRefs.length) ? plan.recommendedRefs.slice(0, 3).join('；') : (plan.integrative || `已关联课题：${plan.herb} · ${plan.compound}`); const prinTxt = plan.principle || plan.mechanism || plan.aiAdvice || `装置：${rig}（${ws.solventType} / ${ws.temp}℃ / ${ws.time}min）`; const concTxt = plan.aiConclusion || ws.aiConclusion || `已完成 ${plan.herb}（${plan.compound}）实验编排，预期结论已同步写入报告。`; deepEl.innerHTML = [{ t: '📚 题库与文献引用', b: refTxt }, { t: '⚗️ 原理与动态装置解析', b: prinTxt }, { t: '📊 AI 预期结论（已写入报告）', b: concTxt }].map(c => `<div class="p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm"><div class="text-[12px] font-bold text-slate-800 mb-1">${c.t}</div><div class="text-[12px] text-slate-600 leading-relaxed">${c.b}</div></div>`).join(''); } const bOpenBank = document.getElementById('btnOpenBankFromReceipt'); if (bOpenBank) bOpenBank.onclick = () => openRightDrawer('bank');
@@ -3681,7 +3681,7 @@
       document.getElementById('qwenBaseUrlInput').value = qwenCfg.baseUrl || 'https://dashscope.aliyuncs.com/compatible-mode/v1';
       document.getElementById('qwenModelSelect').value = qwenCfg.model || 'qwen3.7-plus';
       document.getElementById('qwenCustomModelInput').value = qwenCfg.customModel || '';
-      document.getElementById('qwenCfgStatus').classList.add('hidden');
+      const cfgSt = document.getElementById('qwenCfgStatus'); if (!qwenCfg.apiKey && PUBLIC_QWEN_PROXY_URL) { cfgSt.className = 'p-2.5 rounded-xl text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-900'; cfgSt.textContent = `内置公共通道就绪（免配置）· ${getActiveQwenModel()}，可直接调度或点击“测试连通性”探测。`; cfgSt.classList.remove('hidden'); } else { cfgSt.classList.add('hidden'); }
       const m = document.getElementById('qwenConfigModal');
       m.classList.remove('hidden'); m.classList.add('flex');
     };
@@ -3705,7 +3705,7 @@
         localStorage.setItem(QWEN_CFG_KEY, JSON.stringify(qwenCfg));
         updateQwenStatusUI();
         closeCfg();
-        showToast(qwenCfg.apiKey ? `已保存通义千问配置 (${getActiveQwenModel()})` : '已切换为本地智算演练模式');
+        showToast(qwenCfg.apiKey ? `已保存通义千问配置 (${getActiveQwenModel()})` : (PUBLIC_QWEN_PROXY_URL ? `内置公共通道就绪（免配置）· ${getActiveQwenModel()}` : '已切换为本地智算演练模式'));
       });
     }
 
@@ -3725,7 +3725,7 @@
       btnTest.addEventListener('click', async () => {
         const st = document.getElementById('qwenCfgStatus');
         const tempKey = document.getElementById('qwenApiKeyInput').value.trim();
-        if (!tempKey) {
+        if (!tempKey && !PUBLIC_QWEN_PROXY_URL) {
           st.className = 'p-2.5 rounded-xl text-[11px] bg-amber-50 border border-amber-200 text-amber-900';
           st.textContent = '请先填入阿里云百炼 API Key（sk-...）再测试连通性。';
           st.classList.remove('hidden'); return;
@@ -3782,10 +3782,10 @@
         const btnEl = document.getElementById('btnRunQwenAuto');
         btnEl.disabled = true;
         btnTxt.textContent = qwenCfg.apiKey ? '千问深度规划中...' : '智算编排中...';
-        const ragCtx = searchSiteKnowledge(prompt);
+        const pBox = document.getElementById('qwenProgressBox'); const pBar = document.getElementById('qwenProgressBar'); const pStage = document.getElementById('qwenProgressStageText'); const pTimer = document.getElementById('qwenProgressTimer'); const setStage = (idx, txt, pct) => { if (pStage) pStage.textContent = txt; if (pBar) pBar.style.width = pct + '%'; [1,2,3,4].forEach(n => { const s = document.getElementById('qwenStep' + n); if (s) s.className = n <= idx ? 'text-teal-700 font-bold' : 'text-slate-400'; }); }; if (pBox) pBox.classList.remove('hidden'); const t0 = Date.now(); if (pTimer) pTimer.textContent = '0.0s'; const pInt = setInterval(() => { if (pTimer) pTimer.textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's'; }, 100); setStage(1, '正在检索题库文献...', 20); const ragCtx = searchSiteKnowledge(prompt); setStage(2, '正在调用通义千问...', 48);
         try {
           if (isQwenReady()) {
-            const ragText = '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '\n【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '\n请务必结合上述站内题库与文献做有理论依据的创新设计（不要照抄常规四步模板）；严格输出合法 JSON，不要包含 markdown 代码块。\n'; const sysPrompt = ragText + `你是中国高校《中药化学》实验设计专家与创新实验课程导师，负责把学生的实验想法转化为可直接驱动实验工作台自动化的严格 JSON。要求：①方案在本科常规实验室可落地、有明确理论依据；②必须结合上文【站内检索题库】与【站内检索文献】做创新延伸（如绿色溶剂替代、一材双提、低温防氧化、活性评价延伸、对照实验等），不得照抄通用四步模板；③每一步都要给出可执行的操作方法、试剂用量、仪器与时长；④推荐 2 条以上与课题相关的 GB/T 7714 格式参考文献。必须且仅输出合法 JSON，字段如下：
+            const ragText = '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '\n【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '\n请务必结合上述站内题库与文献做有理论依据的创新设计（不要照抄常规四步模板）；严格输出合法 JSON，不要包含 markdown 代码块。\n'; const sysPrompt = ragText + `你是中国高校《中药化学》实验设计专家与创新实验课程导师，负责把学生的实验想法转化为可直接驱动实验工作台自动化的严格 JSON。要求：①方案在本科常规实验室可落地、有明确理论依据；②必须结合上文【站内检索题库】与【站内检索文献】做创新延伸（如绿色溶剂替代、一材双提、低温防氧化、活性评价延伸、对照实验等），不得照抄通用四步模板；③每一步都要给出可执行的操作方法、试剂用量、仪器与时长；④推荐 2 条以上与课题相关的 GB/T 7714 格式参考文献；⑤药典标准限度数值须前后严格一致，避免引用无关药材文献。必须且仅输出合法 JSON，字段如下：
 {
   "herb": "中药名",
   "compound": "目标有效成分",
@@ -3829,18 +3829,18 @@
             ], true);
             const cleaned = raw.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
             const parsed = JSON.parse(cleaned);
-            applyAiPlanToWorkbench(parsed, true, ragCtx);
+            setStage(3, '正在同步工作台参数与装置...', 78); applyAiPlanToWorkbench(parsed, true, ragCtx); setStage(4, '正在写入报告与入库...', 100);
           } else {
             await new Promise(r => setTimeout(r, 380));
             const plan = localSmartPlan(prompt);
-            applyAiPlanToWorkbench(plan, false, ragCtx);
+            setStage(3, '正在同步工作台参数与装置...', 78); applyAiPlanToWorkbench(plan, false, ragCtx); setStage(4, '正在写入报告与入库...', 100);
           }
         } catch (err) {
           const fallback = localSmartPlan(prompt);
           fallback.aiAdvice = `通义千问接口调用异常（${err.message}），已自动回退至本地智算引擎完成全工作台编排。可点击「⚙ 配置千问 API」核对密钥与域名。`;
           applyAiPlanToWorkbench(fallback, false, ragCtx);
         } finally {
-          btnEl.disabled = false;
+          clearInterval(pInt); if (pBox) pBox.classList.add('hidden'); btnEl.disabled = false;
           btnTxt.textContent = '调度千问 · 自动编排';
         }
       });
@@ -3854,7 +3854,7 @@
       document.getElementById('qwenChatMessages').innerHTML = '<div class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-700">对话已清空。请针对当前实验提出你的问题！</div>';
     });
 
-    const chatForm = document.getElementById('qwenChatForm');
+    function renderTutorMarkdown(md) { const esc = String(md || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); const lines = esc.split(String.fromCharCode(10)); const out = []; let inUl = false; const inline = s => s.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 rounded bg-slate-100 text-teal-800 font-mono text-[11px]">$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>'); for (const raw of lines) { const line = raw.trimEnd(); const hm = line.match(/^#{1,4}\s+(.+)$/); const lm = line.match(/^\s*(?:[-*]|\d+\.)\s+(.+)$/); if (hm) { if (inUl) { out.push('</ul>'); inUl = false; } out.push('<h4 class="font-bold text-slate-900 text-[13px] mt-2 mb-1">' + inline(hm[1]) + '</h4>'); } else if (lm) { if (!inUl) { out.push('<ul class="list-disc pl-4 space-y-0.5 my-1">'); inUl = true; } out.push('<li>' + inline(lm[1]) + '</li>'); } else { if (inUl) { out.push('</ul>'); inUl = false; } out.push(line.trim() === '' ? '<div class="h-1.5"></div>' : '<p class="my-0.5">' + inline(line) + '</p>'); } } if (inUl) out.push('</ul>'); return out.join(''); } const chatForm = document.getElementById('qwenChatForm');
     if (chatForm) {
       chatForm.addEventListener('submit', async e => {
         e.preventDefault();
@@ -3889,7 +3889,7 @@
           ans = `通义千问请求失败（${err.message}），请检查 API Key 或网络跨域设置。`;
         }
         const el = document.getElementById(waitId);
-        if (el) { el.className = 'p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-800 mr-6 leading-relaxed whitespace-pre-wrap'; el.textContent = ans; }
+        if (el) { el.className = 'p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-800 mr-6 leading-relaxed space-y-0.5'; el.innerHTML = renderTutorMarkdown(ans); }
         box.scrollTop = box.scrollHeight;
       });
     }
