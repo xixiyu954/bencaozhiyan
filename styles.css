@@ -833,3 +833,44 @@ body.on-netlify #quickAssistFab {
 body.dark-lab .text-slate-500 { color: #cbd5e1 !important; }
 body.dark-lab .text-slate-600 { color: #e2e8f0 !important; }
 body.dark-lab .text-slate-700 { color: #f1f5f9 !important; }
+
+/* ============ 全站可切换视觉主题皮肤（科研冰蓝 / 典籍琥珀） ============ */
+body.theme-clinical:not(.dark-lab) {
+  --canvas: #f1f5f9;
+  background-color: #f1f5f9;
+  background-image:
+    radial-gradient(at 14% 0%, rgba(14, 165, 233, 0.10) 0px, transparent 48%),
+    radial-gradient(at 88% 12%, rgba(99, 102, 241, 0.08) 0px, transparent 44%),
+    radial-gradient(rgba(30, 58, 138, 0.045) 1px, transparent 0);
+}
+body.theme-clinical:not(.dark-lab) #leftSidebar {
+  background: #0b1f3a !important;
+}
+body.theme-clinical:not(.dark-lab) .zone-tab.active,
+body.theme-clinical:not(.dark-lab) .stepper-track .step-chip.active {
+  background: linear-gradient(135deg, #0b1f3a 0%, #0284c7 100%) !important;
+  border-color: #0b1f3a !important;
+}
+body.theme-clinical:not(.dark-lab) .v9-visual-card::before {
+  background: linear-gradient(90deg, #0b1f3a 0%, #0ea5e9 50%, #6366f1 100%);
+}
+
+body.theme-amber:not(.dark-lab) {
+  --canvas: #f9f5ec;
+  background-color: #f9f5ec;
+  background-image:
+    radial-gradient(at 14% 0%, rgba(217, 119, 6, 0.11) 0px, transparent 48%),
+    radial-gradient(at 88% 12%, rgba(180, 83, 9, 0.08) 0px, transparent 44%),
+    radial-gradient(rgba(120, 53, 15, 0.045) 1px, transparent 0);
+}
+body.theme-amber:not(.dark-lab) #leftSidebar {
+  background: #2b1810 !important;
+}
+body.theme-amber:not(.dark-lab) .zone-tab.active,
+body.theme-amber:not(.dark-lab) .stepper-track .step-chip.active {
+  background: linear-gradient(135deg, #3b1f12 0%, #b45309 100%) !important;
+  border-color: #3b1f12 !important;
+}
+body.theme-amber:not(.dark-lab) .v9-visual-card::before {
+  background: linear-gradient(90deg, #3b1f12 0%, #d97706 50%, #f59e0b 100%);
+}

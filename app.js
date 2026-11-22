@@ -11,7 +11,7 @@
     4: { tag: '04 / 06', title: '装置与流程' },
     5: { tag: '05 / 06', title: '实验数据' },
     6: { tag: '06 / 06', title: 'DIY 报告' },
-    hub: { tag: '装置库', title: '动态流程与装置库' }
+    hub: { tag: '装置库', title: '动态流程与装置库' }, diy: { tag: 'DIY 实验室', title: 'DIY 创意实验室' }, mission: { tag: '任务舱', title: '任务式实验实操中心' }
   };
 
   // 全库真实核实的中医药与中西医结合文献库（不写具体页码占位，聚焦真实权威期刊与高校成果）
@@ -1684,6 +1684,25 @@
       if (!GLOBAL_LITERATURE.some(x => x.text === item.text)) GLOBAL_LITERATURE.push(item);
     });
   }
+
+  if (window.TCM_V14_COURSE && window.TCM_V14_COURSE.V14_COURSE_PRESETS) {
+    Object.entries(window.TCM_V14_COURSE.V14_COURSE_PRESETS).forEach(([k, preset]) => {
+      FEATURED_PRESETS[k] = preset;
+      if (!CATALOG_45.some(c => c.id === k)) {
+        CATALOG_45.unshift({
+          id: preset.id,
+          isInnovative: !!preset.isInnovative,
+          isClassGroup: !!preset.isClassGroup,
+          featured: true,
+          herb: preset.herb,
+          compound: preset.compound,
+          category: preset.category,
+          sourceTag: preset.sourceTag || ''
+        });
+      }
+    });
+  }
+
   if (Array.isArray(V9_DATA.V9_UNIV_CASES)) {
     V9_DATA.V9_UNIV_CASES.forEach(item => {
       if (!UNIV_CASES.some(x => x.title === item.title)) UNIV_CASES.push(item);
@@ -1885,7 +1904,18 @@
   function normalizeState(raw) {
     const base = createDefaultState(), source = isRecord(raw) ? raw : {}, next = { ...base, ...source };
     const step = Number(source.step);
-    next.step = Number.isInteger(step) && step >= 1 && step <= 6 ? step : base.step;
+    const savedStep = (step === 'hub' || (Number.isInteger(step) && step >= 1 && step <= 6)) ? step : 1;
+    next.lastSavedStep = savedStep;
+    // 默认每次新打开页面都从第 1 步首页进入，避免新访客或再次打开时直接落到半路板块；若 URL 显式带 ?step= 则直达
+    const urlParams = new URLSearchParams(window.location.search || '');
+    const urlStepRaw = urlParams.get('step');
+    if (urlStepRaw === 'hub') {
+      next.step = 'hub';
+    } else if (urlStepRaw && Number(urlStepRaw) >= 1 && Number(urlStepRaw) <= 6) {
+      next.step = Number(urlStepRaw);
+    } else {
+      next.step = 1;
+    }
     ['rTab', 'litFilter', 'sideQuery', 'sideCat', 'step1Tab', 'step1Query', 'step1Cat', 'theoryView'].forEach(key => {
       next[key] = typeof source[key] === 'string' ? source[key] : base[key];
     });
@@ -2097,7 +2127,7 @@
       </div>`).join('');
     document.querySelectorAll('[data-side-q]').forEach(b => b.addEventListener('click', () => copyText(queries[Number(b.dataset.sideQ)].q, '已复制检索式')));
 
-    // 3. 高校实验参考
+    // 3. 高校、药企与用户收录实验案例
     const univInput = document.getElementById('univSearchInput');
     if (univInput && !univInput.dataset.bound) {
       univInput.dataset.bound = '1';
@@ -2107,23 +2137,40 @@
       });
     }
 
-    const uTypes = ['全部', '高校实验', '经典复方', '药企中试', '药企QC', '中西医结合', '国家平台'];
+    const uTypes = ['全部', '我的收录案例', '高校实验', '经典复方', '药企中试', '药企QC', '中西医结合', '国家平台'];
     const ufEl = document.getElementById('univFilterBar');
     if (ufEl) {
       ufEl.innerHTML = uTypes.map(tg => `<button type="button" data-univ-f="${tg}" class="px-2.5 py-1 rounded-full text-[10px] font-bold border ${state.univFilter === tg ? 'bg-[#0a3630] text-white border-[#0a3630]' : 'bg-white text-slate-600 border-slate-200'}">${tg}</button>`).join('');
       ufEl.querySelectorAll('[data-univ-f]').forEach(b => b.addEventListener('click', () => { state.univFilter = b.dataset.univF; renderRightDrawer(t, ws); }));
     }
     const univQ = (state.univQuery || '').trim().toLowerCase();
-    let shownUniv = state.univFilter === '全部' ? UNIV_CASES : UNIV_CASES.filter(u => u.type === state.univFilter);
+    let shownUniv = state.univFilter === '全部' ? UNIV_CASES : UNIV_CASES.filter(u => (u.type || '高校实验') === state.univFilter);
     if (univQ) {
-      shownUniv = shownUniv.filter(u => `${u.univ} ${u.title} ${u.desc}`.toLowerCase().includes(univQ));
+      shownUniv = shownUniv.filter(u => `${u.univ || ''} ${u.school || ''} ${u.title || ''} ${u.desc || ''}`.toLowerCase().includes(univQ));
     }
-    document.getElementById('univCasesList').innerHTML = shownUniv.map(u => `
-      <div class="p-3.5 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 space-y-1.5 transition hover:shadow-2xs">
-        <div class="flex items-center justify-between"><span class="px-2.5 py-0.5 rounded-full bg-[#0a3630] text-emerald-200 text-[10px] font-bold">${u.univ}</span><a href="${u.url}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-[#0f5c54] hover:underline">高校原案 ↗</a></div>
-        <div class="text-sm font-bold text-slate-900 pt-0.5">${u.title}</div>
-        <p class="text-xs text-slate-600 leading-relaxed">${u.desc}</p>
-      </div>`).join('') || '<div class="text-center text-xs text-slate-400 py-6">无匹配的高校或药企案例</div>';
+    const univListEl = document.getElementById('univCasesList');
+    univListEl.innerHTML = shownUniv.length ? shownUniv.map(u => {
+      const org = u.univ || u.school || '高校实验案例';
+      const body = u.desc || u.summary || '';
+      const loadId = u.topicId || u.targetId || '';
+      const isUserCase = u.type === '我的收录案例';
+      return `
+      <div class="p-3.5 rounded-2xl ${isUserCase ? 'bg-amber-50/70 border-amber-200' : 'bg-[#f7f7f4] border-slate-200/80'} border space-y-1.5">
+        <div class="flex items-center justify-between gap-2">
+          <span class="px-2.5 py-0.5 rounded-full ${isUserCase ? 'bg-amber-500 text-white' : 'bg-[#0a3630] text-emerald-200'} text-[10px] font-bold">${org}</span>
+          <div class="flex items-center gap-2">
+            ${loadId ? `<button type="button" data-load-case-topic="${loadId}" class="px-2 py-0.5 rounded-lg bg-[#0a3630] text-white text-[10px] font-bold hover:bg-[#062420] transition">载入工作台 →</button>` : ''}
+            ${u.url ? `<a href="${u.url}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-[#0f5c54] underline">参考 ↗</a>` : ''}
+          </div>
+        </div>
+        <div class="text-xs font-bold text-slate-900 pt-0.5">${u.title}</div>
+        <p class="text-[12px] text-slate-600 leading-relaxed">${body}</p>
+      </div>`;
+    }).join('') : '<div class="p-6 text-center text-xs text-slate-500">暂无该分类案例，可点击顶栏「提交我的方案演算」创建并收录专属案例。</div>';
+    univListEl.querySelectorAll('[data-load-case-topic]').forEach(b => b.addEventListener('click', () => {
+      const tid = b.dataset.loadCaseTopic;
+      if (tid) { state.activeTopicId = tid; state.step = 2; saveState(); renderAll(); closeRightDrawer(); showToast('已载入收录案例至工作台'); }
+    }));
 
     // 4. 《中药化学》课程 10 大章节知识库
     const chEl = document.getElementById('courseChaptersList');
@@ -2916,10 +2963,6 @@
         if (rawStep === 'hub') { if (isHub) btn.classList.add('active'); }
         else { const n = Number(rawStep); if (!isHub && n === state.step) btn.classList.add('active'); else if (!isHub && n < state.step) btn.classList.add('done'); }
       });
-      const zoneWf = document.getElementById('zoneTabWorkflow');
-      const zoneHub = document.getElementById('btnOpenApparatusHub');
-      if (zoneWf) zoneWf.classList.toggle('active', !isHub);
-      if (zoneHub) zoneHub.classList.toggle('active', isHub);
       document.querySelectorAll('.wpanel').forEach(p => p.classList.add('hidden'));
       const curP = document.getElementById(`wpanel-${state.step}`);
       if (curP) { curP.classList.remove('hidden'); curP.style.opacity = '1'; curP.classList.remove('panel-anim'); void curP.offsetWidth; curP.classList.add('panel-anim'); }
@@ -2933,9 +2976,12 @@
       if (state.step === 5) renderStep5(t, ws, stats);
       if (state.step === 6) renderStep6(t, ws, stats);
     if (state.step === 'hub') renderHub();
+      if (state.step === 'diy' && window.TCM_DIY_STUDIO) window.TCM_DIY_STUDIO.render();
+      if (state.step === 'mission' && window.TCM_MISSION_OS) window.TCM_MISSION_OS.render();
       if (window.TCM_STUDIO_V8) window.TCM_STUDIO_V8.sync(t, ws, stats, state.step);
       if (window.TCM_V9) window.TCM_V9.sync(t, ws, stats, state.step);
       if (window.TCM_V10_SANDBOX) window.TCM_V10_SANDBOX.sync(t, ws, stats, state.step);
+      if (window.TCM_V14_COURSE) window.TCM_V14_COURSE.sync(t, ws, stats, state.step);
       if (typeof lucide !== 'undefined') lucide.createIcons();
     } catch (error) {
       console.error('工作台渲染失败，请检查存档或刷新重试。', error);
@@ -3037,10 +3083,10 @@
     // 6步导航
     document.querySelectorAll('#wizardNav [data-wstep], [data-go-step]').forEach(btn => btn.addEventListener('click', () => {
       const rawTarget = btn.dataset.wstep || btn.dataset.goStep;
-      if (rawTarget === 'hub') {
+      if (rawTarget === 'hub' || rawTarget === 'diy' || rawTarget === 'mission') {
         if (state.step === 3) stopWalkthrough();
-        if (state.step !== 'hub') state.lastWorkStep = state.step;
-        state.step = 'hub'; saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (state.step !== 'hub' && state.step !== 'diy' && state.step !== 'mission') state.lastWorkStep = state.step;
+        state.step = rawTarget; saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
       const target = Number(rawTarget);
@@ -4061,6 +4107,124 @@
   loadState();
   initEvents();
   updateTimerUI();
+
+  // ============ 用户自有方案推演联动桥接 & 启动加载已收录案例 ============
+  function buildTopicFromUserPlan(plan) {
+    const p = plan.params || {};
+    const id = plan.id || ('user_plan_' + Date.now());
+    return {
+      id,
+      isCustom: true,
+      isInnovative: true,
+      featured: true,
+      herb: plan.herb || '自定药材',
+      compound: plan.compound || '目标活性成分',
+      latin: '用户自建与智能推演案例',
+      category: plan.category || '黄酮',
+      defaultRig: p.rig || 'reflux',
+      applicableRigs: [p.rig || 'reflux', 'rotavap', 'tlc', 'hplc'],
+      defaultExtract: p.rig === 'ultrasonic' ? 'ultrasonic' : (p.rig === 'steam' ? 'steam' : 'reflux'),
+      defaultSep: 'extract',
+      formulas: ['diffusion', 'henderson', 'qc'],
+      defaultCfg: {
+        mass: p.mass || 50,
+        ratio: p.ratio || 10,
+        temp: p.temp || 75,
+        time: p.time || 60,
+        mesh: '粗粉(10~20目)',
+        cycles: String(p.cycles || 2),
+        solventType: p.solventType || '70%乙醇',
+        ph: '中性 7.0'
+      },
+      limitVal: 1.0, limitUnit: '%', crudeUnit: 'g', mpRef: '以实测熔点/标曲为准',
+      origin: `用户提交方案：${plan.title || plan.herb}（综合可行性 ${plan.score || 88} 分）。`,
+      chemistry: plan.sourceText || plan.summaryAdvice || '',
+      pharmacopoeia: '请结合《中国药典》对应药材项下含量限度与实验室安全规范复核。',
+      integrative: plan.summaryAdvice || '',
+      scaling: { auxName: '常规辅助试剂', auxFactor: 0.5, auxUnit: 'mL/g', yieldLow: 0.015, yieldHigh: 0.035, yieldUnit: 'g' },
+      tlcSystem: '硅胶 G 板（按目标成分极性微调乙酸乙酯-石油醚或甲酸-水比例），254/365 nm 紫外检视。',
+      tlcDefault: { front: 8.0, sample: 4.2, ref: 4.2 },
+      steps: (plan.stages || []).map(st => ({
+        stage: (st.stage || '工艺').replace(/^[①②③④]\s*/, ''),
+        title: st.title || '实验操作步骤',
+        principle: st.phenomenon || '',
+        operation: st.tip || '',
+        qc: st.qc || ''
+      })),
+      troubleshoot: (plan.risks || []).map(r => ({ issue: '潜在工艺/安全隐患', cause: r, fix: '按推演建议微调温控、溶剂或操作顺序。' })),
+      sop: (plan.stages || []).map(st => `${st.title}（${st.qc}）`),
+      chemTests: [{ name: '供试品 TLC 对照斑点', passed: true }, { name: '紫外/含量测定精密度复核', passed: true }],
+      demoBatches: [{ mass: p.mass || 50, crude: 1.25, refined: 0.86, mp: 0 }, { mass: p.mass || 50, crude: 1.32, refined: 0.91, mp: 0 }, { mass: p.mass || 50, crude: 1.28, refined: 0.88, mp: 0 }]
+    };
+  }
+
+  if (window.TCM_USER_PLAN && typeof window.TCM_USER_PLAN.loadUserCases === 'function') {
+    window.TCM_USER_PLAN.loadUserCases().forEach(item => {
+      if (!UNIV_CASES.some(u => u.topicId === item.id)) {
+        UNIV_CASES.unshift({
+          type: '我的收录案例',
+          univ: `★ 我的收录 · ${item.createdAt || '已保存'}`,
+          title: item.title || `${item.herb}实验方案`,
+          desc: item.summaryAdvice || (item.sourceText || '').slice(0, 120),
+          topicId: item.id
+        });
+      }
+      if (!state.customTopics[item.id]) {
+        state.customTopics[item.id] = buildTopicFromUserPlan(item);
+      }
+    });
+  }
+
+  window.TCM_USER_PLAN_BRIDGE = {
+    applyPlan: function (plan, archiveAsCase) {
+      const topicObj = buildTopicFromUserPlan(plan);
+      state.customTopics[topicObj.id] = topicObj;
+      state.activeTopicId = topicObj.id;
+      const ws = getWorkState(topicObj);
+      Object.assign(ws, topicObj.defaultCfg);
+      if (archiveAsCase && !UNIV_CASES.some(u => u.topicId === topicObj.id)) {
+        UNIV_CASES.unshift({
+          type: '我的收录案例',
+          univ: `★ 我的收录 · ${plan.createdAt || new Date().toLocaleDateString('zh-CN')}`,
+          title: plan.title || `${plan.herb}实验方案`,
+          desc: plan.summaryAdvice || (plan.sourceText || '').slice(0, 120),
+          topicId: topicObj.id
+        });
+      }
+      saveState();
+      renderAll();
+      showToast(archiveAsCase ? '已收录至「我的收录案例」与题库，并同步全工作台！' : '已将推演方案同步至工作台全部 6 步！');
+    }
+  };
+
+
+  // ============ 首页入口保护 & 上次进度可选续接桥接 ============
+  const urlHasStep = new URLSearchParams(window.location.search || '').has('step');
+  window.TCM_RESUME_BRIDGE = {
+    getResumeInfo: function () {
+      if (urlHasStep) return null;
+      const ls = state.lastSavedStep;
+      if (!ls || ls === 1) return null;
+      const t = getTopicDef();
+      const label = ls === 'hub' ? '动态流程与装置库' : `第 0${ls} 步 · ${(STEP_META[ls] && STEP_META[ls].title) || ''}`;
+      return { step: ls, label, herb: t ? t.herb : '' };
+    },
+    resumeNow: function () {
+      const ls = state.lastSavedStep;
+      if (!ls || ls === 1) return;
+      state.step = ls;
+      state.lastSavedStep = 1;
+      saveState();
+      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast('已为您续接上次实验进度');
+    },
+    dismiss: function () {
+      state.lastSavedStep = 1;
+      saveState();
+    }
+  };
+
   renderAll();
   if (window.TCM_V7_MEDIA) {
     window.TCM_V7_MEDIA.initVideoHubModal();

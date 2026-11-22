@@ -326,13 +326,19 @@
 
   function syncTopZones(step) {
     const isHub = step === 'hub';
+    const isDiy = step === 'diy';
+    const isMission = step === 'mission';
     const zoneWf = document.getElementById('zoneTabWorkflow');
+    const zoneDiy = document.getElementById('btnOpenDiyStudio');
+    const zoneMis = document.getElementById('btnOpenMissionOs');
     const zoneHub = document.getElementById('btnOpenApparatusHub');
     const stepperStrip = document.getElementById('stepperZoneBar');
 
-    if (zoneWf) zoneWf.classList.toggle('active', !isHub);
+    if (zoneWf) zoneWf.classList.toggle('active', !isHub && !isDiy && !isMission);
+    if (zoneDiy) zoneDiy.classList.toggle('active', isDiy);
+    if (zoneMis) zoneMis.classList.toggle('active', isMission);
     if (zoneHub) zoneHub.classList.toggle('active', isHub);
-    if (stepperStrip) stepperStrip.classList.toggle('hidden', isHub);
+    if (stepperStrip) stepperStrip.classList.toggle('hidden', isHub || isDiy || isMission);
 
     // 同步连接线的进度高亮
     const numStep = isHub ? 6 : Number(step) || 1;
@@ -344,6 +350,7 @@
   function syncVisualDock(topic, ws, stats, step) {
     buildDockSkeleton();
     syncTopZones(step);
+    renderWelcomePortalAndResume(step);
 
     const m = computeMetrics(topic, ws);
     const theme = getTheme(topic && topic.category);
@@ -429,11 +436,14 @@
       zoneWf.dataset.bound = '1';
       zoneWf.addEventListener('click', () => {
         const backBtn = document.getElementById('btnBackToWorkflow');
-        if (backBtn && document.getElementById('wpanel-hub') && !document.getElementById('wpanel-hub').classList.contains('hidden')) {
+        const inHub = document.getElementById('wpanel-hub') && !document.getElementById('wpanel-hub').classList.contains('hidden');
+        const inDiy = document.getElementById('wpanel-diy') && !document.getElementById('wpanel-diy').classList.contains('hidden');
+        const inMis = document.getElementById('wpanel-mission') && !document.getElementById('wpanel-mission').classList.contains('hidden');
+        if (backBtn && (inHub || inDiy || inMis)) {
           backBtn.click();
-        } else {
+        } else if (inHub || inDiy || inMis) {
           const step1 = document.querySelector('#wizardNav [data-wstep="1"]');
-          if (step1 && document.getElementById('wpanel-hub') && !document.getElementById('wpanel-hub').classList.contains('hidden')) step1.click();
+          if (step1) step1.click();
         }
       });
     }
@@ -454,6 +464,110 @@
     }
   }
 
+
+
+  // ==================== 首页四大场景快捷门户 & 上次进度可选续接条 ====================
+  function renderWelcomePortalAndResume(step) {
+    // 1. 可选「续接上次进度」提示条（仅在检测到上次停在 2~6 步或装置库时轻轻展示，可一键忽略）
+    const mainCol = document.getElementById('studioMainCol');
+    if (mainCol && window.TCM_RESUME_BRIDGE) {
+      const info = window.TCM_RESUME_BRIDGE.getResumeInfo();
+      let bar = document.getElementById('resumeProgressBanner');
+      if (info && step === 1) {
+        if (!bar) {
+          bar = document.createElement('div');
+          bar.id = 'resumeProgressBanner';
+          bar.className = 'no-print rounded-2xl bg-gradient-to-r from-amber-50 via-emerald-50/70 to-white border border-amber-200/90 px-4 py-3 flex flex-wrap items-center justify-between gap-2.5 shadow-xs panel-anim';
+          mainCol.insertAdjacentElement('afterbegin', bar);
+        }
+        bar.innerHTML = `
+          <div class="flex items-center gap-2 text-xs text-slate-800">
+            <span class="px-2 py-0.5 rounded-full bg-amber-400/25 text-amber-900 font-extrabold">上次进度</span>
+            <span>检测到上次曾停留在 <strong class="text-[#0a3630]">${info.herb ? info.herb + ' · ' : ''}${info.label}</strong>，是否继续？</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btnResumeLastStep" class="px-3 py-1 rounded-xl bg-[#0a3630] hover:bg-[#062420] text-white text-xs font-extrabold transition">继续上次进度 →</button>
+            <button type="button" id="btnDismissResume" class="px-2 py-1 rounded-lg text-slate-500 hover:text-slate-800 text-xs font-bold" title="留在首页">留在首页 ×</button>
+          </div>
+        `;
+        const btnGo = bar.querySelector('#btnResumeLastStep');
+        const btnDis = bar.querySelector('#btnDismissResume');
+        if (btnGo) btnGo.onclick = () => { bar.remove(); window.TCM_RESUME_BRIDGE.resumeNow(); };
+        if (btnDis) btnDis.onclick = () => { bar.remove(); window.TCM_RESUME_BRIDGE.dismiss(); };
+      } else if (bar) {
+        bar.remove();
+      }
+    }
+
+    // 2. 首页（第 1 步）四大场景快捷入口门户卡，让新访客 3 秒看懂全站结构
+    const p1 = document.getElementById('wpanel-1');
+    if (p1 && step === 1) {
+      let hero = document.getElementById('welcomePortalHero');
+      if (!hero) {
+        hero = document.createElement('section');
+        hero.id = 'welcomePortalHero';
+        hero.className = 'no-print lab-card rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-[#062420] via-[#0a3832] to-[#0f5c54] text-white space-y-4 overflow-hidden relative';
+        hero.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="space-y-1">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/12 border border-white/15 text-emerald-200 text-xs font-bold">
+                <span>🌿 中药化学一站式智能实验设计平台</span>
+              </div>
+              <h2 class="text-lg sm:text-xl font-extrabold tracking-tight text-white">从选材定题、工艺仿真到 A4 规范报告，3 步轻松完成实验设计</h2>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5 text-xs text-teal-100/90">
+              <span class="px-2.5 py-1 rounded-xl bg-white/10">① 选药材 / 提需求</span>
+              <span class="text-emerald-300">→</span>
+              <span class="px-2.5 py-1 rounded-xl bg-white/10">② 调参数 / 搭装置</span>
+              <span class="text-emerald-300">→</span>
+              <span class="px-2.5 py-1 rounded-xl bg-white/10">③ 算数据 / 出报告</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+            <button type="button" id="portalGoTopics" class="text-left p-3.5 rounded-2xl bg-white/10 hover:bg-white/18 border border-white/15 transition group">
+              <div class="flex items-center justify-between"><span class="text-xl">🌿</span><span class="text-xs text-emerald-300 font-bold group-hover:translate-x-0.5 transition">去选材 →</span></div>
+              <div class="text-sm font-extrabold text-white mt-2">117 项经典/创新题库</div>
+              <div class="text-xs text-teal-100/80 mt-0.5">覆盖高校高频单味药、名方复方与中西医结合课题</div>
+            </button>
+            <button type="button" id="portalGoAi" class="text-left p-3.5 rounded-2xl bg-white/10 hover:bg-white/18 border border-white/15 transition group">
+              <div class="flex items-center justify-between"><span class="text-xl">✨</span><span class="text-xs text-amber-300 font-bold group-hover:translate-x-0.5 transition">去输入 →</span></div>
+              <div class="text-sm font-extrabold text-white mt-2">智能助手一键编排</div>
+              <div class="text-xs text-teal-100/80 mt-0.5">一句话描述想法，自动生成全流程工艺与参数单</div>
+            </button>
+            <button type="button" id="portalGoUserPlan" class="text-left p-3.5 rounded-2xl bg-amber-400/18 hover:bg-amber-400/28 border border-amber-300/35 transition group">
+              <div class="flex items-center justify-between"><span class="text-xl">📋</span><span class="text-xs text-amber-200 font-bold group-hover:translate-x-0.5 transition">去演算 →</span></div>
+              <div class="text-sm font-extrabold text-white mt-2">提交已有方案演算</div>
+              <div class="text-xs text-amber-100/90 mt-0.5">递交自定方案全流程推演，并永久收录为案例</div>
+            </button>
+            <button type="button" id="portalGoSandbox" class="text-left p-3.5 rounded-2xl bg-white/10 hover:bg-white/18 border border-white/15 transition group">
+              <div class="flex items-center justify-between"><span class="text-xl">🛠️</span><span class="text-xs text-emerald-300 font-bold group-hover:translate-x-0.5 transition">去搭建 →</span></div>
+              <div class="text-sm font-extrabold text-white mt-2">15 套装置与自由沙盒</div>
+              <div class="text-xs text-teal-100/80 mt-0.5">14 种器皿自由组装，实时分析热安全与可行性</div>
+            </button>
+          </div>
+        `;
+        p1.insertAdjacentElement('afterbegin', hero);
+
+        hero.querySelector('#portalGoTopics').addEventListener('click', () => {
+          const grid = document.getElementById('step1FeaturedGrid') || document.getElementById('step1Search');
+          if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        hero.querySelector('#portalGoAi').addEventListener('click', () => {
+          const inp = document.getElementById('qwenPromptInput');
+          if (inp) { inp.scrollIntoView({ behavior: 'smooth', block: 'center' }); inp.focus(); }
+        });
+        hero.querySelector('#portalGoUserPlan').addEventListener('click', () => {
+          const btn = document.getElementById('btnOpenUserPlanModal');
+          if (btn) btn.click();
+        });
+        hero.querySelector('#portalGoSandbox').addEventListener('click', () => {
+          const hub = document.getElementById('btnOpenApparatusHub');
+          if (hub) hub.click();
+        });
+      }
+    }
+  }
 
   // 字号舒适度切换与返回顶部浮球
   function bindUxComfortControls() {

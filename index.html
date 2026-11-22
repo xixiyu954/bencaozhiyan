@@ -298,6 +298,12 @@
             <button type="button" id="zoneTabWorkflow" class="zone-tab active">
               <span>🧪 实验设计工坊</span>
             </button>
+            <button type="button" id="btnOpenDiyStudio" data-go-step="diy" class="zone-tab">
+              <span>🧩 DIY 创意实验室</span>
+            </button>
+            <button type="button" id="btnOpenMissionOs" data-go-step="mission" class="zone-tab">
+              <span>⚡ 实验任务舱</span>
+            </button>
             <button type="button" id="btnOpenApparatusHub" data-go-step="hub" class="zone-tab zone-tab-hub">
               <span>⚙️ 动态流程与装置库</span>
               <span id="navHubCount" class="zone-badge">15</span>
@@ -364,6 +370,7 @@
             </div>
           </div>
           <div class="flex items-center gap-1.5">
+            <button id="btnOpenUserPlanModal" type="button" class="px-3 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300/80 text-amber-900 text-xs font-extrabold transition shadow-xs">📋 提交我的方案演算</button>
             <button id="btnToggleQwenChat" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-[#0f5c54] text-[11px] font-bold transition">💬 实验助教问答</button>
             <button id="btnOpenQwenCfgBar" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-amber-50 text-slate-700 hover:text-amber-900 text-[11px] font-bold transition">服务状态</button>
           </div>
@@ -1020,6 +1027,8 @@
         <!-- 选中装置全景交互舞台 -->
         <div id="hubRigDetailMount" class="space-y-5"></div>
       </section>
+      <section id="wpanel-diy" class="wpanel hidden space-y-6"></section>
+      <section id="wpanel-mission" class="wpanel hidden space-y-6"></section>
         </div>
         <!-- 右侧常驻：v8.0 实时化学萃取动态视窗 & 五维工艺雷达驾驶舱 -->
         <aside id="rightVisualDock" class="no-print studio-right-dock"></aside>
@@ -1181,11 +1190,15 @@
 <script src="./lab-tools-v3.js?v=8"></script>
 <script src="./lab-v6-pro.js?v=11"></script>
 <script src="./lab-v7-media-pro.js?v=11"></script>
-<script src="./lab-v9-data.js?v=18"></script>
-<script src="./lab-v8-studio.js?v=18"></script>
-<script src="./lab-v9-visuals.js?v=18"></script>
-<script src="./lab-v10-sandbox.js?v=18"></script>
-<script src="./cloud-ai.js?v=18"></script>
-<script src="./app.js?v=18"></script>
+<script src="./lab-v9-data.js?v=21"></script>
+<script src="./lab-v8-studio.js?v=21"></script>
+<script src="./lab-v9-visuals.js?v=21"></script>
+<script src="./lab-v10-sandbox.js?v=21"></script>
+<script src="./lab-v11-userplan.js?v=21"></script>
+<script src="./lab-v12-diy-studio.js?v=21"></script>
+<script src="./lab-v13-mission-os.js?v=21"></script>
+<script src="./lab-v14-course-diagrams.js?v=21"></script>
+<script src="./cloud-ai.js?v=21"></script>
+<script src="./app.js?v=21"></script>
 </body>
 </html>
