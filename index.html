@@ -27,7 +27,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <link rel="stylesheet" href="./styles.css?v=9" />
+  <link rel="stylesheet" href="./styles.css?v=11" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
@@ -948,7 +948,7 @@
   </div>
 
   <!-- 移动端底部固定步进栏 -->
-  <div class="no-print lg:hidden fixed bottom-0 inset-x-0 z-20 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2.5 flex items-center justify-between gap-3">
+  <div id="mobStepBar" class="no-print lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2.5 flex items-center justify-between gap-3 transition-all">
     <button id="btnMobPrev" type="button" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold disabled:opacity-40">← 上一步</button>
     <span id="mobStepIndicator" class="text-xs font-bold text-[#0a3630] tabular-nums">1 / 6</span>
     <button id="btnMobNext" type="button" class="px-4 py-2 rounded-xl bg-[#0a3630] text-white text-xs font-bold disabled:opacity-40">下一步 →</button>
@@ -1081,9 +1081,9 @@
 <script src="./lab-v4-spectroscopy.js?v=8"></script>
 <script src="./lab-v5-encyclopedia.js?v=8"></script>
 <script src="./lab-tools-v3.js?v=8"></script>
-<script src="./lab-v6-pro.js?v=9"></script>
-<script src="./lab-v7-media-pro.js?v=9"></script>
-<script src="./cloud-ai.js?v=9"></script>
-<script src="./app.js?v=9"></script>
+<script src="./lab-v6-pro.js?v=11"></script>
+<script src="./lab-v7-media-pro.js?v=11"></script>
+<script src="./cloud-ai.js?v=11"></script>
+<script src="./app.js?v=11"></script>
 </body>
 </html>

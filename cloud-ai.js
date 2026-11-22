@@ -6,8 +6,8 @@
   const NETLIFY_SITE_URL = 'https://tcm-chemistry-lab.netlify.app';
   const PROXY_PATH = '/.netlify/functions/ai-proxy';
   const DEFAULT_MODEL = 'glm-4-flash-250414';
-  const CACHE_KEY = 'tcm_ai_resp_cache_v1';
-  const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 小时缓存，大幅降低重复请求 AI 消耗
+  const CACHE_KEY = 'tcm_ai_resp_cache_v2';
+  const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
   const MAX_CACHE_ENTRIES = 30;
 
   const PROVIDERS = {
@@ -32,19 +32,98 @@
     return Boolean(resolveProxyUrl());
   }
 
-  function cleanJsonText(raw) {
-    const text = String(raw || '')
-      .replace(/^```json\s*/i, '')
-      .replace(/^```\s*/i, '')
-      .replace(/```\s*$/, '')
+  // 强容错 JSON 清洗与自动修复引擎：解决智谱 GLM 偶发截断缺 ']' / '}'、尾随逗号、字符串内未转义换行等问题
+  function repairJsonText(raw) {
+    let text = String(raw || '')
+      .replace(/^\uFEFF/, '')
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```\s*$/i, '')
       .trim();
-    // 若模型在 JSON 前后偶发附加说明文字，自动截取最外层 {...}
+
     const first = text.indexOf('{');
+    if (first === -1) return text;
     const last = text.lastIndexOf('}');
-    if (first !== -1 && last > first) {
-      return text.slice(first, last + 1);
+    // 若模型输出完整，截取最外层 {...}；若因 token 截断缺少末尾 '}'，保留至结尾供自动补全
+    text = last > first ? text.slice(first, last + 1) : text.slice(first);
+
+    // 1. 尝试直接解析
+    try {
+      JSON.parse(text);
+      return text;
+    } catch (_) {}
+
+    // 2. 修复字符串内部未转义的换行/制表符，并去除尾随逗号
+    let fixed = '';
+    let inStr = false;
+    let escaped = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (inStr) {
+        if (escaped) {
+          fixed += ch;
+          escaped = false;
+        } else if (ch === '\\') {
+          fixed += ch;
+          escaped = true;
+        } else if (ch === '"') {
+          fixed += ch;
+          inStr = false;
+        } else if (ch === '\n') {
+          fixed += '\\n';
+        } else if (ch === '\r') {
+          fixed += '';
+        } else if (ch === '\t') {
+          fixed += '\\t';
+        } else {
+          fixed += ch;
+        }
+      } else {
+        if (ch === '"') inStr = true;
+        fixed += ch;
+      }
     }
-    return text;
+
+    // 去除非法尾随逗号（,] 或 ,}）及非法控制符
+    fixed = fixed
+      .replace(/,\s*([}\]])/g, '$1')
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+
+    try {
+      JSON.parse(fixed);
+      return fixed;
+    } catch (_) {}
+
+    // 3. 若发生输出截断或括号失衡（如 Expected ']'），用栈自动闭合未关闭的字符串、数组与对象
+    const stack = [];
+    let sInStr = false;
+    let sEsc = false;
+    for (let i = 0; i < fixed.length; i++) {
+      const ch = fixed[i];
+      if (sInStr) {
+        if (sEsc) sEsc = false;
+        else if (ch === '\\') sEsc = true;
+        else if (ch === '"') sInStr = false;
+      } else {
+        if (ch === '"') sInStr = true;
+        else if (ch === '{') stack.push('}');
+        else if (ch === '[') stack.push(']');
+        else if (ch === '}' || ch === ']') {
+          if (stack.length && stack[stack.length - 1] === ch) stack.pop();
+        }
+      }
+    }
+    if (sInStr) fixed += '"';
+    fixed = fixed.replace(/,\s*$/, '').replace(/:\s*$/, ': ""');
+    while (stack.length) {
+      fixed = fixed.replace(/,\s*$/, '');
+      fixed += stack.pop();
+    }
+    fixed = fixed.replace(/,\s*([}\]])/g, '$1');
+    return fixed;
+  }
+
+  function cleanJsonText(raw) {
+    return repairJsonText(raw);
   }
 
   function normalizeMessages(messages) {
@@ -112,7 +191,11 @@
 
   function assertUsableContent(content, expectJson) {
     if (!content || !content.trim()) throw new Error('模型返回内容为空');
-    if (expectJson) JSON.parse(cleanJsonText(content));
+    if (expectJson) {
+      const repaired = repairJsonText(content);
+      JSON.parse(repaired);
+      return repaired;
+    }
     return content;
   }
 
@@ -164,9 +247,9 @@
         model: DEFAULT_MODEL,
         messages,
         stream: true,
-        temperature: expectJson ? 0.25 : 0.55,
+        temperature: expectJson ? 0.2 : 0.55,
         response_format: expectJson ? { type: 'json_object' } : undefined,
-        max_tokens: expectJson ? 3000 : 1400
+        max_tokens: expectJson ? 4096 : 1600
       }),
       signal
     });
@@ -232,6 +315,19 @@
       return result;
     } catch (error) {
       if (signal?.aborted) throw error;
+      // 若首次因 JSON 格式异常失败，自动用非流式精简重试 1 次
+      if (expectJson && /JSON|Expected|Unexpected|parse/i.test(String(error?.message || ''))) {
+        try {
+          const retryMsgs = [
+            ...normalized,
+            { role: 'user', content: '请严格仅输出一个完整闭合的合法 JSON 对象，字段简洁完整，不要有任何多余说明文字或未闭合括号。' }
+          ];
+          const retryRes = await runAttempt(provider, retryMsgs, true, signal, onProgress);
+          if (useCache) setCachedResponse(cKey, retryRes.content);
+          lastProvider = retryRes;
+          return retryRes;
+        } catch (_) {}
+      }
       throw new Error(`${PROVIDERS[provider].label}: ${error?.message || '未知错误'}`);
     }
   }
@@ -260,5 +356,5 @@
     };
   }
 
-  window.TCMCloudAI = Object.freeze({ complete, testProviders, cleanJsonText, getCapabilities, clearCache, getCacheStats });
+  window.TCMCloudAI = Object.freeze({ complete, testProviders, cleanJsonText, repairJsonText, getCapabilities, clearCache, getCacheStats });
 })();

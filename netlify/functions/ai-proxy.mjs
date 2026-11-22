@@ -12,7 +12,7 @@ const ALLOWED_MODELS = new Set([
 ]);
 
 const DEFAULT_MODEL = 'glm-4-flash-250414';
-const FALLBACK_MODEL = 'glm-4-flash-250414';
+const FALLBACK_MODEL = 'glm-4.7-flash';
 const UPSTREAM_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 const RATE_WINDOW_MS = 60_000;
 const RATE_LIMIT = 20;

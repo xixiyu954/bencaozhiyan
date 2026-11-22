@@ -3119,7 +3119,9 @@
   function searchSiteKnowledge(prompt) { const q = String(prompt || '').trim(); const tokens = q.split(/[\s,，、。;；+＋/]+/).filter(s => s.length >= 2); const scoreText = (txt) => { const t = String(txt || ''); let sc = 0; if (q && t.includes(q)) sc += 5; tokens.forEach(tk => { if (t.includes(tk)) sc += 2; }); return sc; }; const topicMap = Object.assign({}, FEATURED_PRESETS || {}, state.customTopics || {}); const catExtra = Array.isArray(CATALOG_45) ? CATALOG_45 : []; const allTopics = Object.values(topicMap).concat(catExtra.filter(c => c && !topicMap[c.id])); const matchedTopics = allTopics.map(t => ({ item: t, score: scoreText([t.id, t.herb, t.compound, t.category, t.title, t.principle, t.routeSummary, (t.reagents || []).join(' ')].join(' ')) })).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 6).map(x => ({ id: x.item.id, herb: x.item.herb, compound: x.item.compound, category: x.item.category, title: x.item.title, route: x.item.routeSummary || '', source: state.customTopics && state.customTopics[x.item.id] ? 'AI/自建题库' : '站内精编题库' })); const allLit = (Array.isArray(GLOBAL_LITERATURE) ? GLOBAL_LITERATURE : []).concat(state.extraGlobalRefs || []); const matchedLit = allLit.map(l => ({ item: l, score: scoreText((l.tag || '') + ' ' + (l.text || '')) })).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 6).map(x => x.item); return { matchedTopics, matchedLit: matchedLit }; } function localSmartPlan(prompt) {
     const txt = prompt.trim();
     const allKnown = [...Object.values(FEATURED_PRESETS), ...CATALOG_45, ...Object.values(state.customTopics || {})];
-    const matched = allKnown.find(x => x && (txt.includes(x.herb) || (x.compound && txt.includes(x.compound.split('（')[0].split('/')[0]))));
+    const normH = (h) => String(h || "").replace(/（.*?）|\(.*?\)/g, "").trim();
+    const matched = allKnown.filter(Boolean).sort((a, b) => (b.herb || "").length - (a.herb || "").length)
+      .find(x => txt.includes(x.herb) || (normH(x.herb).length >= 2 && txt.includes(normH(x.herb))) || (normH(x.herb).length >= 3 && txt.includes(normH(x.herb).slice(-2))) || (x.compound && txt.includes(x.compound.split(/[、/+（(]/)[0])));
     const isShortTime = /1小时|2小时|90分钟|快速|本科/.test(txt);
     const isNoToxic = /无毒|绿色|不用氯仿|无氯仿|水提|环保/.test(txt);
     const isVolatile = /挥发油|芳香|蒸馏|紫苏|薄荷|丁香|艾叶|肉桂|广藿香/.test(txt);
@@ -3128,7 +3130,7 @@
     const isDouble = /双提|同步|多糖/.test(txt);
 
     const cleanedForHerb = txt.replace(/提取|分离|纯化|精制|检识|鉴定|萃取|蒸馏|研究|实验|设计|方案|工艺/g, '');
-    let herb = matched ? matched.herb : (cleanedForHerb.match(/([一-龥]{2,4})(?:中|的|叶|根|皮|花|果|子|草)/)?.[1] || '紫苏叶');
+    let herb = matched ? matched.herb : (cleanedForHerb.match(/([一-龥]{2,4})(?:中|的|叶|根|皮|花|果|子|草)/)?.[1] || cleanedForHerb.match(/[一-龥]{2,6}/)?.[0] || '自定义药材');
     let compound = matched ? matched.compound : (isVolatile ? `${herb}挥发油与紫苏醛` : `${herb}总活性成分`);
     let category = matched ? matched.category : (isVolatile ? '挥发油与萜类' : isDouble ? '多糖类' : '黄酮');
     let rig = isVolatile ? 'steam' : isUltra || isShortTime ? 'ultrasound' : isNoToxic ? 'reflux' : (matched?.defaultRig || 'reflux');
@@ -3676,9 +3678,25 @@
 
         // 省流优先：若命中内置精编 55 项题库且未要求强制云端定制，则 0 Token 秒出全套方案
         const hasComplexMod = /改良|对照|对比|双提|微针|低共熔|纳米|正交|优化方案|定制|比较/.test(prompt);
+        const HERB_ALIASES = {
+          "黄柏": "phellodendron", "关黄柏": "phellodendron", "川黄柏": "phellodendron",
+          "黄连": "coptis", "小檗碱": "coptis", "黄连素": "coptis",
+          "阿司匹林": "willow_aspirin", "水杨酸": "willow_aspirin", "柳树皮": "willow_aspirin",
+          "血塞通": "sanqi_xuesaitong", "血栓通": "sanqi_xuesaitong", "三七": "sanqi_xuesaitong",
+          "黄连解毒汤": "huanglian_jiedu", "逍遥散": "xiaoyao_formula",
+          "石杉碱甲": "huperzine_a", "千层塔": "huperzine_a",
+          "白藜芦醇": "resveratrol_hydrolysis", "虎杖": "resveratrol_hydrolysis",
+          "广陈皮": "citrus_pmf", "陈皮": "citrus", "薄荷": "mint", "薄荷脑": "mint",
+          "紫杉醇": "taxus_paclitaxel", "红豆杉": "taxus_paclitaxel"
+        };
         const sortedPresets = Object.values(FEATURED_PRESETS).filter(Boolean).sort((a, b) => (b.herb || "").length - (a.herb || "").length);
+        const normHerb = (h) => String(h || "").replace(/（.*?）|\(.*?\)/g, "").trim();
         const exactFullPreset = sortedPresets.find(p => prompt.includes(p.herb));
-        const exactPreset = exactFullPreset || Object.values(FEATURED_PRESETS).find(p => p && (prompt.includes(p.herb.replace(/（.*?）/g, '')) || (p.compound && prompt.includes(p.compound.split(/[、/+（(]/)[0]))));
+        const aliasKey = Object.keys(HERB_ALIASES).sort((a, b) => b.length - a.length).find(k => prompt.includes(k));
+        const exactPreset = exactFullPreset
+          || sortedPresets.find(p => { const nh = normHerb(p.herb); return nh.length >= 2 && prompt.includes(nh); })
+          || (aliasKey && FEATURED_PRESETS[HERB_ALIASES[aliasKey]])
+          || sortedPresets.find(p => p.compound && prompt.includes(p.compound.split(/[、/+（(]/)[0]));
         if (localFirst && !forceCloud && exactPreset && (exactFullPreset || !hasComplexMod)) {
           setStage(3, '命中内置精编库（0 Token 秒出），同步全工作台...', 82);
           const localPlan = normalizeAiPlan({
@@ -3941,6 +3959,7 @@
     }
   })();
 
+  try { if (window.location.hostname.endsWith('.netlify.app')) document.body.classList.add('on-netlify'); } catch (_) {}
   loadState();
   initEvents();
   updateTimerUI();
