@@ -703,3 +703,133 @@ body.dark-lab .v10-flow-card.done {
   border-color: #34d399;
   color: #ecfdf5;
 }
+
+/* ============ 舒适阅读排版体系 & 交互体验深度美化 ============ */
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+html[data-font-scale="large"] { font-size: 17.5px; }
+html[data-font-scale="xlarge"] { font-size: 19px; }
+
+body {
+  font-family: 'PingFang SC', 'HarmonyOS Sans SC', 'Noto Sans SC', 'Microsoft YaHei', 'Inter', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.72;
+  color: #102421;
+}
+
+/* 全面抬升中文微小字号，杜绝“凑近屏幕才能看清”的问题 */
+.text-\[9px\]  { font-size: 0.76rem !important; line-height: 1.48 !important; }
+.text-\[10px\] { font-size: 0.80rem !important; line-height: 1.52 !important; }
+.text-\[11px\] { font-size: 0.86rem !important; line-height: 1.60 !important; }
+.text-xs         { font-size: 0.90rem !important; line-height: 1.64 !important; }
+.text-sm         { font-size: 0.98rem !important; line-height: 1.70 !important; }
+.text-base       { font-size: 1.10rem !important; line-height: 1.66 !important; }
+.text-lg         { font-size: 1.24rem !important; line-height: 1.50 !important; }
+
+/* 提高说明文字与正文对比度 */
+.text-slate-500 { color: #475569 !important; }
+.text-slate-600 { color: #334155 !important; }
+.text-slate-700 { color: #1e293b !important; }
+
+/* 方案全景卡与步骤卡阅读体验放大 */
+.ai-sc { font-size: 0.96rem !important; line-height: 1.76 !important; }
+.ai-sec-title { font-size: 1.05rem !important; margin-bottom: 12px !important; }
+.ai-kv .ai-k { flex: 0 0 82px !important; font-size: 0.88rem !important; }
+.ai-kv .ai-v, .ai-ref-item, .ai-trouble, .ai-concl, .ai-innov { font-size: 0.92rem !important; line-height: 1.72 !important; }
+.ai-flow-node .ai-n-title { font-size: 0.92rem !important; }
+.ai-flow-node .ai-n-meta  { font-size: 0.80rem !important; }
+.bili-pill { font-size: 0.82rem !important; padding: 5px 12px !important; }
+
+/* 顶栏与分区导航更宽松大气 */
+.zone-tab {
+  font-size: 0.88rem !important;
+  padding: 8px 16px !important;
+}
+.stepper-track .step-chip {
+  font-size: 0.88rem !important;
+  padding: 8px 16px 8px 10px !important;
+}
+.stepper-track .step-chip .step-num-dot {
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 0.78rem !important;
+}
+
+/* 实验室卡片更有呼吸感与层次感 */
+.lab-card {
+  border-radius: 24px;
+  border: 1px solid rgba(15, 92, 84, 0.12);
+  box-shadow: 0 2px 6px rgba(5, 33, 29, 0.03), 0 18px 40px -14px rgba(5, 33, 29, 0.08);
+}
+
+/* 左侧配置栏文字更清晰，滑块手感更顺滑 */
+#leftSidebar {
+  width: 300px;
+}
+@media (min-width: 1024px) {
+  body > div.lg\:pl-72 {
+    padding-left: 300px !important;
+  }
+}
+input[type="range"] {
+  height: 6px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+input[type="text"], input[type="number"], select, textarea {
+  font-size: 0.92rem !important;
+}
+
+/* 右侧可视化驾驶舱稍微加宽，图表字更清晰 */
+@media (min-width: 1280px) {
+  .studio-right-dock { width: 376px !important; }
+}
+@media (min-width: 1536px) {
+  .studio-right-dock { width: 416px !important; }
+}
+
+/* 悬浮快捷操作浮球（一键回顶 / 下一环节） */
+#quickAssistFab {
+  position: fixed;
+  right: 22px;
+  bottom: 24px;
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+body.on-netlify #quickAssistFab {
+  bottom: 74px;
+}
+@media (max-width: 1023px) {
+  #quickAssistFab { bottom: 78px; right: 14px; }
+  body.on-netlify #quickAssistFab { bottom: 136px; }
+}
+.quick-fab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  background: rgba(6, 36, 32, 0.92);
+  color: #ecfdf5;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  box-shadow: 0 10px 26px -6px rgba(6, 36, 32, 0.42);
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.quick-fab-btn:hover {
+  transform: translateY(-2px);
+  background: #0f5c54;
+}
+body.dark-lab .text-slate-500 { color: #cbd5e1 !important; }
+body.dark-lab .text-slate-600 { color: #e2e8f0 !important; }
+body.dark-lab .text-slate-700 { color: #f1f5f9 !important; }

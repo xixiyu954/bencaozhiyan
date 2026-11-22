@@ -236,7 +236,7 @@
             <span class="w-7 h-7 rounded-xl bg-sky-50 text-sky-800 flex items-center justify-center font-extrabold text-xs">📊</span>
             <div>
               <h3 class="text-sm sm:text-base font-extrabold text-slate-900">UV-Vis 标准曲线线性拟合 &amp; 含量测定计算器（λ = ${ws.uvCal.lambda} nm）</h3>
-              <p class="text-[11px] text-slate-500">0-Token 最小二乘法自动拟合 A = kC + b 与 R²，输入供试品吸光度一键算含量 (%)</p>
+              <p class="text-[11px] text-slate-500">最小二乘法自动拟合 A = kC + b 与 R²，输入供试品吸光度一键算含量 (%)</p>
             </div>
           </div>
           <button id="btnCopyUvSummary" type="button" class="px-3 py-1.5 rounded-xl bg-[#0a3630] text-white text-xs font-bold hover:bg-[#062420] transition">复制标曲结论写入报告</button>

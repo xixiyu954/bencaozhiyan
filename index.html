@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>本草智研 · 中药化学智能实验设计工作台</title>
-  <meta name="description" content="本草智研（TCM Chemistry Lab Workbench）是面向高校药学与中药学专业的现代化智能实验设计工作台。内置 91 项高校与药企经典/创新药材及中西医结合实验题库、50 篇核实文献、9 套交互式物理仿真装置与分步小分支实操指引，集成智谱 GLM 免费大模型流式实验编排与报告全自动化生成。" />
-  <meta name="keywords" content="中药化学, 实验设计, 智能工作台, 本草智研, 药学实验, 提取分离, 物理仿真, TLC薄层色谱, 智谱GLM, 大模型应用" />
+  <meta name="description" content="本草智研（TCM Chemistry Lab Workbench）是面向高校药学与中药学专业的现代化智能实验设计工作台。内置 117 项高校与药企经典及创新药材实验题库、84 篇规范文献、15 套交互式动态仿真装置与自由组装实验沙盒，支持智能实验编排与规范报告一键导出。" />
+  <meta name="keywords" content="中药化学, 实验设计, 智能工作台, 本草智研, 药学实验, 提取分离, 物理仿真, TLC薄层色谱, 实验报告, 中药提取分离" />
   <meta name="author" content="chenovo495666" />
   <meta name="theme-color" content="#062420" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -27,7 +27,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <link rel="stylesheet" href="./styles.css?v=14" />
+  <link rel="stylesheet" href="./styles.css?v=16" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
@@ -306,16 +306,15 @@
             <button id="btnOpenCmdPalette" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#0f5c54] text-slate-700 text-xs font-bold transition" title="全局极速搜索 (Ctrl+K)">⌘K 搜索</button>
             <button id="btnOpenCompareTop" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-teal-50 border border-teal-200 hover:bg-teal-100 text-[#0a3630] text-xs font-extrabold transition" title="任意两项课题十维度横向对比">⚖️ 对比</button>
             <button id="btnOpenQwenCfgTop" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-100 to-emerald-50 border border-emerald-300/80 text-[#062420] text-xs font-extrabold hover:shadow-xs transition">
-              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i><span id="qwenHeaderBtnLabel">智谱 AI</span>
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i><span id="qwenHeaderBtnLabel">智能助手</span>
             </button>
             <button id="btnToggleVisualDock" type="button" class="studio-dock-toggle-btn items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-emerald-900 text-xs font-bold transition" title="展开/收起右侧动态可视化驾驶舱">📊 驾驶舱</button>
+            <button id="btnFontScale" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#0f5c54] text-slate-700 text-xs font-bold transition" title="一键切换舒适字号（标准 / 舒适大字 / 投影超大）">Aa 字号</button>
             <button id="btnToggleDarkLab" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#0f5c54] text-slate-700 text-xs font-bold transition" title="切换深色护眼实验室模式">🌙 护眼暗色</button>
             <button id="btnOpenFeedbackTop" type="button" class="hidden md:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-amber-300/80 text-amber-900 text-xs font-bold hover:bg-amber-50">
               <i data-lucide="mail" class="w-3.5 h-3.5 text-amber-600"></i>反馈
             </button>
-            <a href="https://github.com/xixiyu954/tcm-chemistry-lab" target="_blank" rel="noopener noreferrer" class="hidden md:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition" title="访问 GitHub 开源项目">
-              <i data-lucide="github" class="w-3.5 h-3.5"></i>GitHub
-            </a>
+            
             <button id="btnResetTopic" type="button" class="p-1.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-rose-600" title="重置"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
           </div>
         </div>
@@ -343,7 +342,7 @@
     <main class="relative z-10 flex-1 max-w-[1620px] w-full mx-auto px-4 sm:px-6 xl:px-8 py-6">
       <div class="studio-layout-grid">
         <div id="studioMainCol" class="flex-1 min-w-0 w-full space-y-6">
-      <!-- ==================== 公共 AI 实验总控台（自然语言调度全工作台自动化） ==================== -->
+      <!-- ==================== 智能实验设计助手（自然语言调度全工作台自动化） ==================== -->
       <section id="qwenCommandBar" class="no-print rounded-3xl bg-white/95 backdrop-blur-md border border-emerald-200/90 shadow-md p-4 sm:p-5 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-2 min-w-0">
@@ -352,21 +351,21 @@
             </span>
             <div class="min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-xs sm:text-sm font-extrabold text-slate-900">公共 AI 实验总控台</span>
-                <span id="qwenStatusPill" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">智谱免费通道 + 本地兜底</span>
+                <span class="text-xs sm:text-sm font-extrabold text-slate-900">智能实验设计助手</span>
+                <span id="qwenStatusPill" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">智能编排已就绪</span>
               </div>
             </div>
           </div>
           <div class="flex items-center gap-1.5">
             <button id="btnToggleQwenChat" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-[#0f5c54] text-[11px] font-bold transition">💬 实验助教问答</button>
-            <button id="btnOpenQwenCfgBar" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-amber-50 text-slate-700 hover:text-amber-900 text-[11px] font-bold transition">⚙ 公共 AI 状态</button>
+            <button id="btnOpenQwenCfgBar" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-amber-50 text-slate-700 hover:text-amber-900 text-[11px] font-bold transition">服务状态</button>
           </div>
         </div>
 
         <form id="qwenAutoForm" class="flex flex-col sm:flex-row gap-2">
           <input id="qwenPromptInput" type="text" placeholder="输入实验想法，如：2小时无毒提取陈皮橙皮苷并配置装置..." class="flex-1 min-w-0 w-full px-4 py-2.5 text-xs sm:text-sm rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:border-[#0f5c54] focus:ring-2 focus:ring-teal-500/15 transition" />
           <button id="btnRunQwenAuto" type="submit" class="shrink-0 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#0a3630] to-[#0f5c54] hover:from-[#062420] hover:to-[#0a3630] text-white text-xs sm:text-sm font-extrabold shadow-sm transition flex items-center justify-center gap-1.5">
-            <i data-lucide="wand-2" class="w-3.5 h-3.5 text-amber-300"></i><span id="btnRunQwenText">调度公共 AI · 自动编排</span>
+            <i data-lucide="wand-2" class="w-3.5 h-3.5 text-amber-300"></i><span id="btnRunQwenText">一键生成实验方案</span>
           </button>
         </form>
 
@@ -391,7 +390,7 @@
           </select>
           <label class="inline-flex items-center gap-1.5 ml-auto px-2.5 py-1 rounded-lg bg-emerald-50/80 border border-emerald-200 text-emerald-900 font-bold cursor-pointer select-none" title="优先匹配内置91项题库与本地24h缓存，大幅节省AI消耗">
             <input id="aiLocalFirstToggle" type="checkbox" checked class="accent-[#0a3630] rounded" />
-            <span>省流优先(本地0消耗)</span>
+            <span>极速匹配（优先经典题库）</span>
           </label>
         </div>
 
@@ -404,11 +403,11 @@
         </div>
 
         <!-- 自动化执行进度与回执 -->
-        <div id="qwenProgressBox" class="hidden rounded-2xl bg-slate-50 border border-teal-200/80 p-3.5 space-y-2 text-[12px]"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2 font-bold text-[#0a3630]"><span class="w-2 h-2 rounded-full bg-teal-500 animate-ping"></span><span id="qwenProgressStageText">正在检索题库文献...</span></div><span id="qwenProgressTimer" class="font-mono text-[11px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">0.0s</span></div><div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden"><div id="qwenProgressBar" class="h-full bg-gradient-to-r from-[#0a3630] to-teal-500 transition-all duration-300" style="width:15%"></div></div><div class="grid grid-cols-4 gap-1 text-[10px] text-slate-400 font-medium"><span id="qwenStep1" class="text-teal-700 font-bold">① 检索题库文献</span><span id="qwenStep2">② 调用智谱 AI</span><span id="qwenStep3">③ 同步工作台参数与装置</span><span id="qwenStep4">④ 写入报告与入库</span></div></div> <div id="qwenExecReceipt" class="hidden rounded-2xl bg-gradient-to-br from-emerald-50/80 to-white border border-emerald-200/80 p-3.5 space-y-2.5 text-[13px]">
+        <div id="qwenProgressBox" class="hidden rounded-2xl bg-slate-50 border border-teal-200/80 p-3.5 space-y-2 text-[12px]"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2 font-bold text-[#0a3630]"><span class="w-2 h-2 rounded-full bg-teal-500 animate-ping"></span><span id="qwenProgressStageText">正在检索题库文献...</span></div><span id="qwenProgressTimer" class="font-mono text-[11px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">0.0s</span></div><div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden"><div id="qwenProgressBar" class="h-full bg-gradient-to-r from-[#0a3630] to-teal-500 transition-all duration-300" style="width:15%"></div></div><div class="grid grid-cols-4 gap-1 text-[10px] text-slate-400 font-medium"><span id="qwenStep1" class="text-teal-700 font-bold">① 检索题库文献</span><span id="qwenStep2">② 智能推演工艺方案</span><span id="qwenStep3">③ 同步工作台参数与装置</span><span id="qwenStep4">④ 写入报告与入库</span></div></div> <div id="qwenExecReceipt" class="hidden rounded-2xl bg-gradient-to-br from-emerald-50/80 to-white border border-emerald-200/80 p-3.5 space-y-2.5 text-[13px]">
           <div class="flex items-center justify-between gap-2">
             <div class="font-extrabold text-[#0a3630] flex items-center gap-1.5">
               <span id="qwenReceiptBadge" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span id="qwenReceiptTitle">智谱 AI 自动化编排完成</span><span id="qwenBankStatusBadge" class="px-2 py-0.5 rounded-full bg-teal-100 text-[#0a3630] text-[10px] font-bold"></span>
+              <span id="qwenReceiptTitle">实验方案编排完成</span><span id="qwenBankStatusBadge" class="px-2 py-0.5 rounded-full bg-teal-100 text-[#0a3630] text-[10px] font-bold"></span>
             </div>
             <button id="btnCloseQwenReceipt" type="button" class="text-slate-400 hover:text-slate-700 font-bold">×</button>
           </div>
@@ -963,7 +962,7 @@
 
     <footer class="no-print mt-auto border-t border-slate-200/80 bg-white/75">
       <div class="max-w-[1620px] mx-auto px-4 sm:px-6 xl:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
-        <div>本草智研 · 《中药化学》智能实验设计工作台（公开通用版）</div>
+        <div>本草智研 · 《中药化学》智能实验设计工作台</div>
         <div class="flex items-center gap-2">
           <a href="https://github.com/xixiyu954/tcm-chemistry-lab" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-700 underline font-semibold">GitHub 仓库</a>
           <span>·</span>
@@ -991,26 +990,26 @@
         <div class="flex items-center gap-2">
           <span class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0a3630] to-emerald-600 text-amber-300 flex items-center justify-center"><i data-lucide="sparkles" class="w-4 h-4"></i></span>
           <div>
-            <h3 class="text-base font-extrabold text-slate-900">公共 AI 服务与自动容灾</h3>
-            <p class="text-[11px] text-slate-500">访客无需 API Key · 密钥仅保存在服务端</p>
+            <h3 class="text-base font-extrabold text-slate-900">智能实验助手说明</h3>
+            <p class="text-[11px] text-slate-500">免费开放 · 开箱即用，无需繁琐配置</p>
           </div>
         </div>
         <button id="btnCloseQwenCfg" type="button" class="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-slate-700 font-bold text-lg">×</button>
       </div>
       <form id="qwenCfgForm" class="space-y-3 text-xs">
         <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 leading-relaxed">
-          <strong>已为所有访客开启免配置 AI</strong><br />
-          每次请求通过 Netlify 安全代理使用智谱 GLM 免费模型（支持自动降级重试）；异常时无缝切换内置本地智算。
+          <strong>智能设计助手已就绪</strong><br />
+          支持直接输入药材名称与实验要求，自动生成完整工艺路线、装置选型与报告框架；网络波动时自动切换站内精编方案库。
         </div>
         <div id="aiProviderList" class="grid gap-2 text-[11px] text-slate-600">
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">① 智谱 GLM 云端通道：Netlify 代理 · 服务端密钥（国内高速直连）</div>
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">② 本地智算演练引擎：离线或断网时自动兜底，保证核心流程 100% 可用</div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">① 云端智能设计：支持自由输入自然语言需求，定制提取与分离工艺</div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">② 站内精编方案库：离线或网络波动时自动平滑衔接，保障实验课全程顺畅</div>
         </div>
         <p class="text-[10px] leading-relaxed text-slate-400">AI 生成内容仅作实验设计草稿，药典限度、文献和实验安全条件须由指导教师复核。</p>
         <div id="qwenCfgStatus" class="hidden p-2.5 rounded-xl text-[11px] leading-relaxed"></div>
         <div class="flex flex-wrap gap-2 pt-1">
-          <button id="btnTestQwenCfg" type="button" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">测试公共 AI</button>
-          <button id="btnClearQwenCfg" type="button" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">清除旧配置</button>
+          <button id="btnTestQwenCfg" type="button" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">检测连接状态</button>
+          <button id="btnClearQwenCfg" type="button" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">重置缓存</button>
           <button type="submit" class="flex-1 py-2 rounded-xl bg-[#0a3630] hover:bg-[#062420] text-white font-extrabold transition">完成</button>
         </div>
       </form>
@@ -1103,6 +1102,10 @@
     </div>
   </div>
 
+    <!-- 右下角悬浮便捷操作（返回顶部） -->
+  <div id="quickAssistFab" class="no-print hidden">
+    <button type="button" id="btnFabScrollTop" class="quick-fab-btn" title="平滑返回顶部">↑ 回顶部</button>
+  </div>
   <div id="toastContainer" class="no-print fixed top-4 left-1/2 -translate-x-1/2 items-center z-50 flex flex-col gap-2 pointer-events-none"></div>
 
 <script src="./lab-data-extra.js?v=8"></script>
@@ -1112,11 +1115,11 @@
 <script src="./lab-tools-v3.js?v=8"></script>
 <script src="./lab-v6-pro.js?v=11"></script>
 <script src="./lab-v7-media-pro.js?v=11"></script>
-<script src="./lab-v9-data.js?v=14"></script>
-<script src="./lab-v8-studio.js?v=14"></script>
-<script src="./lab-v9-visuals.js?v=14"></script>
-<script src="./lab-v10-sandbox.js?v=14"></script>
-<script src="./cloud-ai.js?v=14"></script>
-<script src="./app.js?v=14"></script>
+<script src="./lab-v9-data.js?v=16"></script>
+<script src="./lab-v8-studio.js?v=16"></script>
+<script src="./lab-v9-visuals.js?v=16"></script>
+<script src="./lab-v10-sandbox.js?v=16"></script>
+<script src="./cloud-ai.js?v=16"></script>
+<script src="./app.js?v=16"></script>
 </body>
 </html>

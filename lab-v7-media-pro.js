@@ -324,7 +324,7 @@
           <div class="flex items-center gap-2">
             <span class="w-7 h-7 rounded-xl bg-emerald-100 text-[#0a3630] flex items-center justify-center font-extrabold text-xs">🏆</span>
             <div>
-              <h3 class="text-sm sm:text-base font-extrabold text-slate-900">虚拟实操预习准入考核（0-Token 100分制评测）</h3>
+              <h3 class="text-sm sm:text-base font-extrabold text-slate-900">实验前虚拟预习考核（100 分制）</h3>
               <p class="text-[11px] text-slate-500">进实验室前 1 分钟自测安全红线与核心操作，≥ 80 分自动颁发预习合格徽章</p>
             </div>
           </div>

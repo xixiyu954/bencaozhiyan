@@ -90,7 +90,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h3 class="text-sm sm:text-base font-extrabold text-slate-900">中药活性成分「极性 × 提取路径」动态图谱</h3>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">v9.0 可视化</span>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">实时交互图谱</span>
             </div>
             <p class="text-[11px] text-slate-500">点击任意成分节点可快速定位所属极性区，当前已脉冲锁定 <strong class="text-[#0f5c54]">${esc(topic ? topic.herb : '薄荷')}</strong></p>
           </div>
@@ -113,15 +113,15 @@
           <rect x="26" y="18" width="510" height="128" rx="14" fill="url(#v9PolarGrad)" stroke="rgba(15,92,84,0.14)" stroke-width="1" />
           <line x1="196" y1="18" x2="196" y2="146" stroke="rgba(15,92,84,0.14)" stroke-dasharray="4 4" />
           <line x1="366" y1="18" x2="366" y2="146" stroke="rgba(15,92,84,0.14)" stroke-dasharray="4 4" />
-          <text x="111" y="34" text-anchor="middle" fill="#0f766e" font-size="9.5" font-weight="700">低极性 · 亲脂/挥发区</text>
-          <text x="281" y="34" text-anchor="middle" fill="#b45309" font-size="9.5" font-weight="700">中等极性 · 醇水/酸碱区</text>
-          <text x="451" y="34" text-anchor="middle" fill="#0369a1" font-size="9.5" font-weight="700">强极性 · 水提/大孔树脂区</text>
+          <text x="111" y="34" text-anchor="middle" fill="#0f766e" font-size="11.5" font-weight="700">低极性 · 亲脂/挥发区</text>
+          <text x="281" y="34" text-anchor="middle" fill="#b45309" font-size="11.5" font-weight="700">中等极性 · 醇水/酸碱区</text>
+          <text x="451" y="34" text-anchor="middle" fill="#0369a1" font-size="11.5" font-weight="700">强极性 · 水提/大孔树脂区</text>
 
           <!-- 极性轴 -->
           <line x1="34" y1="158" x2="528" y2="158" stroke="#0f5c54" stroke-width="1.5" />
-          <text x="34" y="171" fill="#64748b" font-size="9" font-weight="700">低极性 (石油醚/挥发油)</text>
-          <text x="281" y="171" text-anchor="middle" fill="#64748b" font-size="9" font-weight="700">中等极性 (70%~95% 乙醇)</text>
-          <text x="528" y="171" text-anchor="end" fill="#64748b" font-size="9" font-weight="700">强极性 (纯化水/醇沉) →</text>
+          <text x="34" y="171" fill="#64748b" font-size="11" font-weight="700">低极性 (石油醚/挥发油)</text>
+          <text x="281" y="171" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700">中等极性 (70%~95% 乙醇)</text>
+          <text x="528" y="171" text-anchor="end" fill="#64748b" font-size="11" font-weight="700">强极性 (纯化水/醇沉) →</text>
 
           ${POLAR_NODES.map(n => {
             const isAct = n.cat === activeNode.cat;
@@ -129,7 +129,7 @@
               <g class="v9-polar-node cursor-pointer" data-polar-cat="${esc(n.cat)}">
                 ${isAct ? `<circle cx="${n.x}" cy="${n.y}" r="18" fill="${n.color}" fill-opacity="0.22" class="anim-sonar" />` : ''}
                 <circle cx="${n.x}" cy="${n.y}" r="${isAct ? 10 : 7}" fill="${n.color}" stroke="#ffffff" stroke-width="${isAct ? 2.8 : 1.8}" />
-                <text x="${n.x}" y="${n.y + (isAct ? 22 : 18)}" text-anchor="middle" fill="${isAct ? '#062420' : '#475569'}" font-size="${isAct ? 10 : 8.8}" font-weight="${isAct ? 800 : 600}">${esc(n.cat.replace('与', '/'))}</text>
+                <text x="${n.x}" y="${n.y + (isAct ? 22 : 18)}" text-anchor="middle" fill="${isAct ? '#062420' : '#475569'}" font-size="${isAct ? 11.5 : 10.2}" font-weight="${isAct ? 800 : 600}">${esc(n.cat.replace('与', '/'))}</text>
               </g>
             `;
           }).join('')}
@@ -375,7 +375,7 @@
     const applyBtn = diyCard.querySelector('#v9BtnApplyDiyToReport');
     if (applyBtn) applyBtn.addEventListener('click', () => {
       const chainText = chosen.map(b => b.name).join(' → ');
-      const txt = `【本草智研 v9.0 DIY 定制路线】药材：${topic ? topic.herb : '自定义'} | 工艺链：${chainText} | 预估总耗时：${totalDiyMin} min | 绿色安全分：${avgGreen}/100 | 耗材估算：¥${totalCost}/组`;
+      const txt = `【本草智研 · 自定义实验工艺路线】药材：${topic ? topic.herb : '自定义'} | 工艺链：${chainText} | 预估总耗时：${totalDiyMin} min | 绿色安全分：${avgGreen}/100 | 耗材估算：¥${totalCost}/组`;
       if (ws) ws.diyChainSummary = txt;
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).catch(() => {});
       applyBtn.textContent = '✓ 已复制并同步';
@@ -441,14 +441,14 @@
             <line x1="42" y1="148" x2="510" y2="148" stroke="#64748b" />
             <line x1="42" y1="24" x2="42" y2="148" stroke="#64748b" />
           </g>
-          <text x="36" y="32" text-anchor="end" fill="#64748b" font-size="9">100%</text>
-          <text x="36" y="91" text-anchor="end" fill="#64748b" font-size="9">50%</text>
-          <text x="36" y="151" text-anchor="end" fill="#64748b" font-size="9">0%</text>
-          <text x="42" y="164" fill="#64748b" font-size="9">0 min</text>
-          <text x="159" y="164" text-anchor="middle" fill="#64748b" font-size="9">60 min</text>
-          <text x="276" y="164" text-anchor="middle" fill="#64748b" font-size="9">120 min</text>
-          <text x="393" y="164" text-anchor="middle" fill="#64748b" font-size="9">180 min</text>
-          <text x="510" y="164" text-anchor="end" fill="#64748b" font-size="9">240 min</text>
+          <text x="36" y="32" text-anchor="end" fill="#64748b" font-size="11">100%</text>
+          <text x="36" y="91" text-anchor="end" fill="#64748b" font-size="11">50%</text>
+          <text x="36" y="151" text-anchor="end" fill="#64748b" font-size="11">0%</text>
+          <text x="42" y="164" fill="#64748b" font-size="11">0 min</text>
+          <text x="159" y="164" text-anchor="middle" fill="#64748b" font-size="11">60 min</text>
+          <text x="276" y="164" text-anchor="middle" fill="#64748b" font-size="11">120 min</text>
+          <text x="393" y="164" text-anchor="middle" fill="#64748b" font-size="11">180 min</text>
+          <text x="510" y="164" text-anchor="end" fill="#64748b" font-size="11">240 min</text>
 
           <!-- 三条动力学曲线 -->
           <path d="${toPath(kCold, 82)}" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="5 5" />
@@ -460,10 +460,10 @@
           <circle cx="${curX.toFixed(1)}" cy="${curY.toFixed(1)}" r="10" fill="#10b981" fill-opacity="0.22" class="anim-sonar" />
           <circle cx="${curX.toFixed(1)}" cy="${curY.toFixed(1)}" r="5" fill="#10b981" stroke="#ffffff" stroke-width="2" />
           <rect x="${Math.min(410, curX + 8).toFixed(1)}" y="${Math.max(26, curY - 22).toFixed(1)}" width="92" height="20" rx="6" fill="#062420" />
-          <text x="${(Math.min(410, curX + 8) + 46).toFixed(1)}" y="${(Math.max(26, curY - 22) + 13).toFixed(1)}" text-anchor="middle" fill="#a7f3d0" font-size="9.5" font-weight="800">${curT}m · ${curYield.toFixed(1)}%</text>
+          <text x="${(Math.min(410, curX + 8) + 46).toFixed(1)}" y="${(Math.max(26, curY - 22) + 13).toFixed(1)}" text-anchor="middle" fill="#a7f3d0" font-size="11.5" font-weight="800">${curT}m · ${curYield.toFixed(1)}%</text>
 
           <!-- 图例 -->
-          <g transform="translate(260, 14)" font-size="9" font-weight="700">
+          <g transform="translate(260, 14)" font-size="11" font-weight="700">
             <line x1="0" y1="0" x2="14" y2="0" stroke="#0f5c54" stroke-width="3" /><text x="18" y="3" fill="#0f5c54">当前工艺 (${cfg.temp}℃/${esc(cfg.mesh.slice(0, 2))})</text>
             <line x1="112" y1="0" x2="126" y2="0" stroke="#f59e0b" stroke-width="2.2" stroke-dasharray="5 2" /><text x="130" y="3" fill="#b45309">超声空化 (${ultraYield.toFixed(0)}%)</text>
             <line x1="210" y1="0" x2="224" y2="0" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="4 4" /><text x="228" y="3" fill="#64748b">冷浸基准</text>
@@ -585,11 +585,11 @@
           <path d="${buildCurve(tR1, sigma1, 108)}" fill="none" stroke="#0f5c54" stroke-width="2.6" />
           <path d="${buildCurve(tR2, sigma2, 74)} L510,140 L36,140 Z" fill="rgba(245,158,11,0.22)" />
           <path d="${buildCurve(tR2, sigma2, 74)}" fill="none" stroke="#d97706" stroke-width="2.2" />
-          <text x="${(36 + (tR1 / maxX) * 474).toFixed(1)}" y="26" text-anchor="middle" fill="#0f5c54" font-size="9.5" font-weight="800">主成分 ${tR1.toFixed(1)}m</text>
-          <text x="${(36 + (tR2 / maxX) * 474).toFixed(1)}" y="58" text-anchor="middle" fill="#b45309" font-size="9" font-weight="800">邻近杂质 ${tR2.toFixed(1)}m</text>
-          <text x="36" y="156" fill="#64748b" font-size="9">0 min</text>
-          <text x="273" y="156" text-anchor="middle" fill="#64748b" font-size="9">8 min</text>
-          <text x="510" y="156" text-anchor="end" fill="#64748b" font-size="9">16 min</text>
+          <text x="${(36 + (tR1 / maxX) * 474).toFixed(1)}" y="26" text-anchor="middle" fill="#0f5c54" font-size="11.5" font-weight="800">主成分 ${tR1.toFixed(1)}m</text>
+          <text x="${(36 + (tR2 / maxX) * 474).toFixed(1)}" y="58" text-anchor="middle" fill="#b45309" font-size="11" font-weight="800">邻近杂质 ${tR2.toFixed(1)}m</text>
+          <text x="36" y="156" fill="#64748b" font-size="11">0 min</text>
+          <text x="273" y="156" text-anchor="middle" fill="#64748b" font-size="11">8 min</text>
+          <text x="510" y="156" text-anchor="end" fill="#64748b" font-size="11">16 min</text>
         </svg>
         <div class="mt-2 grid grid-cols-3 gap-2 text-center text-[11px] tabular-nums">
           <div class="p-2 rounded-xl bg-white border border-slate-200/80"><span class="text-slate-500">分离度 Rs：</span><strong class="${rs >= 1.5 ? 'text-emerald-700' : 'text-rose-600'}">${rs.toFixed(2)}</strong></div>

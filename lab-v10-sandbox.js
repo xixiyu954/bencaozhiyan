@@ -40,9 +40,9 @@
         <circle cx="170" cy="172" r="3" fill="#fff" class="anim-bubble-1"/>
         <circle cx="185" cy="168" r="2.5" fill="#fff" class="anim-bubble-2"/>
         <rect x="142" y="182" width="72" height="18" rx="6" fill="#1e293b"/>
-        <text x="236" y="45" fill="#0369a1" font-size="10" font-weight="700">冷凝滴落</text>
-        <text x="236" y="106" fill="#0f5c54" font-size="10" font-weight="700">虹吸自动回流</text>
-        <text x="236" y="168" fill="#b45309" font-size="10" font-weight="700">水浴持续汽化</text>
+        <text x="236" y="45" fill="#0369a1" font-size="11.5" font-weight="700">冷凝滴落</text>
+        <text x="236" y="106" fill="#0f5c54" font-size="11.5" font-weight="700">虹吸自动回流</text>
+        <text x="236" y="168" fill="#b45309" font-size="11.5" font-weight="700">水浴持续汽化</text>
       </svg>`,
       subSteps: [
         { title: '1. 滤纸筒装药与限高校验', detail: '将药材粗粉装入脱脂滤纸筒，高度务必低于虹吸管最高弯曲点 1 cm。', kw: '索氏提取器 装样' },
@@ -65,20 +65,20 @@
         <text x="43" y="124" text-anchor="middle" fill="#a7f3d0" font-size="11" font-weight="800">CO₂</text>
         <!-- 高压泵 -->
         <rect x="92" y="114" width="44" height="36" rx="8" fill="#0284c7" stroke="#0369a1" stroke-width="2"/>
-        <text x="114" y="136" text-anchor="middle" fill="#fff" font-size="9.5" font-weight="700">高压泵</text>
+        <text x="114" y="136" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">高压泵</text>
         <!-- 萃取釜 -->
         <rect x="168" y="48" width="54" height="126" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="2.5"/>
         <rect x="176" y="76" width="38" height="72" rx="4" fill="#a7f3d0" stroke="#047857" stroke-dasharray="4 3"/>
-        <text x="195" y="116" text-anchor="middle" fill="#064e3b" font-size="10" font-weight="800">萃取釜</text>
-        <text x="195" y="164" text-anchor="middle" fill="#047857" font-size="8.5" font-weight="700">35℃/25MPa</text>
+        <text x="195" y="116" text-anchor="middle" fill="#064e3b" font-size="11.5" font-weight="800">萃取釜</text>
+        <text x="195" y="164" text-anchor="middle" fill="#047857" font-size="10.5" font-weight="700">35℃/25MPa</text>
         <!-- 分离釜 -->
         <rect x="264" y="68" width="48" height="106" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="2.2"/>
-        <text x="288" y="118" text-anchor="middle" fill="#92400e" font-size="10" font-weight="800">降压分离</text>
-        <text x="288" y="156" text-anchor="middle" fill="#b45309" font-size="8.5" font-weight="700">无溶剂油膏</text>
+        <text x="288" y="118" text-anchor="middle" fill="#92400e" font-size="11.5" font-weight="800">降压分离</text>
+        <text x="288" y="156" text-anchor="middle" fill="#b45309" font-size="10.5" font-weight="700">无溶剂油膏</text>
         <!-- 动态流体管路 -->
         <path d="M60 132 L92 132 M136 132 L168 132 M222 84 L264 84" fill="none" stroke="#10b981" stroke-width="3" class="anim-flow"/>
         <path d="M288 68 L288 30 L114 30 L114 114" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="5 5" class="anim-flow"/>
-        <text x="200" y="24" text-anchor="middle" fill="#0284c7" font-size="9.5" font-weight="700">CO₂ 闭环循环回收</text>
+        <text x="200" y="24" text-anchor="middle" fill="#0284c7" font-size="11" font-weight="700">CO₂ 闭环循环回收</text>
       </svg>`,
       subSteps: [
         { title: '1. 药材装料与夹带剂设定', detail: '极性偏中成分可按 3%~8% 比例加入无水乙醇作为夹带剂提升溶解度。', kw: '超临界萃取 夹带剂' },
@@ -104,11 +104,11 @@
         <rect x="126" y="14" width="12" height="72" rx="4" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.6"/>
         <path d="M132 82 L132 20" stroke="#38bdf8" stroke-width="2" class="anim-flow"/>
         <rect x="210" y="56" width="34" height="104" rx="8" fill="#1e293b"/>
-        <text x="227" y="84" text-anchor="middle" fill="#34d399" font-size="9" font-weight="800">400W</text>
-        <text x="227" y="106" text-anchor="middle" fill="#fde68a" font-size="9" font-weight="800">65℃</text>
-        <text x="227" y="128" text-anchor="middle" fill="#7dd3fc" font-size="8.5" font-weight="700">8 min</text>
-        <text x="272" y="96" fill="#0f5c54" font-size="10" font-weight="800">高频偶极内热</text>
-        <text x="272" y="116" fill="#b45309" font-size="9.5" font-weight="700">细胞瞬时破壁</text>
+        <text x="227" y="84" text-anchor="middle" fill="#34d399" font-size="10.5" font-weight="800">400W</text>
+        <text x="227" y="106" text-anchor="middle" fill="#fde68a" font-size="10.5" font-weight="800">65℃</text>
+        <text x="227" y="128" text-anchor="middle" fill="#7dd3fc" font-size="10.5" font-weight="700">8 min</text>
+        <text x="272" y="96" fill="#0f5c54" font-size="11.5" font-weight="800">高频偶极内热</text>
+        <text x="272" y="116" fill="#b45309" font-size="11" font-weight="700">细胞瞬时破壁</text>
       </svg>`,
       subSteps: [
         { title: '1. 极性溶剂润药装入聚四氟乙烯/石英瓶', detail: '优先选用 60%~75% 乙醇或纯化水等高介电常数极性溶剂。', kw: '微波提取 溶剂' },
@@ -276,9 +276,9 @@
         <g transform="translate(${x}, ${y})">
           <rect x="0" y="0" width="${nodeW}" height="86" rx="16" fill="#0d352f" stroke="${u.color}" stroke-width="2" />
           <rect x="0" y="0" width="${nodeW}" height="22" rx="14" fill="${u.color}" fill-opacity="0.22" />
-          <text x="52" y="15" text-anchor="middle" fill="#a7f3d0" font-size="9" font-weight="800">${esc(u.slot)}</text>
+          <text x="52" y="15" text-anchor="middle" fill="#a7f3d0" font-size="10.5" font-weight="800">${esc(u.slot)}</text>
           <text x="52" y="49" text-anchor="middle" font-size="22">${u.icon}</text>
-          <text x="52" y="72" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="800">${esc(u.name.slice(0, 8))}</text>
+          <text x="52" y="72" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="800">${esc(u.name.slice(0, 8))}</text>
           <circle cx="${nodeW - 10}" cy="11" r="3.5" fill="#34d399" class="anim-sonar" />
         </g>
       `;
@@ -296,7 +296,7 @@
             <div>
               <div class="flex items-center gap-2 flex-wrap">
                 <h3 class="text-sm sm:text-base font-extrabold text-slate-900">自由搭建与组装动态装置沙盒 · 可行性实时诊断</h3>
-                <span class="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-extrabold">v10.0 互动工程台</span>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-extrabold">自由组装 · 实时诊断</span>
               </div>
               <p class="text-[11px] text-slate-500">点击下方 14 种真实实验器皿自由插拔组装，系统即时绘制动态管路并执行热力学与工艺可行性解析</p>
             </div>

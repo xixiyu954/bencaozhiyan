@@ -63,7 +63,7 @@
           <span class="w-7 h-7 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center font-extrabold text-xs">🧪</span>
           <div>
             <h3 class="text-sm sm:text-base font-extrabold text-slate-900">TLC 展开剂极性调优器 &amp; 常用溶剂极性速查</h3>
-            <p class="text-[11px] text-slate-500">0-Token 实时诊断薄层拖尾、Rf 偏高/偏低，给出精准配比微调方案</p>
+            <p class="text-[11px] text-slate-500">实时诊断薄层拖尾、Rf 偏高/偏低，给出精准配比微调方案</p>
           </div>
         </div>
         <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 text-[10px] font-bold">正相硅胶板</span>
@@ -288,7 +288,7 @@
         <div class="flex items-center gap-2">
           <span class="w-7 h-7 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center font-extrabold text-xs">🎓</span>
           <div>
-            <h3 class="text-sm sm:text-base font-extrabold text-slate-900">实验答辩 &amp; 考核高频 5 问速测卡（0-Token 专属定制）</h3>
+            <h3 class="text-sm sm:text-base font-extrabold text-slate-900">实验答辩 &amp; 考核高频 5 问速测卡</h3>
             <p class="text-[11px] text-slate-500">点击任意题目展开导师评分要点，提前演练课程答辩与实验考核</p>
           </div>
         </div>

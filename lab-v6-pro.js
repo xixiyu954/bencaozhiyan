@@ -52,7 +52,7 @@
             <div id="cmdPaletteResults" class="max-h-[60vh] overflow-y-auto custom-scroll p-2.5 space-y-1"></div>
             <div class="px-4 py-2 border-t border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between text-[10.5px] text-slate-500">
               <span>快捷键：<kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono">Ctrl+K</kbd> 极速搜索 · <kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono">Alt+1~6</kbd> 切步骤 · <kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono">Alt+H</kbd> 装置库</span>
-              <span class="font-bold text-[#0f5c54]">0-Token 毫秒检索</span>
+              <span class="font-bold text-[#0f5c54]">全站极速检索</span>
             </div>
           </div>
         </div>`;

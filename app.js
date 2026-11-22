@@ -2761,7 +2761,7 @@
       diagCard.innerHTML = `
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-extrabold">0-Token 本地诊断</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-extrabold">实验数据智能诊断</span>
             <h3 class="text-sm font-extrabold text-slate-900">实验数据自动诊断与讨论段落生成</h3>
           </div>
           <button id="btnCopyStep5Draft" type="button" class="px-3 py-1 rounded-xl bg-[#0a3630] text-white text-xs font-bold hover:bg-[#062420] transition">复制讨论段落写入报告</button>
@@ -3121,7 +3121,7 @@
   }
   try { localStorage.removeItem(QWEN_CFG_KEY); } catch (e) {}
 
-  function getActiveQwenModel() { return lastAIProviderLabel || '智谱免费通道 · 自动容灾'; }
+  function getActiveQwenModel() { return lastAIProviderLabel || '智能设计助手'; }
   function isQwenReady() { return Boolean(window.TCMCloudAI); }
 
   function updateQwenStatusUI() {
@@ -3130,13 +3130,13 @@
     const hdrLabel = document.getElementById('qwenHeaderBtnLabel');
     if (pill) {
       pill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
-      pill.textContent = '智谱免费通道 + 本地兜底';
+      pill.textContent = '智能编排已就绪';
     }
-    if (hdrLabel) hdrLabel.textContent = lastAIProviderLabel ? `AI·${lastAIProviderLabel}` : '智谱免费通道 · 免配置';
+    if (hdrLabel) hdrLabel.textContent = '智能助手';
   }
 
   async function callQwenAPI(messages, expectJson = false, options = {}) {
-    if (!window.TCMCloudAI) throw new Error('公共 AI 客户端加载失败，已启用本地智算');
+    if (!window.TCMCloudAI) throw new Error('云端服务暂不可用，已切换站内精编方案库');
     const result = await window.TCMCloudAI.complete({
       messages,
       expectJson,
@@ -3190,7 +3190,7 @@
       origin: basePreset?.origin || `${herb}为本科院校常规实验室易于获取的中药材，适合开展绿色提取分离与多维检识综合设计。`,
       chemistry: basePreset?.chemistry || `目标成分为${compound}，结合其极性与热稳定性采用${solvent}高效溶出。`,
       pharmacopoeia: basePreset?.pharmacopoeia || `对标《中国药典》通则与含量限度要求，控制平行 3 批 RSD < 5%。`,
-      integrative: `智谱免费通道方案延伸：围绕「${txt.slice(0, 36)}」需求，采用本科常规设备（${rig === 'steam' ? '挥发油测定器' : rig === 'ultrasound' ? '超声波清洗机+大孔树脂' : '回流装置+分液漏斗'}）即可落地；${isNoToxic ? '全程规避氯仿等高毒溶剂；' : ''}${isCompare ? '建议平行设立对照实验组并用 TLC/UV 量化差异；' : ''}可进一步拓展抗氧化/经皮递药评价。`,
+      integrative: `个性化实验延伸建议：围绕「${txt.slice(0, 36)}」需求，采用本科常规设备（${rig === 'steam' ? '挥发油测定器' : rig === 'ultrasound' ? '超声波清洗机+大孔树脂' : '回流装置+分液漏斗'}）即可落地；${isNoToxic ? '全程规避氯仿等高毒溶剂；' : ''}${isCompare ? '建议平行设立对照实验组并用 TLC/UV 量化差异；' : ''}可进一步拓展抗氧化/经皮递药评价。`,
       defaultRig: rig,
       defaultExtract: ext,
       defaultSep: sep,
@@ -3220,7 +3220,7 @@
       ],
       troubleshoot: basePreset?.troubleshoot || [{ issue: '收率低于预期', cause: '药材粉碎过粗或提取时间偏短。', fix: '适当减小粒度并补做一次短时复提。' }],
       chemTests: basePreset?.chemTests || [{ name: '特征化学显色反应阳性', passed: true }, { name: 'TLC 对照品同位置清晰单斑', passed: true }],
-      aiAdvice: `已为你按「${isShortTime ? '本科课时高效落地' : '高校常规实验标准'}${isNoToxic ? ' + 绿色无毒溶剂' : ''}」原则自动规划「${herb} · ${compound}」全套方案，并同步写入左侧参数单、动态装置与报告模板。智谱免费通道已启用，可直接获得大模型推理与个性化论文级方案生成！`
+      aiAdvice: `已为你按「${isShortTime ? '本科课时高效落地' : '高校常规实验标准'}${isNoToxic ? ' + 绿色无毒溶剂' : ''}」原则自动规划「${herb} · ${compound}」全套方案，并同步写入左侧参数单、动态装置与报告模板。已同步写入左侧配置单、动态装置与报告框架，可直接微调参数继续完善。`
     };
   }
 
@@ -3302,10 +3302,10 @@
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div class="min-w-0 flex-1">
             <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/12 border border-white/20 text-[10px] font-bold tracking-widest text-emerald-200">
-              <span class="ai-live-dot"></span> AI EXPERIMENT DESIGN · 实验方案全景解读
+              <span class="ai-live-dot"></span> 本草智研 · 实验方案全景解读
             </div>
             <h2 class="text-lg sm:text-2xl font-extrabold mt-2.5 leading-snug">${aiEsc(title)}</h2>
-            <p class="text-[11px] sm:text-xs text-teal-100/90 mt-1.5">${aiEsc(herb)} · ${aiEsc(compound)} · ${aiEsc(category)} ｜ 由 ${usedAI ? aiEsc(lastAIProviderLabel || '公共 AI') : '本地智算演练引擎'} 自动生成</p>
+            <p class="text-[11px] sm:text-xs text-teal-100/90 mt-1.5">${aiEsc(herb)} · ${aiEsc(compound)} · ${aiEsc(category)} ｜ 由 ${usedAI ? '智能设计助手' : '本草智研精编库'} 生成</p>
           </div>
           <div class="no-print flex gap-1.5 shrink-0">
             <button type="button" id="aiCopyPlan" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-[11px] font-bold transition">复制方案全文</button>
@@ -3531,7 +3531,7 @@
         limitUnit: plan.limitUnit || '%',
         crudeUnit: rig === 'steam' ? 'mL' : 'g',
         mpRef: plan.mpRef || '按标准品实测核对',
-        origin: plan.origin || `${plan.herb}（公共 AI 自动构建实验课题）。`,
+        origin: plan.origin || `${plan.herb}（智能设计助手定制课题）。`,
         chemistry: plan.chemistry || `核心成分：${plan.compound}。`,
         pharmacopoeia: plan.pharmacopoeia || `参考限度 ≥ ${Number(plan.limitVal) || 1.0}%。`,
         integrative: plan.integrative || plan.aiAdvice || '',
@@ -3580,7 +3580,7 @@
     const rec = document.getElementById('qwenExecReceipt');
     if (rec) {
       rec.classList.remove('hidden');
-      document.getElementById('qwenReceiptTitle').textContent = `${usedRealQwen ? (lastAIProviderLabel || '公共 AI') : '本地智算演练引擎'} · 已自动完成全工作台编排`;
+      document.getElementById('qwenReceiptTitle').textContent = `${usedRealQwen ? '智能设计助手' : '本草智研精编库'} · 已完成全流程实验编排`;
       document.getElementById('qwenReceiptAdvice').textContent = plan.aiAdvice || plan.integrative || `已为你自动配置「${plan.herb} · ${plan.compound}」全流程实验方案。`;
       const checks = [
         `✓ 锁定课题：${plan.herb} · ${plan.compound}`,
@@ -3601,7 +3601,7 @@
       const capabilities = window.TCMCloudAI?.getCapabilities?.() || { qwen: false, workbuddy: false };
       const cfgSt = document.getElementById('qwenCfgStatus');
       cfgSt.className = 'p-2.5 rounded-xl text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-900';
-      cfgSt.textContent = `智谱免费通道：${capabilities.qwen ? '已配置' : '未配置'}；本地兜底：始终可用。`;
+      cfgSt.textContent = `云端智能服务：${capabilities.qwen ? '连接正常' : '维护中'}；站内精编方案库：随时可用。`;
       cfgSt.classList.remove('hidden');
       const m = document.getElementById('qwenConfigModal');
       m.classList.remove('hidden'); m.classList.add('flex');
@@ -3629,7 +3629,7 @@
         try { localStorage.removeItem(QWEN_CFG_KEY); } catch (e) {}
         lastAIProviderLabel = '';
         updateQwenStatusUI();
-        showToast('旧 API 配置已清除，当前使用公共免配置服务');
+        showToast('本地缓存已重置');
       });
     }
 
@@ -3640,10 +3640,10 @@
         const st = document.getElementById('qwenCfgStatus');
         btnTest.disabled = true;
         st.className = 'p-2.5 rounded-xl text-[11px] bg-slate-100 text-slate-700';
-        st.textContent = '正在测试公共 AI 与自动容灾...';
+        st.textContent = '正在检测智能服务连接状态...';
         st.classList.remove('hidden');
         try {
-          if (!window.TCMCloudAI?.testProviders) throw new Error('公共 AI 客户端尚未加载');
+          if (!window.TCMCloudAI?.testProviders) throw new Error('服务模块加载中，请稍候重试');
           const results = await window.TCMCloudAI.testProviders();
           const successful = results.filter((item) => item.ok);
           lastAIProviderLabel = successful[0]?.label || '本地智算';
@@ -3651,10 +3651,10 @@
           st.className = successful.length ? 'p-2.5 rounded-xl text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-900' : 'p-2.5 rounded-xl text-[11px] bg-amber-50 border border-amber-200 text-amber-900';
           const details = results.map((item) => item.ok ? `✓ ${item.label}：${item.reply}` : `× ${item.label}：${item.error}`).join('\n');
           const capabilities = window.TCMCloudAI.getCapabilities();
-          st.textContent = details + '\n本地兜底：始终可用。';
+          st.textContent = details + '\n站内精编方案库随时可用。';
         } catch (err) {
           st.className = 'p-2.5 rounded-xl text-[11px] bg-amber-50 border border-amber-200 text-amber-900';
-          st.textContent = `公共 AI 暂不可用，已保留本地智算兜底。${err.message}`;
+          st.textContent = `云端服务当前繁忙，站内精编方案库可正常使用。`;
         } finally {
           btnTest.disabled = false;
         }
@@ -3690,7 +3690,7 @@
     if (autoForm) {
       autoForm.addEventListener('submit', async e => {
         e.preventDefault();
-        if (autoRunning) { showToast('公共 AI 正在编排，请稍候', 'info'); return; }
+        if (autoRunning) { showToast('正在为您编排实验方案，请稍候', 'info'); return; }
         const prompt = document.getElementById('qwenPromptInput').value.trim();
         if (!prompt) { showToast('请先输入你的实验想法或计划'); return; }
         if (prompt.length > 1200) { showToast('实验想法请控制在 1200 字以内', 'error'); return; }
@@ -3701,8 +3701,8 @@
         const btnTxt = document.getElementById('btnRunQwenText');
         const btnEl = document.getElementById('btnRunQwenAuto');
         btnEl.disabled = true;
-        btnTxt.textContent = '公共 AI 编排中...';
-        const pBox = document.getElementById('qwenProgressBox'); const pBar = document.getElementById('qwenProgressBar'); const pStage = document.getElementById('qwenProgressStageText'); const pTimer = document.getElementById('qwenProgressTimer'); const setStage = (idx, txt, pct) => { if (pStage) pStage.textContent = txt; if (pBar) pBar.style.width = pct + '%'; [1,2,3,4].forEach(n => { const s = document.getElementById('qwenStep' + n); if (s) s.className = n <= idx ? 'text-teal-700 font-bold' : 'text-slate-400'; }); }; if (pBox) pBox.classList.remove('hidden'); const t0 = Date.now(); if (pTimer) pTimer.textContent = '0.0s'; const pInt = setInterval(() => { if (pTimer) pTimer.textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's'; }, 100); setStage(1, '正在检索题库文献...', 20); const ragCtx = searchSiteKnowledge(prompt); setStage(2, '正在连接智谱 GLM 免费通道...', 38);
+        btnTxt.textContent = '方案编排中...';
+        const pBox = document.getElementById('qwenProgressBox'); const pBar = document.getElementById('qwenProgressBar'); const pStage = document.getElementById('qwenProgressStageText'); const pTimer = document.getElementById('qwenProgressTimer'); const setStage = (idx, txt, pct) => { if (pStage) pStage.textContent = txt; if (pBar) pBar.style.width = pct + '%'; [1,2,3,4].forEach(n => { const s = document.getElementById('qwenStep' + n); if (s) s.className = n <= idx ? 'text-teal-700 font-bold' : 'text-slate-400'; }); }; if (pBox) pBox.classList.remove('hidden'); const t0 = Date.now(); if (pTimer) pTimer.textContent = '0.0s'; const pInt = setInterval(() => { if (pTimer) pTimer.textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's'; }, 100); setStage(1, '正在检索题库文献...', 20); const ragCtx = searchSiteKnowledge(prompt); setStage(2, '正在智能推演实验工艺与装置...', 38);
         const aiScene = document.getElementById('aiSceneSelect')?.value || '高校本科教学(3~4学时)';
         const aiGreen = document.getElementById('aiGreenSelect')?.value || '绿色无氯仿优先';
         const aiTpl = document.getElementById('aiTemplateSelect')?.value || '全板块一键贯通';
@@ -3734,17 +3734,17 @@
           || (aliasKey && FEATURED_PRESETS[HERB_ALIASES[aliasKey]])
           || sortedPresets.find(p => p.compound && prompt.includes(p.compound.split(/[、/+（(]/)[0]));
         if (localFirst && !forceCloud && exactPreset && (exactFullPreset || !hasComplexMod)) {
-          setStage(3, '命中内置精编库（0 Token 秒出），同步全工作台...', 82);
+          setStage(3, '已匹配站内经典课题，正在同步全流程参数...', 82);
           const localPlan = normalizeAiPlan({
             ...exactPreset,
             matchedId: exactPreset.id,
             isNewTopic: false,
             cfg: exactPreset.defaultCfg,
             sampleBatches: exactPreset.demoBatches,
-            aiAdvice: `⚡ 已开启「省流优先」：精准命中内置精编课题「${exactPreset.herb} · ${exactPreset.compound}」（0 Token 消耗），已同步全部 6 步参数、适用装置与分步视频；如需按「${aiScene} / ${aiGreen}」深度改写，可点击下方蓝色按钮调用云端 AI。`,
+            aiAdvice: `✨ 已为您精准匹配精编课题「${exactPreset.herb} · ${exactPreset.compound}」，同步更新了全部 6 步参数、适用装置与实操指引；如需结合「${aiScene} / ${aiGreen}」做深度个性化改写，可点击下方按钮定制生成。`,
             aiConclusion: `本课题依据内置精编方案与《中国药典》参考限度（≥${exactPreset.limitVal}${exactPreset.limitUnit}）自动配置，请在第 4 步查看适用装置小分支并在第 5 步录入实测数据。`
           });
-          lastAIProviderLabel = '内置精编库 · 0 Token 秒出';
+          lastAIProviderLabel = '本草智研精编库';
           applyAiPlanToWorkbench(localPlan, false, ragCtx);
           if (forceBtn) {
             forceBtn.classList.remove('hidden');
@@ -3753,7 +3753,7 @@
           clearInterval(pInt);
           if (pBox) pBox.classList.add('hidden');
           btnEl.disabled = false;
-          btnTxt.textContent = '调度公共 AI · 自动编排';
+          btnTxt.textContent = '一键生成实验方案';
           autoRunning = false;
           activeAIController = null;
           updateQwenStatusUI();
@@ -3824,7 +3824,7 @@
               signal: requestController.signal,
               onProgress: (chars) => {
                 const pct = Math.min(74, 38 + Math.round((chars / 1800) * 36));
-                setStage(2, `智谱 GLM 正在编排全景方案（已生成 ${chars} 字）...`, pct);
+                setStage(2, `正在生成全景实验方案（已撰写 ${chars} 字）...`, pct);
               }
             });
             if (requestId !== autoRequestSeq) return;
@@ -3841,7 +3841,7 @@
         } catch (err) {
           if (requestId !== autoRequestSeq || requestController.signal.aborted) return;
           const fallback = normalizeAiPlan(localSmartPlan(prompt));
-          fallback.aiAdvice = `公共 AI 暂不可用（${err.message}），已自动切换本地智算完成基础编排；请由指导教师复核方案、标准与文献。`;
+          fallback.aiAdvice = `云端服务当前繁忙，已自动采用站内精编方案库为您完成基础编排；具体实验参数与安全条件请结合实验室实际并经指导教师复核。`;
           lastAIProviderLabel = '本地智算';
           applyAiPlanToWorkbench(fallback, false, ragCtx);
         } finally {
@@ -3849,7 +3849,7 @@
           if (requestId === autoRequestSeq) {
             if (pBox) pBox.classList.add('hidden');
             btnEl.disabled = false;
-            btnTxt.textContent = '调度公共 AI · 自动编排';
+            btnTxt.textContent = '一键生成实验方案';
             autoRunning = false;
             activeAIController = null;
             updateQwenStatusUI();
@@ -3883,7 +3883,7 @@
       if (/拖尾|TLC|薄层|斑点/i.test(q)) return `【${t.herb} TLC 优化建议】拖尾通常由酸碱解离引起：酸性成分可尝试在展开剂中加入少量甲酸或冰醋酸抑制电离；生物碱则需按对照方法调整碱化条件。当前推荐系统：${t.tlcSystem}。具体比例须经预实验和指导教师确认。`;
       if (/收率|偏低|提高/.test(q)) return `【${t.herb} 收率排查】依据扩散与传质原理，建议核查：①药材粒度（当前 ${ws.mesh}）；②溶剂浓度与 pH（当前 ${ws.solventType} / ${ws.ph}）；③温度（当前 ${ws.temp}℃）是否引起热敏降解或挥发损失。`;
       if (/讨论|报告|结论/.test(q)) return `【${t.herb} 实验讨论参考】本方案以${ws.solventType}在${ws.temp}℃下提取${ws.time} min，目标为获得${t.compound}。讨论应结合实测收率、RSD 与 TLC 结果，不应把预期结果写成已验证结论。`;
-      return `【本地智算提示】已读取「${t.herb} · ${t.compound}」上下文（${ws.solventType}，${ws.temp}℃）。公共 AI 恢复后可进一步自由问答；当前可继续咨询 TLC、收率或报告讨论。`;
+      return `【实验助教提示】已读取「${t.herb} · ${t.compound}」上下文（${ws.solventType}，${ws.temp}℃）。云端服务空闲时可支持更深入自由问答；当前可继续咨询 TLC、收率或报告讨论。`;
     }
 
     function renderTutorMarkdown(md) {
@@ -3983,7 +3983,7 @@
             ans = localTutorAnswer(q, t, ws);
           }
         } catch (err) {
-          ans = `${localTutorAnswer(q, t, ws)}\n\n公共 AI 暂不可用，以上由本地智算提供。`;
+          ans = `${localTutorAnswer(q, t, ws)}\n\n（以上解答由站内中药化学知识库即时提供）`;
         } finally {
           chatRunning = false;
           if (chatSubmit) chatSubmit.disabled = false;

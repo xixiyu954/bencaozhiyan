@@ -231,7 +231,7 @@
             <span class="w-7 h-7 rounded-xl bg-emerald-50 text-[#0f5c54] flex items-center justify-center font-extrabold text-xs">🏭</span>
             <div>
               <h3 class="text-sm sm:text-base font-extrabold text-slate-900">小试 → 药企中试四级放大 &amp; 溶剂回收核算器</h3>
-              <p class="text-[11px] text-slate-500">一键切换投料规模，0-Token 自动换算提取罐容积、溶剂回收减排量与目标产量</p>
+              <p class="text-[11px] text-slate-500">一键切换投料规模，自动换算提取罐容积、溶剂回收减排量与目标产量</p>
             </div>
           </div>
           <button id="btnCopyScaleUp" type="button" class="px-3 py-1.5 rounded-xl bg-[#0a3630] text-white text-xs font-bold hover:bg-[#062420] transition">复制放大核算单</button>

@@ -167,8 +167,8 @@
                 <path d="M122 58 L122 18" stroke="#6ee7b7" stroke-width="2" stroke-dasharray="5 5" class="anim-flow" />
                 <path d="M132 48 L156 48" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" />
                 <path d="M132 24 L156 24" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" />
-                <text x="160" y="51" fill="#7dd3fc" font-size="8" font-family="monospace">水进</text>
-                <text x="160" y="27" fill="#fcd34d" font-size="8" font-family="monospace">水出</text>
+                <text x="160" y="51" fill="#7dd3fc" font-size="11.5" font-family="monospace">水进</text>
+                <text x="160" y="27" fill="#fcd34d" font-size="11.5" font-family="monospace">水出</text>
 
                 <!-- 圆底烧瓶与动态液面 -->
                 <g clip-path="url(#dockBulbClip)">
@@ -192,8 +192,8 @@
                 <rect x="218" y="24" width="12" height="100" rx="6" fill="rgba(15,23,42,0.75)" stroke="rgba(203,213,225,0.45)" stroke-width="1.2" />
                 <rect id="dockThermBar" x="221" y="54" width="6" height="68" rx="3" fill="#f59e0b" style="transition: y 0.4s ease, height 0.4s ease, fill 0.4s ease;" />
                 <circle id="dockThermBulb" cx="224" cy="126" r="8" fill="#f59e0b" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
-                <text id="dockThermText" x="242" y="76" fill="#fde68a" font-size="11" font-weight="800" font-family="monospace">100℃</text>
-                <text x="242" y="92" fill="#94a3b8" font-size="8">实时温控</text>
+                <text id="dockThermText" x="242" y="76" fill="#fde68a" font-size="12.5" font-weight="800" font-family="monospace">100℃</text>
+                <text x="242" y="92" fill="#94a3b8" font-size="11.5">实时温控</text>
               </svg>
 
               <div class="mt-2 grid grid-cols-3 gap-1.5 text-center">
@@ -240,11 +240,11 @@
               <!-- 动态数据多边形 -->
               <polygon id="dockRadarPoly" points="120,34 176,74 152,138 88,136 65,75" fill="rgba(16,185,129,0.22)" stroke="#0f5c54" stroke-width="2.2" stroke-linejoin="round" style="transition: all 0.45s cubic-bezier(0.16,1,0.3,1);" />
               <!-- 轴标签 -->
-              <text x="120" y="16" text-anchor="middle" fill="#0f5c54" font-size="10" font-weight="700">提取效率</text>
-              <text x="192" y="75" text-anchor="start" fill="#0f5c54" font-size="10" font-weight="700">绿色安全</text>
-              <text x="164" y="163" text-anchor="middle" fill="#0f5c54" font-size="10" font-weight="700">课时适配</text>
-              <text x="76" y="163" text-anchor="middle" fill="#0f5c54" font-size="10" font-weight="700">溶剂经济</text>
-              <text x="48" y="75" text-anchor="end" fill="#0f5c54" font-size="10" font-weight="700">热敏保护</text>
+              <text x="120" y="16" text-anchor="middle" fill="#0f5c54" font-size="11.5" font-weight="700">提取效率</text>
+              <text x="192" y="75" text-anchor="start" fill="#0f5c54" font-size="11.5" font-weight="700">绿色安全</text>
+              <text x="164" y="163" text-anchor="middle" fill="#0f5c54" font-size="11.5" font-weight="700">课时适配</text>
+              <text x="76" y="163" text-anchor="middle" fill="#0f5c54" font-size="11.5" font-weight="700">溶剂经济</text>
+              <text x="48" y="75" text-anchor="end" fill="#0f5c54" font-size="11.5" font-weight="700">热敏保护</text>
             </svg>
           </div>
 
@@ -454,11 +454,51 @@
     }
   }
 
+
+  // 字号舒适度切换与返回顶部浮球
+  function bindUxComfortControls() {
+    const scales = [
+      { id: 'normal', label: 'Aa 标准' },
+      { id: 'large', label: 'Aa 大字' },
+      { id: 'xlarge', label: 'Aa 超大' }
+    ];
+    const saved = localStorage.getItem('tcm_font_scale') || 'normal';
+    let idx = Math.max(0, scales.findIndex(s => s.id === saved));
+    const applyScale = () => {
+      const cur = scales[idx];
+      if (cur.id === 'normal') document.documentElement.removeAttribute('data-font-scale');
+      else document.documentElement.setAttribute('data-font-scale', cur.id);
+      localStorage.setItem('tcm_font_scale', cur.id);
+      const btn = document.getElementById('btnFontScale');
+      if (btn) btn.textContent = cur.label;
+    };
+    applyScale();
+    const fontBtn = document.getElementById('btnFontScale');
+    if (fontBtn && !fontBtn.dataset.bound) {
+      fontBtn.dataset.bound = '1';
+      fontBtn.addEventListener('click', () => {
+        idx = (idx + 1) % scales.length;
+        applyScale();
+      });
+    }
+
+    const fab = document.getElementById('quickAssistFab');
+    const topBtn = document.getElementById('btnFabScrollTop');
+    if (fab && !fab.dataset.bound) {
+      fab.dataset.bound = '1';
+      window.addEventListener('scroll', () => {
+        fab.classList.toggle('hidden', window.scrollY < 320);
+      }, { passive: true });
+      if (topBtn) topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
+  }
+
   window.TCM_STUDIO_V8 = {
     sync: syncVisualDock,
     init: function () {
       buildDockSkeleton();
       bindStudioControls();
+      bindUxComfortControls();
     }
   };
 
