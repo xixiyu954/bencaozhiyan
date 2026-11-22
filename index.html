@@ -144,7 +144,7 @@
     @media print { #aiPlanShowcase { break-inside:avoid; } .ai-sc .no-print { display:none !important; } }
 </style>
 </head>
-<body class="min-h-screen flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
+<body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
 
   <!-- ==================== 左侧固定栏：专属「实验配置单 & 精细 DIY 小参数」 ==================== -->
   <aside id="leftSidebar" class="no-print fixed inset-y-0 left-0 z-40 w-72 bg-[#062420] text-teal-50 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 shadow-2xl lg:shadow-none">
@@ -279,7 +279,7 @@
     <!-- 右抽屉 4 标签 -->
     <div class="px-4 pt-3 pb-2 border-b border-slate-100">
       <div class="grid grid-cols-4 gap-1 p-1 rounded-xl bg-slate-100 text-[11px] font-bold">
-        <button type="button" data-rtab="bank" class="rtab-btn py-1.5 rounded-lg bg-[#0a3630] text-white transition">题库(79)</button>
+        <button type="button" data-rtab="bank" id="rtabBankBtn" class="rtab-btn py-1.5 rounded-lg bg-[#0a3630] text-white transition">题库(79)</button>
         <button type="button" data-rtab="chapters" class="rtab-btn py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">章节知识</button>
         <button type="button" data-rtab="lit" class="rtab-btn py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">文献库</button>
         <button type="button" data-rtab="univ" class="rtab-btn py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">高校实验</button>
@@ -295,7 +295,7 @@
         <div class="flex gap-2">
           <input id="sideSearch" type="text" placeholder="搜索药材或成分..." class="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#0f5c54]" />
           <select id="sideCatFilter" class="w-32 px-2 py-2 text-xs rounded-xl border border-slate-200 bg-white">
-            <option value="全部">全部分类 (79)</option>
+            <option value="全部" id="sideCatAllOpt">全部分类 (79)</option>
             <option value="经典精选课题">★ 经典精选 (19)</option>
             <option value="创新拓展课题">✨ 创新拓展 (24)</option>
             <option value="我的创新DIY">★ 自定义课题</option>
@@ -367,7 +367,7 @@
     <header class="no-print sticky top-0 z-20 bg-[#f4f3ee]/92 backdrop-blur-md border-b border-slate-200/80">
       <div class="h-1 w-full bg-slate-200/70"><div id="topLinearProgress" class="h-full bg-gradient-to-r from-[#0a3630] to-emerald-500 transition-all duration-300" style="width: 16.6%"></div></div>
       <div class="max-w-4xl mx-auto px-4 sm:px-8 py-3 space-y-3">
-        <div class="flex items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
           <div class="flex items-center gap-2.5 min-w-0">
             <button id="btnOpenLeftMobile" type="button" class="lg:hidden p-2 rounded-xl bg-white border border-slate-200 text-slate-700" title="打开左侧配置单"><i data-lucide="sliders" class="w-4 h-4"></i></button>
             <div class="min-w-0">
@@ -378,7 +378,7 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-2 shrink-0">
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 shrink-0 max-w-full">
             <button id="btnOpenQwenCfgTop" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-100 to-emerald-50 border border-emerald-300/80 text-[#062420] text-xs font-extrabold hover:shadow-xs transition">
               <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i><span id="qwenHeaderBtnLabel">千问 AI</span>
             </button>
@@ -393,7 +393,7 @@
         </div>
 
         <!-- 极简 6 步导航（短词清晰） -->
-        <nav id="wizardNav" class="flex items-center gap-1.5 overflow-x-auto custom-scroll pb-0.5">
+        <nav id="wizardNav" class="flex flex-wrap items-center gap-1.5 pb-0.5">
           <button type="button" data-wstep="1" class="step-chip active shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600">01 选材</button>
           <span class="text-slate-300 text-xs">›</span>
           <button type="button" data-wstep="2" class="step-chip shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600">02 定题</button>
@@ -432,7 +432,7 @@
         </div>
 
         <form id="qwenAutoForm" class="flex flex-col sm:flex-row gap-2">
-          <input id="qwenPromptInput" type="text" placeholder="写下你的实验想法或计划，如：本科实验室 2 小时内无毒提取陈皮橙皮苷，自动配置全套参数与装置..." class="flex-1 px-4 py-2.5 text-xs sm:text-sm rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:border-[#0f5c54] focus:ring-2 focus:ring-teal-500/15 transition" />
+          <input id="qwenPromptInput" type="text" placeholder="输入实验想法，如：2小时无毒提取陈皮橙皮苷并配置装置..." class="flex-1 min-w-0 w-full px-4 py-2.5 text-xs sm:text-sm rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:border-[#0f5c54] focus:ring-2 focus:ring-teal-500/15 transition" />
           <button id="btnRunQwenAuto" type="submit" class="shrink-0 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#0a3630] to-[#0f5c54] hover:from-[#062420] hover:to-[#0a3630] text-white text-xs sm:text-sm font-extrabold shadow-sm transition flex items-center justify-center gap-1.5">
             <i data-lucide="wand-2" class="w-3.5 h-3.5 text-amber-300"></i><span id="btnRunQwenText">调度千问 · 自动编排</span>
           </button>
@@ -494,9 +494,9 @@
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>STEP 01 · HERBAL MATERIAL &amp; WORKBENCH
             </div>
             <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">选定实验药材与目标成分</h2>
-            <p class="text-xs sm:text-sm text-teal-100/85 leading-relaxed">覆盖 79 项中药材题库、10 大课程章节与 UV/NMR 波谱速查，支持全参数自由定制与创新药材创建。</p>
+            <p class="text-xs sm:text-sm text-teal-100/85 leading-relaxed">覆盖 <span id="bannerBankCount">79</span> 项中药材题库、10 大课程章节与 UV/NMR 波谱速查，支持全参数自由定制与创新药材创建。</p>
             <div class="flex flex-wrap gap-1.5 pt-1 text-[10px] font-bold">
-              <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-emerald-100">79 项药材题库</span>
+              <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-emerald-100" id="bannerBankPill">79 项药材题库</span>
               <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-emerald-100">10 大章节知识</span>
               <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-emerald-100">7 套动态实验装置</span>
               <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-amber-200">34 篇实证文献</span>
@@ -521,8 +521,8 @@
               <span class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">⌕</span>
             </div>
           </div>
-          <div id="step1CatPills" class="flex items-center gap-1.5 overflow-x-auto custom-scroll pb-0.5"></div>
-          <div id="step1HerbCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[390px] overflow-y-auto custom-scroll pr-1"></div>
+          <div id="step1CatPills" class="flex flex-wrap items-center gap-1.5 pb-0.5"></div>
+          <div id="step1HerbCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[390px] overflow-y-auto custom-scroll pr-1 pb-4"></div>
         </div>
 
         <!-- 板块 B：药材档案 -->
@@ -1079,10 +1079,10 @@
 
   // 核心物理化学与药学公式库（按成分大类自动匹配核心公式）
   const FORMULA_BANK = {
-    distill: { name: '道尔顿分压定律（水蒸气蒸馏）', eq: 'P总 = P水 + P油 = P₀ ； m油 / m水 = (P油·M油) / (P水·M水)', desc: '挥发油与水互不相溶，混合体系总蒸气压等于各组分饱和蒸气压之和，因此在低于 100℃ 时即可共沸馏出，保护热敏萜类。' },
+    distill: { name: '道尔顿分压定律（水蒸气蒸馏）', eq: '<span class="whitespace-nowrap">P总</span> = <span class="whitespace-nowrap">P水</span> + <span class="whitespace-nowrap">P油</span> = <span class="whitespace-nowrap">P₀</span> ； <span class="whitespace-nowrap">m油</span> / <span class="whitespace-nowrap">m水</span> = (<span class="whitespace-nowrap">P油</span>·<span class="whitespace-nowrap">M油</span>) / (<span class="whitespace-nowrap">P水</span>·<span class="whitespace-nowrap">M水</span>)', desc: '挥发油与水互不相溶，混合体系总蒸气压等于各组分饱和蒸气压之和，因此在低于 100℃ 时即可共沸馏出，保护热敏萜类。' },
     diffusion: { name: '菲克第一扩散定律（固液浸提传质）', eq: 'dM / dt = − D · F · (dC / dx)', desc: '浸提速率与扩散系数 D（受温度、超声空化影响）、药材表面积 F（粉碎粒度）及浓度梯度 dC/dx（料液比与提取次数）成正比。' },
     henderson: { name: 'Henderson-Hasselbalch 酸碱解离方程', eq: 'pH = pKa + lg([A⁻] / [HA])', desc: '指导生物碱酸水成盐提取、黄酮/蒽醌碱溶酸沉与大黄 pH 梯度萃取的精准酸碱窗口设定。' },
-    qc: { name: '收率、重复性(RSD)与薄层比移值(Rf)', eq: '收率(%) = (m提取物/m药材)×100% ； RSD = (S / x̄)×100% ； Rf = L斑点 / L₀', desc: '定量评价提取效率、平行批次工艺稳健性（一般要求 RSD < 5%）及薄层定性一致性（|ΔRf| ≤ 0.03）。' }
+    qc: { name: '收率、重复性(RSD)与薄层比移值(Rf)', eq: '收率(%) = (<span class="whitespace-nowrap">m提取物</span>/<span class="whitespace-nowrap">m药材</span>)×100% ； RSD = (S / <span class="whitespace-nowrap">x̄</span>)×100% ； Rf = <span class="whitespace-nowrap">L斑点</span> / <span class="whitespace-nowrap">L₀</span>', desc: '定量评价提取效率、平行批次工艺稳健性（一般要求 RSD < 5%）及薄层定性一致性（|ΔRf| ≤ 0.03）。' }
   };
 
   // 《中药化学》通用核心 10 大章节知识库（第2~9、12~13章）
@@ -2639,7 +2639,7 @@
     // 1. 题库
     const customList = Object.values(state.customTopics).map(c => ({ id: c.id, herb: c.herb, compound: c.compound, category: c.category, isCustom: true }));
     const combined = [...customList, ...CATALOG_45];
-    const q = state.sideQuery.trim().toLowerCase();
+    coconst totalBank = combined.length; const rtabBtn = document.getElementById('rtabBankBtn'); if (rtabBtn) rtabBtn.textContent = `题库(${totalBank})`; const catAllOpt = document.getElementById('sideCatAllOpt'); if (catAllOpt) catAllOpt.textContent = `全部分类 (${totalBank})`; const bCount = document.getElementById('bannerBankCount'); if (bCount) bCount.textContent = totalBank; const bPill = document.getElementById('bannerBankPill'); if (bPill) bPill.textContent = `${totalBank} 项药材题库`;nst q = state.sideQuery.trim().toLowerCase();
     const list = combined.filter(x => (state.sideCat === '全部' ? true : state.sideCat === '我的创新DIY' ? x.isCustom : state.sideCat === '经典精选课题' ? x.isClassGroup : state.sideCat === '创新拓展课题' ? x.isInnovative : x.category === state.sideCat) && (!q || `${x.herb} ${x.compound} ${x.category}`.toLowerCase().includes(q)));
     const listEl = document.getElementById('sideTopicList');
     listEl.innerHTML = list.map(item => {
@@ -2896,6 +2896,7 @@
     document.getElementById('vidMoocLink').href = `https://www.icourse163.org/search.htm?search=${encodeURIComponent('中药化学')}`;
   }
 
+  function getScaledEquipment(rig, ws) { const vol = (Number(ws.mass) || 0) * (Number(ws.ratio) || 0); const req = vol * 1.5; const sizes = [250, 500, 1000, 2000, 5000]; let flask = '1000mL圆底烧瓶'; if (req > 0) { const m = sizes.find(s => s >= req); flask = m ? `${m}mL圆底烧瓶` : '5000mL圆底烧瓶（建议分批提取）'; } return (rig.equipment || []).map(e => e === '1000mL圆底烧瓶' ? flask : e); }
   function renderStep4(t, ws) {
     const rigKey = LAB_RIGS[ws.activeRig] ? ws.activeRig : 'steam', rig = LAB_RIGS[rigKey];
     document.querySelectorAll('.rig-tab-btn').forEach(b => { const a = b.dataset.rig === rigKey; b.classList.remove('bg-[#0a3630]', 'text-white', 'bg-white', 'text-slate-600', 'shadow-sm', 'ring-2', 'ring-teal-500'); b.className = `rig-tab-btn shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition ${a ? 'bg-[#0a3630] text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'}`; b.setAttribute('aria-pressed', a ? 'true' : 'false'); }); const applyBtn = document.getElementById('applyRigToReportBtn'); if (applyBtn) { const applied = (ws.reportRig || rigKey) === rigKey; applyBtn.textContent = applied ? '已应用到报告 ✓' : '应用到报告'; }
@@ -2910,7 +2911,7 @@
     document.getElementById('hotspotTitle').textContent = hs.name;
     document.getElementById('hotspotDesc').textContent = hs.desc;
     document.getElementById('hotspotWarn').textContent = hs.warn;
-    document.getElementById('rigEquipmentChips').innerHTML = rig.equipment.map(e => `<span class="px-2.5 py-1 rounded-lg bg-[#f4f3ee] text-slate-700 text-xs font-medium">${e}</span>`).join('');
+    document.getElementById('rigEquipmentChips').innerHTML = getScaledEquipment(rig, ws).map(e => `<span class="px-2.5 py-1 rounded-lg bg-[#f4f3ee] text-slate-700 text-xs font-medium">${e}</span>`).join('');
 
     const doneCnt = ws.sopDone.filter(Boolean).length, pct = t.sop.length ? Math.round(doneCnt / t.sop.length * 100) : 0;
     document.getElementById('sopProgressText').textContent = `${doneCnt}/${t.sop.length} (${pct}%)`;
@@ -2995,7 +2996,7 @@
     if (mod.origin) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">一、药材基原与药典依据</h4><p><strong>基原：</strong>${t.origin}</p><p><strong>化学成分：</strong>${t.chemistry}</p><p><strong>药典标准：</strong>${t.pharmacopoeia}</p></div>`;
     if (mod.theory) html += `<div class="space-y-1.5"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">二、核心公式原理与中西医结合视角</h4>${fKeys.map(k => `<p class="text-xs"><strong>${FORMULA_BANK[k].name}：</strong><code>${FORMULA_BANK[k].eq}</code> — ${FORMULA_BANK[k].desc}</p>`).join('')}<p class="text-xs"><strong>中西医结合转化：</strong>${t.integrative}${ws.innovKeyword ? `（拓展关键词：${ws.innovKeyword}）` : ''}</p></div>`;
     if (mod.scheme) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">三、工艺路线与配置参数</h4><p class="text-xs"><strong>DIY 配置参数：</strong>投料 ${ws.mass}g，料液比 ${ws.ratio}:1，溶剂 ${ws.solventType}，粒度 ${ws.mesh}，温度 ${ws.temp}℃，时间 ${ws.time}min，提取 ${ws.cycles} 次，pH 调控：${ws.ph}。</p><p class="text-xs"><strong>工艺路线：</strong>${ws.schemeMode === 'diy' ? `${ext.name} → ${sep.name} → ${ws.diyDetects.join('、')}` : t.steps.map(s => s.title).join(' → ')}</p>${ws.diyNotes ? `<p class="text-xs"><strong>改良说明：</strong>${ws.diyNotes}</p>` : ''}</div>`;
-    if (mod.rig) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">四、实验装置与安全要点</h4><p class="text-xs"><strong>装置：</strong>${rig.title}（${rig.equipment.join('、')}）</p><p class="text-xs"><strong>搭建顺序：</strong>${rig.order}</p></div>`;
+    if (mod.rig) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">四、实验装置与安全要点</h4><p class="text-xs"><strong>装置：</strong>${rig.title}（${getScaledEquipment(rig, ws).join('、')}）</p><p class="text-xs"><strong>搭建顺序：</strong>${rig.order}</p></div>`;
     if (mod.scaling) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">五、SOP 执行记录</h4><ul class="list-none space-y-0.5 text-xs">${t.sop.map((s, i) => `<li>[${ws.sopDone[i] ? '✓' : '○'}] ${s}</li>`).join('')}</ul></div>`;
     if (mod.data) html += `<div class="space-y-1.5"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">六、平行数据统计与 TLC 检识</h4><table class="w-full text-xs border-collapse border border-slate-300"><thead><tr class="bg-slate-100"><th class="border border-slate-300 px-2 py-1">批次</th><th class="border border-slate-300 px-2 py-1">投料(g)</th><th class="border border-slate-300 px-2 py-1">粗提(${t.crudeUnit})</th><th class="border border-slate-300 px-2 py-1">精制(g)</th><th class="border border-slate-300 px-2 py-1">熔点(℃)</th><th class="border border-slate-300 px-2 py-1">收率</th></tr></thead><tbody>${ws.batches.map((b, i) => `<tr><td class="border border-slate-300 px-2 py-1">#${i + 1}</td><td class="border border-slate-300 px-2 py-1">${b.mass}</td><td class="border border-slate-300 px-2 py-1">${b.crude}</td><td class="border border-slate-300 px-2 py-1">${b.refined}</td><td class="border border-slate-300 px-2 py-1">${b.mp}</td><td class="border border-slate-300 px-2 py-1 font-bold">${(Number(b.mass) > 0 ? (b.crude / b.mass * 100).toFixed(2) : '0.00')}%</td></tr>`).join('')}</tbody></table><p class="text-xs">平均粗提收率 ${stats.avgCrude.toFixed(2)}%${stats.count > 1 ? `（SD ±${stats.sd.toFixed(3)}%，RSD ${stats.rsd.toFixed(2)}%）` : ''}；${stats.tlcValid ? `TLC 供试品 Rf = ${stats.sampleRf.toFixed(3)}，对照品 Rf = ${stats.refRf.toFixed(3)}，|ΔRf| = ${stats.deltaRf.toFixed(3)}。` : '<span class="text-rose-600 font-semibold">TLC 参数非法（需满足 0 &lt; L ≤ L₀），未写入有效 Rf 数据。</span>'}</p></div>`;
     if (mod.troubleshoot) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">七、异常排障讨论</h4><ul class="list-disc pl-5 text-xs">${t.troubleshoot.map(tr => `<li><strong>${tr.issue}：</strong>${tr.cause} 对策：${tr.fix}</li>`).join('')}</ul></div>`;
