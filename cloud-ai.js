@@ -1,21 +1,31 @@
 (() => {
   'use strict';
 
-  const publicConfig = Object.freeze({
-    resourceId: 'wbcs_4nI7XYVCdQ1GI81bNgJUN4',
-    endpoint: 'https://tcm-chemistry-lab.app.workbuddy.host',
-    oauthRelayBaseUrl: 'https://www.workbuddy.cn/v2/as/genie-baas/oauth',
-    publishableKey: 'wbpk_bRHPX7E0LSEYq1GLIB1pNn_cb424m7WNl7RRive78K4yoGPVUW1DC16'
-  });
-  const QWEN_PROXY_URL = 'https://tcm-qwen-proxy.chenovo495666.workers.dev/';
+  // 若在 Netlify 域名打开，会自动走同源 /.netlify/functions/ai-proxy（无需修改）
+  // 若希望 GitHub Pages 也能调用，请把下面替换成你的 Netlify 站点域名（例如 https://tcm-lab.netlify.app）
+  const NETLIFY_SITE_URL = 'https://YOUR-SITE.netlify.app';
+  const PROXY_PATH = '/.netlify/functions/ai-proxy';
+  const DEFAULT_MODEL = 'glm-4.7-flash';
   const PROVIDERS = {
-    qwen: { label: '通义千问公共通道', timeoutMs: 45000 },
-    workbuddy: { label: 'WorkBuddy 备用模型', timeoutMs: 45000 }
+    qwen: { label: '智谱 GLM-4.7-Flash 免费通道', timeoutMs: 45000 }
   };
 
-  let cloudClient = null;
-  let modelListPromise = null;
   let lastProvider = null;
+
+  function resolveProxyUrl() {
+    try {
+      if (window.location.hostname.endsWith('.netlify.app')) {
+        return PROXY_PATH;
+      }
+    } catch (_) {}
+    const base = String(NETLIFY_SITE_URL || '').replace(/\/+$/, '');
+    if (!base || base.includes('YOUR-SITE')) return '';
+    return `${base}${PROXY_PATH}`;
+  }
+
+  function isProxyConfigured() {
+    return Boolean(resolveProxyUrl());
+  }
 
   function cleanJsonText(raw) {
     return String(raw || '')
@@ -23,48 +33,6 @@
       .replace(/^```\s*/i, '')
       .replace(/```\s*$/, '')
       .trim();
-  }
-
-  function usableOnThisOrigin() {
-    try {
-      return window.location.origin === new URL(publicConfig.endpoint).origin;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  function getCloudClient() {
-    if (!usableOnThisOrigin()) {
-      throw new Error('当前站点未启用 WorkBuddy 备用通道');
-    }
-    if (!window.WorkBuddyCloud?.createWorkBuddyCloud) {
-      throw new Error('WorkBuddy SDK 尚未加载');
-    }
-    if (!cloudClient) {
-      cloudClient = window.WorkBuddyCloud.createWorkBuddyCloud({
-        endpoint: publicConfig.endpoint,
-        oauthRelayBaseUrl: publicConfig.oauthRelayBaseUrl,
-        publishableKey: publicConfig.publishableKey
-      });
-    }
-    return cloudClient;
-  }
-
-  async function getWorkBuddyModel() {
-    const cloud = getCloudClient();
-    if (!modelListPromise) {
-      modelListPromise = cloud.llm.models.list().catch((error) => {
-        modelListPromise = null;
-        throw error;
-      });
-    }
-    const models = await modelListPromise;
-    if (!Array.isArray(models) || models.length === 0) {
-      throw new Error('WorkBuddy 当前没有可用模型');
-    }
-    const model = models.find((item) => item && item.id && item.disabled !== true && item.enabled !== false);
-    if (!model) throw new Error('WorkBuddy 模型均不可用');
-    return model;
   }
 
   function normalizeMessages(messages) {
@@ -81,12 +49,16 @@
     return content;
   }
 
-  async function callQwen(messages, expectJson, signal) {
-    const response = await fetch(QWEN_PROXY_URL, {
+  async function callProxy(messages, expectJson, signal) {
+    const proxyUrl = resolveProxyUrl();
+    if (!proxyUrl) {
+      throw new Error('请先在 cloud-ai.js 中将 NETLIFY_SITE_URL 替换为你的 Netlify 站点域名，或直接通过 Netlify 域名访问');
+    }
+    const response = await fetch(proxyUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'qwen3.7-plus',
+        model: DEFAULT_MODEL,
         messages,
         temperature: expectJson ? 0.35 : 0.65,
         response_format: expectJson ? { type: 'json_object' } : undefined,
@@ -96,30 +68,10 @@
     });
     if (!response.ok) {
       const detail = (await response.text().catch(() => '')).slice(0, 160);
-      throw new Error(`千问 HTTP ${response.status}${detail ? `：${detail}` : ''}`);
+      throw new Error(`免费通道 HTTP ${response.status}${detail ? `：${detail}` : ''}`);
     }
     const data = await response.json();
     return assertUsableContent(data?.choices?.[0]?.message?.content || '', expectJson);
-  }
-
-  async function callWorkBuddy(messages, expectJson, signal) {
-    const cloud = getCloudClient();
-    const model = await getWorkBuddyModel();
-    let answer = '';
-    const options = {
-      model: model.id,
-      messages,
-      stream: true,
-      temperature: expectJson ? 0.35 : 0.65,
-      signal
-    };
-    if (expectJson) options.response_format = { type: 'json_object' };
-    for await (const chunk of cloud.llm.chat.completions.create(options)) {
-      const delta = chunk?.choices?.[0]?.delta?.content;
-      if (delta) answer += delta;
-    }
-    assertUsableContent(answer, expectJson);
-    return { content: answer, modelName: model.name || model.id };
   }
 
   async function runAttempt(provider, messages, expectJson, externalSignal) {
@@ -129,14 +81,13 @@
       if (externalSignal.aborted) abortFromOutside();
       else externalSignal.addEventListener('abort', abortFromOutside, { once: true });
     }
-    const timer = setTimeout(() => controller.abort(new DOMException('AI 请求超时', 'TimeoutError')), PROVIDERS[provider].timeoutMs);
+    const timer = setTimeout(
+      () => controller.abort(new DOMException('AI 请求超时', 'TimeoutError')),
+      PROVIDERS[provider].timeoutMs
+    );
     try {
-      if (provider === 'qwen') {
-        const content = await callQwen(messages, expectJson, controller.signal);
-        return { content, provider, label: PROVIDERS[provider].label };
-      }
-      const result = await callWorkBuddy(messages, expectJson, controller.signal);
-      return { content: result.content, provider, label: `${PROVIDERS[provider].label} · ${result.modelName}` };
+      const content = await callProxy(messages, expectJson, controller.signal);
+      return { content, provider, label: PROVIDERS[provider].label };
     } finally {
       clearTimeout(timer);
       externalSignal?.removeEventListener('abort', abortFromOutside);
@@ -145,22 +96,16 @@
 
   async function complete({ messages, expectJson = false, onProvider, signal } = {}) {
     const normalized = normalizeMessages(messages);
-    const providers = ['qwen'];
-    if (usableOnThisOrigin()) providers.push('workbuddy');
-    const errors = [];
-
-    for (const provider of providers) {
-      try {
-        onProvider?.(provider, PROVIDERS[provider].label);
-        const result = await runAttempt(provider, normalized, expectJson, signal);
-        lastProvider = result;
-        return result;
-      } catch (error) {
-        if (signal?.aborted) throw error;
-        errors.push(`${PROVIDERS[provider].label}: ${error?.message || '未知错误'}`);
-      }
+    const provider = 'qwen';
+    try {
+      onProvider?.(provider, PROVIDERS[provider].label);
+      const result = await runAttempt(provider, normalized, expectJson, signal);
+      lastProvider = result;
+      return result;
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      throw new Error(`${PROVIDERS[provider].label}: ${error?.message || '未知错误'}`);
     }
-    throw new Error(errors.join('；') || '公共 AI 暂不可用');
   }
 
   async function testProviders() {
@@ -168,24 +113,19 @@
       { role: 'system', content: '你是本草智研服务连通性检查器，只返回用户要求的短句。' },
       { role: 'user', content: '请仅回复“连通成功”四个字。' }
     ]);
-    const providers = ['qwen'];
-    if (usableOnThisOrigin()) providers.push('workbuddy');
-    const results = [];
-    for (const provider of providers) {
-      try {
-        const result = await runAttempt(provider, messages, false);
-        results.push({ provider, ok: true, label: result.label, reply: result.content.slice(0, 40) });
-      } catch (error) {
-        results.push({ provider, ok: false, label: PROVIDERS[provider].label, error: error?.message || '未知错误' });
-      }
+    const provider = 'qwen';
+    try {
+      const result = await runAttempt(provider, messages, false);
+      return [{ provider, ok: true, label: result.label, reply: result.content.slice(0, 40) }];
+    } catch (error) {
+      return [{ provider, ok: false, label: PROVIDERS[provider].label, error: error?.message || '未知错误' }];
     }
-    return results;
   }
 
   function getCapabilities() {
     return {
-      qwen: Boolean(QWEN_PROXY_URL),
-      workbuddy: usableOnThisOrigin(),
+      qwen: isProxyConfigured(),
+      workbuddy: false,
       local: true,
       lastProvider
     };
