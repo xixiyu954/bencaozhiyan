@@ -3,7 +3,7 @@
 
   // 若在 Netlify 域名打开，会自动走同源 /.netlify/functions/ai-proxy（无需修改）
   // 若希望 GitHub Pages 也能调用，请把下面替换成你的 Netlify 站点域名（例如 https://tcm-lab.netlify.app）
-  const NETLIFY_SITE_URL = 'https://YOUR-SITE.netlify.app';
+  const NETLIFY_SITE_URL = 'https://tcm-chemistry-lab.netlify.app';
   const PROXY_PATH = '/.netlify/functions/ai-proxy';
   const DEFAULT_MODEL = 'glm-4.7-flash';
   const PROVIDERS = {
