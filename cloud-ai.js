@@ -163,6 +163,25 @@
     throw new Error(errors.join('；') || '公共 AI 暂不可用');
   }
 
+  async function testProviders() {
+    const messages = normalizeMessages([
+      { role: 'system', content: '你是本草智研服务连通性检查器，只返回用户要求的短句。' },
+      { role: 'user', content: '请仅回复“连通成功”四个字。' }
+    ]);
+    const providers = ['qwen'];
+    if (usableOnThisOrigin()) providers.push('workbuddy');
+    const results = [];
+    for (const provider of providers) {
+      try {
+        const result = await runAttempt(provider, messages, false);
+        results.push({ provider, ok: true, label: result.label, reply: result.content.slice(0, 40) });
+      } catch (error) {
+        results.push({ provider, ok: false, label: PROVIDERS[provider].label, error: error?.message || '未知错误' });
+      }
+    }
+    return results;
+  }
+
   function getCapabilities() {
     return {
       qwen: Boolean(QWEN_PROXY_URL),
@@ -172,5 +191,5 @@
     };
   }
 
-  window.TCMCloudAI = Object.freeze({ complete, cleanJsonText, getCapabilities });
+  window.TCMCloudAI = Object.freeze({ complete, testProviders, cleanJsonText, getCapabilities });
 })();

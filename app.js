@@ -2861,12 +2861,15 @@
         st.textContent = '正在测试公共 AI 与自动容灾...';
         st.classList.remove('hidden');
         try {
-          const reply = await callQwenAPI([
-            { role: 'system', content: '你是本草智研服务连通性检查器，只返回用户要求的短句。' },
-            { role: 'user', content: '请仅回复“连通成功”四个字。' }
-          ], false);
-          st.className = 'p-2.5 rounded-xl text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-900';
-          st.textContent = `✓ ${lastAIProviderLabel}连通正常：${reply.slice(0, 40)}`;
+          if (!window.TCMCloudAI?.testProviders) throw new Error('公共 AI 客户端尚未加载');
+          const results = await window.TCMCloudAI.testProviders();
+          const successful = results.filter((item) => item.ok);
+          lastAIProviderLabel = successful[0]?.label || '本地智算';
+          updateQwenStatusUI();
+          st.className = successful.length ? 'p-2.5 rounded-xl text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-900' : 'p-2.5 rounded-xl text-[11px] bg-amber-50 border border-amber-200 text-amber-900';
+          const details = results.map((item) => item.ok ? `✓ ${item.label}：${item.reply}` : `× ${item.label}：${item.error}`).join('\n');
+          const capabilities = window.TCMCloudAI.getCapabilities();
+          st.textContent = details + (capabilities.workbuddy ? '' : '\nWorkBuddy 备用模型仅在 WorkBuddy 发布域名参与容灾。') + '\n本地智算：始终可用。';
         } catch (err) {
           st.className = 'p-2.5 rounded-xl text-[11px] bg-amber-50 border border-amber-200 text-amber-900';
           st.textContent = `公共 AI 暂不可用，已保留本地智算兜底。${err.message}`;
