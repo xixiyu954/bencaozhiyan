@@ -1,0 +1,22 @@
+name: Validate site scripts
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          node --check app.js
+          node --check cloud-ai.js
+          node --check worker.js
+      - name: Reject embedded provider secrets
+        run: |
+          ! grep -R -E "SHARED_QWEN_KEY|atob\(['\"]sk-|apiKey:[[:space:]]*['\"]sk-" --include='*.js' --include='*.html' .
