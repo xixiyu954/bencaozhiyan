@@ -29,8 +29,8 @@
       -webkit-tap-highlight-color: transparent;
     }
     .tabular-nums { font-variant-numeric: tabular-nums; }
-    @keyframes panelReveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    .panel-anim { animation: panelReveal 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes panelReveal { from { opacity: 1; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .panel-anim { opacity: 1; animation: panelReveal 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
     /* 物理实验装置动画 */
     @keyframes dashFlow { to { stroke-dashoffset: -28; } }
@@ -238,9 +238,9 @@
       <!-- 实时换算总览 -->
       <div class="rounded-2xl bg-emerald-500/15 border border-emerald-400/25 p-3 space-y-1.5">
         <div class="text-[10px] font-bold text-emerald-200">配置单实时核算</div>
-        <div class="flex justify-between text-[11px]"><span class="text-teal-100/80">总溶剂耗量</span><span id="cfgTotalSolvent" class="font-bold text-white tabular-nums">1000 mL</span></div>
-        <div class="flex justify-between text-[11px]"><span class="text-teal-100/80">辅助试剂参考</span><span id="cfgAuxEst" class="font-bold text-amber-200 tabular-nums">20 g</span></div>
-        <div class="flex justify-between text-[11px]"><span class="text-teal-100/80">报告已选章节</span><span id="cfgReportCnt" class="font-bold text-emerald-300 tabular-nums">9 / 9</span></div>
+        <div class="flex justify-between gap-2 text-[11px]"><span class="text-teal-100/80 whitespace-nowrap">总溶剂耗量</span><span id="cfgTotalSolvent" class="font-bold text-white tabular-nums">1000 mL</span></div>
+        <div class="flex justify-between gap-2 text-[11px]"><span class="text-teal-100/80 whitespace-nowrap">辅助试剂参考</span><span id="cfgAuxEst" class="font-bold text-amber-200 tabular-nums">20 g</span></div>
+        <div class="flex justify-between gap-2 text-[11px]"><span class="text-teal-100/80 whitespace-nowrap">报告已选章节</span><span id="cfgReportCnt" class="font-bold text-emerald-300 tabular-nums">9 / 9</span></div>
       </div>
     </div>
 
@@ -265,7 +265,7 @@
   </aside>
 
   <!-- ==================== 右侧可拉出/折叠抽屉栏：题库 + 海量中医药/中西医结合文献 + 高校实验库 ==================== -->
-  <aside id="rightDrawer" class="no-print fixed inset-y-0 right-0 z-40 w-80 sm:w-96 bg-white border-l border-slate-200 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300">
+  <aside id="rightDrawer" class="no-print fixed inset-y-0 right-0 z-40 w-80 sm:w-96 max-w-[92vw] bg-white border-l border-slate-200 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 hidden">
     <div class="px-5 py-4 border-b border-slate-200 bg-[#f7f7f4] flex items-center justify-between gap-2">
       <div>
         <div class="text-sm font-extrabold text-slate-900">资源抽屉 · 题库与文献</div>
@@ -883,7 +883,7 @@
             <p class="text-[11px] text-slate-500">OpenAI 兼容接口 · 密钥仅存于本地浏览器</p>
           </div>
         </div>
-        <button id="btnCloseQwenCfg" type="button" class="text-slate-400 hover:text-slate-700 font-bold text-lg">×</button>
+        <button id="btnCloseQwenCfg" type="button" class="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-slate-700 font-bold text-lg">×</button>
       </div>
       <form id="qwenCfgForm" class="space-y-3 text-xs">
         <div>
@@ -926,7 +926,7 @@
     <div class="bg-white rounded-3xl border border-slate-200 max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scroll shadow-2xl">
       <div class="px-6 py-4 bg-[#062420] text-white flex items-center justify-between">
         <div><h3 class="text-base font-bold">创建创新 DIY 药材</h3><p class="text-[11px] text-teal-200">自定义单味药、复方配伍与中西医结合延伸</p></div>
-        <button id="btnCloseDiyHerb" type="button" class="p-1.5 rounded-lg text-teal-100 hover:bg-white/15"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button id="btnCloseDiyHerb" type="button" class="w-9 h-9 flex items-center justify-center rounded-lg text-teal-100 hover:bg-white/15"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <form id="formDiyHerb" class="p-6 space-y-3.5">
         <div class="grid grid-cols-2 gap-3">
@@ -950,7 +950,7 @@
     <div class="bg-white rounded-3xl border border-slate-200 max-w-lg w-full shadow-2xl overflow-hidden">
       <div class="px-6 py-4 bg-[#062420] text-white flex items-center justify-between">
         <div><h3 class="text-base font-bold">网页直邮作者</h3><p class="text-[11px] text-amber-300 font-mono">Chenovo495666@163.com</p></div>
-        <button id="btnCloseFeedback" type="button" class="p-1.5 rounded-lg text-teal-100"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button id="btnCloseFeedback" type="button" class="w-9 h-9 flex items-center justify-center rounded-lg text-teal-100"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <form id="feedbackForm" class="p-6 space-y-4">
         <div class="grid grid-cols-4 gap-2">
@@ -978,7 +978,7 @@
     <div class="bg-white rounded-3xl border border-slate-200 max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
         <div><h3 class="text-base font-bold text-slate-900">高清实验报告长图</h3><p class="text-xs text-slate-500">微信/手机端长按图片即可保存或转发；电脑端点击右下角下载。</p></div>
-        <button id="btnCloseImgModal" type="button" class="p-2 rounded-xl text-slate-400"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button id="btnCloseImgModal" type="button" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="flex-1 overflow-y-auto custom-scroll p-4 bg-slate-100 flex justify-center"><img id="generatedReportImg" src="" alt="实验报告高清长图" class="max-w-full h-auto rounded-xl shadow-lg" /></div>
       <div class="px-5 py-3 border-t border-slate-200 flex justify-end"><a id="btnDownloadReportPng" download="中药化学实验报告.png" class="px-4 py-2 rounded-xl bg-[#0a3630] text-white text-xs font-bold cursor-pointer">下载 PNG</a></div>
@@ -1008,7 +1008,7 @@
     </div>
   </div>
 
-  <div id="toastContainer" class="no-print fixed bottom-16 lg:bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <div id="toastContainer" class="no-print fixed top-4 left-1/2 -translate-x-1/2 items-center z-50 flex flex-col gap-2 pointer-events-none"></div>
 
 <script>
 (function () {
@@ -2589,11 +2589,11 @@
   // 右侧抽屉开关
   function openRightDrawer(tab = null) {
     if (tab) setRightTab(tab);
-    document.getElementById('rightDrawer').classList.remove('translate-x-full');
+    const d = document.getElementById('rightDrawer'); d.classList.remove('hidden'); void d.offsetWidth; d.classList.remove('translate-x-full'); d.classList.add('translate-x-0');
     document.getElementById('drawerBackdrop').classList.remove('hidden');
   }
   function closeRightDrawer() {
-    document.getElementById('rightDrawer').classList.add('translate-x-full');
+    const d = document.getElementById('rightDrawer'); d.classList.remove('translate-x-0'); d.classList.add('translate-x-full', 'hidden');
     document.getElementById('leftSidebar').classList.add('-translate-x-full');
     document.getElementById('drawerBackdrop').classList.add('hidden');
   }
@@ -2607,7 +2607,7 @@
     renderRightDrawer(getTopicDef(), getWorkState(getTopicDef()));
   }
 
-  function renderLeftConfig(t, ws) {
+  function setSelectValue(id, val) { const el = document.getElementById(id); if (!el || val == null) return; const str = String(val); if (!Array.from(el.options).some(o => o.value === str)) { const opt = document.createElement('option'); opt.value = str; opt.textContent = str; el.appendChild(opt); } el.value = str; } function renderLeftConfig(t, ws) {
     const sc = t.scaling;
     const totalSol = Math.round(ws.mass * ws.ratio * (Number(ws.cycles) || 1));
     const auxVal = (ws.mass * sc.auxFactor).toFixed(1).replace(/\.0$/, '');
@@ -2615,7 +2615,7 @@
     const modCnt = REPORT_MODULES.filter(m => ws.reportModules[m.id]).length;
 
     document.getElementById('cfgCategory').textContent = t.category;
-    document.getElementById('cfgModePill').textContent = ws.schemeMode === 'diy' ? 'DIY 定制' : '经典方案';
+    const topicBadge = t.isCustom ? '自建创新' : t.isInnovative ? '创新拓展' : t.isClassGroup ? '经典精选' : '经典方案'; document.getElementById('cfgModePill').textContent = ws.schemeMode === 'diy' ? `${topicBadge} · DIY` : topicBadge;
     document.getElementById('cfgHerbName').textContent = `${t.herb} · ${t.compound}`;
     document.getElementById('cfgSolventEst').textContent = `单次 ${Math.round(ws.mass * ws.ratio)} mL · 预估 ${yL}~${yH} ${sc.yieldUnit}`;
 
@@ -2625,9 +2625,9 @@
     document.getElementById('cfgRatioLbl').textContent = ws.ratio;
     document.getElementById('cfgTemp').value = ws.temp;
     document.getElementById('cfgTime').value = ws.time;
-    document.getElementById('cfgMesh').value = ws.mesh;
+    setSelectValue('cfgMesh', ws.mesh);
     document.getElementById('cfgCycles').value = ws.cycles;
-    document.getElementById('cfgSolventType').value = ws.solventType;
+    setSelectValue('cfgSolventType', ws.solventType);
     document.getElementById('cfgPh').value = ws.ph;
 
     document.getElementById('cfgTotalSolvent').textContent = `${totalSol} mL (${ws.solventType})`;
@@ -3038,7 +3038,7 @@
     });
     document.querySelectorAll('.wpanel').forEach(p => p.classList.add('hidden'));
     const curP = document.getElementById(`wpanel-${state.step}`);
-    if (curP) curP.classList.remove('hidden');
+    if (curP) { curP.classList.remove('hidden'); curP.style.opacity = '1'; curP.classList.remove('panel-anim'); void curP.offsetWidth; curP.classList.add('panel-anim'); }
 
     renderLeftConfig(t, ws);
     renderRightDrawer(t, ws);
