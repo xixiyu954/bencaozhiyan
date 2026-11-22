@@ -12,7 +12,9 @@ const ALLOWED_MODELS = new Set([
   'glm-4-flash-250414'
 ]);
 
-const DEFAULT_MODEL = 'glm-4.7-flash';
+// 默认使用更稳定的模型；遇到 429/5xx（含智谱 1305 限流）时自动降级重试
+const DEFAULT_MODEL = 'glm-4-flash-250414';
+const FALLBACK_MODEL = 'glm-4-flash-250414';
 const UPSTREAM_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 const RATE_WINDOW_MS = 60_000;
 const RATE_LIMIT = 20;
@@ -35,7 +37,7 @@ function corsHeaders(origin) {
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Max-Age': '86400',
-    'Vary': 'Origin'
+    Vary: 'Origin'
   };
 }
 
@@ -84,6 +86,50 @@ function validMessages(value) {
   return total <= 36_000;
 }
 
+function buildPayload(model, messages, expectJson, body) {
+  const payload = {
+    model,
+    messages,
+    temperature: expectJson ? 0.35 : 0.65,
+    max_tokens: Math.min(5000, Math.max(256, Number(body.max_tokens) || 1800))
+  };
+  if (expectJson) payload.response_format = { type: 'json_object' };
+  // GLM-4.7-Flash 默认开启深度思考模式，关闭后可直接输出 content
+  if (model === 'glm-4.7-flash') payload.thinking = { type: 'disabled' };
+  return payload;
+}
+
+async function callUpstream(payload, apiKey, signal) {
+  const upstream = await fetch(UPSTREAM_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify(payload),
+    signal
+  });
+  const text = await upstream.text();
+  return {
+    status: upstream.status,
+    text,
+    contentType: upstream.headers.get('content-type') || 'application/json; charset=utf-8'
+  };
+}
+
+// 判断是否值得降级重试：429 / 5xx，或 2xx 但 body 里是限流类业务错误（如智谱 1305）
+function shouldFallback(status, text) {
+  if (status === 429 || status >= 500) return true;
+  if (status >= 200 && status < 300) {
+    try {
+      const data = JSON.parse(text);
+      const code = String(data?.error?.code || '');
+      return ['1305', '1302', '1303'].includes(code);
+    } catch (_) {}
+  }
+  return false;
+}
+
 export default async (request) => {
   const origin = request.headers.get('origin') || '';
   const apiKey = process.env.ZHIPU_API_KEY || '';
@@ -98,6 +144,7 @@ export default async (request) => {
         platform: 'netlify-functions',
         provider: 'zhipu-bigmodel-free',
         model: DEFAULT_MODEL,
+        fallbackModel: FALLBACK_MODEL,
         configured: Boolean(apiKey)
       },
       200,
@@ -144,45 +191,32 @@ export default async (request) => {
   }
 
   const requestedModel = typeof body.model === 'string' ? body.model : DEFAULT_MODEL;
-  const model = ALLOWED_MODELS.has(requestedModel) ? requestedModel : DEFAULT_MODEL;
+  const primaryModel = ALLOWED_MODELS.has(requestedModel) ? requestedModel : DEFAULT_MODEL;
   const expectJson = body.response_format?.type === 'json_object';
-
-  const payload = {
-    model,
-    messages: body.messages,
-    temperature: expectJson ? 0.35 : 0.65,
-    max_tokens: Math.min(5000, Math.max(256, Number(body.max_tokens) || 1800))
-  };
-
-  if (expectJson) {
-    payload.response_format = { type: 'json_object' };
-  }
-
-  // GLM-4.7-Flash 默认开启深度思考模式，关闭后可直接输出 content，避免空内容或超时
-  if (model === 'glm-4.7-flash') {
-    payload.thinking = { type: 'disabled' };
-  }
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 40_000);
 
   try {
-    const upstream = await fetch(UPSTREAM_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify(payload),
-      signal: controller.signal
-    });
-    const text = await upstream.text();
-    return new Response(text, {
-      status: upstream.status,
+    let result = await callUpstream(buildPayload(primaryModel, body.messages, expectJson, body), apiKey, controller.signal);
+    let usedModel = primaryModel;
+    let fellBack = false;
+
+    // 主模型遇到限流/服务端错误时，自动改用备用模型重试一次
+    if (shouldFallback(result.status, result.text) && primaryModel !== FALLBACK_MODEL) {
+      fellBack = true;
+      usedModel = FALLBACK_MODEL;
+      result = await callUpstream(buildPayload(FALLBACK_MODEL, body.messages, expectJson, body), apiKey, controller.signal);
+    }
+
+    return new Response(result.text, {
+      status: result.status,
       headers: {
         ...corsHeaders(origin),
-        'Content-Type': upstream.headers.get('content-type') || 'application/json; charset=utf-8',
-        'Cache-Control': 'no-store'
+        'Content-Type': result.contentType,
+        'Cache-Control': 'no-store',
+        'X-Actual-Model': usedModel,
+        'X-Fallback': fellBack ? 'true' : 'false'
       }
     });
   } catch (error) {

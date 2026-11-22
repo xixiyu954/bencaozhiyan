@@ -5,7 +5,7 @@
   // 若希望 GitHub Pages 也能调用，请把下面替换成你的 Netlify 站点域名（例如 https://tcm-lab.netlify.app）
   const NETLIFY_SITE_URL = 'https://tcm-chemistry-lab.netlify.app';
   const PROXY_PATH = '/.netlify/functions/ai-proxy';
-  const DEFAULT_MODEL = 'glm-4.7-flash';
+  const DEFAULT_MODEL = 'glm-4-flash-250414';
   const PROVIDERS = {
     qwen: { label: '智谱 GLM-4.7-Flash 免费通道', timeoutMs: 45000 }
   };
