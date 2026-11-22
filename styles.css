@@ -236,3 +236,49 @@ body {
 @keyframes aiRigFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
 .ai-live-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981; animation:aiPulse 1.9s ease-in-out infinite; }
 @media print { #aiPlanShowcase { break-inside:avoid; } .ai-sc .no-print { display:none !important; } }
+
+
+/* ============ v7.0 深色护眼实验室模式 (Dark Lab Mode) ============ */
+body.dark-lab {
+  background-color: #071513;
+  background-image:
+    radial-gradient(at 15% 0%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+    radial-gradient(at 88% 12%, rgba(217, 155, 38, 0.08) 0px, transparent 42%);
+  color: #e2f1ed;
+}
+body.dark-lab header {
+  background: rgba(7, 24, 21, 0.92) !important;
+  border-color: rgba(45, 212, 191, 0.16) !important;
+}
+body.dark-lab .lab-card,
+body.dark-lab #qwenCommandBar,
+body.dark-lab #aiPlanShowcase,
+body.dark-lab #rightDrawer {
+  background: rgba(13, 36, 32, 0.94) !important;
+  border-color: rgba(45, 212, 191, 0.18) !important;
+  color: #e2f1ed !important;
+}
+body.dark-lab .bg-white,
+body.dark-lab .bg-slate-50,
+body.dark-lab .bg-\[\#f7f7f4\],
+body.dark-lab .bg-\[\#fbfcfa\] {
+  background-color: #0f2c27 !important;
+  border-color: rgba(45, 212, 191, 0.16) !important;
+}
+body.dark-lab .text-slate-900,
+body.dark-lab .text-slate-800 { color: #f0fdfa !important; }
+body.dark-lab .text-slate-700,
+body.dark-lab .text-slate-600 { color: #cbd5e1 !important; }
+body.dark-lab .text-slate-500 { color: #94a3b8 !important; }
+body.dark-lab input,
+body.dark-lab select,
+body.dark-lab textarea {
+  background-color: #081e1b !important;
+  color: #f0fdfa !important;
+  border-color: rgba(45, 212, 191, 0.25) !important;
+}
+body.dark-lab .a4-paper {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+body.dark-lab .a4-paper * { color: inherit; }

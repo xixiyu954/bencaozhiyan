@@ -1624,6 +1624,40 @@
     });
   }
 
+  // ============ 合并 v4.0 & v5.0 扩展数据（13套装置 / 110+题库 / 74篇文献 / 32项院校药企案例） ============
+  const V4_DATA = window.TCM_V4_SPECTRO || {};
+  const V5_DATA = window.TCM_V5_ENCYCLOPEDIA || {};
+  if (V4_DATA.V4_RIGS) {
+    Object.assign(LAB_RIGS, V4_DATA.V4_RIGS);
+  }
+  if (V5_DATA.V5_PRESETS) {
+    Object.entries(V5_DATA.V5_PRESETS).forEach(([k, preset]) => {
+      FEATURED_PRESETS[k] = preset;
+      if (!CATALOG_45.some(c => c.id === k)) {
+        CATALOG_45.push({
+          id: preset.id,
+          isInnovative: !!preset.isInnovative,
+          isClassGroup: !!preset.isClassGroup,
+          featured: true,
+          herb: preset.herb,
+          compound: preset.compound,
+          category: preset.category,
+          sourceTag: preset.sourceTag || ''
+        });
+      }
+    });
+  }
+  if (Array.isArray(V5_DATA.V5_LITERATURE)) {
+    V5_DATA.V5_LITERATURE.forEach(item => {
+      if (!GLOBAL_LITERATURE.some(x => x.text === item.text)) GLOBAL_LITERATURE.push(item);
+    });
+  }
+  if (Array.isArray(V5_DATA.V5_UNIV_CASES)) {
+    V5_DATA.V5_UNIV_CASES.forEach(item => {
+      if (!UNIV_CASES.some(x => x.title === item.title)) UNIV_CASES.push(item);
+    });
+  }
+
   // 精准短词 B站链接生成器（1~2 词高命中，解决检索词过多导致视频偏题问题）
   function biliUrl(kw) {
     const clean = String(kw || '中药化学实验').replace(/[（）()\[\]【】、,，。；;：:]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -1988,7 +2022,7 @@
     document.getElementById('linkWanfangQuick').href = `https://s.wanfangdata.com.cn/paper?q=${kw}`;
     document.getElementById('linkPubmedQuick').href = `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(t.latin.split(' ')[0] || t.herb)}`;
 
-    const tags = ['全部', '药典教材', '中药化学', '中西医结合', '高校实验', '药企中试'];
+    const tags = ['全部', '药典教材', '中药化学', '中西医结合', '高校实验', '药企中试', '经典复方'];
     const fb = document.getElementById('litFilterBar');
     fb.innerHTML = tags.map(tg => `<button type="button" data-lit-f="${tg}" class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${state.litFilter === tg ? 'bg-[#0a3630] text-white border-[#0a3630]' : 'bg-white text-slate-600 border-slate-200'}">${tg}</button>`).join('');
     fb.querySelectorAll('[data-lit-f]').forEach(b => b.addEventListener('click', () => { state.litFilter = b.dataset.litF; renderRightDrawer(t, ws); }));
@@ -2015,7 +2049,7 @@
     document.querySelectorAll('[data-side-q]').forEach(b => b.addEventListener('click', () => copyText(queries[Number(b.dataset.sideQ)].q, '已复制检索式')));
 
     // 3. 高校实验参考
-    const uTypes = ['全部', '高校实验', '药企中试', '药企QC', '中西医结合', '国家平台'];
+    const uTypes = ['全部', '高校实验', '经典复方', '药企中试', '药企QC', '中西医结合', '国家平台'];
     const ufEl = document.getElementById('univFilterBar');
     if (ufEl) {
       ufEl.innerHTML = uTypes.map(tg => `<button type="button" data-univ-f="${tg}" class="px-2.5 py-1 rounded-full text-[10px] font-bold border ${state.univFilter === tg ? 'bg-[#0a3630] text-white border-[#0a3630]' : 'bg-white text-slate-600 border-slate-200'}">${tg}</button>`).join('');
@@ -2064,7 +2098,7 @@
   function renderStep1(t) {
     const el = document.getElementById('step1HerbCards');
     const CLASS_ORDER = ['coptis','ginkgo_flav','forsythia','sophora','cassia','mint','senna','sedum','lonicera','phellodendron_flav','salvia','scutellaria','glycyrrhiza','andrographis','panax','pueraria','armeniaca','polygonum','panax_quinquefolius'];
-    const EXTRA_INNO_IDS = [...Object.keys(V3_DATA.V3_PRESETS || {}), ...Object.keys(EXTRA_DATA.EXTRA_PRESETS || {})];
+    const EXTRA_INNO_IDS = [...Object.keys(V5_DATA.V5_PRESETS || {}), ...Object.keys(V3_DATA.V3_PRESETS || {}), ...Object.keys(EXTRA_DATA.EXTRA_PRESETS || {})];
     const INNO_ORDER = [...EXTRA_INNO_IDS, 'clove','cnidium','carthamus','sophora_flavescens','epimedium','bupleurum','astragalus','angelica_dahurica','paeonia_lactiflora','prunella','citrus','curcuma_longa','magnolia','schisandra','notoginseng','lycium','corydalis','gardenia','fraxinus','tea_caffeine','paeonia_moutan','star_anise','periploca','anemarrhena'];
     const tab = state.step1Tab || 'innovative';
     document.querySelectorAll('[data-s1-tab]').forEach(btn => {
@@ -2096,7 +2130,7 @@
 
     const q = (state.step1Query || '').trim().toLowerCase();
     const curCat = state.step1Cat || '全部';
-    const RIG_SHORT = { steam: '水蒸气蒸馏', reflux: '加热回流', soxhlet: '索氏提取', ultrasound: '低温超声', filter: '减压抽滤', extract: '液-液萃取', column: '硅胶柱层析', rotavap: '旋转蒸发', resin: '大孔树脂', tlc: '薄层检视', percolation: '渗漉提取' };
+    const RIG_SHORT = { steam: '水蒸气蒸馏', reflux: '加热回流', soxhlet: '索氏提取', ultrasound: '低温超声', filter: '减压抽滤', extract: '液-液萃取', column: '硅胶柱层析', rotavap: '旋转蒸发', resin: '大孔树脂', tlc: '薄层检视', percolation: '渗漉提取', hplc: 'HPLC分析', freeze_dry: '真空冻干' };
     const totalTopicsCount = CATALOG_45.length + Object.keys(state.customTopics || {}).length;
     const innoCount = INNO_ORDER.filter(id => FEATURED_PRESETS[id]).length;
     const classCount = CLASS_ORDER.filter(id => FEATURED_PRESETS[id]).length;
@@ -2155,6 +2189,7 @@
   }
 
   function renderStep2(t, ws) {
+    if (window.TCM_V5_ENCYCLOPEDIA) window.TCM_V5_ENCYCLOPEDIA.renderScaleUpCalculator(document.getElementById('step2ScaleUpCard'), t, ws, copyText);
     const el = document.getElementById('step2TrackCards');
     el.innerHTML = TRACK_OPTIONS.map(tr => `
       <button type="button" data-pick-track="${tr.id}" class="pick-card ${ws.trackId === tr.id ? 'selected' : ''} text-left rounded-2xl bg-white border border-slate-200 p-4 space-y-1">
@@ -2358,6 +2393,7 @@
           <p class="text-[12px] text-slate-600 leading-relaxed">${sp.nmr}</p>
         </div>`;
     }
+    if (window.TCM_V4_SPECTRO) window.TCM_V4_SPECTRO.renderFourSpectraPanel(document.getElementById('step3FourSpectraCard'), t);
     const btnOpenCh = document.getElementById('btnOpenChaptersFromStep3');
     if (btnOpenCh) btnOpenCh.onclick = () => { openRightDrawer('chapters'); };
 
@@ -2436,7 +2472,7 @@
 
     const tabsEl = document.getElementById('step4ApplicableRigTabs');
     if (tabsEl) {
-      const RIG_LABELS = { steam: '水蒸气蒸馏', reflux: '加热回流', soxhlet: '索氏提取', ultrasound: '低温超声', filter: '减压抽滤', extract: '分液液-液萃取', column: '硅胶柱层析', rotavap: '旋转蒸发浓缩', resin: '大孔树脂纯化', tlc: 'TLC 展开检视', percolation: '渗漉连续提取' };
+      const RIG_LABELS = { steam: '水蒸气蒸馏', reflux: '加热回流', soxhlet: '索氏提取', ultrasound: '低温超声', filter: '减压抽滤', extract: '分液液-液萃取', column: '硅胶柱层析', rotavap: '旋转蒸发浓缩', resin: '大孔树脂纯化', tlc: 'TLC 展开检视', percolation: '渗漉连续提取', hplc: 'HPLC 精密分析', freeze_dry: '真空冷冻干燥' };
       tabsEl.innerHTML = applicable.map(item => {
         const active = item.key === rigKey;
         return `<button type="button" data-app-rig="${item.key}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-extrabold border transition ${active ? 'bg-[#0a3630] text-white border-[#0a3630] shadow-md' : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-[#0f5c54] hover:bg-teal-50/50'}">
@@ -2504,6 +2540,7 @@
 
     document.getElementById('troubleshootList').innerHTML = t.troubleshoot.map(tr => `<div class="p-3 rounded-2xl bg-amber-50/60 border border-amber-200/70 text-xs space-y-1"><div class="font-bold text-amber-950">${tr.issue}</div><div class="text-slate-600">成因：${tr.cause}</div><div class="text-[#0f5c54] font-bold">对策：${tr.fix}</div></div>`).join('');
     if (window.TCMToolsV3) window.TCMToolsV3.renderSafetyMatrix(document.getElementById('step4SafetyMatrix'), t, ws, copyText);
+    if (window.TCM_V7_MEDIA) window.TCM_V7_MEDIA.renderLabExamSim(document.getElementById('step4LabExamCard'), t, ws, applicable, LAB_RIGS);
   }
 
   // ============ 独立板块：动态流程与实验装置总览库渲染 ============
@@ -2512,9 +2549,9 @@
     const RIG_CATS = {
       steam: '提取装置', reflux: '提取装置', soxhlet: '提取装置', ultrasound: '提取装置', percolation: '提取装置',
       extract: '分离纯化', column: '分离纯化', resin: '分离纯化',
-      rotavap: '浓缩与检识', filter: '浓缩与检识', tlc: '浓缩与检识'
+      rotavap: '浓缩与保活', filter: '浓缩与保活', freeze_dry: '浓缩与保活', tlc: '精密分析', hplc: '精密分析'
     };
-    const catList = ['全部', '提取装置', '分离纯化', '浓缩与检识'];
+    const catList = ['全部', '提取装置', '分离纯化', '浓缩与保活', '精密分析'];
     const curCat = state.hubCat || '全部';
     const pillsEl = document.getElementById('hubFilterPills');
     if (pillsEl) {
@@ -2707,6 +2744,7 @@
     }
     if (window.TCMToolsV3) {
       window.TCMToolsV3.renderTlcTuner(document.getElementById('step5TlcTunerCard'), t);
+      if (window.TCM_V4_SPECTRO) window.TCM_V4_SPECTRO.renderUvCalibrationTool(document.getElementById('step5UvCalCard'), t, ws, copyText, (txt) => { ws.aiConclusion = (ws.aiConclusion ? ws.aiConclusion + '\n' : '') + txt; saveState(); });
       window.TCMToolsV3.renderOrthogonalTool(document.getElementById('step5OrthoCard'), t, ws, copyText, (txt) => {
         ws.aiConclusion = (ws.aiConclusion ? ws.aiConclusion + '\n' : '') + txt;
         saveState();
@@ -2742,6 +2780,15 @@
 
   function renderStep6(t, ws, stats) {
     if (window.TCMToolsV3) window.TCMToolsV3.renderDefenseQuiz(document.getElementById('step6DefenseQuizCard'), t, ws, getApplicableRigs(t, ws), LAB_RIGS);
+    const bFormal = document.getElementById('btnReportViewFormal');
+    const bRaw = document.getElementById('btnReportViewRawLog');
+    if (bFormal && bRaw && window.TCM_V7_MEDIA) {
+      const isRaw = state.reportViewMode === 'raw';
+      bFormal.className = `px-2.5 py-1 rounded-lg transition ${!isRaw ? 'bg-[#0a3630] text-white' : 'text-slate-600 hover:text-slate-900'}`;
+      bRaw.className = `px-2.5 py-1 rounded-lg transition ${isRaw ? 'bg-[#0a3630] text-white' : 'text-slate-600 hover:text-slate-900'}`;
+      bFormal.onclick = () => { state.reportViewMode = 'formal'; renderStep6(t, ws, stats); };
+      bRaw.onclick = () => { state.reportViewMode = 'raw'; renderStep6(t, ws, stats); };
+    }
     const modEl = document.getElementById('diyReportModulesList');
     modEl.innerHTML = REPORT_MODULES.map(m => {
       const on = !!ws.reportModules[m.id];
@@ -2750,7 +2797,7 @@
     modEl.querySelectorAll('[data-rep-mod]').forEach(chk => chk.addEventListener('change', () => { ws.reportModules[chk.dataset.repMod] = chk.checked; saveState(); renderAll(); }));
 
     document.getElementById('reportModuleCount').textContent = `已选 ${REPORT_MODULES.filter(m => ws.reportModules[m.id]).length}/${REPORT_MODULES.length} 项`;
-    document.getElementById('printableReportMount').innerHTML = buildReportInnerHtml(t, ws, stats);
+    document.getElementById('printableReportMount').innerHTML = (state.reportViewMode === 'raw' && window.TCM_V7_MEDIA) ? window.TCM_V7_MEDIA.buildRawLogSheetHtml(t, ws) : buildReportInnerHtml(t, ws, stats);
     document.getElementById('metaClass').value = state.meta.className || ''; document.getElementById('metaGroup').value = state.meta.groupName || '';
     document.getElementById('metaDate').value = state.meta.date || ''; document.getElementById('metaTeacher').value = state.meta.teacher || '';
 
@@ -3629,7 +3676,8 @@
 
         // 省流优先：若命中内置精编 55 项题库且未要求强制云端定制，则 0 Token 秒出全套方案
         const hasComplexMod = /改良|对照|对比|双提|微针|低共熔|纳米|正交|优化方案|定制|比较/.test(prompt);
-        const exactFullPreset = Object.values(FEATURED_PRESETS).find(p => p && prompt.includes(p.herb));
+        const sortedPresets = Object.values(FEATURED_PRESETS).filter(Boolean).sort((a, b) => (b.herb || "").length - (a.herb || "").length);
+        const exactFullPreset = sortedPresets.find(p => prompt.includes(p.herb));
         const exactPreset = exactFullPreset || Object.values(FEATURED_PRESETS).find(p => p && (prompt.includes(p.herb.replace(/（.*?）/g, '')) || (p.compound && prompt.includes(p.compound.split(/[、/+（(]/)[0]))));
         if (localFirst && !forceCloud && exactPreset && (exactFullPreset || !hasComplexMod)) {
           setStage(3, '命中内置精编库（0 Token 秒出），同步全工作台...', 82);
@@ -3690,8 +3738,8 @@
   "recommendedRefs": ["[1] 作者. 题名[J]. 期刊, 年, 卷(期): 页码.", "[2] 作者. 题名[J]. 期刊, 年, 卷(期): 页码."],
   "spectra": { "chapter": "对应教材章节", "uv": "UV最大吸收波长与带型解析", "nmr": "1H-NMR/13C-NMR特征化学位移解析" },
   "rigAnalysis": "所选实验装置的传质传热原理与安全运行要点",
-  "defaultRig": "steam|reflux|soxhlet|ultrasound|percolation|filter|extract|column|rotavap|resin|tlc",
-  "applicableRigs": ["steam|reflux|soxhlet|ultrasound|percolation|filter|extract|column|rotavap|resin|tlc", "第2适用装置"],
+  "defaultRig": "steam|reflux|soxhlet|ultrasound|percolation|filter|extract|column|rotavap|resin|tlc|hplc|freeze_dry",
+  "applicableRigs": ["steam|reflux|soxhlet|ultrasound|percolation|filter|extract|column|rotavap|resin|tlc|hplc|freeze_dry", "第2适用装置"],
   "defaultExtract": "steam|reflux|soxhlet|ultrasound|acid_water|boil_enzyme",
   "defaultSep": "freeze|acid_precip|salting_out|resin|extract|column|precip",
   "cfg": { "mass": 50, "ratio": 10, "temp": 75, "time": 60, "mesh": "中粉(40目)", "cycles": "2", "solventType": "70%乙醇", "ph": "中性 7.0" },
@@ -3897,4 +3945,22 @@
   initEvents();
   updateTimerUI();
   renderAll();
+  if (window.TCM_V7_MEDIA) {
+    window.TCM_V7_MEDIA.initVideoHubModal();
+    window.TCM_V7_MEDIA.initDarkMode();
+  }
+  if (window.TCM_V6_PRO) {
+    window.TCM_V6_PRO.initProSuite({
+      getAllTopics: () => [...Object.values(state.customTopics || {}), ...CATALOG_45],
+      getTopicById: (id) => findTopicDef(id, state.customTopics) || getTopicDef(),
+      getRigs: () => LAB_RIGS,
+      getLiterature: () => [...GLOBAL_LITERATURE, ...state.extraGlobalRefs],
+      getUnivCases: () => UNIV_CASES,
+      selectTopic: (id) => { state.activeTopicId = id; if (state.step === 'hub') state.step = 1; saveState(); renderAll(); showToast(`已切换课题：${getTopicDef().herb}`); },
+      goStep: (s) => { if (s === 'hub') state.lastWorkStep = state.step !== 'hub' ? state.step : 1; state.step = s; saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); },
+      openHubRig: (rk) => { state.hubRig = rk; state.hubCat = '全部'; state.step = 'hub'; saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); },
+      copyText,
+      showToast
+    });
+  }
 })();

@@ -27,7 +27,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <link rel="stylesheet" href="./styles.css?v=7" />
+  <link rel="stylesheet" href="./styles.css?v=9" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
@@ -274,6 +274,13 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 shrink-0 max-w-full">
+            <button id="btnToggleDarkLab" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#0f5c54] text-slate-700 text-xs font-bold transition" title="切换深色护眼实验室模式">🌙 护眼暗色</button>
+            <button id="btnOpenCmdPalette" type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#0f5c54] text-slate-700 text-xs font-bold transition" title="全局极速搜索 (Ctrl+K)">
+              <span>⌘K 极速搜索</span>
+            </button>
+            <button id="btnOpenCompareTop" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-teal-50 border border-teal-200 hover:bg-teal-100 text-[#0a3630] text-xs font-extrabold transition" title="任意两项课题十维度横向对比">
+              <span>⚖️ 课题对比</span>
+            </button>
             <button id="btnOpenQwenCfgTop" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-100 to-emerald-50 border border-emerald-300/80 text-[#062420] text-xs font-extrabold hover:shadow-xs transition">
               <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i><span id="qwenHeaderBtnLabel">智谱 AI</span>
             </button>
@@ -498,6 +505,9 @@
           </div>
         </div>
 
+        <!-- v5.0 新增：小试 → 药企中试四级放大与溶剂回收核算器 -->
+        <div id="step2ScaleUpCard" class="lab-card rounded-3xl p-5 sm:p-6 space-y-3.5"></div>
+
         <div class="flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-slate-200/80 mt-6">
           <button type="button" data-go-step="1" class="px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">← 上一步：01 重新选材</button>
           <button type="button" data-go-step="3" class="px-6 py-3 rounded-2xl bg-[#0a3630] hover:bg-[#062420] text-white text-sm font-bold shadow-md transition flex items-center gap-2">下一步：03 查看原理与方案设计 <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
@@ -561,6 +571,9 @@
           </div>
           <div id="s3SpectraGrid" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
         </div>
+
+        <!-- v4.0 新增：UV / IR / 1H-NMR / MS 四谱联合解析交互卡 -->
+        <div id="step3FourSpectraCard" class="lab-card rounded-3xl p-5 sm:p-6 space-y-3.5"></div>
 
         <!-- 独立板块 3：方案配置（经典 or DIY） -->
         <div class="lab-card rounded-3xl p-6 space-y-4">
@@ -683,6 +696,9 @@
         <!-- v3.0 新增：智能试剂安全 MSDS 与废液分类助手（0-Token 自动识别） -->
         <div id="step4SafetyMatrix" class="lab-card rounded-3xl p-5 sm:p-6 space-y-3.5"></div>
 
+        <!-- v7.0 新增：虚拟实验预习仿真考核（100分制实时评测） -->
+        <div id="step4LabExamCard" class="lab-card rounded-3xl p-5 sm:p-6 space-y-3.5"></div>
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="lg:col-span-7 lab-card rounded-3xl p-5 space-y-3.5">
             <div class="flex items-center justify-between"><h3 class="text-base font-extrabold text-slate-900">操作 SOP</h3><span id="sopProgressText" class="text-xs font-bold text-[#0f5c54] tabular-nums">0%</span></div>
@@ -765,6 +781,9 @@
 
         <!-- v3.0 新增：TLC 展开剂极性调优器与 10 种溶剂极性速查 -->
         <div id="step5TlcTunerCard" class="lab-card rounded-3xl p-5 sm:p-6 space-y-3.5"></div>
+
+        <!-- v4.0 新增：UV-Vis 标准曲线最小二乘拟合与含量测定计算器 -->
+        <div id="step5UvCalCard" class="lab-card rounded-3xl p-5 sm:p-6 space-y-4"></div>
 
         <!-- v3.0 新增：L9(3^4) 正交实验设计与极差 R 自动分析器 -->
         <div id="step5OrthoCard" class="lab-card rounded-3xl p-5 sm:p-6 space-y-4"></div>
@@ -870,7 +889,13 @@
         <div id="step6DefenseQuizCard" class="no-print lab-card rounded-3xl p-5 sm:p-6 space-y-3.5"></div>
 
         <div id="reportPreviewCard" class="space-y-2">
-          <div class="no-print flex items-center justify-between px-1"><span class="text-xs font-bold text-slate-600">A4 实时预览</span><span id="reportModuleCount" class="text-xs font-bold text-[#0f5c54]"></span></div>
+          <div class="no-print flex items-center justify-between px-1"><div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-600">A4 实时预览</span>
+              <div class="inline-flex p-0.5 rounded-xl bg-slate-100 border border-slate-200 text-[11px] font-bold">
+                <button id="btnReportViewFormal" type="button" class="px-2.5 py-1 rounded-lg bg-[#0a3630] text-white">正式实验报告</button>
+                <button id="btnReportViewRawLog" type="button" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900">📋 原始手写记录单</button>
+              </div>
+            </div><span id="reportModuleCount" class="text-xs font-bold text-[#0f5c54]"></span></div>
           <div id="printableReportMount" class="a4-paper rounded-2xl p-6 sm:p-10 text-slate-900 space-y-5 text-xs sm:text-sm leading-7"></div>
         </div>
 
@@ -888,7 +913,7 @@
               STANDALONE HUB · APPARATUS &amp; PROCESS LIBRARY
             </div>
             <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">动态流程与实验装置总览库</h2>
-            <p class="text-xs sm:text-sm text-teal-100/90 leading-relaxed">无需先走完选材步骤，直接在此一站式查阅全部 11 套动态交互实验装置（含 TLC 展开检视与渗漉提取）、组件安全热点、4 步可操作小分支、精准 B站实操视频及对应代表药材。</p>
+            <p class="text-xs sm:text-sm text-teal-100/90 leading-relaxed">无需先走完选材步骤，直接在此一站式查阅全部 13 套动态交互实验装置（覆盖提取、纯化、浓缩、HPLC 精密分析与真空冻干全链路）、组件安全热点、4 步可操作小分支、精准 B站实操视频及对应代表药材。</p>
           </div>
           <button type="button" id="btnBackToWorkflow" class="shrink-0 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-extrabold transition">← 返回 6 步实验工作台</button>
         </div>
@@ -1051,10 +1076,14 @@
 
   <div id="toastContainer" class="no-print fixed top-4 left-1/2 -translate-x-1/2 items-center z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-<script src="./lab-data-extra.js?v=7"></script>
-<script src="./lab-data-v3.js?v=7"></script>
-<script src="./lab-tools-v3.js?v=7"></script>
-<script src="./cloud-ai.js?v=7"></script>
-<script src="./app.js?v=7"></script>
+<script src="./lab-data-extra.js?v=8"></script>
+<script src="./lab-data-v3.js?v=8"></script>
+<script src="./lab-v4-spectroscopy.js?v=8"></script>
+<script src="./lab-v5-encyclopedia.js?v=8"></script>
+<script src="./lab-tools-v3.js?v=8"></script>
+<script src="./lab-v6-pro.js?v=9"></script>
+<script src="./lab-v7-media-pro.js?v=9"></script>
+<script src="./cloud-ai.js?v=9"></script>
+<script src="./app.js?v=9"></script>
 </body>
 </html>

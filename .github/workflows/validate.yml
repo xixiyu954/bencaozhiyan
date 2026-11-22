@@ -19,6 +19,10 @@ jobs:
           node --check lab-data-extra.js
           node --check lab-data-v3.js
           node --check lab-tools-v3.js
+          node --check lab-v4-spectroscopy.js
+          node --check lab-v5-encyclopedia.js
+          node --check lab-v6-pro.js
+          node --check lab-v7-media-pro.js
           node --check netlify/functions/ai-proxy.mjs
       - name: Reject embedded provider secrets
         run: |
