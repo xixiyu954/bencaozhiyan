@@ -1,5 +1,11 @@
 # 本草智研 · 中药化学智能实验设计工作台
 
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-brightgreen?logo=github)](https://xixiyu954.github.io/tcm-chemistry-lab/)
+[![Netlify Status](https://img.shields.io/badge/Netlify-Mirror%20%26%20Proxy-00C7B7?logo=netlify)](https://tcm-chemistry-lab.netlify.app/)
+[![AI Engine](https://img.shields.io/badge/AI%20Engine-GLM--4--Flash%20(SSE)-4f46e5)](https://open.bigmodel.cn/)
+[![Herb Database](https://img.shields.io/badge/Herbs-79%20Topics-0f5c54)](https://xixiyu954.github.io/tcm-chemistry-lab/)
+[![Literature](https://img.shields.io/badge/Literature-34%20GB%2FT%207714-d99b26)](https://xixiyu954.github.io/tcm-chemistry-lab/)
+
 面向全国高校药学、中药学及相关专业师生的公开通用《中药化学》智能实验设计、工艺核算、动态装置仿真与报告自动生成工作台。
 
 ---
@@ -10,6 +16,26 @@
 
 - **GitHub Pages 站点**：[https://xixiyu954.github.io/tcm-chemistry-lab/](https://xixiyu954.github.io/tcm-chemistry-lab/)
 - **Netlify 镜像与 AI 代理站点**：[https://tcm-chemistry-lab.netlify.app/](https://tcm-chemistry-lab.netlify.app/)
+
+---
+
+## 📁 站点与仓库目录结构
+
+```text
+tcm-chemistry-lab/
+├── index.html                  # 核心单页工作台主入口（含 SEO、PWA 清单与 6 步视觉流）
+├── app.js                      # 核心业务调度逻辑、79 味题库、34 篇文献、TLC 模拟与助教渲染
+├── cloud-ai.js                 # 智谱 GLM SSE 流式客户端与本地容灾调度器
+├── styles.css                  # 定制主题样式表（国内加速字体、物理装置流线动画）
+├── manifest.webmanifest        # PWA 渐进式 Web 应用配置清单
+├── netlify.toml                # Netlify 部署、函数路由与静态安全响应头规则
+├── netlify/
+│   └── functions/
+│       └── ai-proxy.mjs        # Netlify Functions 安全无服务器代理（SSE 流式透传、CORS 白名单、限流）
+└── .github/
+    └── workflows/
+        └── validate.yml        # CI 自动化语法校验与代码安全防护检查
+```
 
 ---
 

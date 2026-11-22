@@ -16,7 +16,6 @@ jobs:
         run: |
           node --check app.js
           node --check cloud-ai.js
-          node --check worker.js
           node --check netlify/functions/ai-proxy.mjs
       - name: Reject embedded provider secrets
         run: |

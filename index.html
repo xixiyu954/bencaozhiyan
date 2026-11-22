@@ -4,6 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>本草智研 · 中药化学智能实验设计工作台</title>
+  <meta name="description" content="本草智研（TCM Chemistry Lab Workbench）是面向高校药学与中药学专业的现代化智能实验设计工作台。内置 79 项经典与创新药材实验题库、34 篇规范文献、7 套交互式物理仿真装置与 TLC 薄层色谱仿真，集成智谱 GLM 免费大模型流式实验编排与报告全自动化生成。" />
+  <meta name="keywords" content="中药化学, 实验设计, 智能工作台, 本草智研, 药学实验, 提取分离, 物理仿真, TLC薄层色谱, 智谱GLM, 大模型应用" />
+  <meta name="author" content="chenovo495666" />
+  <meta name="theme-color" content="#062420" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="本草智研" />
+  <!-- Open Graph 社交分享卡片 -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="本草智研" />
+  <meta property="og:title" content="本草智研 · 中药化学智能实验设计工作台" />
+  <meta property="og:description" content="高校中药化学智能实验设计、工艺核算、物理动态仿真与报告一键导出工作台。" />
+  <meta property="og:url" content="https://tcm-chemistry-lab.netlify.app/" />
+  <!-- 站点图标与 PWA 清单 -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23062420'/%3E%3Ctext%20y='.75em'%20x='50%25'%20font-size='60'%20text-anchor='middle'%20dominant-baseline='central'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E" />
+  <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
   <script defer src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -249,7 +266,7 @@
 
           <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 shrink-0 max-w-full">
             <button id="btnOpenQwenCfgTop" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-100 to-emerald-50 border border-emerald-300/80 text-[#062420] text-xs font-extrabold hover:shadow-xs transition">
-              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i><span id="qwenHeaderBtnLabel">千问 AI</span>
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i><span id="qwenHeaderBtnLabel">智谱 AI</span>
             </button>
             <button id="btnOpenRightBank" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0a3630] text-white text-xs font-bold hover:bg-[#062420] transition shadow-xs">
               <i data-lucide="panel-right-open" class="w-3.5 h-3.5 text-emerald-300"></i><span>题库 / 章节 / 文献</span>
@@ -257,6 +274,9 @@
             <button id="btnOpenFeedbackTop" type="button" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-amber-300/80 text-amber-900 text-xs font-bold hover:bg-amber-50">
               <i data-lucide="mail" class="w-3.5 h-3.5 text-amber-600"></i>反馈
             </button>
+            <a href="https://github.com/xixiyu954/tcm-chemistry-lab" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition" title="访问 GitHub 开源项目">
+              <i data-lucide="github" class="w-3.5 h-3.5"></i>GitHub
+            </a>
             <button id="btnResetTopic" type="button" class="p-2 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-rose-600" title="重置"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
           </div>
         </div>
@@ -290,7 +310,7 @@
             <div class="min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
                 <span class="text-xs sm:text-sm font-extrabold text-slate-900">公共 AI 实验总控台</span>
-                <span id="qwenStatusPill" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">本地智算演练 · 可接入千问 API</span>
+                <span id="qwenStatusPill" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">智谱免费通道 + 本地兜底</span>
               </div>
             </div>
           </div>
@@ -332,14 +352,14 @@
           </div>
         </div>
 
-        <!-- 折叠式：千问实验助教自由问答区 -->
+        <!-- 折叠式：AI 实验助教自由问答区 -->
         <div id="qwenChatBox" class="hidden rounded-2xl bg-slate-50 border border-slate-200/90 p-3.5 space-y-2.5">
           <div class="flex items-center justify-between text-[11px] text-slate-500">
             <span>当前问答自动关联工作台上下文（所选药材、左侧参数与装置）</span>
             <button id="btnClearQwenChat" type="button" class="text-slate-400 hover:text-rose-600 font-semibold">清空对话</button>
           </div>
           <div id="qwenChatMessages" class="max-h-52 overflow-y-auto custom-scroll space-y-2 text-xs">
-            <div class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-700">你好！我是中药化学千问实验助教。你可以问我收率偏低原因、TLC 展开剂调整、UV/NMR 谱图解析，或让我帮你润色实验讨论。</div>
+            <div class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-700">你好！我是本草智研中药化学实验助教。你可以问我收率偏低原因、TLC 展开剂调整、UV/NMR 谱图解析，或让我帮你润色实验讨论。</div>
           </div>
           <form id="qwenChatForm" class="flex gap-2">
             <input id="qwenChatInput" type="text" placeholder="针对当前实验提问，如：为什么 TLC 斑点拖尾？如何写实验讨论？" class="flex-1 px-3 py-2 text-xs rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-[#0f5c54]" />
@@ -724,6 +744,8 @@
       <div class="max-w-4xl mx-auto px-4 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
         <div>本草智研 · 《中药化学》智能实验设计工作台（公开通用版）</div>
         <div class="flex items-center gap-2">
+          <a href="https://github.com/xixiyu954/tcm-chemistry-lab" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-700 underline font-semibold">GitHub 仓库</a>
+          <span>·</span>
           <span>联系作者：</span>
           <button id="btnCopyEmailFooter" type="button" class="font-mono text-slate-700 hover:text-[#0f5c54] underline">Chenovo495666@163.com</button>
           <span>·</span>
