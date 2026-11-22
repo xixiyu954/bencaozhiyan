@@ -2639,7 +2639,7 @@
     // 1. 题库
     const customList = Object.values(state.customTopics).map(c => ({ id: c.id, herb: c.herb, compound: c.compound, category: c.category, isCustom: true }));
     const combined = [...customList, ...CATALOG_45];
-    coconst totalBank = combined.length; const rtabBtn = document.getElementById('rtabBankBtn'); if (rtabBtn) rtabBtn.textContent = `题库(${totalBank})`; const catAllOpt = document.getElementById('sideCatAllOpt'); if (catAllOpt) catAllOpt.textContent = `全部分类 (${totalBank})`; const bCount = document.getElementById('bannerBankCount'); if (bCount) bCount.textContent = totalBank; const bPill = document.getElementById('bannerBankPill'); if (bPill) bPill.textContent = `${totalBank} 项药材题库`;nst q = state.sideQuery.trim().toLowerCase();
+    const totalBank = combined.length; const rtabBtn = document.getElementById('rtabBankBtn'); if (rtabBtn) rtabBtn.textContent = `题库(${totalBank})`; const catAllOpt = document.getElementById('sideCatAllOpt'); if (catAllOpt) catAllOpt.textContent = `全部分类 (${totalBank})`; const bCount = document.getElementById('bannerBankCount'); if (bCount) bCount.textContent = totalBank; const bPill = document.getElementById('bannerBankPill'); if (bPill) bPill.textContent = `${totalBank} 项药材题库`; const q = state.sideQuery.trim().toLowerCase();
     const list = combined.filter(x => (state.sideCat === '全部' ? true : state.sideCat === '我的创新DIY' ? x.isCustom : state.sideCat === '经典精选课题' ? x.isClassGroup : state.sideCat === '创新拓展课题' ? x.isInnovative : x.category === state.sideCat) && (!q || `${x.herb} ${x.compound} ${x.category}`.toLowerCase().includes(q)));
     const listEl = document.getElementById('sideTopicList');
     listEl.innerHTML = list.map(item => {
