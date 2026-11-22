@@ -4,11 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>本草智研 · 中药化学智能实验设计工作台</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
   <script defer src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script defer src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <link rel="stylesheet" href="./styles.css?v=4" />
+  <link rel="stylesheet" href="./styles.css?v=5" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
@@ -313,11 +315,11 @@
         </div>
 
         <!-- 自动化执行进度与回执 -->
-        <div id="qwenProgressBox" class="hidden rounded-2xl bg-slate-50 border border-teal-200/80 p-3.5 space-y-2 text-[12px]"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2 font-bold text-[#0a3630]"><span class="w-2 h-2 rounded-full bg-teal-500 animate-ping"></span><span id="qwenProgressStageText">正在检索题库文献...</span></div><span id="qwenProgressTimer" class="font-mono text-[11px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">0.0s</span></div><div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden"><div id="qwenProgressBar" class="h-full bg-gradient-to-r from-[#0a3630] to-teal-500 transition-all duration-300" style="width:15%"></div></div><div class="grid grid-cols-4 gap-1 text-[10px] text-slate-400 font-medium"><span id="qwenStep1" class="text-teal-700 font-bold">① 检索题库文献</span><span id="qwenStep2">② 调用通义千问</span><span id="qwenStep3">③ 同步工作台参数与装置</span><span id="qwenStep4">④ 写入报告与入库</span></div></div> <div id="qwenExecReceipt" class="hidden rounded-2xl bg-gradient-to-br from-emerald-50/80 to-white border border-emerald-200/80 p-3.5 space-y-2.5 text-[13px]">
+        <div id="qwenProgressBox" class="hidden rounded-2xl bg-slate-50 border border-teal-200/80 p-3.5 space-y-2 text-[12px]"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2 font-bold text-[#0a3630]"><span class="w-2 h-2 rounded-full bg-teal-500 animate-ping"></span><span id="qwenProgressStageText">正在检索题库文献...</span></div><span id="qwenProgressTimer" class="font-mono text-[11px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">0.0s</span></div><div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden"><div id="qwenProgressBar" class="h-full bg-gradient-to-r from-[#0a3630] to-teal-500 transition-all duration-300" style="width:15%"></div></div><div class="grid grid-cols-4 gap-1 text-[10px] text-slate-400 font-medium"><span id="qwenStep1" class="text-teal-700 font-bold">① 检索题库文献</span><span id="qwenStep2">② 调用智谱 AI</span><span id="qwenStep3">③ 同步工作台参数与装置</span><span id="qwenStep4">④ 写入报告与入库</span></div></div> <div id="qwenExecReceipt" class="hidden rounded-2xl bg-gradient-to-br from-emerald-50/80 to-white border border-emerald-200/80 p-3.5 space-y-2.5 text-[13px]">
           <div class="flex items-center justify-between gap-2">
             <div class="font-extrabold text-[#0a3630] flex items-center gap-1.5">
               <span id="qwenReceiptBadge" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span id="qwenReceiptTitle">千问 AI 自动化编排完成</span><span id="qwenBankStatusBadge" class="px-2 py-0.5 rounded-full bg-teal-100 text-[#0a3630] text-[10px] font-bold"></span>
+              <span id="qwenReceiptTitle">智谱 AI 自动化编排完成</span><span id="qwenBankStatusBadge" class="px-2 py-0.5 rounded-full bg-teal-100 text-[#0a3630] text-[10px] font-bold"></span>
             </div>
             <button id="btnCloseQwenReceipt" type="button" class="text-slate-400 hover:text-slate-700 font-bold">×</button>
           </div>
@@ -739,7 +741,7 @@
   </div>
 
   <!-- 弹窗：创建创新 DIY 药材 -->
-  <!-- 通义千问 API 配置弹窗 -->
+  <!-- 智谱 AI / 公共通道配置弹窗 -->
   <div id="qwenConfigModal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/55 backdrop-blur-xs p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -755,12 +757,11 @@
       <form id="qwenCfgForm" class="space-y-3 text-xs">
         <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 leading-relaxed">
           <strong>已为所有访客开启免配置 AI</strong><br />
-          每次请求优先使用通义千问；失败时在当前发布域名自动切换 WorkBuddy 备用模型；两者均不可用时仍可使用内置本地智算。
+          每次请求通过 Netlify 安全代理使用智谱 GLM 免费模型（支持自动降级重试）；异常时无缝切换内置本地智算。
         </div>
         <div id="aiProviderList" class="grid gap-2 text-[11px] text-slate-600">
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">① 通义千问公共通道：服务端密钥、模型白名单与请求限制</div>
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">② WorkBuddy 免费模型：按应用可用模型动态选择</div>
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">③ 本地智算：无网络时生成基础方案，保证核心流程可用</div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">① 智谱 GLM 云端通道：Netlify 代理 · 服务端密钥（国内高速直连）</div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">② 本地智算演练引擎：离线或断网时自动兜底，保证核心流程 100% 可用</div>
         </div>
         <p class="text-[10px] leading-relaxed text-slate-400">AI 生成内容仅作实验设计草稿，药典限度、文献和实验安全条件须由指导教师复核。</p>
         <div id="qwenCfgStatus" class="hidden p-2.5 rounded-xl text-[11px] leading-relaxed"></div>
@@ -861,8 +862,7 @@
 
   <div id="toastContainer" class="no-print fixed top-4 left-1/2 -translate-x-1/2 items-center z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-<script async src="https://cdn.jsdelivr.net/npm/@tencent-ai/workbuddy-cloud-sdk@dev/lib/index.global.js"></script>
-<script src="./cloud-ai.js?v=4"></script>
-<script src="./app.js?v=4"></script>
+<script src="./cloud-ai.js?v=5"></script>
+<script src="./app.js?v=5"></script>
 </body>
 </html>

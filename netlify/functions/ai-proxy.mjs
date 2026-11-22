@@ -23,10 +23,12 @@ function isAllowedOrigin(origin) {
   if (ALLOWED_EXACT_ORIGINS.has(origin)) return true;
   try {
     const parsed = new URL(origin);
-    return parsed.protocol === 'https:' && parsed.hostname.endsWith('.netlify.app');
+    if (parsed.protocol === 'https:' && parsed.hostname.endsWith('.netlify.app')) return true;
+    if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') return true;
   } catch (_) {
     return false;
   }
+  return false;
 }
 
 function corsHeaders(origin) {

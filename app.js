@@ -2350,8 +2350,7 @@
     document.getElementById('btnConfirmOk').addEventListener('click', () => { if (pendingConfirmAction) pendingConfirmAction(); const m = document.getElementById('confirmModal'); m.classList.add('hidden'); m.classList.remove('flex'); });
   }
 
-  // ==================== 通义千问 (Qwen) AI 接入与工作台全自动化调度引擎 ====================
-  const PUBLIC_QWEN_PROXY_URL = 'https://tcm-qwen-proxy.chenovo495666.workers.dev/';
+  // ==================== 智谱 AI (Zhipu GLM) 接入与工作台全自动化调度引擎 ====================
   const QWEN_CFG_KEY = 'tcm_qwen_cfg_v1';
   let lastAIProviderLabel = '';
   let activeAIController = null;
@@ -2366,7 +2365,7 @@
   try { localStorage.removeItem(QWEN_CFG_KEY); } catch (e) {}
 
   function getActiveQwenModel() { return lastAIProviderLabel || '智谱免费通道 · 自动容灾'; }
-  function isQwenReady() { return Boolean(window.TCMCloudAI && PUBLIC_QWEN_PROXY_URL); }
+  function isQwenReady() { return Boolean(window.TCMCloudAI); }
 
   function updateQwenStatusUI() {
     const capabilities = window.TCMCloudAI?.getCapabilities?.() || { qwen: true, workbuddy: false };

@@ -1,0 +1,29 @@
+# Netlify 自动化部署与路由配置文件
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# API 路由转发：将 /api/ai 转发至 Netlify 函数代理
+[[redirects]]
+  from = "/api/ai"
+  to = "/.netlify/functions/ai-proxy"
+  status = 200
+
+# 全局安全响应头配置
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# 静态前端资源缓存设置
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, must-revalidate"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, must-revalidate"

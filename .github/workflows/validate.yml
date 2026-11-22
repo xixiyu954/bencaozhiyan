@@ -17,6 +17,7 @@ jobs:
           node --check app.js
           node --check cloud-ai.js
           node --check worker.js
+          node --check netlify/functions/ai-proxy.mjs
       - name: Reject embedded provider secrets
         run: |
           ! grep -R -E "SHARED_QWEN_KEY|atob\(['\"]sk-|apiKey:[[:space:]]*['\"]sk-" --include='*.js' --include='*.html' .

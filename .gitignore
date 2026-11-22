@@ -1,0 +1,21 @@
+# Netlify
+.netlify/
+
+# Local Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+
+# Node / Package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor Files
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+.vscode/
+.idea/
