@@ -1,13 +1,13 @@
 (() => {
   'use strict';
 
-  // 若在 Netlify 域名打开，会自动走同源 /.netlify/functions/ai-proxy（无需修改）
-  // 若希望 GitHub Pages 也能调用，请把下面替换成你的 Netlify 站点域名（例如 https://tcm-lab.netlify.app）
+  // 若在 Netlify 域名打开，会自动走同源 /.netlify/functions/ai-proxy
+  // 在 GitHub Pages 访问时走跨域代理地址
   const NETLIFY_SITE_URL = 'https://tcm-chemistry-lab.netlify.app';
   const PROXY_PATH = '/.netlify/functions/ai-proxy';
   const DEFAULT_MODEL = 'glm-4-flash-250414';
   const PROVIDERS = {
-    qwen: { label: '智谱 GLM-4.7-Flash 免费通道', timeoutMs: 45000 }
+    qwen: { label: '智谱 GLM 免费通道', timeoutMs: 85000 }
   };
 
   let lastProvider = null;
@@ -28,11 +28,18 @@
   }
 
   function cleanJsonText(raw) {
-    return String(raw || '')
+    const text = String(raw || '')
       .replace(/^```json\s*/i, '')
       .replace(/^```\s*/i, '')
       .replace(/```\s*$/, '')
       .trim();
+    // 若模型在 JSON 前后偶发附加说明文字，自动截取最外层 {...}
+    const first = text.indexOf('{');
+    const last = text.lastIndexOf('}');
+    if (first !== -1 && last > first) {
+      return text.slice(first, last + 1);
+    }
+    return text;
   }
 
   function normalizeMessages(messages) {
@@ -49,10 +56,46 @@
     return content;
   }
 
-  async function callProxy(messages, expectJson, signal) {
+  async function readSseStream(response, onProgress) {
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let content = '';
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split(/\r?\n/);
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.startsWith('data:')) continue;
+        const payload = trimmed.slice(5).trim();
+        if (payload === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(payload);
+          if (parsed?.error?.message) {
+            throw new Error(parsed.error.message);
+          }
+          const delta = parsed?.choices?.[0]?.delta?.content;
+          if (typeof delta === 'string' && delta) {
+            content += delta;
+            onProgress?.(content.length, content);
+          }
+        } catch (err) {
+          if (err && err.message && !String(err.message).includes('JSON')) throw err;
+        }
+      }
+    }
+    return content;
+  }
+
+  async function callProxy(messages, expectJson, signal, onProgress) {
     const proxyUrl = resolveProxyUrl();
     if (!proxyUrl) {
-      throw new Error('请先在 cloud-ai.js 中将 NETLIFY_SITE_URL 替换为你的 Netlify 站点域名，或直接通过 Netlify 域名访问');
+      throw new Error('请先在 cloud-ai.js 中配置 NETLIFY_SITE_URL');
     }
     const response = await fetch(proxyUrl, {
       method: 'POST',
@@ -60,9 +103,10 @@
       body: JSON.stringify({
         model: DEFAULT_MODEL,
         messages,
-        temperature: expectJson ? 0.35 : 0.65,
+        stream: true,
+        temperature: expectJson ? 0.3 : 0.6,
         response_format: expectJson ? { type: 'json_object' } : undefined,
-        max_tokens: expectJson ? 5000 : 1800
+        max_tokens: expectJson ? 2800 : 1400
       }),
       signal
     });
@@ -70,11 +114,21 @@
       const detail = (await response.text().catch(() => '')).slice(0, 160);
       throw new Error(`免费通道 HTTP ${response.status}${detail ? `：${detail}` : ''}`);
     }
-    const data = await response.json();
-    return assertUsableContent(data?.choices?.[0]?.message?.content || '', expectJson);
+
+    const contentType = (response.headers.get('content-type') || '').toLowerCase();
+    let content = '';
+    if (contentType.includes('text/event-stream') && response.body) {
+      content = await readSseStream(response, onProgress);
+    } else {
+      const data = await response.json();
+      if (data?.error?.message) throw new Error(data.error.message);
+      content = data?.choices?.[0]?.message?.content || '';
+      onProgress?.(content.length, content);
+    }
+    return assertUsableContent(content, expectJson);
   }
 
-  async function runAttempt(provider, messages, expectJson, externalSignal) {
+  async function runAttempt(provider, messages, expectJson, externalSignal, onProgress) {
     const controller = new AbortController();
     const abortFromOutside = () => controller.abort(externalSignal?.reason);
     if (externalSignal) {
@@ -86,7 +140,7 @@
       PROVIDERS[provider].timeoutMs
     );
     try {
-      const content = await callProxy(messages, expectJson, controller.signal);
+      const content = await callProxy(messages, expectJson, controller.signal, onProgress);
       return { content, provider, label: PROVIDERS[provider].label };
     } finally {
       clearTimeout(timer);
@@ -94,12 +148,12 @@
     }
   }
 
-  async function complete({ messages, expectJson = false, onProvider, signal } = {}) {
+  async function complete({ messages, expectJson = false, onProvider, onProgress, signal } = {}) {
     const normalized = normalizeMessages(messages);
     const provider = 'qwen';
     try {
       onProvider?.(provider, PROVIDERS[provider].label);
-      const result = await runAttempt(provider, normalized, expectJson, signal);
+      const result = await runAttempt(provider, normalized, expectJson, signal, onProgress);
       lastProvider = result;
       return result;
     } catch (error) {

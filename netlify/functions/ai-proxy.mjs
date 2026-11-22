@@ -1,18 +1,16 @@
 // 放置路径：GitHub 仓库中的 netlify/functions/ai-proxy.mjs
-// 在 Netlify 导入仓库后，于 Site configuration -> Environment variables 中添加：
-//   Key:   ZHIPU_API_KEY
-//   Value: 你的智谱开放平台 API Key（https://open.bigmodel.cn/）
+// 支持流式透传（SSE）以彻底规避 Netlify 免费函数同步超时（HTTP 502），
+// 同时保留非流式兼容、429/1305 自动降级重试及 X-Actual-Model / X-Fallback 追踪响应头。
 
 const ALLOWED_EXACT_ORIGINS = new Set([
   'https://xixiyu954.github.io'
 ]);
 
 const ALLOWED_MODELS = new Set([
-  'glm-4.7-flash',
-  'glm-4-flash-250414'
+  'glm-4-flash-250414',
+  'glm-4.7-flash'
 ]);
 
-// 默认使用更稳定的模型；遇到 429/5xx（含智谱 1305 限流）时自动降级重试
 const DEFAULT_MODEL = 'glm-4-flash-250414';
 const FALLBACK_MODEL = 'glm-4-flash-250414';
 const UPSTREAM_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
@@ -36,18 +34,20 @@ function corsHeaders(origin) {
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Expose-Headers': 'X-Actual-Model, X-Fallback',
     'Access-Control-Max-Age': '86400',
-    Vary: 'Origin'
+    'Vary': 'Origin'
   };
 }
 
-function json(data, status, origin) {
+function json(data, status, origin, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
       ...corsHeaders(origin),
       'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store'
+      'Cache-Control': 'no-store',
+      ...extraHeaders
     }
   });
 }
@@ -86,12 +86,13 @@ function validMessages(value) {
   return total <= 36_000;
 }
 
-function buildPayload(model, messages, expectJson, body) {
+function buildPayload(model, messages, expectJson, body, wantStream) {
   const payload = {
     model,
     messages,
-    temperature: expectJson ? 0.35 : 0.65,
-    max_tokens: Math.min(5000, Math.max(256, Number(body.max_tokens) || 1800))
+    stream: wantStream,
+    temperature: expectJson ? 0.3 : 0.6,
+    max_tokens: Math.min(4096, Math.max(256, Number(body.max_tokens) || 2200))
   };
   if (expectJson) payload.response_format = { type: 'json_object' };
   // GLM-4.7-Flash 默认开启深度思考模式，关闭后可直接输出 content
@@ -99,8 +100,8 @@ function buildPayload(model, messages, expectJson, body) {
   return payload;
 }
 
-async function callUpstream(payload, apiKey, signal) {
-  const upstream = await fetch(UPSTREAM_URL, {
+async function fetchUpstream(payload, apiKey, signal) {
+  return fetch(UPSTREAM_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -109,18 +110,12 @@ async function callUpstream(payload, apiKey, signal) {
     body: JSON.stringify(payload),
     signal
   });
-  const text = await upstream.text();
-  return {
-    status: upstream.status,
-    text,
-    contentType: upstream.headers.get('content-type') || 'application/json; charset=utf-8'
-  };
 }
 
 // 判断是否值得降级重试：429 / 5xx，或 2xx 但 body 里是限流类业务错误（如智谱 1305）
 function shouldFallback(status, text) {
   if (status === 429 || status >= 500) return true;
-  if (status >= 200 && status < 300) {
+  if (status >= 200 && status < 300 && text) {
     try {
       const data = JSON.parse(text);
       const code = String(data?.error?.code || '');
@@ -145,6 +140,7 @@ export default async (request) => {
         provider: 'zhipu-bigmodel-free',
         model: DEFAULT_MODEL,
         fallbackModel: FALLBACK_MODEL,
+        streaming: true,
         configured: Boolean(apiKey)
       },
       200,
@@ -193,27 +189,71 @@ export default async (request) => {
   const requestedModel = typeof body.model === 'string' ? body.model : DEFAULT_MODEL;
   const primaryModel = ALLOWED_MODELS.has(requestedModel) ? requestedModel : DEFAULT_MODEL;
   const expectJson = body.response_format?.type === 'json_object';
+  const wantStream = body.stream === true;
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 40_000);
+  const timer = setTimeout(() => controller.abort(), wantStream ? 55_000 : 25_000);
 
   try {
-    let result = await callUpstream(buildPayload(primaryModel, body.messages, expectJson, body), apiKey, controller.signal);
     let usedModel = primaryModel;
     let fellBack = false;
+    let upstream = await fetchUpstream(buildPayload(primaryModel, body.messages, expectJson, body, wantStream), apiKey, controller.signal);
 
-    // 主模型遇到限流/服务端错误时，自动改用备用模型重试一次
-    if (shouldFallback(result.status, result.text) && primaryModel !== FALLBACK_MODEL) {
-      fellBack = true;
-      usedModel = FALLBACK_MODEL;
-      result = await callUpstream(buildPayload(FALLBACK_MODEL, body.messages, expectJson, body), apiKey, controller.signal);
+    // 流式透传分支：首字节即刻下发，避免 Netlify 免费函数 502 超时
+    if (wantStream) {
+      if ((upstream.status === 429 || upstream.status >= 500) && primaryModel !== FALLBACK_MODEL) {
+        try { await upstream.body?.cancel(); } catch (_) {}
+        fellBack = true;
+        usedModel = FALLBACK_MODEL;
+        upstream = await fetchUpstream(buildPayload(FALLBACK_MODEL, body.messages, expectJson, body, true), apiKey, controller.signal);
+      }
+
+      if (upstream.ok && upstream.body) {
+        clearTimeout(timer);
+        return new Response(upstream.body, {
+          status: 200,
+          headers: {
+            ...corsHeaders(origin),
+            'Content-Type': upstream.headers.get('content-type') || 'text/event-stream; charset=utf-8',
+            'Cache-Control': 'no-cache, no-store',
+            'X-Actual-Model': usedModel,
+            'X-Fallback': fellBack ? 'true' : 'false'
+          }
+        });
+      }
+
+      const errText = await upstream.text();
+      return new Response(errText, {
+        status: upstream.status,
+        headers: {
+          ...corsHeaders(origin),
+          'Content-Type': upstream.headers.get('content-type') || 'application/json; charset=utf-8',
+          'Cache-Control': 'no-store',
+          'X-Actual-Model': usedModel,
+          'X-Fallback': fellBack ? 'true' : 'false'
+        }
+      });
     }
 
-    return new Response(result.text, {
-      status: result.status,
+    // 非流式兼容分支
+    let text = await upstream.text();
+    let status = upstream.status;
+    let contentType = upstream.headers.get('content-type') || 'application/json; charset=utf-8';
+
+    if (shouldFallback(status, text) && primaryModel !== FALLBACK_MODEL) {
+      fellBack = true;
+      usedModel = FALLBACK_MODEL;
+      upstream = await fetchUpstream(buildPayload(FALLBACK_MODEL, body.messages, expectJson, body, false), apiKey, controller.signal);
+      text = await upstream.text();
+      status = upstream.status;
+      contentType = upstream.headers.get('content-type') || 'application/json; charset=utf-8';
+    }
+
+    return new Response(text, {
+      status,
       headers: {
         ...corsHeaders(origin),
-        'Content-Type': result.contentType,
+        'Content-Type': contentType,
         'Cache-Control': 'no-store',
         'X-Actual-Model': usedModel,
         'X-Fallback': fellBack ? 'true' : 'false'

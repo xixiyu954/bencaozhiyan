@@ -2387,8 +2387,9 @@
       signal: options.signal,
       onProvider: (_provider, label) => {
         const stage = document.getElementById('qwenProgressStageText');
-        if (stage) stage.textContent = `正在使用${label}...`;
-      }
+        if (stage) stage.textContent = `正在连接${label}...`;
+      },
+      onProgress: options.onProgress
     });
     lastAIProviderLabel = result.label;
     updateQwenStatusUI();
@@ -2920,51 +2921,70 @@
         const btnEl = document.getElementById('btnRunQwenAuto');
         btnEl.disabled = true;
         btnTxt.textContent = '公共 AI 编排中...';
-        const pBox = document.getElementById('qwenProgressBox'); const pBar = document.getElementById('qwenProgressBar'); const pStage = document.getElementById('qwenProgressStageText'); const pTimer = document.getElementById('qwenProgressTimer'); const setStage = (idx, txt, pct) => { if (pStage) pStage.textContent = txt; if (pBar) pBar.style.width = pct + '%'; [1,2,3,4].forEach(n => { const s = document.getElementById('qwenStep' + n); if (s) s.className = n <= idx ? 'text-teal-700 font-bold' : 'text-slate-400'; }); }; if (pBox) pBox.classList.remove('hidden'); const t0 = Date.now(); if (pTimer) pTimer.textContent = '0.0s'; const pInt = setInterval(() => { if (pTimer) pTimer.textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's'; }, 100); setStage(1, '正在检索题库文献...', 20); const ragCtx = searchSiteKnowledge(prompt); setStage(2, '正在调用通义千问...', 48);
+        const pBox = document.getElementById('qwenProgressBox'); const pBar = document.getElementById('qwenProgressBar'); const pStage = document.getElementById('qwenProgressStageText'); const pTimer = document.getElementById('qwenProgressTimer'); const setStage = (idx, txt, pct) => { if (pStage) pStage.textContent = txt; if (pBar) pBar.style.width = pct + '%'; [1,2,3,4].forEach(n => { const s = document.getElementById('qwenStep' + n); if (s) s.className = n <= idx ? 'text-teal-700 font-bold' : 'text-slate-400'; }); }; if (pBox) pBox.classList.remove('hidden'); const t0 = Date.now(); if (pTimer) pTimer.textContent = '0.0s'; const pInt = setInterval(() => { if (pTimer) pTimer.textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's'; }, 100); setStage(1, '正在检索题库文献...', 20); const ragCtx = searchSiteKnowledge(prompt); setStage(2, '正在连接智谱 GLM 免费通道...', 38);
         try {
           if (isQwenReady()) {
-            const ragText = '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '\n【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '\n请务必结合上述站内题库与文献做有理论依据的创新设计（不要照抄常规四步模板）；严格输出合法 JSON，不要包含 markdown 代码块。\n'; const sysPrompt = ragText + `你是中国高校《中药化学》实验设计专家与创新实验课程导师，负责把学生的实验想法转化为可直接驱动实验工作台自动化的严格 JSON。要求：①方案在本科常规实验室可落地、有明确理论依据；②必须结合上文【站内检索题库】与【站内检索文献】做创新延伸（如绿色溶剂替代、一材双提、低温防氧化、活性评价延伸、对照实验等），不得照抄通用四步模板；③每一步都要给出可执行的操作方法、试剂用量、仪器与时长；④推荐 2 条以上与课题相关的 GB/T 7714 格式参考文献；⑤药典标准限度数值须前后严格一致，避免引用无关药材文献。必须且仅输出合法 JSON，字段如下：
+            const ragText = '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '\n【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '\n';
+            const sysPrompt = ragText + `你是“本草智研 · 中药化学智能实验设计工作台”的首席课程导师与排版编排引擎。你的输出将直接渲染到网站的 6 大结构化视觉模块（1.创新设计四宫格 2.动态流程图 3.双栏四步工艺详解卡 4.可勾选SOP规程 5.题库文献区 6.排障与导师结论卡），因此必须严格遵守以下内容深度与版面均衡规范：
+【硬性规范】
+1. 必须严格输出合法 JSON（不要 markdown 代码块、不要额外解释文字）。
+2. 四宫格字数均衡：origin、chemistry、pharmacopoeia、tlcSystem 每项严格控制在 35~65 字，信息密度对等（含拉丁基原/性味、核心母核与溶解性、《中国药典》限度与RSD<5%、展开剂精确体积比与显色法）。
+3. 必须完整输出 4 个工艺阶段（steps 数组长度严格为 4，stage 依次为“提取”“分离”“纯化”“检识”），禁止偷懒合并成 2 步；每步 7 个字段全填满，principle 25~45 字讲清化学机理，operation 45~75 字写出具体温度/时间/用量/操作手法，qc 给出明确质控指标。
+4. sop 必须给出 6~8 条带精确数值（克、毫升、℃、min、目数、pH）的实验室可执行指令；troubleshoot 必须给出 3 条典型异常（如乳化、收率偏低、TLC拖尾/斑点不显）的成因与实操对策。
+5. 必须结合上方【站内检索题库】与【站内检索文献】在 innovation（45~75 字）与 integrative 中体现绿色/本科可落地的创新亮点，并给出 2~3 条与本药材严格相关的 GB/T 7714 参考文献。
+6. aiConclusion 80~140 字，包含预期收率区间、3 批平行 RSD 质控与 TLC/UV/NMR 确证结论；aiAdvice 50~85 字，含本科课时分配与安全防护提醒。
+【JSON 字段模板】
 {
   "herb": "中药名",
   "compound": "目标有效成分",
   "latin": "拉丁基原名",
-  "category": "从以下选一：黄酮|生物碱|挥发油与萜类|香豆素与木脂素|蒽醌与醌类|皂苷与三萜|甾体与强心苷|萜类内酯与环烯醚萜|氰苷类|苯丙素与有机酸|多糖类",
-  "formalTitle": "规范实验课题全称",
+  "category": "黄酮|生物碱|挥发油与萜类|香豆素与木脂素|蒽醌与醌类|皂苷与三萜|甾体与强心苷|萜类内酯与环烯醚萜|氰苷类|苯丙素与有机酸|多糖类",
+  "formalTitle": "规范学术实验课题全称",
   "limitVal": 1.0,
   "limitUnit": "%",
   "mpRef": "参考熔点或性状",
-  "origin": "基原与性味功效简介",
-  "chemistry": "核心结构特征与理化性质",
-  "pharmacopoeia": "药典质控与重复性要求",
-  "integrative": "中西医结合或绿色创新延伸思路",
-  "innovation": "本方案相对常规教学实验的创新点（结合站内题库/文献，60字内）",
+  "origin": "35~65字：基原部位、性味归经与核心功效",
+  "chemistry": "35~65字：化学母核、特征官能团、酸碱性与溶解性规律",
+  "pharmacopoeia": "35~65字：《中国药典》含量限度、水分灰分与3批平行RSD<5%要求",
+  "integrative": "45~80字：绿色溶剂替代/一材双提/活性评价等课程延伸思路",
+  "innovation": "45~75字：相对传统教学实验的核心创新亮点（直击痛点）",
   "citedBank": ["引用的站内精编题库课题标题"],
-  "citedLiterature": ["引用的站内文献或经典文献标题"],
+  "citedLiterature": ["引用的站内文献标题"],
   "recommendedRefs": ["[1] 作者. 题名[J]. 期刊, 年, 卷(期): 页码.", "[2] 作者. 题名[J]. 期刊, 年, 卷(期): 页码."],
-  "spectra": { "chapter": "课程章节", "uv": "UV 特征吸收解析", "nmr": "NMR 特征信号解析" },
-  "rigAnalysis": "所选装置的原理与动态运行解析",
-  "defaultRig": "从以下选一：steam|reflux|soxhlet|ultrasound|filter|extract|column",
-  "defaultExtract": "从以下选一：steam|reflux|soxhlet|ultrasound|acid_water|boil_enzyme",
-  "defaultSep": "从以下选一：freeze|acid_precip|salting_out|resin|extract|column|precip",
+  "spectra": { "chapter": "对应教材章节", "uv": "UV最大吸收波长与带型解析", "nmr": "1H-NMR/13C-NMR特征化学位移解析" },
+  "rigAnalysis": "所选实验装置的传质传热原理与安全运行要点",
+  "defaultRig": "steam|reflux|soxhlet|ultrasound|filter|extract|column",
+  "defaultExtract": "steam|reflux|soxhlet|ultrasound|acid_water|boil_enzyme",
+  "defaultSep": "freeze|acid_precip|salting_out|resin|extract|column|precip",
   "cfg": { "mass": 50, "ratio": 10, "temp": 75, "time": 60, "mesh": "中粉(40目)", "cycles": "2", "solventType": "70%乙醇", "ph": "中性 7.0" },
-  "tlcSystem": "薄层色谱展开剂与显色方法",
+  "tlcSystem": "35~65字：硅胶板类型、展开剂精确体积比、检视波长与显色剂及预期Rf范围",
   "steps": [
-    { "stage": "提取", "title": "步骤名", "principle": "化学原理", "operation": "详细操作方法：含试剂用量、仪器、手法、温度与时长，45字内", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 60 min", "qc": "质控要点" },
-    { "stage": "分离", "title": "步骤名", "principle": "化学原理", "operation": "详细操作方法", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 40 min", "qc": "质控要点" },
-    { "stage": "纯化", "title": "步骤名", "principle": "化学原理", "operation": "详细操作方法", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 45 min", "qc": "质控要点" },
-    { "stage": "检识", "title": "步骤名", "principle": "化学原理", "operation": "详细操作方法", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 30 min", "qc": "质控要点" }
+    { "stage": "提取", "title": "步骤名", "principle": "25~45字化学原理", "operation": "45~75字操作方法（含用量、温度、时长与手法）", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 45 min", "qc": "关键质控红线" },
+    { "stage": "分离", "title": "步骤名", "principle": "25~45字化学原理", "operation": "45~75字操作方法", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 30 min", "qc": "关键质控红线" },
+    { "stage": "纯化", "title": "步骤名", "principle": "25~45字化学原理", "operation": "45~75字操作方法", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 35 min", "qc": "关键质控红线" },
+    { "stage": "检识", "title": "步骤名", "principle": "25~45字化学原理", "operation": "45~75字操作方法", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 25 min", "qc": "关键质控红线" }
   ],
-  "sop": ["6~8 条具体可执行操作指令（含数值）", "操作2", "操作3", "操作4", "操作5", "操作6"],
-  "troubleshoot": [{ "issue": "常见异常", "cause": "原因", "fix": "对策" }],
-  "chemTests": [{ "name": "特征显色1", "passed": true }, { "name": "TLC对照", "passed": true }],
-  "expectedYield": "按投料量估算的预期收率范围与依据",
-  "aiConclusion": "AI 预期结论与工艺讨论（含收率、RSD、结构确证要点）",
-  "aiAdvice": "给学生的核心导师点评、课时安排与安全提醒(80字内)"
+  "sop": ["步骤1（含具体数值）", "步骤2", "步骤3", "步骤4", "步骤5", "步骤6"],
+  "troubleshoot": [
+    { "issue": "异常现象1", "cause": "机理原因", "fix": "实操对策" },
+    { "issue": "异常现象2", "cause": "机理原因", "fix": "实操对策" },
+    { "issue": "异常现象3", "cause": "机理原因", "fix": "实操对策" }
+  ],
+  "chemTests": [{ "name": "特征显色反应1", "passed": true }, { "name": "特征显色反应2", "passed": true }, { "name": "TLC对照品共色谱", "passed": true }],
+  "expectedYield": "按投料量估算的粗提物/精制品预期收率区间与依据",
+  "aiConclusion": "80~140字：预期收率区间、3批平行RSD质控讨论及TLC/UV结构确证结论",
+  "aiAdvice": "50~85字：本科课时拆解建议与通风/防爆/废液回收安全提醒"
 }`;
             const raw = await callQwenAPI([
               { role: 'system', content: sysPrompt },
               { role: 'user', content: prompt }
-            ], true, { signal: requestController.signal });
+            ], true, {
+              signal: requestController.signal,
+              onProgress: (chars) => {
+                const pct = Math.min(74, 38 + Math.round((chars / 1800) * 36));
+                setStage(2, `智谱 GLM 正在编排全景方案（已生成 ${chars} 字）...`, pct);
+              }
+            });
             if (requestId !== autoRequestSeq) return;
             const cleaned = window.TCMCloudAI?.cleanJsonText ? window.TCMCloudAI.cleanJsonText(raw) : raw.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
             const parsed = normalizeAiPlan(JSON.parse(cleaned));
@@ -3011,7 +3031,63 @@
       return `【本地智算提示】已读取「${t.herb} · ${t.compound}」上下文（${ws.solventType}，${ws.temp}℃）。公共 AI 恢复后可进一步自由问答；当前可继续咨询 TLC、收率或报告讨论。`;
     }
 
-    function renderTutorMarkdown(md) { const esc = String(md || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); const lines = esc.split(String.fromCharCode(10)); const out = []; let inUl = false; const inline = s => s.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 rounded bg-slate-100 text-teal-800 font-mono text-[11px]">$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>'); for (const raw of lines) { const line = raw.trimEnd(); const hm = line.match(/^#{1,4}\s+(.+)$/); const lm = line.match(/^\s*(?:[-*]|\d+\.)\s+(.+)$/); if (hm) { if (inUl) { out.push('</ul>'); inUl = false; } out.push('<h4 class="font-bold text-slate-900 text-[13px] mt-2 mb-1">' + inline(hm[1]) + '</h4>'); } else if (lm) { if (!inUl) { out.push('<ul class="list-disc pl-4 space-y-0.5 my-1">'); inUl = true; } out.push('<li>' + inline(lm[1]) + '</li>'); } else { if (inUl) { out.push('</ul>'); inUl = false; } out.push(line.trim() === '' ? '<div class="h-1.5"></div>' : '<p class="my-0.5">' + inline(line) + '</p>'); } } if (inUl) out.push('</ul>'); return out.join(''); } let chatRunning = false;
+    function renderTutorMarkdown(md) {
+      const esc = String(md || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      const lines = esc.split(/\r?\n/);
+      const out = [];
+      let listTag = '';
+      let tableRows = [];
+      const inline = s => s
+        .replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-teal-50 text-[#0f5c54] border border-teal-200/70 font-mono text-[11px]">$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>');
+      const closeList = () => { if (listTag) { out.push(`</${listTag}>`); listTag = ''; } };
+      const flushTable = () => {
+        if (!tableRows.length) return;
+        const parseRow = r => r.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
+        const head = parseRow(tableRows[0]);
+        const bodyRows = tableRows.slice(1).filter(r => !/^\|?[\s:-]+(\|[\s:-]+)+\|?$/.test(r.trim()));
+        out.push('<div class="overflow-x-auto my-2 rounded-xl border border-teal-200/80"><table class="w-full text-left border-collapse text-[11.5px]"><thead><tr class="bg-[#0a3630] text-white">' +
+          head.map(h => `<th class="px-2.5 py-1.5 font-bold whitespace-nowrap">${inline(h)}</th>`).join('') +
+          '</tr></thead><tbody>' +
+          bodyRows.map((r, idx) => `<tr class="${idx % 2 ? 'bg-slate-50/90' : 'bg-white'} border-t border-slate-100">` + parseRow(r).map(c => `<td class="px-2.5 py-1.5 text-slate-700 align-top">${inline(c)}</td>`).join('') + '</tr>').join('') +
+          '</tbody></table></div>');
+        tableRows = [];
+      };
+      for (const raw of lines) {
+        const line = raw.trimEnd();
+        const trimmed = line.trim();
+        if (trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.split('|').length >= 3) {
+          closeList();
+          tableRows.push(trimmed);
+          continue;
+        }
+        flushTable();
+        const hm = line.match(/^#{1,4}\s+(.+)$/);
+        const bq = line.match(/^&gt;\s*(.+)$/);
+        const ul = line.match(/^\s*[-*•]\s+(.+)$/);
+        const ol = line.match(/^\s*\d+\.\s+(.+)$/);
+        if (hm) {
+          closeList();
+          out.push('<h4 class="font-extrabold text-[#0a3630] text-[12.5px] mt-2.5 mb-1 pl-2 border-l-2 border-teal-600">' + inline(hm[1]) + '</h4>');
+        } else if (bq) {
+          closeList();
+          out.push('<div class="my-1.5 px-2.5 py-1.5 rounded-lg bg-amber-50/90 border-l-2 border-amber-500 text-amber-950 text-[12px] leading-relaxed">' + inline(bq[1]) + '</div>');
+        } else if (ul) {
+          if (listTag !== 'ul') { closeList(); out.push('<ul class="list-disc pl-4 space-y-1 my-1 text-slate-700">'); listTag = 'ul'; }
+          out.push('<li>' + inline(ul[1]) + '</li>');
+        } else if (ol) {
+          if (listTag !== 'ol') { closeList(); out.push('<ol class="list-decimal pl-4 space-y-1 my-1 text-slate-700">'); listTag = 'ol'; }
+          out.push('<li>' + inline(ol[1]) + '</li>');
+        } else {
+          closeList();
+          out.push(trimmed === '' ? '<div class="h-1"></div>' : '<p class="my-1 text-slate-700 leading-relaxed">' + inline(line) + '</p>');
+        }
+      }
+      flushTable();
+      closeList();
+      return out.join('');
+    }
+    let chatRunning = false;
     const chatForm = document.getElementById('qwenChatForm');
     if (chatForm) {
       chatForm.addEventListener('submit', async e => {
@@ -3042,7 +3118,7 @@
         try {
           if (isQwenReady()) {
             ans = await callQwenAPI([
-              { role: 'system', content: `你是专业的中药化学实验指导教师，回答简洁实用、有理论依据，不编造标准或文献。${ctx}` },
+              { role: 'system', content: `你是“本草智研”中药化学智能实验工作台的指导教师。请严格按以下版面风格作答：①先用 1~2 句话给出核心结论；②用小标题（###）配合分点清单或紧凑 Markdown 表格展示工艺参数、化学机理或对比；③用 > 引用块给出 1 条实验安全或质控提醒；④语言专业精炼、不编造药典标准或文献。${ctx}` },
               { role: 'user', content: q }
             ], false, { signal: chatController.signal });
           } else {
