@@ -250,29 +250,35 @@
 
           <!-- 三联环形仪表盘 -->
           <div class="grid grid-cols-3 gap-2 pt-1">
-            <div class="rounded-2xl bg-slate-50 border border-slate-100 p-2 text-center">
-              <svg viewBox="0 0 44 44" class="w-10 h-10 mx-auto -rotate-90">
-                <circle cx="22" cy="22" r="17" fill="none" stroke="#e2e8f0" stroke-width="4" />
-                <circle id="dockRingEff" cx="22" cy="22" r="17" fill="none" stroke="#10b981" stroke-width="4" stroke-linecap="round" stroke-dasharray="88 19" style="transition: stroke-dasharray 0.45s ease;" />
-              </svg>
-              <div id="dockValEff" class="text-xs font-extrabold text-slate-900 tabular-nums -mt-7 mb-3">88%</div>
-              <div class="text-[10px] font-bold text-slate-500">提取效率</div>
+            <div class="rounded-2xl bg-slate-50/80 border border-slate-200/60 p-2.5 flex flex-col items-center justify-center text-center shadow-xs">
+              <div class="relative w-11 h-11 flex items-center justify-center">
+                <svg viewBox="0 0 44 44" class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
+                  <circle cx="22" cy="22" r="18" fill="none" stroke="#e2e8f0" stroke-width="3.2" />
+                  <circle id="dockRingEff" cx="22" cy="22" r="18" fill="none" stroke="#10b981" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="99.5 13.6" style="transition: stroke-dasharray 0.45s ease;" />
+                </svg>
+                <span id="dockValEff" class="relative z-10 text-[11px] font-black text-slate-800 tabular-nums leading-none tracking-tight">88%</span>
+              </div>
+              <div class="text-[10px] font-bold text-slate-500 mt-1.5 truncate">提取效率</div>
             </div>
-            <div class="rounded-2xl bg-slate-50 border border-slate-100 p-2 text-center">
-              <svg viewBox="0 0 44 44" class="w-10 h-10 mx-auto -rotate-90">
-                <circle cx="22" cy="22" r="17" fill="none" stroke="#e2e8f0" stroke-width="4" />
-                <circle id="dockRingGreen" cx="22" cy="22" r="17" fill="none" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" stroke-dasharray="92 15" style="transition: stroke-dasharray 0.45s ease;" />
-              </svg>
-              <div id="dockValGreen" class="text-xs font-extrabold text-slate-900 tabular-nums -mt-7 mb-3">92%</div>
-              <div class="text-[10px] font-bold text-slate-500">绿色环保</div>
+            <div class="rounded-2xl bg-slate-50/80 border border-slate-200/60 p-2.5 flex flex-col items-center justify-center text-center shadow-xs">
+              <div class="relative w-11 h-11 flex items-center justify-center">
+                <svg viewBox="0 0 44 44" class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
+                  <circle cx="22" cy="22" r="18" fill="none" stroke="#e2e8f0" stroke-width="3.2" />
+                  <circle id="dockRingGreen" cx="22" cy="22" r="18" fill="none" stroke="#0ea5e9" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="104.1 9.0" style="transition: stroke-dasharray 0.45s ease;" />
+                </svg>
+                <span id="dockValGreen" class="relative z-10 text-[11px] font-black text-slate-800 tabular-nums leading-none tracking-tight">92%</span>
+              </div>
+              <div class="text-[10px] font-bold text-slate-500 mt-1.5 truncate">绿色环保</div>
             </div>
-            <div class="rounded-2xl bg-slate-50 border border-slate-100 p-2 text-center">
-              <svg viewBox="0 0 44 44" class="w-10 h-10 mx-auto -rotate-90">
-                <circle cx="22" cy="22" r="17" fill="none" stroke="#e2e8f0" stroke-width="4" />
-                <circle id="dockRingFit" cx="22" cy="22" r="17" fill="none" stroke="#d99b26" stroke-width="4" stroke-linecap="round" stroke-dasharray="90 17" style="transition: stroke-dasharray 0.45s ease;" />
-              </svg>
-              <div id="dockValFit" class="text-xs font-extrabold text-slate-900 tabular-nums -mt-7 mb-3">90%</div>
-              <div class="text-[10px] font-bold text-slate-500">课时匹配</div>
+            <div class="rounded-2xl bg-slate-50/80 border border-slate-200/60 p-2.5 flex flex-col items-center justify-center text-center shadow-xs">
+              <div class="relative w-11 h-11 flex items-center justify-center">
+                <svg viewBox="0 0 44 44" class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
+                  <circle cx="22" cy="22" r="18" fill="none" stroke="#e2e8f0" stroke-width="3.2" />
+                  <circle id="dockRingFit" cx="22" cy="22" r="18" fill="none" stroke="#d99b26" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="101.8 11.3" style="transition: stroke-dasharray 0.45s ease;" />
+                </svg>
+                <span id="dockValFit" class="relative z-10 text-[11px] font-black text-slate-800 tabular-nums leading-none tracking-tight">90%</span>
+              </div>
+              <div class="text-[10px] font-bold text-slate-500 mt-1.5 truncate">课时匹配</div>
             </div>
           </div>
         </section>
@@ -400,9 +406,9 @@
       el('dockRadarPoly').setAttribute('stroke', theme.liquid);
     }
     if (el('dockOverallScore')) el('dockOverallScore').textContent = `综合 ${m.overall} 分`;
-    if (el('dockRingEff')) el('dockRingEff').setAttribute('stroke-dasharray', ringDash(m.efficiency, 17));
-    if (el('dockRingGreen')) el('dockRingGreen').setAttribute('stroke-dasharray', ringDash(m.green, 17));
-    if (el('dockRingFit')) el('dockRingFit').setAttribute('stroke-dasharray', ringDash(m.scheduleFit, 17));
+    if (el('dockRingEff')) el('dockRingEff').setAttribute('stroke-dasharray', ringDash(m.efficiency, 18));
+    if (el('dockRingGreen')) el('dockRingGreen').setAttribute('stroke-dasharray', ringDash(m.green, 18));
+    if (el('dockRingFit')) el('dockRingFit').setAttribute('stroke-dasharray', ringDash(m.scheduleFit, 18));
     if (el('dockValEff')) el('dockValEff').textContent = `${m.efficiency}%`;
     if (el('dockValGreen')) el('dockValGreen').textContent = `${m.green}%`;
     if (el('dockValFit')) el('dockValFit').textContent = `${m.scheduleFit}%`;

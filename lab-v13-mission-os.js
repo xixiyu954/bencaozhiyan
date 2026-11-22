@@ -53,6 +53,30 @@
     { id: 'impure', name: '含杂质粗品（对比组）', t1: 105.5, t2: 111.8, pure: false, note: '混入杂质后呈现典型“熔点明显下降、熔程拉长至 > 6℃”特征！' }
   ];
 
+
+  const ROTAVAP_SOLVENTS = [
+    { id: 'etoh', name: '乙醇 (常压 78.3℃)', bp0: 78.3, k: 46 },
+    { id: 'etoac', name: '乙酸乙酯 (常压 77.1℃)', bp0: 77.1, k: 48 },
+    { id: 'meoh', name: '甲醇 (常压 64.7℃)', bp0: 64.7, k: 44 },
+    { id: 'water', name: '纯化水 (常压 100.0℃)', bp0: 100.0, k: 56 },
+    { id: 'acetone', name: '丙酮 (常压 56.1℃)', bp0: 56.1, k: 45 },
+    { id: 'pe', name: '石油醚 (常压 45.0℃)', bp0: 45.0, k: 38 }
+  ];
+
+  const COLOR_REACTIONS = [
+    { name: '盐酸-镁粉反应', cls: '黄酮类', swatch: '#dc2626', phenom: '冒气泡并呈樱红至深红色（黄酮/黄酮醇阳性；查耳酮阴性）' },
+    { name: 'Molish 紫环反应', cls: '糖与苷类', swatch: '#7e22ce', phenom: 'α-萘酚+浓硫酸沿壁缓加，两液界面现紫红色环' },
+    { name: '改良碘化铋钾', cls: '生物碱', swatch: '#ea580c', phenom: '酸性水溶液中立即产生橘红色致密沉淀' },
+    { name: 'Borntrager 反应', cls: '羟基蒽醌', swatch: '#e11d48', phenom: '遇稀氨水或 NaOH 显鲜红至紫红色，酸化后褪色' },
+    { name: '三氯化铁反应', cls: '酚羟基/鞣质', swatch: '#0f766e', phenom: '显蓝绿色、墨绿色或蓝黑色络合物' },
+    { name: 'Liebermann-Burchard', cls: '三萜/甾体皂苷', swatch: '#2563eb', phenom: '醋酐-浓硫酸显黄→红→紫→蓝→绿多色渐变' },
+    { name: '香草醛-浓硫酸', cls: '挥发油/萜类', swatch: '#9333ea', phenom: 'TLC 喷雾 105℃ 加热呈现紫红、蓝绿等多彩斑点' },
+    { name: '2,4-二硝基苯肼', cls: '挥发油羰基', swatch: '#d97706', phenom: '与醛酮迅速生成橙红色结晶沉淀' }
+  ];
+
+  let rotaState = { sol: 'etoh', vacMpa: 0.085 };
+  let colState = { crudeG: 2.0, ratio: 35 };
+
   let timerHandle = null;
   let timerState = { label: '首提回流计时', totalSec: 3600, remainSec: 3600, running: false };
   let viewMode = 'list'; // 'list' | 'kanban'
@@ -86,13 +110,16 @@
       return {
         phSim: s.phSim !== false,
         mpSim: s.mpSim !== false,
+        rotaSim: s.rotaSim !== false,
+        colCalc: s.colCalc !== false,
         rsdCalc: s.rsdCalc !== false,
+        colorRef: s.colorRef !== false,
         dilution: s.dilution !== false,
         emergency: s.emergency !== false,
         meshTable: s.meshTable === true
       };
     } catch {
-      return { phSim: true, mpSim: true, rsdCalc: true, dilution: true, emergency: true, meshTable: false };
+      return { phSim: true, mpSim: true, rotaSim: true, colCalc: true, rsdCalc: true, colorRef: true, dilution: true, emergency: true, meshTable: false };
     }
   }
   function savePlugins(p) { try { localStorage.setItem(PLUGIN_STORE_KEY, JSON.stringify(p)); } catch {} }
@@ -222,6 +249,20 @@
     const sdY = Math.sqrt(yields.reduce((s, y) => s + Math.pow(y - meanY, 2), 0) / Math.max(1, yields.length - 1));
     const rsdY = meanY > 0 ? (sdY / meanY) * 100 : 0;
 
+
+    // 旋蒸真空沸点换算（经验对数减压降沸模型）
+    const rSol = ROTAVAP_SOLVENTS.find(x => x.id === rotaState.sol) || ROTAVAP_SOLVENTS[0];
+    const pBar = Math.max(0.015, 1.0 - rotaState.vacMpa / 0.1013);
+    const bpVac = Math.max(18, rSol.bp0 + (rSol.k * 0.4343 * Math.log(pBar)));
+    const bathRec = Math.min(95, bpVac + 18);
+    const chillRec = Math.max(0, bpVac - 20);
+
+    // 柱层析装柱速算
+    const silicaG = Math.round(colState.crudeG * colState.ratio);
+    const colDiam = silicaG <= 30 ? '2.0 cm' : (silicaG <= 100 ? '3.0 cm' : (silicaG <= 250 ? '4.5 cm' : '6.0 cm'));
+    const bvMl = Math.round(silicaG * 1.45);
+    const enabledPluginCnt = Object.values(plugins).filter(Boolean).length;
+
     const timerPct = timerState.totalSec > 0 ? ((timerState.totalSec - timerState.remainSec) / timerState.totalSec) * 100 : 0;
 
     panel.innerHTML = `
@@ -235,7 +276,16 @@
           <div class="flex flex-wrap items-center gap-2">
             <button type="button" id="btnAutoDecomposeMission" class="px-4 py-2 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-[#062420] text-xs font-extrabold shadow-sm transition">✨ 按当前课题智能拆解任务</button>
             <button type="button" id="btnNewLabMission" class="px-4 py-2 rounded-2xl bg-amber-400 hover:bg-amber-300 text-[#062420] text-xs font-extrabold shadow-sm transition">+ 新建空白任务</button>
+            <button type="button" id="btnExportMissionMd" class="px-3.5 py-2 rounded-2xl bg-white/15 hover:bg-white/25 text-white text-xs font-extrabold transition">📥 导出实验日志</button>
           </div>
+        </div>
+
+        
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div class="rounded-2xl bg-white/10 border border-white/15 px-3.5 py-2.5"><div class="text-xs text-teal-200">并行实验任务</div><div class="text-lg font-extrabold text-white tabular-nums">${store.missions.length} 项</div></div>
+          <div class="rounded-2xl bg-white/10 border border-white/15 px-3.5 py-2.5"><div class="text-xs text-teal-200">当前任务进度</div><div class="text-lg font-extrabold text-emerald-300 tabular-nums">${pct}% (${doneCnt}/${totalCnt})</div></div>
+          <div class="rounded-2xl bg-white/10 border border-white/15 px-3.5 py-2.5"><div class="text-xs text-teal-200">原始现象记录</div><div class="text-lg font-extrabold text-amber-300 tabular-nums">${active.logs.length} 条</div></div>
+          <div class="rounded-2xl bg-white/10 border border-white/15 px-3.5 py-2.5"><div class="text-xs text-teal-200">已启微实验室</div><div class="text-lg font-extrabold text-sky-200 tabular-nums">${enabledPluginCnt} / 9 项</div></div>
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/12 text-xs">
@@ -292,13 +342,16 @@
           <section class="lab-card v9-visual-card rounded-3xl p-4 sm:p-5 space-y-3">
             <div>
               <h3 class="text-base font-extrabold text-slate-900">🔌 可扩展微实验室插件</h3>
-              <p class="text-xs text-slate-500">自由勾选启用实验细节模拟器和专业计算工具</p>
+              <div class="flex items-center justify-between gap-2"><p class="text-xs text-slate-500">按需插拔专业微工具</p><div class="flex gap-1"><button type="button" id="btnPluginAllOn" class="px-2 py-0.5 rounded-lg bg-teal-50 text-[#0f5c54] text-[11px] font-bold">全开</button><button type="button" id="btnPluginMinimal" class="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold">精简</button></div></div>
             </div>
             <div class="space-y-2 text-xs">
               ${[
                 ['phSim', '🧫 酸沉/碱游离 pH 动态烧杯模拟仪'],
                 ['mpSim', '🌡️ 毛细管熔点测定晶体熔融模拟仪'],
+                ['rotaSim', '🌊 减压旋蒸沸点与水浴温差换算仪'],
+                ['colCalc', '🫧 柱层析装柱硅胶量与 BV 速算器'],
                 ['rsdCalc', '⚖️ 3 批平行称量回收率与 RSD 验收台'],
+                ['colorRef', '🎨 8 大中药化学显色反应速查卡'],
                 ['dilution', '🧪 溶液稀释配制计算器 (C₁V₁=C₂V₂)'],
                 ['emergency', '🧯 实验室突发异常应急处置速查'],
                 ['meshTable', '📏 中国药典筛网目数与粒径对照表']
@@ -536,6 +589,79 @@
             </section>
           ` : ''}
 
+
+          ${plugins.rotaSim ? `
+            <section class="lab-card v9-visual-card rounded-3xl p-5 space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 class="text-base font-extrabold text-slate-900">🌊 细节模拟 · 减压旋转蒸发沸点与「20℃ 黄金温差」换算仪</h3>
+                  <p class="text-xs text-slate-500">调节真空度与溶剂种类，自动推算减压沸点、推荐水浴温度与冷凝水温，防暴沸防倒吸</p>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-900 font-mono text-xs font-extrabold tabular-nums">真空 -${rotaState.vacMpa.toFixed(3)} MPa</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">待浓缩溶剂</label>
+                  <select id="rotaSolSel" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-bold">
+                    ${ROTAVAP_SOLVENTS.map(s => `<option value="${s.id}" ${s.id === rSol.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 v9-chart-surface">
+                  <div class="flex justify-between font-bold mb-1"><span>水泵/隔膜泵真空度</span><span class="text-[#0f5c54] tabular-nums">-${rotaState.vacMpa.toFixed(3)} MPa</span></div>
+                  <input id="rotaVacSlider" type="range" min="0.010" max="0.096" step="0.002" value="${rotaState.vacMpa}" class="w-full accent-sky-600" />
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-center text-xs tabular-nums">
+                <div class="p-3 rounded-2xl bg-sky-50 border border-sky-200"><div class="text-slate-500">减压下实际沸点</div><div class="text-lg font-extrabold text-sky-900 mt-0.5">${bpVac.toFixed(1)} ℃</div></div>
+                <div class="p-3 rounded-2xl bg-amber-50 border border-amber-200"><div class="text-slate-500">推荐水浴锅温度</div><div class="text-lg font-extrabold text-amber-900 mt-0.5">${bathRec.toFixed(1)} ℃</div></div>
+                <div class="p-3 rounded-2xl bg-emerald-50 border border-emerald-200"><div class="text-slate-500">建议冷凝循环水温</div><div class="text-lg font-extrabold text-emerald-900 mt-0.5">≤ ${chillRec.toFixed(0)} ℃</div></div>
+              </div>
+            </section>
+          ` : ''}
+
+          ${plugins.colCalc ? `
+            <section class="lab-card v9-visual-card rounded-3xl p-5 space-y-3.5">
+              <div>
+                <h3 class="text-base font-extrabold text-slate-900">🫧 细节算具 · 柱层析硅胶装柱量与柱体积 (BV) 速算器</h3>
+                <p class="text-xs text-slate-500">输入粗浸膏质量与分离难度，自动换算 200~300 目硅胶用量、层析柱内径与梯度洗脱备液量</p>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div><label class="block font-bold text-slate-700 mb-1">粗浸膏上样量 (g)</label><input id="colCrudeInp" type="number" step="0.5" min="0.2" max="50" value="${colState.crudeG}" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-bold tabular-nums" /></div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">分离难度（硅胶:样品比）</label>
+                  <select id="colRatioSel" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-bold">
+                    <option value="25" ${colState.ratio === 25 ? 'selected' : ''}>常规快速分离 (25 : 1)</option>
+                    <option value="35" ${colState.ratio === 35 ? 'selected' : ''}>标准教学精制 (35 : 1)</option>
+                    <option value="60" ${colState.ratio === 60 ? 'selected' : ''}>相近极性难分单体 (60 : 1)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center text-xs tabular-nums">
+                <div class="p-3 rounded-2xl bg-teal-50 border border-teal-200"><div class="text-slate-500">推荐硅胶用量</div><div class="text-base font-extrabold text-[#0a3630] mt-0.5">${silicaG} g</div></div>
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200"><div class="text-slate-500">推荐柱内径</div><div class="text-base font-extrabold text-slate-900 mt-0.5">${colDiam}</div></div>
+                <div class="p-3 rounded-2xl bg-indigo-50 border border-indigo-200"><div class="text-slate-500">估算 1 柱体积</div><div class="text-base font-extrabold text-indigo-900 mt-0.5">${bvMl} mL</div></div>
+                <div class="p-3 rounded-2xl bg-amber-50 border border-amber-200"><div class="text-slate-500">单梯度备液 (3 BV)</div><div class="text-base font-extrabold text-amber-900 mt-0.5">${bvMl * 3} mL</div></div>
+              </div>
+            </section>
+          ` : ''}
+
+          ${plugins.colorRef ? `
+            <section class="lab-card v9-visual-card rounded-3xl p-5 space-y-3">
+              <h3 class="text-base font-extrabold text-slate-900">🎨 8 大经典中药化学检识显色反应速查卡</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                ${COLOR_REACTIONS.map(cr => `
+                  <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-2.5 v9-chart-surface">
+                    <span class="w-4 h-4 rounded-full shrink-0 mt-0.5 border border-white shadow-xs" style="background:${cr.swatch}"></span>
+                    <div class="space-y-0.5">
+                      <div class="font-extrabold text-slate-900">${esc(cr.name)} <span class="text-[#0f5c54] font-bold">· ${esc(cr.cls)}</span></div>
+                      <div class="text-slate-600 leading-relaxed">${esc(cr.phenom)}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </section>
+          ` : ''}
+
           <!-- 6. 稀释配液 / 应急处置 / 药典筛网表 -->
           ${plugins.dilution ? `
             <section class="lab-card v9-visual-card rounded-3xl p-5 space-y-3">
@@ -704,6 +830,33 @@
       });
       saveMissionStore(store); renderMissionPanel();
     };
+
+
+    const btnExpMd = panel.querySelector('#btnExportMissionMd');
+    if (btnExpMd) btnExpMd.onclick = () => {
+      const md = `# ${active.title} — 实验任务与原始记录\n\n日期：${active.createdAt} ｜ 完成度：${pct}% (${doneCnt}/${totalCnt})\n\n## 一、实操检查单\n` +
+        active.checklist.map(c => `- [${c.status === 'done' ? 'x' : ' '}] (${c.phase}) ${c.text}`).join('\n') +
+        `\n\n## 二、时间戳原始记录\n` +
+        active.logs.map(l => `- **[${l.time}] ${l.tag}**：${l.text}`).join('\n');
+      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+      const u = URL.createObjectURL(blob); const a = document.createElement('a');
+      a.href = u; a.download = `${active.title.replace(/[^\w\u4e00-\u9fa5]+/g, '_')}_实验日志.md`;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 1000);
+    };
+    const btnAllOn = panel.querySelector('#btnPluginAllOn');
+    if (btnAllOn) btnAllOn.onclick = () => { Object.keys(plugins).forEach(k => plugins[k] = true); savePlugins(plugins); renderMissionPanel(); };
+    const btnMin = panel.querySelector('#btnPluginMinimal');
+    if (btnMin) btnMin.onclick = () => { Object.keys(plugins).forEach(k => plugins[k] = (k === 'phSim' || k === 'rotaSim' || k === 'rsdCalc')); savePlugins(plugins); renderMissionPanel(); };
+
+    const rotaSel = panel.querySelector('#rotaSolSel');
+    const rotaVac = panel.querySelector('#rotaVacSlider');
+    if (rotaSel) rotaSel.onchange = () => { rotaState.sol = rotaSel.value; renderMissionPanel(); };
+    if (rotaVac) rotaVac.oninput = () => { rotaState.vacMpa = Number(rotaVac.value); renderMissionPanel(); };
+
+    const colInp = panel.querySelector('#colCrudeInp');
+    const colRat = panel.querySelector('#colRatioSel');
+    if (colInp) colInp.oninput = () => { colState.crudeG = Number(colInp.value) || 0.5; renderMissionPanel(); };
+    if (colRat) colRat.onchange = () => { colState.ratio = Number(colRat.value) || 35; renderMissionPanel(); };
 
     // 稀释计算器
     ['dilC1', 'dilC2', 'dilV2'].forEach(id => {

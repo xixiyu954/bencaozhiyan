@@ -586,6 +586,15 @@ body.dark-lab .dock-step-row.done {
   color: #a7f3d0;
   border-color: rgba(16, 185, 129, 0.3);
 }
+body.dark-lab #dockValEff,
+body.dark-lab #dockValGreen,
+body.dark-lab #dockValFit {
+  color: #f1f5f9 !important;
+}
+body.dark-lab .studio-dock-card .bg-slate-50\/80 {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(45, 212, 191, 0.15) !important;
+}
 
 /* v8.0 宽屏双栏工作站显式响应式布局（不受 .hidden !important 影响） */
 .studio-layout-grid {
