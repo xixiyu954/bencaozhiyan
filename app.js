@@ -2365,7 +2365,7 @@
   }
   try { localStorage.removeItem(QWEN_CFG_KEY); } catch (e) {}
 
-  function getActiveQwenModel() { return lastAIProviderLabel || '公共 AI · 自动容灾'; }
+  function getActiveQwenModel() { return lastAIProviderLabel || '智谱免费通道 · 自动容灾'; }
   function isQwenReady() { return Boolean(window.TCMCloudAI && PUBLIC_QWEN_PROXY_URL); }
 
   function updateQwenStatusUI() {
@@ -2374,9 +2374,9 @@
     const hdrLabel = document.getElementById('qwenHeaderBtnLabel');
     if (pill) {
       pill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
-      pill.textContent = capabilities.workbuddy ? '公共 AI 已就绪 · 千问 + WorkBuddy 双通道' : '公共 AI 已就绪 · 千问 + 本地兜底';
+      pill.textContent = '智谱免费通道 + 本地兜底';
     }
-    if (hdrLabel) hdrLabel.textContent = lastAIProviderLabel ? `AI·${lastAIProviderLabel}` : '公共 AI · 免配置';
+    if (hdrLabel) hdrLabel.textContent = lastAIProviderLabel ? `AI·${lastAIProviderLabel}` : '智谱免费通道 · 免配置';
   }
 
   async function callQwenAPI(messages, expectJson = false, options = {}) {
@@ -2431,7 +2431,7 @@
       origin: basePreset?.origin || `${herb}为本科院校常规实验室易于获取的中药材，适合开展绿色提取分离与多维检识综合设计。`,
       chemistry: basePreset?.chemistry || `目标成分为${compound}，结合其极性与热稳定性采用${solvent}高效溶出。`,
       pharmacopoeia: basePreset?.pharmacopoeia || `对标《中国药典》通则与含量限度要求，控制平行 3 批 RSD < 5%。`,
-      integrative: `千问 AI 方案延伸：围绕「${txt.slice(0, 36)}」需求，采用本科常规设备（${rig === 'steam' ? '挥发油测定器' : rig === 'ultrasound' ? '超声波清洗机+大孔树脂' : '回流装置+分液漏斗'}）即可落地；${isNoToxic ? '全程规避氯仿等高毒溶剂；' : ''}${isCompare ? '建议平行设立对照实验组并用 TLC/UV 量化差异；' : ''}可进一步拓展抗氧化/经皮递药评价。`,
+      integrative: `智谱免费通道方案延伸：围绕「${txt.slice(0, 36)}」需求，采用本科常规设备（${rig === 'steam' ? '挥发油测定器' : rig === 'ultrasound' ? '超声波清洗机+大孔树脂' : '回流装置+分液漏斗'}）即可落地；${isNoToxic ? '全程规避氯仿等高毒溶剂；' : ''}${isCompare ? '建议平行设立对照实验组并用 TLC/UV 量化差异；' : ''}可进一步拓展抗氧化/经皮递药评价。`,
       defaultRig: rig,
       defaultExtract: ext,
       defaultSep: sep,
@@ -2461,7 +2461,7 @@
       ],
       troubleshoot: basePreset?.troubleshoot || [{ issue: '收率低于预期', cause: '药材粉碎过粗或提取时间偏短。', fix: '适当减小粒度并补做一次短时复提。' }],
       chemTests: basePreset?.chemTests || [{ name: '特征化学显色反应阳性', passed: true }, { name: 'TLC 对照品同位置清晰单斑', passed: true }],
-      aiAdvice: `已为你按「${isShortTime ? '本科课时高效落地' : '高校常规实验标准'}${isNoToxic ? ' + 绿色无毒溶剂' : ''}」原则自动规划「${herb} · ${compound}」全套方案，并同步写入左侧参数单、动态装置与报告模板。配置阿里云百炼千问 API Key 后，还可解锁大模型深度自由推理与个性化论文级方案生成！`
+      aiAdvice: `已为你按「${isShortTime ? '本科课时高效落地' : '高校常规实验标准'}${isNoToxic ? ' + 绿色无毒溶剂' : ''}」原则自动规划「${herb} · ${compound}」全套方案，并同步写入左侧参数单、动态装置与报告模板。智谱免费通道已启用，可直接获得大模型推理与个性化论文级方案生成！`
     };
   }
 
@@ -2819,7 +2819,7 @@
       const capabilities = window.TCMCloudAI?.getCapabilities?.() || { qwen: false, workbuddy: false };
       const cfgSt = document.getElementById('qwenCfgStatus');
       cfgSt.className = 'p-2.5 rounded-xl text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-900';
-      cfgSt.textContent = `千问公共通道：${capabilities.qwen ? '已配置' : '未配置'}；WorkBuddy 备用通道：${capabilities.workbuddy ? '当前域名可用' : '仅在 WorkBuddy 发布域名启用'}；本地智算始终可用。`;
+      cfgSt.textContent = `智谱免费通道：${capabilities.qwen ? '已配置' : '未配置'}；本地兜底：始终可用。`;
       cfgSt.classList.remove('hidden');
       const m = document.getElementById('qwenConfigModal');
       m.classList.remove('hidden'); m.classList.add('flex');
@@ -2869,7 +2869,7 @@
           st.className = successful.length ? 'p-2.5 rounded-xl text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-900' : 'p-2.5 rounded-xl text-[11px] bg-amber-50 border border-amber-200 text-amber-900';
           const details = results.map((item) => item.ok ? `✓ ${item.label}：${item.reply}` : `× ${item.label}：${item.error}`).join('\n');
           const capabilities = window.TCMCloudAI.getCapabilities();
-          st.textContent = details + (capabilities.workbuddy ? '' : '\nWorkBuddy 备用模型仅在 WorkBuddy 发布域名参与容灾。') + '\n本地智算：始终可用。';
+          st.textContent = details + '\n本地兜底：始终可用。';
         } catch (err) {
           st.className = 'p-2.5 rounded-xl text-[11px] bg-amber-50 border border-amber-200 text-amber-900';
           st.textContent = `公共 AI 暂不可用，已保留本地智算兜底。${err.message}`;
