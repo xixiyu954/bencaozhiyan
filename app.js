@@ -1,5 +1,6 @@
 (function () {
-  const STORAGE_KEY = 'lnutcm_tcm_chem_pro_v7';
+  const STORAGE_KEY = 'bencao_tcm_chem_pro_v8';
+  const LEGACY_STORAGE_KEY = 'lnutcm_tcm_chem_pro_v7';
   const AUTHOR_EMAIL = 'Chenovo495666@163.com';
   const IS_WECHAT = /MicroMessenger/i.test(navigator.userAgent || '');
 
@@ -9,7 +10,8 @@
     3: { tag: '03 / 06', title: '原理与方案' },
     4: { tag: '04 / 06', title: '装置与流程' },
     5: { tag: '05 / 06', title: '实验数据' },
-    6: { tag: '06 / 06', title: 'DIY 报告' }
+    6: { tag: '06 / 06', title: 'DIY 报告' },
+    hub: { tag: '装置库', title: '动态流程与装置库' }
   };
 
   // 全库真实核实的中医药与中西医结合文献库（不写具体页码占位，聚焦真实权威期刊与高校成果）
@@ -1548,6 +1550,119 @@
     { id: 'venenum_bufonis', herb: '蟾酥', compound: '华蟾酥毒基（乙型强心苷）', category: '甾体与强心苷' }
   ];
 
+  // ============ 合并扩展模块 TCM_EXTRA_DATA（9套装置/91项题库/50篇文献/20项院校药企案例） ============
+  const EXTRA_DATA = window.TCM_EXTRA_DATA || {};
+  if (EXTRA_DATA.EXTRA_RIGS) {
+    Object.assign(LAB_RIGS, EXTRA_DATA.EXTRA_RIGS);
+  }
+  if (EXTRA_DATA.RIG_ENHANCEMENTS) {
+    Object.entries(EXTRA_DATA.RIG_ENHANCEMENTS).forEach(([k, enh]) => {
+      if (LAB_RIGS[k]) {
+        Object.assign(LAB_RIGS[k], enh);
+      }
+    });
+  }
+  if (EXTRA_DATA.EXTRA_PRESETS) {
+    Object.entries(EXTRA_DATA.EXTRA_PRESETS).forEach(([k, preset]) => {
+      FEATURED_PRESETS[k] = preset;
+      if (!CATALOG_45.some(c => c.id === k)) {
+        CATALOG_45.push({
+          id: preset.id,
+          isInnovative: !!preset.isInnovative,
+          isClassGroup: !!preset.isClassGroup,
+          featured: true,
+          herb: preset.herb,
+          compound: preset.compound,
+          category: preset.category,
+          sourceTag: preset.sourceTag || ''
+        });
+      }
+    });
+  }
+  if (Array.isArray(EXTRA_DATA.EXTRA_LITERATURE)) {
+    EXTRA_DATA.EXTRA_LITERATURE.forEach(item => {
+      if (!GLOBAL_LITERATURE.some(x => x.text === item.text)) GLOBAL_LITERATURE.push(item);
+    });
+  }
+  if (Array.isArray(EXTRA_DATA.EXTRA_UNIV_CASES)) {
+    UNIV_CASES.forEach(u => { if (!u.type) u.type = /药检|中科院|药植所/.test(u.univ) ? '国家平台' : '高校实验'; });
+    EXTRA_DATA.EXTRA_UNIV_CASES.forEach(item => {
+      if (!UNIV_CASES.some(x => x.title === item.title)) UNIV_CASES.push(item);
+    });
+  }
+
+  // 精准短词 B站链接生成器（1~2 词高命中，解决检索词过多导致视频偏题问题）
+  function biliUrl(kw) {
+    const clean = String(kw || '中药化学实验').replace(/[（）()\[\]【】、,，。；;：:]/g, ' ').replace(/\s+/g, ' ').trim();
+    const parts = clean.split(' ').filter(Boolean).slice(0, 2);
+    return `https://search.bilibili.com/all?keyword=${encodeURIComponent(parts.join(' '))}`;
+  }
+  function getTopicShortBiliKw(t) {
+    const herb = String(t?.herb || '中药').replace(/（.*?）|\(.*?\)/g, '').trim();
+    const comp = String(t?.compound || '').replace(/（.*?）|\(.*?\)/g, '').split(/[、/+]/)[0].trim();
+    return comp ? `${herb} ${comp}` : herb;
+  }
+
+  // 根据选材与当前实验设计，智能推导本课题适用的 2~3 套装置（解决 Step 4 全平铺杂乱问题）
+  function getApplicableRigs(t, ws) {
+    const out = [];
+    const add = (key, roleLabel) => {
+      const k = canonicalRigKey(key, '');
+      if (k && LAB_RIGS[k] && !out.some(x => x.key === k)) out.push({ key: k, roleLabel });
+    };
+    const isDiy = ws && ws.schemeMode === 'diy';
+    if (isDiy) {
+      const extObj = DIY_EXTRACT_LIST.find(x => x.id === ws.diyExtract);
+      if (extObj) add(extObj.rig, '① 提取适用');
+      const sepRigMap = { freeze: 'filter', acid_precip: 'filter', salting_out: 'filter', resin: 'resin', extract: 'extract', column: 'column', precip: 'filter' };
+      const sepRig = sepRigMap[ws.diySeparate] || 'filter';
+      add(sepRig, '② 分离纯化适用');
+      if (ws.diyExtract !== 'steam' && sepRig !== 'rotavap') add('rotavap', '③ 浓缩回收适用');
+      return out.length ? out : [{ key: canonicalRigKey(t.defaultRig), roleLabel: '① 核心适用' }];
+    }
+    if (Array.isArray(t.applicableRigs) && t.applicableRigs.length) {
+      const roles = ['① 提取/核心适用', '② 分离/浓缩适用', '③ 纯化/收尾适用', '④ 辅助适用'];
+      t.applicableRigs.forEach((rk, i) => add(rk, roles[i] || '适用装置'));
+      return out;
+    }
+    const mainRig = canonicalRigKey(t.defaultRig, 'reflux');
+    add(mainRig, '① 提取适用');
+    const sepMap = { freeze: 'filter', acid_precip: 'filter', salting_out: 'filter', resin: 'resin', extract: 'extract', column: 'column', precip: 'filter' };
+    if (t.defaultSep && sepMap[t.defaultSep] && sepMap[t.defaultSep] !== mainRig) {
+      add(sepMap[t.defaultSep], '② 分离纯化适用');
+    }
+    if (mainRig !== 'steam' && mainRig !== 'filter' && out.length < 3) {
+      add('rotavap', out.length === 1 ? '② 浓缩回收适用' : '③ 浓缩回收适用');
+    } else if (mainRig === 'steam' && !out.some(x => x.key === 'filter')) {
+      add('filter', '② 析晶抽滤适用');
+    }
+    return out;
+  }
+
+  // 为任意大流程步骤生成可操作小分支（优先用 AI/预设自定义，否则零消耗匹配内置小分支模板）
+  function getStepSubBranches(t, ws, stepObj, idx) {
+    if (Array.isArray(stepObj?.subBranches) && stepObj.subBranches.length) {
+      return stepObj.subBranches.slice(0, 4);
+    }
+    const sb = EXTRA_DATA.STAGE_SUBBRANCHES || {};
+    const stageStr = String(stepObj?.stage || '');
+    if (idx === 0 || /提取/.test(stageStr)) {
+      const extKey = (ws?.schemeMode === 'diy' ? ws.diyExtract : t.defaultExtract) || 'reflux';
+      return (sb.extract && sb.extract[extKey]) || (sb.extract && sb.extract.reflux) || [];
+    }
+    if (idx === 1 || /分离/.test(stageStr)) {
+      const sepKey = (ws?.schemeMode === 'diy' ? ws.diySeparate : t.defaultSep) || 'resin';
+      return (sb.separate && sb.separate[sepKey]) || (sb.separate && sb.separate.resin) || [];
+    }
+    if (/纯化|精制/.test(stageStr)) {
+      return sb.purify || [];
+    }
+    if (/检识|鉴定|分析/.test(stageStr)) {
+      return sb.detect || [];
+    }
+    return sb.purify || [];
+  }
+
   function hydrateTopic(entry) {
     if (Object.prototype.hasOwnProperty.call(FEATURED_PRESETS, entry.id)) return JSON.parse(JSON.stringify(FEATURED_PRESETS[entry.id]));
     const isVol = entry.category === '挥发油与萜类' || entry.prop === 'volatile';
@@ -1583,7 +1698,7 @@
 
   function createDefaultState() {
     return {
-      step: 1, rTab: 'bank', litFilter: '全部', activeTopicId: 'mint', sideQuery: '', sideCat: '全部', step1Tab: 'innovative', step1Query: '', step1Cat: '全部', theoryView: 'plain', drawerWide: false,
+      step: 1, lastWorkStep: 1, hubRig: 'steam', hubCat: '全部', univFilter: '全部', rTab: 'bank', litFilter: '全部', activeTopicId: 'mint', sideQuery: '', sideCat: '全部', step1Tab: 'innovative', step1Query: '', step1Cat: '全部', theoryView: 'plain', drawerWide: false,
       customTopics: {}, topicStates: {}, extraGlobalRefs: [],
       meta: {
         className: '药学 / 中药学专业', groupName: '实验设计组', date: new Date().toISOString().slice(0, 10), teacher: '',
@@ -1840,7 +1955,7 @@
     document.getElementById('linkWanfangQuick').href = `https://s.wanfangdata.com.cn/paper?q=${kw}`;
     document.getElementById('linkPubmedQuick').href = `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(t.latin.split(' ')[0] || t.herb)}`;
 
-    const tags = ['全部', '药典教材', '中药化学', '中西医结合', '高校实验'];
+    const tags = ['全部', '药典教材', '中药化学', '中西医结合', '高校实验', '药企中试'];
     const fb = document.getElementById('litFilterBar');
     fb.innerHTML = tags.map(tg => `<button type="button" data-lit-f="${tg}" class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${state.litFilter === tg ? 'bg-[#0a3630] text-white border-[#0a3630]' : 'bg-white text-slate-600 border-slate-200'}">${tg}</button>`).join('');
     fb.querySelectorAll('[data-lit-f]').forEach(b => b.addEventListener('click', () => { state.litFilter = b.dataset.litF; renderRightDrawer(t, ws); }));
@@ -1867,7 +1982,14 @@
     document.querySelectorAll('[data-side-q]').forEach(b => b.addEventListener('click', () => copyText(queries[Number(b.dataset.sideQ)].q, '已复制检索式')));
 
     // 3. 高校实验参考
-    document.getElementById('univCasesList').innerHTML = UNIV_CASES.map(u => `
+    const uTypes = ['全部', '高校实验', '药企中试', '药企QC', '中西医结合', '国家平台'];
+    const ufEl = document.getElementById('univFilterBar');
+    if (ufEl) {
+      ufEl.innerHTML = uTypes.map(tg => `<button type="button" data-univ-f="${tg}" class="px-2.5 py-1 rounded-full text-[10px] font-bold border ${state.univFilter === tg ? 'bg-[#0a3630] text-white border-[#0a3630]' : 'bg-white text-slate-600 border-slate-200'}">${tg}</button>`).join('');
+      ufEl.querySelectorAll('[data-univ-f]').forEach(b => b.addEventListener('click', () => { state.univFilter = b.dataset.univF; renderRightDrawer(t, ws); }));
+    }
+    const shownUniv = state.univFilter === '全部' ? UNIV_CASES : UNIV_CASES.filter(u => u.type === state.univFilter);
+    document.getElementById('univCasesList').innerHTML = shownUniv.map(u => `
       <div class="p-3.5 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 space-y-1">
         <div class="flex items-center justify-between"><span class="px-2 py-0.5 rounded-full bg-[#0a3630] text-emerald-200 text-[10px] font-bold">${u.univ}</span><a href="${u.url}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-[#0f5c54] underline">参考 ↗</a></div>
         <div class="text-xs font-bold text-slate-900 pt-0.5">${u.title}</div>
@@ -1909,7 +2031,8 @@
   function renderStep1(t) {
     const el = document.getElementById('step1HerbCards');
     const CLASS_ORDER = ['coptis','ginkgo_flav','forsythia','sophora','cassia','mint','senna','sedum','lonicera','phellodendron_flav','salvia','scutellaria','glycyrrhiza','andrographis','panax','pueraria','armeniaca','polygonum','panax_quinquefolius'];
-    const INNO_ORDER = ['clove','cnidium','carthamus','sophora_flavescens','epimedium','bupleurum','astragalus','angelica_dahurica','paeonia_lactiflora','prunella','paeonia_moutan','tea_caffeine','fraxinus','citrus','curcuma_longa','magnolia','schisandra','notoginseng','lycium','corydalis','gardenia','star_anise','periploca','anemarrhena'];
+    const EXTRA_INNO_IDS = Object.keys(EXTRA_DATA.EXTRA_PRESETS || {});
+    const INNO_ORDER = [...EXTRA_INNO_IDS, 'clove','cnidium','carthamus','sophora_flavescens','epimedium','bupleurum','astragalus','angelica_dahurica','paeonia_lactiflora','prunella','citrus','curcuma_longa','magnolia','schisandra','notoginseng','lycium','corydalis','gardenia','fraxinus','tea_caffeine','paeonia_moutan','star_anise','periploca','anemarrhena'];
     const tab = state.step1Tab || 'innovative';
     document.querySelectorAll('[data-s1-tab]').forEach(btn => {
       const active = btn.dataset.s1Tab === tab;
@@ -1940,7 +2063,22 @@
 
     const q = (state.step1Query || '').trim().toLowerCase();
     const curCat = state.step1Cat || '全部';
-    const RIG_SHORT = { steam: '水蒸气蒸馏', reflux: '加热回流', soxhlet: '索氏提取', ultrasound: '低温超声', filter: '酸水抽滤', extract: '分液萃取', column: '硅胶柱层析' };
+    const RIG_SHORT = { steam: '水蒸气蒸馏', reflux: '加热回流', soxhlet: '索氏提取', ultrasound: '低温超声', filter: '减压抽滤', extract: '液-液萃取', column: '硅胶柱层析', rotavap: '旋转蒸发', resin: '大孔树脂' };
+    const totalTopicsCount = CATALOG_45.length + Object.keys(state.customTopics || {}).length;
+    const innoCount = INNO_ORDER.filter(id => FEATURED_PRESETS[id]).length;
+    const classCount = CLASS_ORDER.filter(id => FEATURED_PRESETS[id]).length;
+    const allFeaturedCount = Object.keys(FEATURED_PRESETS).length;
+    const setTxt = (id, v) => { const x = document.getElementById(id); if (x) x.textContent = v; };
+    setTxt('bannerBankCount', totalTopicsCount);
+    setTxt('drawerBankCount', totalTopicsCount);
+    setTxt('btnStep1BankCnt', totalTopicsCount);
+    setTxt('bannerBankPill', `${totalTopicsCount} 项药材题库`);
+    setTxt('bannerRigPill', `${Object.keys(LAB_RIGS).length} 套动态实验装置`);
+    setTxt('bannerLitPill', `${GLOBAL_LITERATURE.length + state.extraGlobalRefs.length} 篇实证文献`);
+    setTxt('navHubCount', Object.keys(LAB_RIGS).length);
+    const tInno = document.querySelector('[data-s1-tab="innovative"]'); if (tInno) tInno.textContent = `✨ 创新拓展 (${innoCount}项)`;
+    const tClass = document.querySelector('[data-s1-tab="class"]'); if (tClass) tClass.textContent = `★ 经典精选 (${classCount}项)`;
+    const tAll = document.querySelector('[data-s1-tab="all"]'); if (tAll) tAll.textContent = `全部精编 (${allFeaturedCount}项)`;
     const cards = baseCards.filter(p => (curCat === '全部' || p.category === curCat) && (!q || `${p.herb} ${p.compound} ${p.category} ${p.integrative || ''} ${RIG_SHORT[p.defaultRig] || ''}`.toLowerCase().includes(q)));
 
     el.innerHTML = cards.map(p => {
@@ -2000,11 +2138,24 @@
 
   function renderWalkthrough(t) {
     const steps = t.steps || []; if (!steps.length) return;
+    const ws = getWorkState(t);
     walkIdx = walkIdx % steps.length; const cur = steps[walkIdx];
     document.getElementById('walkStagePill').textContent = `分镜 ${walkIdx + 1}/${steps.length} · ${cur.stage}`;
     document.getElementById('walkVisualTitle').textContent = cur.title;
     document.getElementById('walkPrinciple').textContent = cur.principle;
-    document.getElementById('walkQc').textContent = cur.qc;
+    document.getElementById('walkQc').textContent = cur.qc || '按左侧参数规范质控';
+    const subMount = document.getElementById('walkSubBranches');
+    if (subMount) {
+      const subs = getStepSubBranches(t, ws, cur, walkIdx);
+      subMount.innerHTML = subs.map((s, si) => `
+        <div class="p-2.5 rounded-xl bg-white/10 border border-white/15 space-y-1.5">
+          <div class="flex items-center justify-between gap-1">
+            <span class="text-[11px] font-bold text-emerald-200">${walkIdx + 1}.${si + 1} ${aiEsc(s.name || s.title)}</span>
+            <a href="${biliUrl(s.biliKw || getTopicShortBiliKw(t))}" target="_blank" rel="noopener noreferrer" class="px-2 py-0.5 rounded-full bg-pink-500/25 hover:bg-pink-500/40 text-pink-100 text-[10px] font-bold shrink-0">▶ B站</a>
+          </div>
+          <p class="text-[10.5px] text-teal-100/85 leading-relaxed">${aiEsc(s.detail || s.action || '')}</p>
+        </div>`).join('');
+    }
     const dots = document.getElementById('walkDots');
     dots.innerHTML = steps.map((_, i) => `<button type="button" data-walk-i="${i}" class="h-2 rounded-full transition ${i === walkIdx ? 'bg-emerald-300 w-5' : 'bg-white/25 w-2'}"></button>`).join('');
     dots.querySelectorAll('[data-walk-i]').forEach(b => b.addEventListener('click', () => { walkIdx = Number(b.dataset.walkI); renderWalkthrough(t); }));
@@ -2129,7 +2280,7 @@
             <div class="flex items-center gap-1.5 text-xs font-extrabold text-[#0a3630]">
               <span>📚</span><span>本课题关联文献与实证研究（GB/T 7714 规范）</span>
             </div>
-            <button id="btnOpenFullLitFromStep3" type="button" class="text-xs font-bold text-[#0f5c54] hover:underline">查看全部 34 篇文献库 ↗</button>
+            <button id="btnOpenFullLitFromStep3" type="button" class="text-xs font-bold text-[#0f5c54] hover:underline">查看全部 ${allLit.length} 篇文献库 ↗</button>
           </div>
           <div class="space-y-2">
             ${displayLit.map((item, idx) => `
@@ -2184,13 +2335,30 @@
     document.getElementById('diySchemeBox').classList.toggle('hidden', !isDiy);
 
     document.getElementById('classicRouteBanner').textContent = t.steps.map(s => s.title).join(' → ');
-    document.getElementById('classicStepsGrid').innerHTML = t.steps.map((s, i) => `
-      <div class="p-3.5 rounded-2xl bg-[#f7f7f4] border border-slate-200/70 space-y-1.5">
-        <div class="flex items-center gap-2"><span class="inline-flex items-center justify-center w-5 h-5 rounded-lg bg-[#0a3630] text-white text-[10px] font-extrabold shrink-0">${i + 1}</span><div class="text-xs font-bold text-slate-900">${aiEsc(s.title)}</div></div>
+    document.getElementById('classicStepsGrid').innerHTML = t.steps.map((s, i) => {
+      const subs = getStepSubBranches(t, ws, s, i);
+      return `
+      <div class="p-4 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 space-y-2">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="inline-flex items-center justify-center w-5 h-5 rounded-lg bg-[#0a3630] text-white text-[10px] font-extrabold shrink-0">${i + 1}</span>
+            <div class="text-xs font-extrabold text-slate-900 truncate">${aiEsc(s.title)}</div>
+          </div>
+          <span class="px-2 py-0.5 rounded-full bg-teal-50 text-[#0f5c54] text-[10px] font-bold shrink-0">${aiEsc(s.stage || ('阶段' + (i + 1)))}</span>
+        </div>
         <p class="text-[12px] text-slate-600 leading-relaxed"><strong class="text-[#0f5c54]">原理：</strong>${aiEsc(s.principle)}</p>
         ${s.operation ? `<p class="text-[11px] text-slate-700 leading-relaxed"><strong class="text-[#0f5c54]">操作：</strong>${aiEsc(s.operation)}${s.duration ? ' <span class="text-slate-400">（' + aiEsc(s.duration) + '）</span>' : ''}</p>` : ''}
         ${s.qc ? `<p class="text-[11px] text-amber-800 leading-relaxed"><strong>质控：</strong>${aiEsc(s.qc)}</p>` : ''}
-      </div>`).join('');
+        ${subs.length ? `<div class="pt-2 border-t border-slate-200/70 space-y-1.5">
+          <div class="text-[10.5px] font-extrabold text-slate-500">小分支操作与 B站微视频指引：</div>
+          ${subs.map((sub, si) => `
+            <div class="flex items-start justify-between gap-2 p-2 rounded-xl bg-white border border-slate-200/70 text-[11px]">
+              <div class="min-w-0"><strong class="text-[#0a3630]">${i + 1}.${si + 1} ${aiEsc(sub.name || sub.title)}：</strong><span class="text-slate-600">${aiEsc(sub.detail || sub.action || '')}</span></div>
+              <a href="${biliUrl(sub.biliKw || getTopicShortBiliKw(t))}" target="_blank" rel="noopener noreferrer" class="bili-pill shrink-0 !py-0.5 !px-2 !text-[10px]" title="B站精准检索：${aiEsc(sub.biliKw || '')}">▶ ${aiEsc((sub.biliKw || '视频').split(' ')[0])}</a>
+            </div>`).join('')}
+        </div>` : ''}
+      </div>`;
+    }).join('');
 
     const diagEl = document.getElementById('diySanityCheck');
     let warn = '';
@@ -2213,19 +2381,57 @@
     document.getElementById('diyNotesInput').value = ws.diyNotes || '';
 
     renderWalkthrough(t);
-    document.getElementById('vidBiliLink').href = `https://search.bilibili.com/all?keyword=${encodeURIComponent(`中药化学 ${t.herb} ${t.compound.split('、')[0]} 提取`)}`;
+    const shortKw = getTopicShortBiliKw(t); const bLink = document.getElementById('vidBiliLink'); bLink.href = biliUrl(shortKw); bLink.textContent = `B站精准搜「${shortKw}」 ↗`;
     document.getElementById('vidMoocLink').href = `https://www.icourse163.org/search.htm?search=${encodeURIComponent('中药化学')}`;
   }
 
   function getScaledEquipment(rig, ws) { const vol = (Number(ws.mass) || 0) * (Number(ws.ratio) || 0); const req = vol * 1.5; const sizes = [250, 500, 1000, 2000, 5000]; let flask = '1000mL圆底烧瓶'; if (req > 0) { const m = sizes.find(s => s >= req); flask = m ? `${m}mL圆底烧瓶` : '5000mL圆底烧瓶（建议分批提取）'; } return (rig.equipment || []).map(e => e === '1000mL圆底烧瓶' ? flask : e); }
   function renderStep4(t, ws) {
-    const rigKey = LAB_RIGS[ws.activeRig] ? ws.activeRig : 'steam', rig = LAB_RIGS[rigKey];
-    document.querySelectorAll('.rig-tab-btn').forEach(b => { const a = b.dataset.rig === rigKey; b.classList.remove('bg-[#0a3630]', 'text-white', 'bg-white', 'text-slate-600', 'shadow-sm', 'ring-2', 'ring-teal-500'); b.className = `rig-tab-btn shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition ${a ? 'bg-[#0a3630] text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'}`; b.setAttribute('aria-pressed', a ? 'true' : 'false'); }); const applyBtn = document.getElementById('applyRigToReportBtn'); if (applyBtn) { const applied = (ws.reportRig || rigKey) === rigKey; applyBtn.textContent = applied ? '已应用到报告 ✓' : '应用到报告'; }
+    const applicable = getApplicableRigs(t, ws);
+    const appKeys = applicable.map(x => x.key);
+    if (!appKeys.includes(ws.activeRig)) {
+      ws.activeRig = appKeys[0] || 'steam';
+      ws.activeHotspot = 1;
+    }
+    const rigKey = LAB_RIGS[ws.activeRig] ? ws.activeRig : (appKeys[0] || 'steam');
+    const rig = LAB_RIGS[rigKey];
+
+    const hintEl = document.getElementById('step4ContextHint');
+    if (hintEl) {
+      hintEl.textContent = `当前课题「${t.herb} · ${t.compound}」（${ws.schemeMode === 'diy' ? 'DIY 定制方案' : '经典方案'}）已智能锁定 ${applicable.length} 套适用装置，排除无关干扰。`;
+    }
+
+    const tabsEl = document.getElementById('step4ApplicableRigTabs');
+    if (tabsEl) {
+      const RIG_LABELS = { steam: '水蒸气蒸馏', reflux: '加热回流', soxhlet: '索氏提取', ultrasound: '低温超声', filter: '减压抽滤', extract: '分液液-液萃取', column: '硅胶柱层析', rotavap: '旋转蒸发浓缩', resin: '大孔树脂纯化' };
+      tabsEl.innerHTML = applicable.map(item => {
+        const active = item.key === rigKey;
+        return `<button type="button" data-app-rig="${item.key}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-extrabold border transition ${active ? 'bg-[#0a3630] text-white border-[#0a3630] shadow-md' : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-[#0f5c54] hover:bg-teal-50/50'}">
+          <span class="px-1.5 py-0.5 rounded-md text-[10px] ${active ? 'bg-emerald-400/25 text-emerald-100' : 'bg-teal-100 text-[#0f5c54]'}">${item.roleLabel}</span>
+          <span>${RIG_LABELS[item.key] || LAB_RIGS[item.key]?.title || item.key}</span>
+        </button>`;
+      }).join('');
+      tabsEl.querySelectorAll('[data-app-rig]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          ws.activeRig = btn.dataset.appRig;
+          ws.activeHotspot = 1;
+          saveState();
+          renderStep4(t, ws);
+        });
+      });
+    }
+
+    const applyBtn = document.getElementById('applyRigToReportBtn');
+    if (applyBtn) { const applied = (ws.reportRig || rigKey) === rigKey; applyBtn.textContent = applied ? '已应用到报告 ✓' : '应用到报告'; }
     document.getElementById('rigDiagramTitle').textContent = rig.title;
     document.getElementById('rigAssemblyOrder').innerHTML = `<strong>搭建顺序：</strong>${rig.order}`;
     const rigPt = document.getElementById('rigPlainTheoryText');
     if (rigPt) rigPt.textContent = rig.plainTheory || '利用理化性质差异实现成分高效富集。';
-    document.getElementById('rigVideoSearchLink').href = `https://search.bilibili.com/all?keyword=${encodeURIComponent(rig.videoKw)}`;
+    const vLink = document.getElementById('rigVideoSearchLink');
+    if (vLink) {
+      vLink.href = biliUrl(rig.videoKw);
+      vLink.textContent = `▶ B站搜「${rig.videoKw}」 ↗`;
+    }
     const sw = document.getElementById('rigSvgWrapper'); sw.innerHTML = rig.svg; sw.classList.add('rig-live');
     sw.querySelectorAll('[data-hotspot]').forEach(g => g.addEventListener('click', () => { ws.activeHotspot = Number(g.dataset.hotspot); saveState(); renderStep4(t, ws); }));
 
@@ -2236,6 +2442,26 @@
     document.getElementById('hotspotWarn').textContent = hs.warn;
     document.getElementById('rigEquipmentChips').innerHTML = getScaledEquipment(rig, ws).map(e => `<span class="px-2.5 py-1 rounded-lg bg-[#f4f3ee] text-slate-700 text-xs font-medium">${e}</span>`).join('');
 
+    // 渲染装置 4 步可操作小分支与精准 B站视频指引
+    const subBox = document.getElementById('rigSubStepsBox');
+    const subSteps = Array.isArray(rig.subSteps) ? rig.subSteps : [];
+    const subBadge = document.getElementById('rigSubStepsBadge');
+    if (subBadge) subBadge.textContent = `${subSteps.length} 个实操小分支`;
+    if (subBox) {
+      subBox.innerHTML = subSteps.map((s, idx) => `
+        <div class="subbranch-item space-y-2">
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-[#0a3630] text-emerald-200 text-[11px] font-extrabold shrink-0">${s.code || (idx + 1)}</span>
+              <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 leading-snug">${aiEsc(s.title)}</h4>
+            </div>
+            <a href="${biliUrl(s.biliKw || rig.videoKw)}" target="_blank" rel="noopener noreferrer" class="bili-pill shrink-0" title="精准B站检索：${aiEsc(s.biliKw || rig.videoKw)}">▶ ${aiEsc(s.biliKw || '看演示')} ↗</a>
+          </div>
+          <p class="text-xs text-slate-700 leading-relaxed">${aiEsc(s.action)}</p>
+          <div class="text-[11px] text-amber-900 bg-amber-50/80 border border-amber-200/70 rounded-lg px-2.5 py-1.5"><strong>⚠ 避坑要点：</strong>${aiEsc(s.tip)}</div>
+        </div>`).join('');
+    }
+
     const doneCnt = ws.sopDone.filter(Boolean).length, pct = t.sop.length ? Math.round(doneCnt / t.sop.length * 100) : 0;
     document.getElementById('sopProgressText').textContent = `${doneCnt}/${t.sop.length} (${pct}%)`;
     document.getElementById('sopProgressBar').style.width = `${pct}%`;
@@ -2244,6 +2470,121 @@
     sopEl.querySelectorAll('[data-sop-i]').forEach(chk => chk.addEventListener('change', () => { ws.sopDone[Number(chk.dataset.sopI)] = chk.checked; saveState(); renderStep4(t, ws); }));
 
     document.getElementById('troubleshootList').innerHTML = t.troubleshoot.map(tr => `<div class="p-3 rounded-2xl bg-amber-50/60 border border-amber-200/70 text-xs space-y-1"><div class="font-bold text-amber-950">${tr.issue}</div><div class="text-slate-600">成因：${tr.cause}</div><div class="text-[#0f5c54] font-bold">对策：${tr.fix}</div></div>`).join('');
+  }
+
+  // ============ 独立板块：动态流程与实验装置总览库渲染 ============
+  let hubHotspotId = 1;
+  function renderHub() {
+    const RIG_CATS = {
+      steam: '提取装置', reflux: '提取装置', soxhlet: '提取装置', ultrasound: '提取装置',
+      extract: '分离纯化', column: '分离纯化', resin: '分离纯化',
+      rotavap: '浓缩与固液分离', filter: '浓缩与固液分离'
+    };
+    const catList = ['全部', '提取装置', '分离纯化', '浓缩与固液分离'];
+    const curCat = state.hubCat || '全部';
+    const pillsEl = document.getElementById('hubFilterPills');
+    if (pillsEl) {
+      pillsEl.innerHTML = catList.map(c => {
+        const cnt = c === '全部' ? Object.keys(LAB_RIGS).length : Object.keys(LAB_RIGS).filter(k => RIG_CATS[k] === c).length;
+        return `<button type="button" data-hub-cat="${c}" class="px-3 py-1.5 rounded-full text-xs font-bold border transition ${curCat === c ? 'bg-[#0a3630] text-white border-[#0a3630]' : 'bg-white text-slate-600 border-slate-200 hover:border-[#0f5c54]'}">${c} (${cnt})</button>`;
+      }).join('');
+      pillsEl.querySelectorAll('[data-hub-cat]').forEach(b => b.addEventListener('click', () => { state.hubCat = b.dataset.hubCat; saveState(); renderHub(); }));
+    }
+
+    const keys = Object.keys(LAB_RIGS).filter(k => curCat === '全部' || RIG_CATS[k] === curCat);
+    if (!keys.includes(state.hubRig)) { state.hubRig = keys[0] || 'steam'; hubHotspotId = 1; }
+    const activeKey = state.hubRig;
+    const gridEl = document.getElementById('hubRigCardsGrid');
+    if (gridEl) {
+      gridEl.innerHTML = keys.map(k => {
+        const r = LAB_RIGS[k];
+        const sel = k === activeKey;
+        return `<button type="button" data-hub-rig="${k}" class="pick-card ${sel ? 'selected' : ''} text-left p-3.5 rounded-2xl bg-white border border-slate-200 space-y-1">
+          <div class="flex items-center justify-between gap-1.5">
+            <span class="px-2 py-0.5 rounded-full bg-teal-50 text-[#0f5c54] text-[10px] font-bold">${r.stageTag || RIG_CATS[k] || '实验装置'}</span>
+            <span class="text-[10px] text-slate-400 font-semibold">${(r.subSteps || []).length} 个小分支</span>
+          </div>
+          <div class="text-xs sm:text-sm font-extrabold text-slate-900 leading-snug">${aiEsc(r.title)}</div>
+          <div class="text-[11px] text-slate-500 line-clamp-1">${aiEsc((r.equipment || []).slice(0, 3).join(' · '))}</div>
+        </button>`;
+      }).join('');
+      gridEl.querySelectorAll('[data-hub-rig]').forEach(b => b.addEventListener('click', () => { state.hubRig = b.dataset.hubRig; hubHotspotId = 1; saveState(); renderHub(); }));
+    }
+
+    const mount = document.getElementById('hubRigDetailMount');
+    const rig = LAB_RIGS[activeKey];
+    if (!mount || !rig) return;
+    const hs = (rig.hotspots || []).find(h => h.id === hubHotspotId) || rig.hotspots[0];
+    const matchedHerbs = Object.values(FEATURED_PRESETS).filter(p => p.defaultRig === activeKey || (Array.isArray(p.applicableRigs) && p.applicableRigs.includes(activeKey))).slice(0, 8);
+    const subs = Array.isArray(rig.subSteps) ? rig.subSteps : [];
+
+    mount.innerHTML = `
+      <div class="lab-card rounded-3xl p-5 sm:p-6 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full bg-teal-50 text-[#0f5c54] text-[11px] font-bold">${aiEsc(rig.stageTag || RIG_CATS[activeKey] || '实验室装置')}</span>
+            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-1">${aiEsc(rig.title)}</h3>
+          </div>
+          <a href="${biliUrl(rig.videoKw)}" target="_blank" rel="noopener noreferrer" class="bili-pill">▶ B站搜「${aiEsc(rig.videoKw)}」 ↗</a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+          <div class="lg:col-span-7 rounded-2xl bg-gradient-to-b from-[#fbfcfa] to-[#e9f4f1] border border-slate-200 p-4 flex flex-col justify-between space-y-3">
+            <div id="hubSvgWrap" class="w-full flex items-center justify-center py-2 rig-live">${rig.svg}</div>
+            <div class="text-xs text-[#0a3630] bg-white/90 rounded-xl px-3.5 py-2.5 border border-teal-100"><strong>搭建顺序：</strong>${aiEsc(rig.order)}</div>
+            <div class="text-xs text-amber-950 bg-amber-50/90 rounded-xl px-3.5 py-2.5 border border-amber-200"><strong class="text-amber-900">💡 装置原理大白话：</strong>${aiEsc(rig.plainTheory || '')}</div>
+          </div>
+          <div class="lg:col-span-5 flex flex-col justify-between gap-3">
+            <div class="rounded-2xl bg-[#062420] text-white p-5 space-y-2">
+              <span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 text-xs font-bold">组件 #${hs.id}（点击左图编号切换）</span>
+              <h4 class="text-base font-bold">${aiEsc(hs.name)}</h4>
+              <p class="text-xs text-teal-50/90 leading-relaxed">${aiEsc(hs.desc)}</p>
+              <div class="p-2.5 rounded-xl bg-amber-400/15 border border-amber-300/30 text-xs text-amber-100"><strong class="text-amber-300">安全警示：</strong>${aiEsc(hs.warn)}</div>
+            </div>
+            <div class="rounded-2xl bg-white border border-slate-200 p-4 space-y-2">
+              <div class="text-xs font-extrabold text-slate-800">核心器材清单</div>
+              <div class="flex flex-wrap gap-1.5">${(rig.equipment || []).map(e => `<span class="px-2.5 py-1 rounded-lg bg-[#f4f3ee] text-slate-700 text-xs font-medium">${aiEsc(e)}</span>`).join('')}</div>
+            </div>
+            <div class="rounded-2xl bg-teal-50/60 border border-teal-200/80 p-4 space-y-2">
+              <div class="text-xs font-extrabold text-[#0a3630]">适用代表药材（点击一键载入工作台）</div>
+              <div class="flex flex-wrap gap-1.5">${matchedHerbs.length ? matchedHerbs.map(h => `<button type="button" data-hub-load-topic="${h.id}" class="px-2.5 py-1 rounded-full bg-white border border-teal-200 text-[#0f5c54] hover:bg-[#0a3630] hover:text-white text-[11px] font-bold transition">${aiEsc(h.herb)} · ${aiEsc(h.compound.split('、')[0])}</button>`).join('') : '<span class="text-xs text-slate-500">适用于各类定制工艺流程</span>'}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-2 border-t border-slate-100">
+          <div class="flex items-center justify-between">
+            <h4 class="text-sm font-extrabold text-slate-900">🧩 装置搭建与实操 4 大分步小分支（附精准 B站视频）</h4>
+            <span class="text-[11px] text-slate-400">每个小步骤独立匹配 1~2 词高命中检索</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            ${subs.map((s, idx) => `
+              <div class="subbranch-item space-y-2">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-[#0a3630] text-emerald-200 text-[11px] font-extrabold shrink-0">${s.code || (idx + 1)}</span>
+                    <div class="text-xs sm:text-sm font-extrabold text-slate-900">${aiEsc(s.title)}</div>
+                  </div>
+                  <a href="${biliUrl(s.biliKw || rig.videoKw)}" target="_blank" rel="noopener noreferrer" class="bili-pill shrink-0">▶ ${aiEsc(s.biliKw || '看演示')} ↗</a>
+                </div>
+                <p class="text-xs text-slate-700 leading-relaxed">${aiEsc(s.action)}</p>
+                <div class="text-[11px] text-amber-900 bg-amber-50/80 border border-amber-200/70 rounded-lg px-2.5 py-1.5"><strong>⚠ 避坑要点：</strong>${aiEsc(s.tip)}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+
+    mount.querySelectorAll('[data-hotspot]').forEach(g => g.addEventListener('click', () => { hubHotspotId = Number(g.dataset.hotspot); renderHub(); }));
+    mount.querySelectorAll('[data-hub-load-topic]').forEach(btn => btn.addEventListener('click', () => {
+      state.activeTopicId = btn.dataset.hubLoadTopic;
+      state.step = 4;
+      state.lastWorkStep = 4;
+      const nt = getTopicDef(), nws = getWorkState(nt);
+      nws.activeRig = activeKey;
+      saveState();
+      renderAll();
+      showToast(`已载入「${nt.herb}」并定位至适用装置页`);
+    }));
   }
 
   function renderStep5(t, ws, stats) {
@@ -2299,6 +2640,37 @@
     const ce = document.getElementById('chemTestsList');
     ce.innerHTML = ws.chemTests.map((x, i) => `<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl border ${x.passed ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/40 border-rose-200'}"><span class="text-xs text-slate-800">${i + 1}. ${x.name}</span><button type="button" data-tog-c="${i}" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-white ${x.passed ? 'bg-emerald-600' : 'bg-rose-600'}">${x.passed ? '符合' : '待复检'}</button></div>`).join('');
     ce.querySelectorAll('[data-tog-c]').forEach(b => b.addEventListener('click', () => { ws.chemTests[Number(b.dataset.togC)].passed = !ws.chemTests[Number(b.dataset.togC)].passed; saveState(); renderAll(); }));
+
+    // 渲染 0-Token 本地智能数据诊断与报告讨论草稿
+    const diagCard = document.getElementById('step5AutoDiagCard');
+    if (diagCard) {
+      const yieldVerdict = stats.count
+        ? (stats.meets ? `平均粗提收率 ${stats.avgCrude.toFixed(2)}% 高于参考限度（${stats.limit}%），工艺提取充分。` : `平均粗提收率 ${stats.avgCrude.toFixed(2)}% 低于参考限度（${stats.limit}%），建议核查药材粉碎目数（当前 ${ws.mesh}）、延长提取时长或将提取次数由 ${ws.cycles} 次增至 3 次。`)
+        : '尚未录入平行批次数据，可点击左侧「演示数据」或手动录入 3 批数据。';
+      const rsdVerdict = stats.count >= 2
+        ? (stats.rsd < 3 ? `平行重复性极佳（RSD = ${stats.rsd.toFixed(2)}% < 3%），操作稳定可靠。` : stats.rsd <= 5 ? `平行重复性合格（RSD = ${stats.rsd.toFixed(2)}% ≤ 5%），满足常规质控要求。` : `平行波动偏大（RSD = ${stats.rsd.toFixed(2)}% > 5%），建议重点排查批次间温度波动、抽滤残留或浓缩挂壁损失。`)
+        : '需录入至少 2 批平行数据以核算 RSD。';
+      const tlcVerdict = stats.tlcValid
+        ? (stats.tlcOk ? `TLC 定性确证通过（供试品 Rf=${stats.sampleRf.toFixed(2)}，对照品 Rf=${stats.refRf.toFixed(2)}，|ΔRf|=${stats.deltaRf.toFixed(3)} ≤ 0.03）。` : `TLC 斑点存在偏差（|ΔRf|=${stats.deltaRf.toFixed(3)} > 0.03），建议检查展开缸预饱和时间与点样浓度。`)
+        : '请完善 TLC 前沿与斑点位移数值。';
+      const draftPara = `本实验采用${ws.solventType}（料液比 1:${ws.ratio}，${ws.temp}℃，${ws.time} min，${ws.cycles}次）提取${t.herb}中的${t.compound}。${yieldVerdict}${rsdVerdict}${tlcVerdict}综合理化显色与薄层对照结果（通过率 ${stats.passedTests}/${stats.totalTests}），所建工艺具备良好的教学复现性与质控依据。`;
+      diagCard.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-extrabold">0-Token 本地诊断</span>
+            <h3 class="text-sm font-extrabold text-slate-900">实验数据自动诊断与讨论段落生成</h3>
+          </div>
+          <button id="btnCopyStep5Draft" type="button" class="px-3 py-1 rounded-xl bg-[#0a3630] text-white text-xs font-bold hover:bg-[#062420] transition">复制讨论段落写入报告</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+          <div class="p-3 rounded-2xl ${stats.meets ? 'bg-emerald-50/70 border-emerald-200' : 'bg-amber-50/70 border-amber-200'} border text-slate-700 leading-relaxed"><strong class="block text-slate-900 mb-0.5">① 收率达标诊断</strong>${yieldVerdict}</div>
+          <div class="p-3 rounded-2xl ${stats.rsd <= 5 ? 'bg-teal-50/70 border-teal-200' : 'bg-rose-50/70 border-rose-200'} border text-slate-700 leading-relaxed"><strong class="block text-slate-900 mb-0.5">② 平行性 RSD 诊断</strong>${rsdVerdict}</div>
+          <div class="p-3 rounded-2xl ${stats.tlcOk ? 'bg-indigo-50/70 border-indigo-200' : 'bg-amber-50/70 border-amber-200'} border text-slate-700 leading-relaxed"><strong class="block text-slate-900 mb-0.5">③ TLC 定性诊断</strong>${tlcVerdict}</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 text-xs text-slate-700 leading-relaxed"><strong class="text-[#0a3630]">可直接写入第 6 步报告的讨论参考：</strong>${draftPara}</div>`;
+      const copyBtn = document.getElementById('btnCopyStep5Draft');
+      if (copyBtn) copyBtn.onclick = () => { ws.aiConclusion = draftPara; saveState(); copyText(draftPara, '已复制并同步写入第 6 步报告结论'); };
+    }
   }
 
   function buildReportInnerHtml(t, ws, stats) {
@@ -2350,19 +2722,21 @@
     try {
       const aiBox = document.getElementById('aiPlanShowcase'); if (aiBox && aiBox.dataset.topicId && aiBox.dataset.topicId !== state.activeTopicId) aiBox.classList.add('hidden');
       const t = getTopicDef(), ws = getWorkState(t), stats = computeStats(t, ws);
+      const isHub = state.step === 'hub';
       const meta = STEP_META[state.step] || STEP_META[1];
       document.getElementById('headerStepTag').textContent = meta.tag;
       document.getElementById('headerTitle').textContent = meta.title;
-      document.getElementById('topLinearProgress').style.width = `${(state.step / 6 * 100).toFixed(1)}%`;
-      document.getElementById('mobStepIndicator').textContent = `0${state.step}/06 · ${meta.title}`;
-      document.getElementById('btnMobPrev').disabled = state.step <= 1;
-      document.getElementById('btnMobNext').disabled = state.step >= 6;
-      document.getElementById('btnMobPrev').textContent = state.step > 1 ? `← ${STEP_META[state.step - 1]?.title || '上一步'}` : '← 上一步';
-      document.getElementById('btnMobNext').textContent = state.step < 6 ? `${STEP_META[state.step + 1]?.title || '下一步'} →` : '已完成报告';
+      document.getElementById('topLinearProgress').style.width = isHub ? '100%' : `${(Number(state.step) / 6 * 100).toFixed(1)}%`;
+      document.getElementById('mobStepIndicator').textContent = isHub ? '装置与工艺库' : `0${state.step}/06 · ${meta.title}`;
+      document.getElementById('btnMobPrev').disabled = isHub || Number(state.step) <= 1;
+      document.getElementById('btnMobNext').disabled = isHub || Number(state.step) >= 6;
+      document.getElementById('btnMobPrev').textContent = !isHub && state.step > 1 ? `← ${STEP_META[state.step - 1]?.title || '上一步'}` : '← 上一步';
+      document.getElementById('btnMobNext').textContent = !isHub && state.step < 6 ? `${STEP_META[state.step + 1]?.title || '下一步'} →` : '已完成报告';
 
-      document.querySelectorAll('#wizardNav .step-chip').forEach(btn => {
-        const n = Number(btn.dataset.wstep); btn.classList.remove('active', 'done');
-        if (n === state.step) btn.classList.add('active'); else if (n < state.step) btn.classList.add('done');
+      document.querySelectorAll('#wizardNav [data-wstep]').forEach(btn => {
+        const rawStep = btn.dataset.wstep; btn.classList.remove('active', 'done');
+        if (rawStep === 'hub') { if (isHub) btn.classList.add('active'); }
+        else { const n = Number(rawStep); if (!isHub && n === state.step) btn.classList.add('active'); else if (!isHub && n < state.step) btn.classList.add('done'); }
       });
       document.querySelectorAll('.wpanel').forEach(p => p.classList.add('hidden'));
       const curP = document.getElementById(`wpanel-${state.step}`);
@@ -2376,6 +2750,7 @@
       if (state.step === 4) renderStep4(t, ws);
       if (state.step === 5) renderStep5(t, ws, stats);
       if (state.step === 6) renderStep6(t, ws, stats);
+    if (state.step === 'hub') renderHub();
       if (typeof lucide !== 'undefined') lucide.createIcons();
     } catch (error) {
       console.error('工作台渲染失败，请检查存档或刷新重试。', error);
@@ -2475,8 +2850,24 @@
     });
 
     // 6步导航
-    document.querySelectorAll('#wizardNav [data-wstep]').forEach(b => b.addEventListener('click', () => { if (autoRunning) cancelActiveAI(); state.step = Number(b.dataset.wstep); stopWalkthrough(); saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
-    document.querySelectorAll('[data-go-step]').forEach(b => b.addEventListener('click', () => { if (autoRunning) cancelActiveAI(); state.step = Number(b.dataset.goStep); stopWalkthrough(); saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
+    document.querySelectorAll('#wizardNav [data-wstep], [data-go-step]').forEach(btn => btn.addEventListener('click', () => {
+      const rawTarget = btn.dataset.wstep || btn.dataset.goStep;
+      if (rawTarget === 'hub') {
+        if (state.step === 3) stopWalkthrough();
+        if (state.step !== 'hub') state.lastWorkStep = state.step;
+        state.step = 'hub'; saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      const target = Number(rawTarget);
+      if (target >= 1 && target <= 6) {
+        if (state.step === 3 && target !== 3) stopWalkthrough();
+        state.step = target; state.lastWorkStep = target; saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }));
+    const btnJumpHub = document.getElementById('btnJumpHubFromStep4');
+    if (btnJumpHub) btnJumpHub.addEventListener('click', () => { state.lastWorkStep = 4; state.step = 'hub'; saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    const btnBackWf = document.getElementById('btnBackToWorkflow');
+    if (btnBackWf) btnBackWf.addEventListener('click', () => { state.step = state.lastWorkStep || 1; saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
     document.getElementById('btnMobPrev').addEventListener('click', () => { if (state.step > 1) { if (autoRunning) cancelActiveAI(); state.step--; stopWalkthrough(); saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
     document.getElementById('btnMobNext').addEventListener('click', () => { if (state.step < 6) { if (autoRunning) cancelActiveAI(); state.step++; stopWalkthrough(); saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
 
@@ -2940,6 +3331,19 @@
     out.limitVal = finiteNumber(raw.limitVal, 1, 0, 1000);
     const requestedRig = raw.defaultRig === 'funnel' ? 'extract' : raw.defaultRig;
     out.defaultRig = Object.prototype.hasOwnProperty.call(LAB_RIGS, requestedRig) ? requestedRig : 'reflux';
+    out.applicableRigs = (Array.isArray(raw.applicableRigs) ? raw.applicableRigs : []).map(r => canonicalRigKey(r, '')).filter(Boolean).slice(0, 4);
+    if (!out.applicableRigs.includes(out.defaultRig)) out.applicableRigs.unshift(out.defaultRig);
+    if (raw.tlcDefault && typeof raw.tlcDefault === 'object') {
+      out.tlcDefault = { front: finiteNumber(raw.tlcDefault.front, 8.0, 2, 15), sample: finiteNumber(raw.tlcDefault.sample, 4.0, 0.5, 14), ref: finiteNumber(raw.tlcDefault.ref, 4.1, 0.5, 14) };
+    }
+    if (Array.isArray(raw.sampleBatches) && raw.sampleBatches.length) {
+      out.sampleBatches = raw.sampleBatches.slice(0, 3).map(b => ({
+        mass: finiteNumber(b.mass, out.cfg?.mass || 50, 1, 5000),
+        crude: finiteNumber(b.crude, 0.85, 0.01, 500),
+        refined: finiteNumber(b.refined, 0.62, 0.01, 500),
+        mp: finiteNumber(b.mp, 0, 0, 450)
+      }));
+    }
     const extracts = ['steam', 'reflux', 'soxhlet', 'ultrasound', 'acid_water', 'boil_enzyme'];
     const separations = ['freeze', 'acid_precip', 'salting_out', 'resin', 'extract', 'column', 'precip'];
     out.defaultExtract = extracts.includes(raw.defaultExtract) ? raw.defaultExtract : '';
@@ -2954,6 +3358,13 @@
     out.steps = (Array.isArray(raw.steps) ? raw.steps : []).filter((s) => s && typeof s === 'object' && !Array.isArray(s)).slice(0, 8).map((s) => {
       const step = {};
       ['stage', 'title', 'principle', 'operation', 'reagents', 'apparatus', 'duration', 'qc'].forEach((key) => { step[key] = safeAIString(s[key], 5000); });
+      if (Array.isArray(s.subBranches)) {
+        step.subBranches = s.subBranches.filter(b => b && typeof b === 'object').slice(0, 4).map(b => ({
+          name: safeAIString(b.name || b.title, 120),
+          detail: safeAIString(b.detail || b.action, 400),
+          biliKw: safeAIString(b.biliKw, 40)
+        })).filter(b => b.name);
+      }
       return step;
     });
     const stringArray = (value, maxItems = 12) => (Array.isArray(value) ? value : []).filter((x) => typeof x === 'string' || typeof x === 'number').slice(0, maxItems).map((x) => safeAIString(x, 2000)).filter(Boolean);
@@ -2984,6 +3395,7 @@
         category: plan.category || '黄酮',
         isCustom: true, isAiGenerated: true, spectra: plan.spectra || null,
         defaultRig: rig,
+        applicableRigs: plan.applicableRigs && plan.applicableRigs.length ? plan.applicableRigs : [rig, 'rotavap', 'filter'],
         defaultExtract: plan.defaultExtract || (rig === 'steam' ? 'steam' : rig === 'ultrasound' ? 'ultrasound' : 'reflux'),
         defaultSep: plan.defaultSep || 'resin',
         formulas: rig === 'steam' ? ['distill', 'diffusion', 'qc'] : ['henderson', 'diffusion', 'qc'],
@@ -2998,7 +3410,7 @@
         integrative: plan.integrative || plan.aiAdvice || '',
         scaling: { auxName: '分离纯化辅料', auxFactor: 0.30, auxUnit: 'g', yieldLow: 0.01, yieldHigh: 0.025, yieldUnit: rig === 'steam' ? 'mL' : 'g' },
         tlcSystem: plan.tlcSystem || `硅胶 G 板，按《中国药典》${plan.herb}项下展开剂对照。`,
-        tlcDefault: { front: 8.0, sample: 4.1, ref: 4.2 },
+        tlcDefault: plan.tlcDefault || { front: 8.0, sample: 4.1, ref: 4.2 },
         steps: Array.isArray(plan.steps) && plan.steps.length ? plan.steps : [
           { stage: '提取', title: '目标成分高效提取', principle: '依据菲克第一扩散定律优化传质。', qc: '控温防降解。' },
           { stage: '分离', title: '杂质去除与富集', principle: '按极性与酸碱性差异实现分离。', qc: '收集目标部位。' },
@@ -3008,7 +3420,7 @@
         troubleshoot: Array.isArray(plan.troubleshoot) && plan.troubleshoot.length ? plan.troubleshoot : [{ issue: '收率偏低', cause: '提取时间或溶剂比例不足。', fix: '适当提高料液比或增加提取次数。' }],
         sop: Array.isArray(plan.sop) && plan.sop.length ? plan.sop : ['药材前处理称量', '按设定参数提取', '分离纯化富集', '浓缩干燥计收率', '显色与TLC检识'],
         chemTests: Array.isArray(plan.chemTests) && plan.chemTests.length ? plan.chemTests : [{ name: '特征化学显色阳性', passed: true }, { name: 'TLC 对照品单斑一致', passed: true }],
-        demoBatches: [{ mass: Number(plan.cfg?.mass) || 50, crude: 0.85, refined: 0.62, mp: 0 }, { mass: Number(plan.cfg?.mass) || 50, crude: 0.91, refined: 0.66, mp: 0 }, { mass: Number(plan.cfg?.mass) || 50, crude: 0.88, refined: 0.64, mp: 0 }]
+        demoBatches: plan.sampleBatches && plan.sampleBatches.length ? plan.sampleBatches : [{ mass: Number(plan.cfg?.mass) || 50, crude: 0.85, refined: 0.62, mp: 0 }, { mass: Number(plan.cfg?.mass) || 50, crude: 0.91, refined: 0.66, mp: 0 }, { mass: Number(plan.cfg?.mass) || 50, crude: 0.88, refined: 0.64, mp: 0 }]
       };
     }
 
@@ -3032,6 +3444,8 @@
         ph: plan.cfg.ph || ws.ph
       });
     }
+    if (plan.tlcDefault) ws.tlc = { ...plan.tlcDefault };
+    if (plan.sampleBatches && plan.sampleBatches.length) ws.batches = plan.sampleBatches.map(b => ({ ...b }));
     if (plan.aiConclusion) ws.aiConclusion = plan.aiConclusion; if (Array.isArray(plan.recommendedRefs)) { plan.recommendedRefs.slice(0, 3).forEach(r => { if (r && !state.extraGlobalRefs.some(x => x.text === r)) state.extraGlobalRefs.unshift({ tag: 'AI推荐', text: r, url: '' }); }); } if (createdNewInBank) state.step1Tab = 'ai_custom'; saveState();
     renderAll();
 
@@ -3162,9 +3576,50 @@
         btnEl.disabled = true;
         btnTxt.textContent = '公共 AI 编排中...';
         const pBox = document.getElementById('qwenProgressBox'); const pBar = document.getElementById('qwenProgressBar'); const pStage = document.getElementById('qwenProgressStageText'); const pTimer = document.getElementById('qwenProgressTimer'); const setStage = (idx, txt, pct) => { if (pStage) pStage.textContent = txt; if (pBar) pBar.style.width = pct + '%'; [1,2,3,4].forEach(n => { const s = document.getElementById('qwenStep' + n); if (s) s.className = n <= idx ? 'text-teal-700 font-bold' : 'text-slate-400'; }); }; if (pBox) pBox.classList.remove('hidden'); const t0 = Date.now(); if (pTimer) pTimer.textContent = '0.0s'; const pInt = setInterval(() => { if (pTimer) pTimer.textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's'; }, 100); setStage(1, '正在检索题库文献...', 20); const ragCtx = searchSiteKnowledge(prompt); setStage(2, '正在连接智谱 GLM 免费通道...', 38);
+        const aiScene = document.getElementById('aiSceneSelect')?.value || '高校本科教学(3~4学时)';
+        const aiGreen = document.getElementById('aiGreenSelect')?.value || '绿色无氯仿优先';
+        const aiTpl = document.getElementById('aiTemplateSelect')?.value || '全板块一键贯通';
+        const localFirst = document.getElementById('aiLocalFirstToggle')?.checked !== false;
+        const forceCloud = autoForm.dataset.forceCloud === '1';
+        autoForm.dataset.forceCloud = '0';
+        const forceBtn = document.getElementById('btnForceCloudAi');
+        if (forceBtn) forceBtn.classList.add('hidden');
+
+        // 省流优先：若命中内置精编 55 项题库且未要求强制云端定制，则 0 Token 秒出全套方案
+        const hasComplexMod = /改良|对照|对比|双提|微针|低共熔|纳米|正交|优化方案|定制|比较/.test(prompt);
+        const exactFullPreset = Object.values(FEATURED_PRESETS).find(p => p && prompt.includes(p.herb));
+        const exactPreset = exactFullPreset || Object.values(FEATURED_PRESETS).find(p => p && (prompt.includes(p.herb.replace(/（.*?）/g, '')) || (p.compound && prompt.includes(p.compound.split(/[、/+（(]/)[0]))));
+        if (localFirst && !forceCloud && exactPreset && (exactFullPreset || !hasComplexMod)) {
+          setStage(3, '命中内置精编库（0 Token 秒出），同步全工作台...', 82);
+          const localPlan = normalizeAiPlan({
+            ...exactPreset,
+            matchedId: exactPreset.id,
+            isNewTopic: false,
+            cfg: exactPreset.defaultCfg,
+            sampleBatches: exactPreset.demoBatches,
+            aiAdvice: `⚡ 已开启「省流优先」：精准命中内置精编课题「${exactPreset.herb} · ${exactPreset.compound}」（0 Token 消耗），已同步全部 6 步参数、适用装置与分步视频；如需按「${aiScene} / ${aiGreen}」深度改写，可点击下方蓝色按钮调用云端 AI。`,
+            aiConclusion: `本课题依据内置精编方案与《中国药典》参考限度（≥${exactPreset.limitVal}${exactPreset.limitUnit}）自动配置，请在第 4 步查看适用装置小分支并在第 5 步录入实测数据。`
+          });
+          lastAIProviderLabel = '内置精编库 · 0 Token 秒出';
+          applyAiPlanToWorkbench(localPlan, false, ragCtx);
+          if (forceBtn) {
+            forceBtn.classList.remove('hidden');
+            forceBtn.onclick = () => { autoForm.dataset.forceCloud = '1'; autoForm.dispatchEvent(new Event('submit', { cancelable: true })); };
+          }
+          clearInterval(pInt);
+          if (pBox) pBox.classList.add('hidden');
+          btnEl.disabled = false;
+          btnTxt.textContent = '调度公共 AI · 自动编排';
+          autoRunning = false;
+          activeAIController = null;
+          updateQwenStatusUI();
+          return;
+        }
+
         try {
           if (isQwenReady()) {
-            const ragText = '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '\n【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '\n';
+            const precondText = `【用户前置条件】实验场景：${aiScene}；绿色与溶剂约束：${aiGreen}；输出模板侧重：${aiTpl}。\n`;
+            const ragText = precondText + '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '\n【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '\n';
             const sysPrompt = ragText + `你是“本草智研 · 中药化学智能实验设计工作台”的首席课程导师与排版编排引擎。你的输出将直接渲染到网站的 6 大结构化视觉模块（1.创新设计四宫格 2.动态流程图 3.双栏四步工艺详解卡 4.可勾选SOP规程 5.题库文献区 6.排障与导师结论卡），因此必须严格遵守以下内容深度与版面均衡规范：
 【硬性规范】
 1. 必须严格输出合法 JSON（不要 markdown 代码块、不要额外解释文字）。
@@ -3193,13 +3648,14 @@
   "recommendedRefs": ["[1] 作者. 题名[J]. 期刊, 年, 卷(期): 页码.", "[2] 作者. 题名[J]. 期刊, 年, 卷(期): 页码."],
   "spectra": { "chapter": "对应教材章节", "uv": "UV最大吸收波长与带型解析", "nmr": "1H-NMR/13C-NMR特征化学位移解析" },
   "rigAnalysis": "所选实验装置的传质传热原理与安全运行要点",
-  "defaultRig": "steam|reflux|soxhlet|ultrasound|filter|extract|column",
+  "defaultRig": "steam|reflux|soxhlet|ultrasound|filter|extract|column|rotavap|resin",
+  "applicableRigs": ["steam|reflux|soxhlet|ultrasound|filter|extract|column|rotavap|resin", "第2适用装置"],
   "defaultExtract": "steam|reflux|soxhlet|ultrasound|acid_water|boil_enzyme",
   "defaultSep": "freeze|acid_precip|salting_out|resin|extract|column|precip",
   "cfg": { "mass": 50, "ratio": 10, "temp": 75, "time": 60, "mesh": "中粉(40目)", "cycles": "2", "solventType": "70%乙醇", "ph": "中性 7.0" },
   "tlcSystem": "35~65字：硅胶板类型、展开剂精确体积比、检视波长与显色剂及预期Rf范围",
   "steps": [
-    { "stage": "提取", "title": "步骤名", "principle": "25~45字化学原理", "operation": "45~75字操作方法（含用量、温度、时长与手法）", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 45 min", "qc": "关键质控红线" },
+    { "stage": "提取", "title": "步骤名", "principle": "25~45字化学原理", "operation": "45~75字操作方法（含用量、温度、时长与手法）", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 45 min", "qc": "关键质控红线", "subBranches": [{"name": "小分支名", "detail": "20~40字具体实操动作", "biliKw": "1~2个高命中B站短词如 水蒸气蒸馏"}] },
     { "stage": "分离", "title": "步骤名", "principle": "25~45字化学原理", "operation": "45~75字操作方法", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 30 min", "qc": "关键质控红线" },
     { "stage": "纯化", "title": "步骤名", "principle": "25~45字化学原理", "operation": "45~75字操作方法", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 35 min", "qc": "关键质控红线" },
     { "stage": "检识", "title": "步骤名", "principle": "25~45字化学原理", "operation": "45~75字操作方法", "reagents": "试剂与用量", "apparatus": "主要仪器", "duration": "如 25 min", "qc": "关键质控红线" }
@@ -3213,7 +3669,9 @@
   "chemTests": [{ "name": "特征显色反应1", "passed": true }, { "name": "特征显色反应2", "passed": true }, { "name": "TLC对照品共色谱", "passed": true }],
   "expectedYield": "按投料量估算的粗提物/精制品预期收率区间与依据",
   "aiConclusion": "80~140字：预期收率区间、3批平行RSD质控讨论及TLC/UV结构确证结论",
-  "aiAdvice": "50~85字：本科课时拆解建议与通风/防爆/废液回收安全提醒"
+  "tlcDefault": { "front": 8.0, "sample": 4.2, "ref": 4.3 },
+  "sampleBatches": [{"mass": 50, "crude": 0.92, "refined": 0.65, "mp": 0}, {"mass": 50, "crude": 0.96, "refined": 0.68, "mp": 0}, {"mass": 50, "crude": 0.94, "refined": 0.66, "mp": 0}],
+  "aiAdvice": "50~85字：贴合所选实验场景的课时/中试排期建议与通风/防爆/废液回收安全提醒"
 }`;
             const raw = await callQwenAPI([
               { role: 'system', content: sysPrompt },
@@ -3257,6 +3715,19 @@
     }
 
     // Qwen Q&A Chat Toggle & Submit
+    const chatTplMount = document.getElementById('aiChatTemplateChips');
+    if (chatTplMount && Array.isArray(EXTRA_DATA.AI_CHAT_TEMPLATES)) {
+      chatTplMount.innerHTML = EXTRA_DATA.AI_CHAT_TEMPLATES.map((tpl, idx) =>
+        `<button type="button" data-chat-tpl="${idx}" class="px-2.5 py-1 rounded-full bg-white hover:bg-teal-50 border border-slate-200 hover:border-[#0f5c54] text-[11px] font-bold text-slate-700 hover:text-[#0a3630] transition">${tpl.label}</button>`
+      ).join('');
+      chatTplMount.querySelectorAll('[data-chat-tpl]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tpl = EXTRA_DATA.AI_CHAT_TEMPLATES[Number(btn.dataset.chatTpl)];
+          const inp = document.getElementById('qwenChatInput');
+          if (tpl && inp) { inp.value = tpl.prompt; inp.focus(); }
+        });
+      });
+    }
     const btnToggleChat = document.getElementById('btnToggleQwenChat');
     if (btnToggleChat) btnToggleChat.addEventListener('click', () => document.getElementById('qwenChatBox').classList.toggle('hidden'));
     const btnClearChat = document.getElementById('btnClearQwenChat');
@@ -3353,7 +3824,9 @@
 
         const t = getTopicDef();
         const ws = getWorkState(t);
-        const ctx = `当前实验课题：${t.herb}（${t.compound}，类别：${t.category}）。左侧参数：投料${ws.mass}g、料液比1:${ws.ratio}、溶剂${ws.solventType}、温度${ws.temp}℃、时间${ws.time}min、pH:${ws.ph}。薄层系统：${t.tlcSystem}。`;
+        const statsNow = computeStats(t, ws);
+        const appRigsTxt = getApplicableRigs(t, ws).map(x => LAB_RIGS[x.key]?.title || x.key).join(' → ');
+        const ctx = `当前实验课题：${t.herb}（${t.compound}，类别：${t.category}）。适用装置：${appRigsTxt}。左侧参数：投料${ws.mass}g、料液比1:${ws.ratio}、溶剂${ws.solventType}、温度${ws.temp}℃、时间${ws.time}min、pH:${ws.ph}。薄层系统：${t.tlcSystem}。当前实测统计：批次数${statsNow.count}、平均粗提收率${statsNow.avgCrude.toFixed(2)}%、RSD=${statsNow.rsd.toFixed(2)}%。`;
         let ans = '';
         try {
           if (isQwenReady()) {

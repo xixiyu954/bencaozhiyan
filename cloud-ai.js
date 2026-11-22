@@ -6,11 +6,16 @@
   const NETLIFY_SITE_URL = 'https://tcm-chemistry-lab.netlify.app';
   const PROXY_PATH = '/.netlify/functions/ai-proxy';
   const DEFAULT_MODEL = 'glm-4-flash-250414';
+  const CACHE_KEY = 'tcm_ai_resp_cache_v1';
+  const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 小时缓存，大幅降低重复请求 AI 消耗
+  const MAX_CACHE_ENTRIES = 30;
+
   const PROVIDERS = {
     qwen: { label: '智谱 GLM 免费通道', timeoutMs: 85000 }
   };
 
   let lastProvider = null;
+  let sessionCacheHits = 0;
 
   function resolveProxyUrl() {
     try {
@@ -48,6 +53,61 @@
       safe.unshift({ role: 'system', content: '你是本草智研的中药化学实验助教。回答严谨、简洁，不编造标准或文献。' });
     }
     return safe.map((item) => ({ role: item.role || 'user', content: item.content.slice(0, 24000) }));
+  }
+
+  function hashKey(messages, expectJson) {
+    const raw = (expectJson ? 'J:' : 'T:') + messages.map((m) => `${m.role}:${m.content.slice(0, 800)}`).join('|');
+    let h = 2166136261;
+    for (let i = 0; i < raw.length; i++) {
+      h ^= raw.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return 'k_' + (h >>> 0).toString(36) + '_' + raw.length;
+  }
+
+  function readCacheMap() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function writeCacheMap(map) {
+    try {
+      const entries = Object.entries(map)
+        .filter(([, v]) => v && typeof v.ts === 'number' && Date.now() - v.ts < CACHE_TTL_MS)
+        .sort((a, b) => b[1].ts - a[1].ts)
+        .slice(0, MAX_CACHE_ENTRIES);
+      localStorage.setItem(CACHE_KEY, JSON.stringify(Object.fromEntries(entries)));
+    } catch (_) {}
+  }
+
+  function getCachedResponse(key) {
+    const map = readCacheMap();
+    const item = map[key];
+    if (item && typeof item.content === 'string' && Date.now() - item.ts < CACHE_TTL_MS) {
+      return item.content;
+    }
+    return null;
+  }
+
+  function setCachedResponse(key, content) {
+    if (!content || content.length > 48000) return;
+    const map = readCacheMap();
+    map[key] = { content, ts: Date.now() };
+    writeCacheMap(map);
+  }
+
+  function clearCache() {
+    try { localStorage.removeItem(CACHE_KEY); } catch (_) {}
+    sessionCacheHits = 0;
+  }
+
+  function getCacheStats() {
+    const map = readCacheMap();
+    return { entries: Object.keys(map).length, hits: sessionCacheHits };
   }
 
   function assertUsableContent(content, expectJson) {
@@ -104,9 +164,9 @@
         model: DEFAULT_MODEL,
         messages,
         stream: true,
-        temperature: expectJson ? 0.3 : 0.6,
+        temperature: expectJson ? 0.25 : 0.55,
         response_format: expectJson ? { type: 'json_object' } : undefined,
-        max_tokens: expectJson ? 2800 : 1400
+        max_tokens: expectJson ? 3000 : 1400
       }),
       signal
     });
@@ -148,12 +208,26 @@
     }
   }
 
-  async function complete({ messages, expectJson = false, onProvider, onProgress, signal } = {}) {
+  async function complete({ messages, expectJson = false, useCache = true, onProvider, onProgress, signal } = {}) {
     const normalized = normalizeMessages(messages);
     const provider = 'qwen';
+    const cKey = hashKey(normalized, expectJson);
+
+    if (useCache) {
+      const cached = getCachedResponse(cKey);
+      if (cached) {
+        sessionCacheHits += 1;
+        onProgress?.(cached.length, cached);
+        const result = { content: cached, provider, label: '智谱 GLM（本地缓存·0消耗）', fromCache: true };
+        lastProvider = result;
+        return result;
+      }
+    }
+
     try {
       onProvider?.(provider, PROVIDERS[provider].label);
       const result = await runAttempt(provider, normalized, expectJson, signal, onProgress);
+      if (useCache) setCachedResponse(cKey, result.content);
       lastProvider = result;
       return result;
     } catch (error) {
@@ -181,9 +255,10 @@
       qwen: isProxyConfigured(),
       workbuddy: false,
       local: true,
-      lastProvider
+      lastProvider,
+      cache: getCacheStats()
     };
   }
 
-  window.TCMCloudAI = Object.freeze({ complete, testProviders, cleanJsonText, getCapabilities });
+  window.TCMCloudAI = Object.freeze({ complete, testProviders, cleanJsonText, getCapabilities, clearCache, getCacheStats });
 })();

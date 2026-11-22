@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>本草智研 · 中药化学智能实验设计工作台</title>
-  <meta name="description" content="本草智研（TCM Chemistry Lab Workbench）是面向高校药学与中药学专业的现代化智能实验设计工作台。内置 79 项经典与创新药材实验题库、34 篇规范文献、7 套交互式物理仿真装置与 TLC 薄层色谱仿真，集成智谱 GLM 免费大模型流式实验编排与报告全自动化生成。" />
+  <meta name="description" content="本草智研（TCM Chemistry Lab Workbench）是面向高校药学与中药学专业的现代化智能实验设计工作台。内置 91 项高校与药企经典/创新药材及中西医结合实验题库、50 篇核实文献、9 套交互式物理仿真装置与分步小分支实操指引，集成智谱 GLM 免费大模型流式实验编排与报告全自动化生成。" />
   <meta name="keywords" content="中药化学, 实验设计, 智能工作台, 本草智研, 药学实验, 提取分离, 物理仿真, TLC薄层色谱, 智谱GLM, 大模型应用" />
   <meta name="author" content="chenovo495666" />
   <meta name="theme-color" content="#062420" />
@@ -27,7 +27,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <link rel="stylesheet" href="./styles.css?v=5" />
+  <link rel="stylesheet" href="./styles.css?v=6" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
@@ -158,7 +158,7 @@
           <span>📚 研学资料库</span>
           <span class="px-2 py-0.5 rounded-full bg-teal-100 text-[#0f5c54] text-[10px] font-bold">题库 / 章节 / 文献</span>
         </div>
-        <div class="text-[11px] text-slate-500">涵盖 79 药材题库、10 大章节知识与 34 篇 GB/T 7714 规范文献</div>
+        <div class="text-[11px] text-slate-500">涵盖 <span id="drawerBankCount">91</span> 项药材题库、10 大章节、50 篇规范文献与 20 项院校/药企案例</div>
       </div>
       <div class="flex items-center gap-1.5">
         <button id="btnToggleDrawerWide" type="button" class="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-[#0f5c54] text-xs font-bold transition flex items-center gap-1" title="切换宽屏/标准屏">
@@ -176,7 +176,7 @@
         <button type="button" data-rtab="bank" id="rtabBankBtn" class="rtab-btn py-1.5 rounded-lg bg-[#0a3630] text-white transition">题库(79)</button>
         <button type="button" data-rtab="chapters" class="rtab-btn py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">章节知识</button>
         <button type="button" data-rtab="lit" class="rtab-btn py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">文献库</button>
-        <button type="button" data-rtab="univ" class="rtab-btn py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">高校实验</button>
+        <button type="button" data-rtab="univ" class="rtab-btn py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">院校/药企</button>
       </div>
     </div>
 
@@ -235,6 +235,7 @@
       <!-- 抽屉面板 3：全国医药高校代表性药学与中西医结合实验参考 -->
       <div id="rpanel-univ" class="hidden space-y-2.5">
         <p class="text-[11px] text-slate-500 leading-relaxed">汇总国内多所医药及中医药高校的经典药学与中西医结合实验思路，供课程设计与创新拓展参考。</p>
+        <div id="univFilterBar" class="flex flex-wrap gap-1.5 pb-1"></div>
         <div id="univCasesList" class="space-y-2.5"></div>
       </div>
 
@@ -302,6 +303,8 @@
           <button type="button" data-wstep="5" class="step-chip shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600">05 数据</button>
           <span class="text-slate-300 text-xs">›</span>
           <button type="button" data-wstep="6" class="step-chip shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-600">06 报告</button>
+          <span class="hidden sm:inline-block h-4 w-px bg-slate-300 mx-1"></span>
+          <button type="button" id="btnOpenApparatusHub" data-wstep="hub" class="hub-nav-pill shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold inline-flex items-center gap-1">⚙️ 动态流程与装置库 <span id="navHubCount" class="px-1.5 py-0.2 rounded-full bg-amber-900/15 text-[10px]">9</span></button>
         </nav>
       </div>
     </header>
@@ -335,10 +338,36 @@
           </button>
         </form>
 
+        <!-- AI 前置条件与全板块模板约束栏 -->
+        <div id="aiPrecondBar" class="flex flex-wrap items-center gap-2 pt-0.5 text-[11px]">
+          <span class="text-slate-500 font-bold">前置条件：</span>
+          <select id="aiSceneSelect" class="ai-precond-select" title="实验场景约束">
+            <option value="高校本科教学(3~4学时)">场景：本科教学(3~4h)</option>
+            <option value="创新竞赛与科研探索">场景：创新竞赛/科研</option>
+            <option value="药企QC与中试研发">场景：药企QC/中试</option>
+            <option value="中西医结合转化对比">场景：中西医结合转化</option>
+          </select>
+          <select id="aiGreenSelect" class="ai-precond-select" title="溶剂与安全约束">
+            <option value="绿色无氯仿优先">溶剂：绿色无氯仿优先</option>
+            <option value="常规教学溶剂体系">溶剂：常规教学体系</option>
+            <option value="纯化水/极低有机溶剂">溶剂：纯化水优先</option>
+          </select>
+          <select id="aiTemplateSelect" class="ai-precond-select" title="AI 结构化模板">
+            <option value="全板块一键贯通">模板：全板块贯通(1→6步)</option>
+            <option value="正交工艺优化对比">模板：工艺优化对比</option>
+            <option value="数据诊断与报告润色">模板：数据与报告强化</option>
+          </select>
+          <label class="inline-flex items-center gap-1.5 ml-auto px-2.5 py-1 rounded-lg bg-emerald-50/80 border border-emerald-200 text-emerald-900 font-bold cursor-pointer select-none" title="优先匹配内置91项题库与本地24h缓存，大幅节省AI消耗">
+            <input id="aiLocalFirstToggle" type="checkbox" checked class="accent-[#0a3630] rounded" />
+            <span>省流优先(本地0消耗)</span>
+          </label>
+        </div>
+
         <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
           <span class="text-slate-400 font-semibold">快捷灵感：</span>
           <button type="button" data-qwen-demo="用普通本科实验室2小时内提取紫苏叶挥发油，结合抗氧化创新设计，自动配置参数与装置" class="px-2.5 py-1 rounded-full bg-[#f6f5f0] hover:bg-teal-50 border border-slate-200/80 text-slate-600 hover:text-[#0f5c54] transition">紫苏叶挥发油 + 抗氧化</button>
-          <button type="button" data-qwen-demo="本科常规实验不用氯仿，低温超声提取红花羟基红花黄色素A并大孔树脂纯化，自动生成全流程" class="px-2.5 py-1 rounded-full bg-[#f6f5f0] hover:bg-teal-50 border border-slate-200/80 text-slate-600 hover:text-[#0f5c54] transition">无毒水提红花黄色素A</button>
+          <button type="button" data-qwen-demo="柳树皮水杨酸溯源与阿司匹林乙酰化纯化，对比天然与化学药质控" class="px-2.5 py-1 rounded-full bg-[#f6f5f0] hover:bg-teal-50 border border-slate-200/80 text-slate-600 hover:text-[#0f5c54] transition">柳树皮→阿司匹林中西医对比</button>
+          <button type="button" data-qwen-demo="丹参脂水双提丹参酮IIA与丹酚酸B，配置D101大孔树脂分级纯化" class="px-2.5 py-1 rounded-full bg-[#f6f5f0] hover:bg-teal-50 border border-slate-200/80 text-slate-600 hover:text-[#0f5c54] transition">丹参脂水双提 + 大孔树脂</button>
           <button type="button" data-qwen-demo="设计生黄芪与炙黄芪一材双提黄芪多糖与黄芪甲苷对照实验，自动填好左侧参数与报告框架" class="px-2.5 py-1 rounded-full bg-[#f6f5f0] hover:bg-teal-50 border border-slate-200/80 text-slate-600 hover:text-[#0f5c54] transition">黄芪一材双提对照</button>
         </div>
 
@@ -356,7 +385,7 @@
           <div class="flex flex-wrap gap-2 pt-1">
             <button type="button" data-qwen-jump="3" class="px-3 py-1.5 rounded-xl bg-[#0a3630] text-white text-[11px] font-bold hover:bg-[#062420] transition">查看第 3 步原理与方案 →</button>
             <button type="button" data-qwen-jump="4" class="px-3 py-1.5 rounded-xl bg-white border border-teal-200 text-[#0f5c54] text-[11px] font-bold hover:bg-teal-50 transition">查看第 4 步动态装置 →</button>
-            <button type="button" data-qwen-jump="6" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold hover:bg-amber-100 transition">直达第 6 步预览报告 →</button><button id="btnShowFullPlan" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition">🧩 展开完整实验方案</button><button id="btnOpenBankFromReceipt" type="button" class="ml-auto px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold transition">📚 查看已更新题库</button>
+            <button type="button" data-qwen-jump="6" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold hover:bg-amber-100 transition">直达第 6 步预览报告 →</button><button id="btnShowFullPlan" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition">🧩 展开完整实验方案</button><button id="btnForceCloudAi" type="button" class="hidden px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold transition">⚡ 改用云端 AI 深度定制</button><button id="btnOpenBankFromReceipt" type="button" class="ml-auto px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold transition">📚 查看已更新题库</button>
           </div>
         </div>
 
@@ -366,6 +395,7 @@
             <span>当前问答自动关联工作台上下文（所选药材、左侧参数与装置）</span>
             <button id="btnClearQwenChat" type="button" class="text-slate-400 hover:text-rose-600 font-semibold">清空对话</button>
           </div>
+          <div id="aiChatTemplateChips" class="flex flex-wrap gap-1.5 pb-1"></div>
           <div id="qwenChatMessages" class="max-h-52 overflow-y-auto custom-scroll space-y-2 text-xs">
             <div class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-700">你好！我是本草智研中药化学实验助教。你可以问我收率偏低原因、TLC 展开剂调整、UV/NMR 谱图解析，或让我帮你润色实验讨论。</div>
           </div>
@@ -395,13 +425,13 @@
             <div class="flex flex-wrap gap-1.5 pt-1 text-[10px] font-bold">
               <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-emerald-100" id="bannerBankPill">79 项药材题库</span>
               <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-emerald-100">10 大章节知识</span>
-              <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-emerald-100">7 套动态实验装置</span>
-              <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-amber-200">34 篇实证文献</span>
+              <span id="bannerRigPill" class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-emerald-100">9 套动态实验装置</span>
+              <span id="bannerLitPill" class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-amber-200">50 篇实证文献</span>
             </div>
           </div>
           <div class="relative flex flex-wrap sm:flex-col gap-2.5 shrink-0">
             <button id="btnOpenDiyHerbHero" type="button" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-200 hover:to-amber-300 text-[#05211d] text-xs font-extrabold transition shadow-md">+ 创建创新 DIY 药材</button>
-            <button id="btnOpenBankFromStep1" type="button" class="px-4 py-2 rounded-xl bg-white/12 hover:bg-white/22 text-white text-xs font-bold border border-white/20 backdrop-blur-xs transition">打开右侧 79 项题库 →</button>
+            <button id="btnOpenBankFromStep1" type="button" class="px-4 py-2 rounded-xl bg-white/12 hover:bg-white/22 text-white text-xs font-bold border border-white/20 backdrop-blur-xs transition">打开右侧 <span id="btnStep1BankCnt">91</span> 项题库 →</button>
           </div>
         </div>
 
@@ -560,6 +590,7 @@
             <div id="walkVisualTitle" class="text-base font-extrabold"></div>
             <p id="walkPrinciple" class="text-xs sm:text-sm text-teal-50/90 leading-relaxed"></p>
             <div class="text-xs text-amber-300">质控要点：<span id="walkQc" class="text-amber-100"></span></div>
+            <div id="walkSubBranches" class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-white/10"></div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <a id="vidBiliLink" target="_blank" rel="noopener noreferrer" class="p-2.5 rounded-xl bg-pink-50 text-pink-900 border border-pink-200 text-xs font-bold text-center hover:bg-pink-100">B站实操视频 ↗</a>
@@ -578,21 +609,20 @@
       <section id="wpanel-4" class="wpanel panel-anim hidden space-y-6">
         <div class="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <div class="text-xs font-bold text-[#0f5c54] uppercase tracking-widest">STEP 04 · APPARATUS & SOP</div>
-            <h2 class="text-2xl font-extrabold text-slate-900">装置与流程</h2>
+            <div class="text-xs font-bold text-[#0f5c54] uppercase tracking-widest">STEP 04 · CONTEXTUAL APPARATUS & SUB-STEPS</div>
+            <h2 class="text-2xl font-extrabold text-slate-900">本课题适用装置与分步流程</h2>
+            <p id="step4ContextHint" class="text-xs text-slate-500 mt-0.5">已根据当前选材与实验设计自动筛选适用装置，避免无关装置干扰。</p>
           </div>
-          <a id="rigVideoSearchLink" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-pink-50 border border-pink-200 text-pink-900 text-xs font-bold">看搭建视频 ↗</a>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btnJumpHubFromStep4" type="button" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-300/80 text-amber-900 text-xs font-bold hover:bg-amber-100 transition">⚙️ 浏览全部 9 套装置库 →</button>
+            <a id="rigVideoSearchLink" target="_blank" rel="noopener noreferrer" class="bili-pill">▶ B站看本装置搭建 ↗</a>
+          </div>
         </div>
 
         <div class="lab-card rounded-3xl p-5 sm:p-6 space-y-4">
-          <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl overflow-x-auto custom-scroll">
-            <button type="button" data-rig="steam" class="rig-tab-btn shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold">水蒸气蒸馏</button>
-            <button type="button" data-rig="reflux" class="rig-tab-btn shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold">加热回流</button>
-            <button type="button" data-rig="soxhlet" class="rig-tab-btn shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold">索氏提取</button>
-            <button type="button" data-rig="ultrasound" class="rig-tab-btn shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold">超声提取</button>
-            <button type="button" data-rig="filter" class="rig-tab-btn shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold">减压抽滤</button>
-            <button type="button" data-rig="extract" class="rig-tab-btn shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold">分液液-液萃取</button>
-            <button type="button" data-rig="column" class="rig-tab-btn shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold">硅胶柱层析</button>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div id="step4ApplicableRigTabs" class="flex flex-wrap items-center gap-2"></div>
+            <span class="text-[11px] text-slate-400 font-medium">仅展示当前方案匹配装置</span>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
@@ -633,6 +663,21 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- 新增：装置搭建与操作小分支拆解（每一步附精准短词 B站视频推荐） -->
+        <div class="lab-card rounded-3xl p-5 sm:p-6 space-y-3.5">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-xl bg-teal-50 text-[#0f5c54] flex items-center justify-center font-extrabold text-xs">🧩</span>
+              <div>
+                <h3 class="text-sm sm:text-base font-extrabold text-slate-900">分步搭建与操作小分支（附精准 B站视频指引）</h3>
+                <p class="text-[11px] text-slate-500">将大流程拆解为独立可操作小步骤，每步仅用 1~2 个高命中核心词直达 B站实操演示</p>
+              </div>
+            </div>
+            <span id="rigSubStepsBadge" class="px-2.5 py-0.5 rounded-full bg-teal-50 text-[#0f5c54] text-[11px] font-bold">4 步拆解</span>
+          </div>
+          <div id="rigSubStepsBox" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -711,6 +756,9 @@
           </div>
           <div class="lg:col-span-6 lab-card rounded-3xl p-5 space-y-3"><h3 class="text-sm font-extrabold text-slate-900">理化检识记录</h3><div id="chemTestsList" class="space-y-2"></div></div>
         </div>
+
+        <!-- 新增：0-Token 本地智能数据诊断与报告讨论草稿 -->
+        <div id="step5AutoDiagCard" class="lab-card rounded-3xl p-5 space-y-3 border-l-4 border-l-[#0f5c54]"></div>
 
         <!-- 新增：数据指标与检识小白通俗拆解指南 -->
         <div id="step5AnalyticsGuide" class="lab-card rounded-3xl p-5 space-y-3.5 bg-gradient-to-br from-white via-teal-50/20 to-amber-50/30">
@@ -818,6 +866,32 @@
           <button type="button" data-go-step="5" class="px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">← 上一步：修改数据与检识</button>
           <button type="button" data-go-step="1" class="px-5 py-2.5 rounded-2xl bg-emerald-50 text-[#0f5c54] border border-emerald-200 text-sm font-bold hover:bg-emerald-100 transition">↺ 返回第 01 步探索新课题</button>
         </div>
+      </section>
+
+      <!-- ==================== 独立板块：动态流程与实验装置总览库 ==================== -->
+      <section id="wpanel-hub" class="wpanel panel-anim hidden space-y-6">
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#062420] via-[#0e473f] to-[#17695d] text-white p-6 sm:p-7 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-2 max-w-2xl">
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-400/20 border border-amber-300/30 text-[10px] font-extrabold text-amber-200 uppercase tracking-widest">
+              STANDALONE HUB · APPARATUS &amp; PROCESS LIBRARY
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">动态流程与实验装置总览库</h2>
+            <p class="text-xs sm:text-sm text-teal-100/90 leading-relaxed">无需先走完选材步骤，直接在此一站式查阅全部 9 套动态交互实验装置、组件安全热点、4 步可操作小分支、精准 B站实操视频及对应代表药材。</p>
+          </div>
+          <button type="button" id="btnBackToWorkflow" class="shrink-0 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-extrabold transition">← 返回 6 步实验工作台</button>
+        </div>
+
+        <!-- 装置分类筛选条 + 9套装置卡片网格 -->
+        <div class="lab-card rounded-3xl p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div id="hubFilterPills" class="flex flex-wrap gap-1.5"></div>
+            <span class="text-xs text-slate-500 font-medium">点击任意装置卡片查看动态原理图与分步小分支</span>
+          </div>
+          <div id="hubRigCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5"></div>
+        </div>
+
+        <!-- 选中装置全景交互舞台 -->
+        <div id="hubRigDetailMount" class="space-y-5"></div>
       </section>
     </main>
 
@@ -965,7 +1039,8 @@
 
   <div id="toastContainer" class="no-print fixed top-4 left-1/2 -translate-x-1/2 items-center z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-<script src="./cloud-ai.js?v=5"></script>
-<script src="./app.js?v=5"></script>
+<script src="./lab-data-extra.js?v=6"></script>
+<script src="./cloud-ai.js?v=6"></script>
+<script src="./app.js?v=6"></script>
 </body>
 </html>
