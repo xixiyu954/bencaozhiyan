@@ -74,7 +74,7 @@
     .step-chip.active { background: #0a3630; color: #ffffff; border-color: #0a3630; box-shadow: 0 4px 12px rgba(10, 54, 48, 0.25); }
     .step-chip.done { background: #e3f4f0; color: #0a3630; border-color: #a9dbd0; }
     .formula-box { font-family: 'Cambria Math', 'Times New Roman', serif; }
-    .hotspot-btn { cursor: pointer; transition: transform 0.18s ease; }
+    .hotspot-btn { cursor: pointer; transform-box: fill-box; transform-origin: center; transition: transform 0.18s ease; }
     .hotspot-btn:hover { transform: scale(1.15); }
     .a4-paper { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08); }
     .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -686,7 +686,7 @@
             <div class="lg:col-span-7 rounded-2xl bg-gradient-to-b from-[#fbfcfa] to-[#e9f4f1] border border-slate-200 p-4 flex flex-col justify-between">
               <div class="flex items-center justify-between text-[11px] mb-2">
                 <span id="rigDiagramTitle" class="font-bold text-[#0a3630]"></span>
-                <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">点编号看详情</span>
+                <div class="flex items-center gap-1.5 shrink-0"><button type="button" id="applyRigToReportBtn" class="px-2.5 py-0.5 rounded-full bg-[#0a3630] text-white font-semibold hover:bg-[#0f5c54] transition">应用到报告</button><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">点编号看详情</span></div>
               </div>
               <div id="rigSvgWrapper" class="w-full flex items-center justify-center py-2"></div>
               <div id="rigAssemblyOrder" class="text-[11px] text-[#0a3630] bg-white/85 rounded-xl px-3 py-2 border border-teal-100 mt-2"></div>
@@ -761,7 +761,7 @@
           </div>
           <div class="lg:col-span-5 lab-card rounded-3xl p-5 space-y-2.5">
             <div class="flex items-center justify-between"><h3 class="text-sm font-extrabold text-slate-900">收率对比图</h3><span id="chartLimitLabel" class="text-xs font-bold text-rose-600"></span></div>
-            <div class="relative h-64 w-full"><canvas id="yieldChart"></canvas></div>
+            <div class="relative h-64 w-full" style="height:256px;min-height:256px;"><canvas id="yieldChart" style="display:block;width:100%;height:100%;"></canvas></div>
           </div>
         </div>
 
@@ -775,7 +775,7 @@
                   <div><label class="block text-[11px] text-slate-500 mb-1">供试品</label><input id="tlcSample" type="number" step="0.1" min="0" class="w-full px-2 py-1.5 text-sm rounded-xl border border-slate-200 tabular-nums" /></div>
                   <div><label class="block text-[11px] text-slate-500 mb-1">对照品</label><input id="tlcRef" type="number" step="0.1" min="0" class="w-full px-2 py-1.5 text-sm rounded-xl border border-slate-200 tabular-nums" /></div>
                 </div>
-                <div class="grid grid-cols-3 gap-2 text-center">
+                <p id="tlcErrorMsg" class="hidden text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-1.5"></p><div class="grid grid-cols-3 gap-2 text-center">
                   <div class="p-2 rounded-xl bg-slate-50"><div class="text-[10px] text-slate-500">供试品 Rf</div><div id="tlcSampleRf" class="text-sm font-bold text-[#0f5c54] tabular-nums"></div></div>
                   <div class="p-2 rounded-xl bg-slate-50"><div class="text-[10px] text-slate-500">对照品 Rf</div><div id="tlcRefRf" class="text-sm font-bold text-indigo-700 tabular-nums"></div></div>
                   <div class="p-2 rounded-xl bg-slate-50"><div class="text-[10px] text-slate-500">|ΔRf|</div><div id="tlcDeltaRf" class="text-sm font-bold text-slate-900 tabular-nums"></div></div>
@@ -1335,7 +1335,7 @@
         { id: 2, name: '上下两相分配界面', desc: '乙酸乙酯/正丁醇在上层，氯仿在下层；遵循少量多次萃取原则。', warn: '若出现乳化层，可静置、轻搅或加饱和 NaCl 盐析破乳。' },
         { id: 3, name: '活塞与接液瓶', desc: '分液前先拔去上口玻璃塞平衡气压，下层从下口放出，上层由上口倒出。', warn: '合并有机层后加无水 Na₂SO₄ 脱水再减压浓缩。' }
       ],
-      svg: `<svg viewBox="0 0 420 260" class="w-full max-w-md h-auto"><rect x="110" y="232" width="180" height="8" rx="4" fill="#475569"/><rect x="132" y="22" width="7" height="212" rx="3" fill="#64748b"/><rect x="139" y="128" width="44" height="5" rx="2" fill="#94a3b8"/><rect x="200" y="26" width="20" height="14" rx="3" fill="#94a3b8"/><path d="M202 40 L218 40 L218 54 C248 64 252 108 220 154 L218 178 L202 178 L200 154 C168 108 172 64 202 54 Z" fill="#fff" stroke="#0f5c54" stroke-width="2.5"/><path d="M180 96 C180 76 196 64 210 64 C224 64 240 76 240 96 L237 110 L183 110 Z" fill="#fbbf24" opacity="0.72"/><path d="M183 110 L237 110 L220 154 L200 154 Z" fill="#38bdf8" opacity="0.62"/><line x1="182" y1="110" x2="238" y2="110" stroke="#0f5c54" stroke-width="1.6" stroke-dasharray="3 2"/><rect x="196" y="162" width="28" height="6" rx="2" fill="#0a3630"/><circle cx="210" cy="186" r="2.8" fill="#0284c7" class="anim-drop"/><path d="M196 204 L224 204 L232 232 L188 232 Z" fill="#fff" stroke="#0f5c54" stroke-width="2.2"/><text x="254" y="88" font-size="9" fill="#b45309" font-weight="700">有机相(乙酸乙酯/正丁醇)</text><text x="254" y="132" font-size="9" fill="#0369a1" font-weight="700">水相 / 氯仿下层</text><g class="hotspot-btn" data-hotspot="1"><circle cx="210" cy="34" r="10" fill="#0a3630"/><text x="210" y="38" text-anchor="middle" font-size="9" fill="#fff" font-weight="700">1</text></g><g class="hotspot-btn" data-hotspot="2"><circle cx="210" cy="110" r="11" fill="#c58a32"/><text x="210" y="114" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">2</text></g><g class="hotspot-btn" data-hotspot="3"><circle cx="210" cy="165" r="10" fill="#0284c7"/><text x="210" y="169" text-anchor="middle" font-size="9" fill="#fff" font-weight="700">3</text></g></svg>`
+      svg: `<svg viewBox="0 0 420 260" class="w-full max-w-md h-auto"><rect x="110" y="232" width="180" height="8" rx="4" fill="#475569"/><rect x="132" y="22" width="7" height="212" rx="3" fill="#64748b"/><rect x="139" y="128" width="44" height="5" rx="2" fill="#94a3b8"/><rect x="200" y="26" width="20" height="14" rx="3" fill="#94a3b8"/><path d="M202 40 L218 40 L218 54 C248 64 252 108 220 154 L218 178 L202 178 L200 154 C168 108 172 64 202 54 Z" fill="#fff" stroke="#0f5c54" stroke-width="2.5"/><path d="M180 96 C180 76 196 64 210 64 C224 64 240 76 240 96 L237 110 L183 110 Z" fill="#fbbf24" opacity="0.72"/><path d="M183 110 L237 110 L220 154 L200 154 Z" fill="#38bdf8" opacity="0.62"/><line x1="182" y1="110" x2="238" y2="110" stroke="#0f5c54" stroke-width="1.6" stroke-dasharray="3 2"/><rect x="196" y="162" width="28" height="6" rx="2" fill="#0a3630"/><circle cx="210" cy="186" r="2.8" fill="#0284c7" class="anim-drop"/><path d="M196 204 L224 204 L232 232 L188 232 Z" fill="#fff" stroke="#0f5c54" stroke-width="2.2"/><text x="246" y="82" font-size="8.5" fill="#b45309" font-weight="700">上层：轻质有机相(乙酸乙酯/正丁醇)<tspan x="246" dy="11" font-size="7.5" fill="#64748b">（若用氯仿等重质溶剂，则水相在上）</tspan></text><text x="246" y="124" font-size="8.5" fill="#0369a1" font-weight="700">下层：水相（常规轻质溶剂体系）<tspan x="246" dy="11" font-size="7.5" fill="#64748b">（若用氯仿/二氯甲烷，则有机相在下）</tspan></text><g class="hotspot-btn" data-hotspot="1"><circle cx="210" cy="34" r="10" fill="#0a3630"/><text x="210" y="38" text-anchor="middle" font-size="9" fill="#fff" font-weight="700">1</text></g><g class="hotspot-btn" data-hotspot="2"><circle cx="210" cy="110" r="11" fill="#c58a32"/><text x="210" y="114" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">2</text></g><g class="hotspot-btn" data-hotspot="3"><circle cx="210" cy="165" r="10" fill="#0284c7"/><text x="210" y="169" text-anchor="middle" font-size="9" fill="#fff" font-weight="700">3</text></g></svg>`
     }
   };
 
@@ -2540,7 +2540,7 @@
         mass: c.mass, ratio: c.ratio, temp: c.temp, time: c.time, mesh: c.mesh, cycles: c.cycles, solventType: c.solventType, ph: c.ph,
         schemeMode: 'classic', diyExtract: t.defaultExtract || 'steam', diySeparate: t.defaultSep || 'freeze',
         diyDetects: [DIY_DETECT_LIST[0], DIY_DETECT_LIST[1]], diyNotes: '',
-        activeRig: t.defaultRig || 'steam', activeHotspot: 1,
+        activeRig: t.defaultRig || 'steam', reportRig: t.defaultRig || 'steam', activeHotspot: 1,
         sopDone: t.sop.map(() => false), batches: JSON.parse(JSON.stringify(t.demoBatches)),
         tlc: { ...t.tlcDefault }, chemTests: JSON.parse(JSON.stringify(t.chemTests)),
         reportModules: REPORT_MODULES.reduce((acc, m) => { acc[m.id] = true; return acc; }, {})
@@ -2580,10 +2580,10 @@
       sd = Math.sqrt(crudeYields.reduce((acc, v) => acc + Math.pow(v - avgCrude, 2), 0) / (crudeYields.length - 1));
       rsd = avgCrude > 0 ? (sd / avgCrude) * 100 : 0;
     }
-    const front = Number(ws.tlc.front) || 0, sampleRf = front > 0 ? (Number(ws.tlc.sample) || 0) / front : 0, refRf = front > 0 ? (Number(ws.tlc.ref) || 0) / front : 0;
-    const deltaRf = Math.abs(sampleRf - refRf), tlcOk = front > 0 && sampleRf > 0 && sampleRf <= 1 && refRf > 0 && refRf <= 1 && deltaRf <= 0.03;
+    const front = Number(ws.tlc.front), sampleL = Number(ws.tlc.sample), refL = Number(ws.tlc.ref); const tlcFrontOk = Number.isFinite(front) && front > 0, sampleValid = tlcFrontOk && Number.isFinite(sampleL) && sampleL > 0 && sampleL <= front, refValid = tlcFrontOk && Number.isFinite(refL) && refL > 0 && refL <= front, tlcValid = sampleValid && refValid; const sampleRf = sampleValid ? sampleL / front : null, refRf = refValid ? refL / front : null;
+    const deltaRf = tlcValid ? Math.abs(sampleRf - refRf) : null, tlcOk = tlcValid && deltaRf <= 0.03;
     const totalTests = ws.chemTests.length + 1, passedTests = ws.chemTests.filter(x => x.passed).length + (tlcOk ? 1 : 0);
-    return { limit, avgCrude, avgRefined, avgMp, sd, rsd, sampleRf, refRf, deltaRf, tlcOk, passedTests, totalTests, passRate: totalTests > 0 ? passedTests / totalTests * 100 : 0, meets: avgCrude >= limit, count: valid.length };
+    return { limit, avgCrude, avgRefined, avgMp, sd, rsd, sampleRf, refRf, deltaRf, tlcValid, tlcOk, passedTests, totalTests, passRate: totalTests > 0 ? passedTests / totalTests * 100 : 0, meets: avgCrude >= limit, count: valid.length };
   }
 
   // 右侧抽屉开关
@@ -2880,7 +2880,7 @@
 
     const extEl = document.getElementById('diyExtractOptions');
     extEl.innerHTML = DIY_EXTRACT_LIST.map(item => `<button type="button" data-diy-ext="${item.id}" class="pick-card ${ws.diyExtract === item.id ? 'selected' : ''} text-left p-3 rounded-2xl bg-white border border-slate-200 space-y-0.5"><div class="text-xs font-bold text-slate-900">${item.name}</div><div class="text-[11px] text-slate-500">${item.desc}</div></button>`).join('');
-    extEl.querySelectorAll('[data-diy-ext]').forEach(b => b.addEventListener('click', () => { ws.diyExtract = b.dataset.diyExt; const f = DIY_EXTRACT_LIST.find(x => x.id === ws.diyExtract); if (f) ws.activeRig = f.rig; saveState(); renderAll(); }));
+    extEl.querySelectorAll('[data-diy-ext]').forEach(b => b.addEventListener('click', () => { ws.diyExtract = b.dataset.diyExt; const f = DIY_EXTRACT_LIST.find(x => x.id === ws.diyExtract); if (f) { ws.activeRig = f.rig; ws.reportRig = f.rig; } saveState(); renderAll(); }));
 
     const sepEl = document.getElementById('diySeparateOptions');
     sepEl.innerHTML = DIY_SEPARATE_LIST.map(item => `<button type="button" data-diy-sep="${item.id}" class="pick-card ${ws.diySeparate === item.id ? 'selected' : ''} text-left p-3 rounded-2xl bg-white border border-slate-200 space-y-0.5"><div class="text-xs font-bold text-slate-900">${item.name}</div><div class="text-[11px] text-slate-500">${item.desc}</div></button>`).join('');
@@ -2898,7 +2898,7 @@
 
   function renderStep4(t, ws) {
     const rigKey = LAB_RIGS[ws.activeRig] ? ws.activeRig : 'steam', rig = LAB_RIGS[rigKey];
-    document.querySelectorAll('.rig-tab-btn').forEach(b => { const a = b.dataset.rig === rigKey; b.className = `rig-tab-btn shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition ${a ? 'bg-[#0a3630] text-white' : 'text-slate-600'}`; });
+    document.querySelectorAll('.rig-tab-btn').forEach(b => { const a = b.dataset.rig === rigKey; b.classList.remove('bg-[#0a3630]', 'text-white', 'bg-white', 'text-slate-600', 'shadow-sm', 'ring-2', 'ring-teal-500'); b.className = `rig-tab-btn shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition ${a ? 'bg-[#0a3630] text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'}`; b.setAttribute('aria-pressed', a ? 'true' : 'false'); }); const applyBtn = document.getElementById('applyRigToReportBtn'); if (applyBtn) { const applied = (ws.reportRig || rigKey) === rigKey; applyBtn.textContent = applied ? '已应用到报告 ✓' : '应用到报告'; }
     document.getElementById('rigDiagramTitle').textContent = rig.title;
     document.getElementById('rigAssemblyOrder').innerHTML = `<strong>搭建顺序：</strong>${rig.order}`;
     document.getElementById('rigVideoSearchLink').href = `https://search.bilibili.com/all?keyword=${encodeURIComponent(rig.videoKw)}`;
@@ -2916,7 +2916,7 @@
     document.getElementById('sopProgressText').textContent = `${doneCnt}/${t.sop.length} (${pct}%)`;
     document.getElementById('sopProgressBar').style.width = `${pct}%`;
     const sopEl = document.getElementById('sopList');
-    sopEl.innerHTML = t.sop.map((txt, i) => `<label class="flex items-start gap-2.5 p-2.5 rounded-xl border ${ws.sopDone[i] ? 'bg-teal-50/50 border-teal-200' : 'bg-[#f7f7f4] border-slate-200/70'} cursor-pointer"><input type="checkbox" data-sop-i="${i}" ${ws.sopDone[i] ? 'checked' : ''} class="mt-0.5 accent-[#0a3630]" /><span class="text-xs sm:text-sm ${ws.sopDone[i] ? 'line-through text-slate-400' : 'text-slate-700'}">${i + 1}. ${txt}</span></label>`).join('');
+    sopEl.innerHTML = t.sop.map((txt, i) => `<label class="flex items-start gap-2.5 p-2.5 rounded-xl border ${ws.sopDone[i] ? 'bg-teal-50/50 border-teal-200' : 'bg-[#f7f7f4] border-slate-200/70'} cursor-pointer"><input type="checkbox" data-sop-i="${i}" ${ws.sopDone[i] ? 'checked' : ''} class="mt-0.5 accent-[#0a3630]" /><span class="text-xs sm:text-sm ${ws.sopDone[i] ? 'line-through text-slate-400' : 'text-slate-700'}">${String(txt).replace(/^\d+[\.、]\s*/, '')}</span></label>`).join('');
     sopEl.querySelectorAll('[data-sop-i]').forEach(chk => chk.addEventListener('change', () => { ws.sopDone[Number(chk.dataset.sopI)] = chk.checked; saveState(); renderStep4(t, ws); }));
 
     document.getElementById('troubleshootList').innerHTML = t.troubleshoot.map(tr => `<div class="p-3 rounded-2xl bg-amber-50/60 border border-amber-200/70 text-xs space-y-1"><div class="font-bold text-amber-950">${tr.issue}</div><div class="text-slate-600">成因：${tr.cause}</div><div class="text-[#0f5c54] font-bold">对策：${tr.fix}</div></div>`).join('');
@@ -2953,7 +2953,7 @@
     document.getElementById('chartLimitLabel').textContent = `限度 ${stats.limit}%`;
     const ctx = document.getElementById('yieldChart');
     if (ctx && typeof Chart !== 'undefined') {
-      if (yieldChartInstance) yieldChartInstance.destroy();
+      const colors = vals.map(v => v >= stats.limit ? 'rgba(15, 92, 84, 0.85)' : 'rgba(225, 29, 72, 0.75)'); const limitData = labels.map(() => stats.limit); if (yieldChartInstance && yieldChartInstance.canvas === ctx) { yieldChartInstance.data.labels = labels; yieldChartInstance.data.datasets[0].data = vals; yieldChartInstance.data.datasets[0].backgroundColor = colors; yieldChartInstance.data.datasets[1].label = `限度(${stats.limit}%)`; yieldChartInstance.data.datasets[1].data = limitData; yieldChartInstance.update('none'); } else { if (yieldChartInstance) yieldChartInstance.destroy();
       const labels = ws.batches.map((_, i) => `批次${i + 1}`), vals = ws.batches.map(b => Number(b.mass) > 0 ? Number((b.crude / b.mass * 100).toFixed(2)) : 0);
       yieldChartInstance = new Chart(ctx, {
         type: 'bar',
@@ -2963,14 +2963,14 @@
     }
 
     document.getElementById('tlcFront').value = ws.tlc.front; document.getElementById('tlcSample').value = ws.tlc.sample; document.getElementById('tlcRef').value = ws.tlc.ref;
-    document.getElementById('tlcSampleRf').textContent = stats.sampleRf.toFixed(3); document.getElementById('tlcRefRf').textContent = stats.refRf.toFixed(3); document.getElementById('tlcDeltaRf').textContent = stats.deltaRf.toFixed(3);
+    document.getElementById('tlcSampleRf').textContent = stats.sampleRf !== null ? stats.sampleRf.toFixed(3) : '--'; document.getElementById('tlcRefRf').textContent = stats.refRf !== null ? stats.refRf.toFixed(3) : '--'; document.getElementById('tlcDeltaRf').textContent = stats.deltaRf !== null ? stats.deltaRf.toFixed(3) : '--'; const errEl = document.getElementById('tlcErrorMsg'); if (errEl) { if (!stats.tlcValid) { errEl.textContent = '参数非法：需满足 0 < 供试品/对照品位移 L ≤ 前沿位移 L₀（且 L₀ > 0）'; errEl.classList.remove('hidden'); } else { errEl.classList.add('hidden'); } }
     document.getElementById('tlcSystemNote').textContent = t.tlcSystem;
     const tb = document.getElementById('tlcVerdictBadge');
-    tb.textContent = stats.tlcOk ? '一致 (|ΔRf|≤0.03)' : '偏差偏大';
-    tb.className = `px-2.5 py-0.5 rounded-full text-xs font-bold ${stats.tlcOk ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`;
+    tb.textContent = !stats.tlcValid ? '参数非法' : (stats.tlcOk ? '一致 (|ΔRf|≤0.03)' : '偏差偏大');
+    tb.className = `px-2.5 py-0.5 rounded-full text-xs font-bold ${!stats.tlcValid ? 'bg-rose-100 text-rose-700' : (stats.tlcOk ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700')}`;
     const cl = v => Math.max(0.05, Math.min(0.95, v));
-    document.getElementById('svgSpotSample').setAttribute('cy', (184 - cl(stats.sampleRf) * 156).toFixed(1));
-    document.getElementById('svgSpotRef').setAttribute('cy', (184 - cl(stats.refRf) * 156).toFixed(1));
+    document.getElementById('svgSpotSample').setAttribute('cy', stats.sampleRf !== null ? (184 - cl(stats.sampleRf) * 156).toFixed(1) : '184');
+    document.getElementById('svgSpotRef').setAttribute('cy', stats.refRf !== null ? (184 - cl(stats.refRf) * 156).toFixed(1) : '184');
 
     const ce = document.getElementById('chemTestsList');
     ce.innerHTML = ws.chemTests.map((x, i) => `<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl border ${x.passed ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/40 border-rose-200'}"><span class="text-xs text-slate-800">${i + 1}. ${x.name}</span><button type="button" data-tog-c="${i}" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-white ${x.passed ? 'bg-emerald-600' : 'bg-rose-600'}">${x.passed ? '符合' : '待复检'}</button></div>`).join('');
@@ -2978,7 +2978,7 @@
   }
 
   function buildReportInnerHtml(t, ws, stats) {
-    const mod = ws.reportModules, rig = LAB_RIGS[ws.activeRig] || LAB_RIGS.steam;
+    const mod = ws.reportModules, rig = LAB_RIGS[ws.reportRig || ws.activeRig] || LAB_RIGS.steam;
     const ext = DIY_EXTRACT_LIST.find(x => x.id === ws.diyExtract) || DIY_EXTRACT_LIST[0], sep = DIY_SEPARATE_LIST.find(x => x.id === ws.diySeparate) || DIY_SEPARATE_LIST[0];
     const fKeys = t.formulas || ['diffusion', 'qc'];
     const allRefs = [...GLOBAL_LITERATURE.slice(0, 6), ...state.extraGlobalRefs];
@@ -2996,8 +2996,8 @@
     if (mod.theory) html += `<div class="space-y-1.5"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">二、核心公式原理与中西医结合视角</h4>${fKeys.map(k => `<p class="text-xs"><strong>${FORMULA_BANK[k].name}：</strong><code>${FORMULA_BANK[k].eq}</code> — ${FORMULA_BANK[k].desc}</p>`).join('')}<p class="text-xs"><strong>中西医结合转化：</strong>${t.integrative}${ws.innovKeyword ? `（拓展关键词：${ws.innovKeyword}）` : ''}</p></div>`;
     if (mod.scheme) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">三、工艺路线与配置参数</h4><p class="text-xs"><strong>DIY 配置参数：</strong>投料 ${ws.mass}g，料液比 ${ws.ratio}:1，溶剂 ${ws.solventType}，粒度 ${ws.mesh}，温度 ${ws.temp}℃，时间 ${ws.time}min，提取 ${ws.cycles} 次，pH 调控：${ws.ph}。</p><p class="text-xs"><strong>工艺路线：</strong>${ws.schemeMode === 'diy' ? `${ext.name} → ${sep.name} → ${ws.diyDetects.join('、')}` : t.steps.map(s => s.title).join(' → ')}</p>${ws.diyNotes ? `<p class="text-xs"><strong>改良说明：</strong>${ws.diyNotes}</p>` : ''}</div>`;
     if (mod.rig) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">四、实验装置与安全要点</h4><p class="text-xs"><strong>装置：</strong>${rig.title}（${rig.equipment.join('、')}）</p><p class="text-xs"><strong>搭建顺序：</strong>${rig.order}</p></div>`;
-    if (mod.scaling) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">五、SOP 执行记录</h4><ul class="list-disc pl-5 text-xs">${t.sop.map((s, i) => `<li>[${ws.sopDone[i] ? '✓' : '○'}] ${s}</li>`).join('')}</ul></div>`;
-    if (mod.data) html += `<div class="space-y-1.5"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">六、平行数据统计与 TLC 检识</h4><table class="w-full text-xs border-collapse border border-slate-300"><thead><tr class="bg-slate-100"><th class="border border-slate-300 px-2 py-1">批次</th><th class="border border-slate-300 px-2 py-1">投料(g)</th><th class="border border-slate-300 px-2 py-1">粗提(${t.crudeUnit})</th><th class="border border-slate-300 px-2 py-1">精制(g)</th><th class="border border-slate-300 px-2 py-1">熔点(℃)</th><th class="border border-slate-300 px-2 py-1">收率</th></tr></thead><tbody>${ws.batches.map((b, i) => `<tr><td class="border border-slate-300 px-2 py-1">#${i + 1}</td><td class="border border-slate-300 px-2 py-1">${b.mass}</td><td class="border border-slate-300 px-2 py-1">${b.crude}</td><td class="border border-slate-300 px-2 py-1">${b.refined}</td><td class="border border-slate-300 px-2 py-1">${b.mp}</td><td class="border border-slate-300 px-2 py-1 font-bold">${(Number(b.mass) > 0 ? (b.crude / b.mass * 100).toFixed(2) : '0.00')}%</td></tr>`).join('')}</tbody></table><p class="text-xs">平均粗提收率 ${stats.avgCrude.toFixed(2)}%${stats.count > 1 ? `（SD ±${stats.sd.toFixed(3)}%，RSD ${stats.rsd.toFixed(2)}%）` : ''}；TLC 供试品 Rf = ${stats.sampleRf.toFixed(3)}，对照品 Rf = ${stats.refRf.toFixed(3)}，|ΔRf| = ${stats.deltaRf.toFixed(3)}。</p></div>`;
+    if (mod.scaling) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">五、SOP 执行记录</h4><ul class="list-none space-y-0.5 text-xs">${t.sop.map((s, i) => `<li>[${ws.sopDone[i] ? '✓' : '○'}] ${s}</li>`).join('')}</ul></div>`;
+    if (mod.data) html += `<div class="space-y-1.5"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">六、平行数据统计与 TLC 检识</h4><table class="w-full text-xs border-collapse border border-slate-300"><thead><tr class="bg-slate-100"><th class="border border-slate-300 px-2 py-1">批次</th><th class="border border-slate-300 px-2 py-1">投料(g)</th><th class="border border-slate-300 px-2 py-1">粗提(${t.crudeUnit})</th><th class="border border-slate-300 px-2 py-1">精制(g)</th><th class="border border-slate-300 px-2 py-1">熔点(℃)</th><th class="border border-slate-300 px-2 py-1">收率</th></tr></thead><tbody>${ws.batches.map((b, i) => `<tr><td class="border border-slate-300 px-2 py-1">#${i + 1}</td><td class="border border-slate-300 px-2 py-1">${b.mass}</td><td class="border border-slate-300 px-2 py-1">${b.crude}</td><td class="border border-slate-300 px-2 py-1">${b.refined}</td><td class="border border-slate-300 px-2 py-1">${b.mp}</td><td class="border border-slate-300 px-2 py-1 font-bold">${(Number(b.mass) > 0 ? (b.crude / b.mass * 100).toFixed(2) : '0.00')}%</td></tr>`).join('')}</tbody></table><p class="text-xs">平均粗提收率 ${stats.avgCrude.toFixed(2)}%${stats.count > 1 ? `（SD ±${stats.sd.toFixed(3)}%，RSD ${stats.rsd.toFixed(2)}%）` : ''}；${stats.tlcValid ? `TLC 供试品 Rf = ${stats.sampleRf.toFixed(3)}，对照品 Rf = ${stats.refRf.toFixed(3)}，|ΔRf| = ${stats.deltaRf.toFixed(3)}。` : '<span class="text-rose-600 font-semibold">TLC 参数非法（需满足 0 &lt; L ≤ L₀），未写入有效 Rf 数据。</span>'}</p></div>`;
     if (mod.troubleshoot) html += `<div class="space-y-1"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">七、异常排障讨论</h4><ul class="list-disc pl-5 text-xs">${t.troubleshoot.map(tr => `<li><strong>${tr.issue}：</strong>${tr.cause} 对策：${tr.fix}</li>`).join('')}</ul></div>`;
     if (mod.conclusion) html += `<div class="space-y-1.5"><h4 class="text-sm font-extrabold border-b border-slate-300 pb-1">八、实验结论与参考文献</h4><p class="text-xs leading-relaxed">本实验以${t.herb}为原料，按设定工艺完成 ${stats.count} 批次平行试验，平均收率 ${stats.avgCrude.toFixed(2)}%（${stats.meets ? '达到' : '低于'}限度 ${stats.limit}%），检识通过率 ${stats.passRate.toFixed(0)}%，${stats.meets && stats.passRate === 100 ? '工艺稳定可行，满足课程与质量控制要求。' : '建议结合排障分析进一步优化参数。'}</p>${ws.aiConclusion ? `<p class="text-xs leading-relaxed bg-emerald-50/60 p-2 rounded border border-emerald-200/70"><strong>AI 深度结论与工艺讨论：</strong>${ws.aiConclusion}</p>` : ''}<div class="text-[11px] space-y-0.5 pt-1">${allRefs.map((r, i) => `<p>[${i + 1}] ${r.text}</p>`).join('')}</div></div>`;
     return html || '<p class="text-center text-slate-400 py-8">请勾选至少 1 个章节</p>';
@@ -3152,7 +3152,7 @@
     });
 
     // Step 4
-    document.querySelectorAll('.rig-tab-btn').forEach(b => b.addEventListener('click', () => { const t = getTopicDef(), ws = getWorkState(t); ws.activeRig = b.dataset.rig; ws.activeHotspot = 1; saveState(); renderStep4(t, ws); }));
+    document.querySelectorAll('.rig-tab-btn').forEach(b => b.addEventListener('click', () => { const t = getTopicDef(), ws = getWorkState(t); ws.activeRig = b.dataset.rig; ws.activeHotspot = 1; saveState(); renderStep4(t, ws); })); document.getElementById('applyRigToReportBtn')?.addEventListener('click', () => { const t = getTopicDef(), ws = getWorkState(t); ws.reportRig = ws.activeRig; saveState(); renderAll(); showToast('已将当前预览装置应用到实验报告'); });
     document.querySelectorAll('[data-timer-preset]').forEach(b => b.addEventListener('click', () => { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; document.getElementById('btnTimerToggle').textContent = '开始'; } timerSeconds = Number(b.dataset.timerPreset) * 60; updateTimerUI(); }));
     document.getElementById('btnTimerToggle').addEventListener('click', () => {
       const btn = document.getElementById('btnTimerToggle');
@@ -3636,7 +3636,7 @@
     const ws = getWorkState(getTopicDef());
     if (plan.formalTitle) ws.formalTitle = plan.formalTitle;
     ws.trackId = 'optimization';
-    ws.activeRig = rig;
+    ws.activeRig = rig; ws.reportRig = rig;
     if (plan.defaultExtract) ws.diyExtract = plan.defaultExtract;
     if (plan.defaultSep) ws.diySeparate = plan.defaultSep;
     if (plan.integrative || plan.aiAdvice) ws.diyNotes = `[千问AI自动规划] ${plan.aiAdvice || plan.integrative}`;
