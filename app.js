@@ -2055,19 +2055,35 @@
     document.getElementById('linkWanfangQuick').href = `https://s.wanfangdata.com.cn/paper?q=${kw}`;
     document.getElementById('linkPubmedQuick').href = `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(t.latin.split(' ')[0] || t.herb)}`;
 
+    const litInput = document.getElementById('litSearchInput');
+    if (litInput && !litInput.dataset.bound) {
+      litInput.dataset.bound = '1';
+      litInput.addEventListener('input', e => {
+        state.litQuery = e.target.value;
+        renderRightDrawer(t, ws);
+      });
+    }
+
     const tags = ['全部', '药典教材', '中药化学', '中西医结合', '高校实验', '药企中试', '经典复方'];
     const fb = document.getElementById('litFilterBar');
     fb.innerHTML = tags.map(tg => `<button type="button" data-lit-f="${tg}" class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${state.litFilter === tg ? 'bg-[#0a3630] text-white border-[#0a3630]' : 'bg-white text-slate-600 border-slate-200'}">${tg}</button>`).join('');
     fb.querySelectorAll('[data-lit-f]').forEach(b => b.addEventListener('click', () => { state.litFilter = b.dataset.litF; renderRightDrawer(t, ws); }));
 
     const allLit = [...GLOBAL_LITERATURE, ...state.extraGlobalRefs];
-    const shownLit = state.litFilter === '全部' ? allLit : allLit.filter(x => x.tag === state.litFilter);
+    const litQ = (state.litQuery || '').trim().toLowerCase();
+    let shownLit = state.litFilter === '全部' ? allLit : allLit.filter(x => x.tag === state.litFilter);
+    if (litQ) {
+      shownLit = shownLit.filter(x => `${x.tag} ${x.text}`.toLowerCase().includes(litQ));
+    }
     document.getElementById('globalLitList').innerHTML = shownLit.map((r, i) => `
-      <div class="p-3 rounded-xl bg-[#f7f7f4] border border-slate-200/70 text-[11px] leading-relaxed space-y-1">
-        <div class="flex items-center justify-between gap-2"><span class="px-1.5 py-0.5 rounded bg-teal-50 text-[#0f5c54] text-[10px] font-bold">${r.tag}</span><button type="button" data-copy-glit="${i}" class="text-[#0f5c54] font-semibold hover:underline">复制</button></div>
-        <div class="text-slate-800">${r.text}</div>
-        ${r.url ? `<a href="${r.url}" target="_blank" rel="noopener noreferrer" class="inline-block text-[#0f5c54] underline">原文核查 ↗</a>` : ''}
-      </div>`).join('');
+      <div class="p-3 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 text-xs leading-relaxed space-y-1.5 transition hover:shadow-2xs">
+        <div class="flex items-center justify-between gap-2">
+          <span class="px-2 py-0.5 rounded-full bg-teal-50 text-[#0f5c54] text-[10px] font-bold border border-teal-200/60">${r.tag}</span>
+          <button type="button" data-copy-glit="${i}" class="text-xs font-bold text-[#0f5c54] hover:underline">复制 GB/T 7714 格式</button>
+        </div>
+        <div class="text-slate-800 text-xs sm:text-[13px] leading-relaxed select-all">${r.text}</div>
+        ${r.url ? `<a href="${r.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[11px] font-bold text-[#0f5c54] hover:underline">原文与期刊核查 ↗</a>` : ''}
+      </div>`).join('') || '<div class="text-center text-xs text-slate-400 py-6">无符合检索条件的文献</div>';
     document.querySelectorAll('[data-copy-glit]').forEach(b => b.addEventListener('click', () => copyText(shownLit[Number(b.dataset.copyGlit)].text, '已复制文献')));
 
     const queries = [
@@ -2082,19 +2098,32 @@
     document.querySelectorAll('[data-side-q]').forEach(b => b.addEventListener('click', () => copyText(queries[Number(b.dataset.sideQ)].q, '已复制检索式')));
 
     // 3. 高校实验参考
+    const univInput = document.getElementById('univSearchInput');
+    if (univInput && !univInput.dataset.bound) {
+      univInput.dataset.bound = '1';
+      univInput.addEventListener('input', e => {
+        state.univQuery = e.target.value;
+        renderRightDrawer(t, ws);
+      });
+    }
+
     const uTypes = ['全部', '高校实验', '经典复方', '药企中试', '药企QC', '中西医结合', '国家平台'];
     const ufEl = document.getElementById('univFilterBar');
     if (ufEl) {
       ufEl.innerHTML = uTypes.map(tg => `<button type="button" data-univ-f="${tg}" class="px-2.5 py-1 rounded-full text-[10px] font-bold border ${state.univFilter === tg ? 'bg-[#0a3630] text-white border-[#0a3630]' : 'bg-white text-slate-600 border-slate-200'}">${tg}</button>`).join('');
       ufEl.querySelectorAll('[data-univ-f]').forEach(b => b.addEventListener('click', () => { state.univFilter = b.dataset.univF; renderRightDrawer(t, ws); }));
     }
-    const shownUniv = state.univFilter === '全部' ? UNIV_CASES : UNIV_CASES.filter(u => u.type === state.univFilter);
+    const univQ = (state.univQuery || '').trim().toLowerCase();
+    let shownUniv = state.univFilter === '全部' ? UNIV_CASES : UNIV_CASES.filter(u => u.type === state.univFilter);
+    if (univQ) {
+      shownUniv = shownUniv.filter(u => `${u.univ} ${u.title} ${u.desc}`.toLowerCase().includes(univQ));
+    }
     document.getElementById('univCasesList').innerHTML = shownUniv.map(u => `
-      <div class="p-3.5 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 space-y-1">
-        <div class="flex items-center justify-between"><span class="px-2 py-0.5 rounded-full bg-[#0a3630] text-emerald-200 text-[10px] font-bold">${u.univ}</span><a href="${u.url}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-[#0f5c54] underline">参考 ↗</a></div>
-        <div class="text-xs font-bold text-slate-900 pt-0.5">${u.title}</div>
-        <p class="text-[12px] text-slate-600 leading-relaxed">${u.desc}</p>
-      </div>`).join('');
+      <div class="p-3.5 rounded-2xl bg-[#f7f7f4] border border-slate-200/80 space-y-1.5 transition hover:shadow-2xs">
+        <div class="flex items-center justify-between"><span class="px-2.5 py-0.5 rounded-full bg-[#0a3630] text-emerald-200 text-[10px] font-bold">${u.univ}</span><a href="${u.url}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-[#0f5c54] hover:underline">高校原案 ↗</a></div>
+        <div class="text-sm font-bold text-slate-900 pt-0.5">${u.title}</div>
+        <p class="text-xs text-slate-600 leading-relaxed">${u.desc}</p>
+      </div>`).join('') || '<div class="text-center text-xs text-slate-400 py-6">无匹配的高校或药企案例</div>';
 
     // 4. 《中药化学》课程 10 大章节知识库
     const chEl = document.getElementById('courseChaptersList');
@@ -2126,6 +2155,31 @@
         state.activeTopicId = btn.dataset.chPick; walkIdx = 0; saveState(); closeRightDrawer(); renderAll(); showToast(`已从课程章节载入：${getTopicDef().herb}`);
       }));
     }
+  }
+
+  function getHerbLaymanNote(t) {
+    if (t.layman) return t.layman;
+    const h = t.herb;
+    const c = t.category;
+    if (c === '生物碱') {
+      return `【${h} · 生物碱类】核心为含氮碱性化合物。小白通关要点：它就像个“变装双面谍”，遇酸穿上带电马甲溶于水相，加碱脱掉马甲变游离碱跳入有机相；常用酸水提取或碱化后萃取，极适合用 TLC 碘化铋钾试剂喷雾显橙红色斑点。`;
+    }
+    if (c === '挥发油与萜类') {
+      return `【${h} · 挥发油类】核心具有挥发性与天然芳香。小白通关要点：沸点低、极性小、怕长时间强热！通常利用与水共沸特性，在 95~98℃ 下水蒸气蒸馏带出，或用低极性石油醚冷浸；千万不能开敞口高温长时间蒸发，否则香气成分全部挥发跑光！`;
+    }
+    if (c === '黄酮') {
+      return `【${h} · 黄酮类】多具酚羟基与色原酮骨架。小白通关要点：怕强碱长时间氧化，遇酸可能水解糖苷键。通常选用 60%~80% 乙醇文火回流或超声提取；分离纯化常用大孔吸附树脂或聚酰胺吸附，检识用盐酸-镁粉反应显樱红色，紫外灯下呈亮黄色荧光。`;
+    }
+    if (c === '蒽醌与醌类') {
+      return `【${h} · 醌类】核心具共轭醌环与不同数目的酚羟基。小白通关要点：酸性强弱取决于酚羟基的位置和数量！可巧妙利用 NaHCO₃、Na₂CO₃、1% NaOH 溶液梯度萃取法，像分楼梯一样把不同酸性的蒽醌依次分离出来，Bornträger 反应加碱显红。`;
+    }
+    if (c === '皂苷与三萜') {
+      return `【${h} · 皂苷类】分子大，一头亲水（多糖链）一头亲脂（皂苷元）。小白通关要点：水溶液用力振摇会产生蜂窝状持久泡沫；提取常用正丁醇萃取纯化，或用大孔树脂脱盐；怕强酸水解，薄层色谱喷 10% 硫酸乙醇显紫红至褐色。`;
+    }
+    if (c === '多糖类') {
+      return `【${h} · 多糖类】水溶性高分子聚合物。小白通关要点：极爱溶于热水，但在乙醇中会像雪花一样析出沉淀！所以经典工艺是“水提醇沉法”（水煮出浓缩液，加 4 倍量无水乙醇让多糖沉淀析出），Sevage 法除蛋白即可获得高纯多糖。`;
+    }
+    return `【${h} · ${c}】小白通关要点：目标成分为 ${t.compound}。请注意控制提取温度在 ${t.defaultCfg?.temp || 75}℃ 左右保护热敏活性，选用 ${t.defaultCfg?.solventType || '适宜溶剂'} 高效溶出，按提取、分离、纯化、检识 4 个阶段规范推进实验。`;
   }
 
   function renderStep1(t) {
@@ -2219,6 +2273,8 @@
     document.getElementById('s1Origin').textContent = t.origin;
     document.getElementById('s1Chem').textContent = t.chemistry;
     document.getElementById('s1Pharm').textContent = t.pharmacopoeia;
+    const laymanEl = document.getElementById('s1Layman');
+    if (laymanEl) laymanEl.textContent = getHerbLaymanNote(t);
   }
 
   function renderStep2(t, ws) {
@@ -2860,6 +2916,10 @@
         if (rawStep === 'hub') { if (isHub) btn.classList.add('active'); }
         else { const n = Number(rawStep); if (!isHub && n === state.step) btn.classList.add('active'); else if (!isHub && n < state.step) btn.classList.add('done'); }
       });
+      const zoneWf = document.getElementById('zoneTabWorkflow');
+      const zoneHub = document.getElementById('btnOpenApparatusHub');
+      if (zoneWf) zoneWf.classList.toggle('active', !isHub);
+      if (zoneHub) zoneHub.classList.toggle('active', isHub);
       document.querySelectorAll('.wpanel').forEach(p => p.classList.add('hidden'));
       const curP = document.getElementById(`wpanel-${state.step}`);
       if (curP) { curP.classList.remove('hidden'); curP.style.opacity = '1'; curP.classList.remove('panel-anim'); void curP.offsetWidth; curP.classList.add('panel-anim'); }
@@ -2993,6 +3053,8 @@
     if (btnJumpHub) btnJumpHub.addEventListener('click', () => { state.lastWorkStep = 4; state.step = 'hub'; saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
     const btnBackWf = document.getElementById('btnBackToWorkflow');
     if (btnBackWf) btnBackWf.addEventListener('click', () => { state.step = state.lastWorkStep || 1; saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    const btnZoneWf = document.getElementById('zoneTabWorkflow');
+    if (btnZoneWf) btnZoneWf.addEventListener('click', () => { state.step = state.lastWorkStep || 1; saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
     document.getElementById('btnMobPrev').addEventListener('click', () => { if (state.step > 1) { if (autoRunning) cancelActiveAI(); state.step--; stopWalkthrough(); saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
     document.getElementById('btnMobNext').addEventListener('click', () => { if (state.step < 6) { if (autoRunning) cancelActiveAI(); state.step++; stopWalkthrough(); saveState(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
 

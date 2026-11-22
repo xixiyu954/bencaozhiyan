@@ -27,7 +27,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <link rel="stylesheet" href="./styles.css?v=16" />
+  <link rel="stylesheet" href="./styles.css?v=18" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
@@ -232,6 +232,10 @@
           <a href="https://ydz.chp.org.cn/" target="_blank" rel="noopener noreferrer" class="py-1.5 rounded-lg bg-amber-50 text-amber-800 text-[11px] font-bold text-center border border-amber-200 hover:bg-amber-100">药典 ↗</a>
         </div>
 
+        <div class="relative">
+          <input id="litSearchInput" type="text" placeholder="🔍 快速检索文献（如：黄连、提取、超声、药典...）" class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 bg-white placeholder:text-slate-400 focus:border-[#0f5c54] focus:outline-none transition shadow-2xs" />
+        </div>
+
         <div class="flex items-center justify-between gap-2">
           <div id="litFilterBar" class="flex flex-wrap gap-1"></div>
           <button id="btnSideCopyRefs" type="button" class="shrink-0 text-[11px] font-bold text-[#0f5c54] hover:underline">复制全部</button>
@@ -249,6 +253,9 @@
       <!-- 抽屉面板 3：全国医药高校代表性药学与中西医结合实验参考 -->
       <div id="rpanel-univ" class="hidden space-y-2.5">
         <p class="text-[11px] text-slate-500 leading-relaxed">汇总国内多所医药及中医药高校的经典药学与中西医结合实验思路，供课程设计与创新拓展参考。</p>
+        <div class="relative">
+          <input id="univSearchInput" type="text" placeholder="🔍 检索院校/案例（如：中国药科大、复方、SOP...）" class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 bg-white placeholder:text-slate-400 focus:border-[#0f5c54] focus:outline-none transition shadow-2xs" />
+        </div>
         <div id="univFilterBar" class="flex flex-wrap gap-1.5 pb-1"></div>
         <div id="univCasesList" class="space-y-2.5"></div>
       </div>
@@ -500,6 +507,13 @@
             <div class="p-4 rounded-2xl bg-[#f7f7f4] space-y-1"><div class="text-xs font-bold text-[#0f5c54]">化学成分</div><p id="s1Chem" class="text-xs sm:text-sm text-slate-700 leading-relaxed"></p></div>
             <div class="p-4 rounded-2xl bg-[#f7f7f4] space-y-1"><div class="text-xs font-bold text-[#0f5c54]">药典标准</div><p id="s1Pharm" class="text-xs sm:text-sm text-slate-700 leading-relaxed"></p></div>
           </div>
+          <!-- 小白速懂：药材脾气与生活速读卡片 -->
+          <div id="s1LaymanBox" class="mt-3.5 p-4 rounded-2xl bg-amber-50/80 border border-amber-200/90 space-y-1.5 shadow-2xs">
+            <div class="text-xs font-extrabold text-amber-900 flex items-center gap-1.5">
+              <span>💡</span><span>小白速懂 · 药材脾气与实验关键（零基础必读）</span>
+            </div>
+            <p id="s1Layman" class="text-xs sm:text-sm text-amber-950 leading-relaxed"></p>
+          </div>
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-slate-200/80 mt-6">
@@ -548,6 +562,58 @@
           <div class="inline-flex p-1 rounded-2xl bg-white border border-slate-200 shadow-2xs shrink-0">
             <button id="btnModeClassic" type="button" class="px-4 py-1.5 rounded-xl text-xs font-bold transition bg-[#0a3630] text-white">经典方案</button>
             <button id="btnModeDiy" type="button" class="px-4 py-1.5 rounded-xl text-xs font-bold transition text-slate-600">DIY 定制</button>
+          </div>
+        </div>
+
+        <!-- 零基础通关：中药提取分离 4 大通俗锦囊 -->
+        <div class="lab-card rounded-3xl p-5 sm:p-6 space-y-3.5 bg-gradient-to-br from-amber-50/70 via-white to-emerald-50/40 border border-amber-200/80 shadow-xs">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center font-bold text-sm">💡</span>
+              <div>
+                <h3 class="text-base font-extrabold text-slate-900">小白 3 分钟速通 · 中药提取纯化四大核心逻辑</h3>
+                <p class="text-xs text-slate-500">零基础不用死记硬背公式，掌握这 4 条生活通俗比喻，实验原理与设计答辩轻松通关！</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold">零基础必读</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+            <div class="p-3.5 rounded-2xl bg-white/95 border border-amber-200/80 shadow-2xs space-y-1.5">
+              <div class="text-xs font-extrabold text-amber-900 flex items-center gap-1.5">
+                <span>🍶</span><span>① 溶剂怎么选？（极性对对碰）</span>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                <strong>“相似相溶像找朋友”</strong>：水极性最大（爱溶糖与盐），石油醚极性最小（爱溶挥发油）。<strong>70% 乙醇</strong>是一趟万能和事佬快车，既亲水又亲脂，把黄酮、生物碱一网打尽，还不溶淀粉杂质！
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-white/95 border border-emerald-200/80 shadow-2xs space-y-1.5">
+              <div class="text-xs font-extrabold text-emerald-900 flex items-center gap-1.5">
+                <span>🌡️</span><span>② 火候怎么控？（热敏与扩散）</span>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                <strong>“扩散要热，成分怕熟”</strong>：温度每升 10℃ 分子跑得快一倍；但超过 75℃，娇贵的黄酮苷、薄荷油就会水解或挥发！高校实验推荐 <strong>60~75℃ 文火温浴</strong>，既溶出快，又保护活性不被煮烂。
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-white/95 border border-sky-200/80 shadow-2xs space-y-1.5">
+              <div class="text-xs font-extrabold text-sky-900 flex items-center gap-1.5">
+                <span>⚖️</span><span>③ 杂质怎么甩？（两相跳跃法）</span>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                <strong>“酸碱变装，水油两相跳”</strong>：生物碱加酸穿上带电马甲跳进水层，加碱脱掉马甲变游离碱跳入有机层，来回一次甩掉所有杂质！大孔树脂则像海绵，水冲走糖，酒精把有效黄酮洗下来。
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-white/95 border border-indigo-200/80 shadow-2xs space-y-1.5">
+              <div class="text-xs font-extrabold text-indigo-900 flex items-center gap-1.5">
+                <span>🎯</span><span>④ 怎么算做成了？（TLC照妖镜）</span>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                <strong>“硅胶板上赛跑比高度”</strong>：薄层板就像吸水纸，供试品斑点随着展开剂爬升。只要和标准品爬到<strong>同一相对高度（Rf 一致）</strong>并在紫外灯下发同色荧光，就证明实验 100% 成功！
+              </p>
+            </div>
           </div>
         </div>
 
@@ -1115,11 +1181,11 @@
 <script src="./lab-tools-v3.js?v=8"></script>
 <script src="./lab-v6-pro.js?v=11"></script>
 <script src="./lab-v7-media-pro.js?v=11"></script>
-<script src="./lab-v9-data.js?v=16"></script>
-<script src="./lab-v8-studio.js?v=16"></script>
-<script src="./lab-v9-visuals.js?v=16"></script>
-<script src="./lab-v10-sandbox.js?v=16"></script>
-<script src="./cloud-ai.js?v=16"></script>
-<script src="./app.js?v=16"></script>
+<script src="./lab-v9-data.js?v=18"></script>
+<script src="./lab-v8-studio.js?v=18"></script>
+<script src="./lab-v9-visuals.js?v=18"></script>
+<script src="./lab-v10-sandbox.js?v=18"></script>
+<script src="./cloud-ai.js?v=18"></script>
+<script src="./app.js?v=18"></script>
 </body>
 </html>
