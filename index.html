@@ -21,14 +21,14 @@
   <!-- 站点图标与 PWA 清单 -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23062420'/%3E%3Ctext%20y='.75em'%20x='50%25'%20font-size='60'%20text-anchor='middle'%20dominant-baseline='central'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <!-- 全本地化同源依赖：零境外 CDN 依赖，保障中国大陆校园网/移动网稳定秒开 -->
-  <script defer src="./vendor/tailwindcss-3.4.17.min.js"></script>
-  <script defer src="./vendor/chart-4.4.1.umd.min.js"></script>
-  <script defer src="./vendor/lucide-0.460.0.min.js"></script>
+  <!-- 全本地化同源依赖：零境外 CDN 依赖，同步加载核心样式/图表/图标避免空框与闪烁 -->
+  <script src="./vendor/tailwindcss-3.4.17.min.js"></script>
+  <script src="./vendor/chart-4.4.1.umd.min.js"></script>
+  <script src="./vendor/lucide-0.460.0.min.js"></script>
   <script defer src="./vendor/html2canvas-1.4.1.min.js"></script>
-  <link rel="stylesheet" href="./styles.css?v=23" />
+  <link rel="stylesheet" href="./styles.css?v=24" />
   <link rel="stylesheet" href="./lab-v15-insight.css?v=16" />
-  <link rel="stylesheet" href="./lab-v16-portal.css?v=18" />
+  <link rel="stylesheet" href="./lab-v16-portal.css?v=19" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
@@ -52,8 +52,12 @@
     <!-- 极简品牌头 -->
     <div class="px-5 py-4 border-b border-white/10 flex items-center justify-between gap-2">
       <div class="flex items-center gap-2.5 min-w-0">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-300 to-teal-600 text-[#062420] flex items-center justify-center shadow-md shrink-0">
-          <i data-lucide="sliders" class="w-4 h-4 stroke-[2.4]"></i>
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-300 via-teal-400 to-teal-600 text-[#05211d] flex items-center justify-center shadow-md ring-1 ring-white/25 shrink-0" aria-hidden="true">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 3h6" /><path d="M10 3v5.4L5.6 16.5A3 3 0 0 0 8.2 21h7.6a3 3 0 0 0 2.6-4.5L14 8.4V3" />
+            <path d="M7.5 15.5c2-1 4 1 6.5 0s2.5-.5 2.5-.5" />
+            <path d="M11.5 13c.2-1.8 1.5-3 3-3-.2 1.8-1.5 3-3 3Z" fill="currentColor" stroke="none" opacity="0.85" />
+          </svg>
         </div>
         <div class="min-w-0">
           <div class="text-sm font-extrabold text-white tracking-tight truncate">本草智研 · 配置单</div>
@@ -91,17 +95,17 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[10px] text-teal-200 mb-1">提取温度 (℃)</label>
-            <input id="cfgTemp" type="number" min="20" max="120" step="5" class="w-full px-2.5 py-1.5 rounded-lg bg-white/10 border border-white/15 text-white text-xs tabular-nums" />
+            <input id="cfgTemp" type="number" min="20" max="120" step="5" class="w-full h-9 px-2.5 rounded-lg bg-white/10 border border-white/15 text-white text-xs tabular-nums" />
           </div>
           <div>
             <label class="block text-[10px] text-teal-200 mb-1">提取时间 (min)</label>
-            <input id="cfgTime" type="number" min="15" max="480" step="15" class="w-full px-2.5 py-1.5 rounded-lg bg-white/10 border border-white/15 text-white text-xs tabular-nums" />
+            <input id="cfgTime" type="number" min="15" max="480" step="15" class="w-full h-9 px-2.5 rounded-lg bg-white/10 border border-white/15 text-white text-xs tabular-nums" />
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[10px] text-teal-200 mb-1">粉碎粒度</label>
-            <select id="cfgMesh" class="w-full px-2 py-1.5 rounded-lg bg-white/10 border border-white/15 text-white text-xs">
+            <select id="cfgMesh" class="w-full h-9 px-2 rounded-lg bg-white/10 border border-white/15 text-white text-xs">
               <option value="切段(1~2cm)" class="text-slate-900">切段(1~2cm)</option>
               <option value="粗粉(10~20目)" class="text-slate-900">粗粉(10~20目)</option>
               <option value="中粉(40目)" class="text-slate-900">中粉(40目)</option>
@@ -110,7 +114,7 @@
           </div>
           <div>
             <label class="block text-[10px] text-teal-200 mb-1">提取次数</label>
-            <select id="cfgCycles" class="w-full px-2 py-1.5 rounded-lg bg-white/10 border border-white/15 text-white text-xs">
+            <select id="cfgCycles" class="w-full h-9 px-2 rounded-lg bg-white/10 border border-white/15 text-white text-xs">
               <option value="1" class="text-slate-900">1 次提取</option>
               <option value="2" class="text-slate-900">2 次合并</option>
               <option value="3" class="text-slate-900">3 次合并</option>
@@ -120,7 +124,7 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[10px] text-teal-200 mb-1">溶剂体系</label>
-            <select id="cfgSolventType" class="w-full px-2 py-1.5 rounded-lg bg-white/10 border border-white/15 text-white text-xs">
+            <select id="cfgSolventType" class="w-full h-9 px-2 rounded-lg bg-white/10 border border-white/15 text-white text-xs">
               <option value="纯化水" class="text-slate-900">纯化水</option>
               <option value="70%乙醇" class="text-slate-900">70%乙醇</option>
               <option value="95%乙醇" class="text-slate-900">95%乙醇</option>
@@ -131,7 +135,7 @@
           </div>
           <div>
             <label class="block text-[10px] text-teal-200 mb-1">目标 pH 调控</label>
-            <input id="cfgPh" type="text" placeholder="如 7.0 / 1.5" class="w-full px-2.5 py-1.5 rounded-lg bg-white/10 border border-white/15 text-white text-xs" />
+            <input id="cfgPh" type="text" placeholder="如 7.0 / 1.5" class="w-full h-9 px-2.5 rounded-lg bg-white/10 border border-white/15 text-white text-xs" />
           </div>
         </div>
       </div>
@@ -360,8 +364,11 @@
       <section id="qwenCommandBar" class="no-print rounded-3xl bg-white/95 backdrop-blur-md border border-emerald-200/90 shadow-md p-4 sm:p-5 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-2 min-w-0">
-            <span class="w-7 h-7 rounded-xl bg-gradient-to-br from-[#0a3630] to-emerald-600 text-amber-300 flex items-center justify-center shadow-xs shrink-0">
-              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#072f29] via-[#0c4d44] to-emerald-600 text-amber-300 flex items-center justify-center shadow-sm ring-1 ring-emerald-400/30 shrink-0" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" fill="currentColor" fill-opacity="0.22" />
+                <path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z" />
+              </svg>
             </span>
             <div class="min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
@@ -1064,7 +1071,12 @@
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2">
-          <span class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0a3630] to-emerald-600 text-amber-300 flex items-center justify-center"><i data-lucide="sparkles" class="w-4 h-4"></i></span>
+          <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#072f29] via-[#0c4d44] to-emerald-600 text-amber-300 flex items-center justify-center shadow-sm ring-1 ring-emerald-400/30 shrink-0" aria-hidden="true">
+            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" fill="currentColor" fill-opacity="0.22" />
+              <path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z" />
+            </svg>
+          </span>
           <div>
             <h3 class="text-base font-extrabold text-slate-900">智能实验助手说明</h3>
             <p class="text-[11px] text-slate-500">免费开放 · 开箱即用，无需繁琐配置</p>
@@ -1202,6 +1214,6 @@
 <script src="./cloud-ai.js?v=24"></script>
 <script src="./app.js?v=24"></script>
 <script src="./lab-v15-insight.js?v=17"></script>
-<script src="./lab-v16-portal.js?v=18"></script>
+<script src="./lab-v16-portal.js?v=19"></script>
 </body>
 </html>

@@ -69,13 +69,100 @@ body[data-v16-route="ai"] .wpanel {
   display: none !important;
 }
 
-/* 在纯净 6 步工坊中，收起旧版 Step 1 重复的双重 Hero 堆叠（这些已升级进独立首页与题库页） */
+/* 在纯净 6 步工坊中，收起旧版 Step 1 重复的双重 Hero 堆叠与冗余工具条，一屏直达核心内容 */
 body[data-v16-route="workflow"] #welcomePortalHero,
+body[data-v16-route="workflow"] #v15Mini,
+body[data-v16-route="workflow"] #v16WorkflowBar,
 body[data-v16-route="workflow"] #wpanel-1 > div:first-of-type {
   display: none !important;
 }
-body[data-v16-route="workflow"] #v15Mini {
-  margin-top: 0 !important;
+
+/* 顶栏去噪：在首页/题库/AI/DIY 走向页中，隐藏冗余的 PORTAL/总览首页 文字标签（当前激活导航胶囊已标明页面） */
+body[data-v16-mode="portal"] #headerStepTag,
+body[data-v16-mode="portal"] #headerTitle {
+  display: none !important;
+}
+
+/* 彻底消除导航栏下方丑陋的 Windows 横向滚动条，并紧凑单排排布 */
+#workspaceZoneBar {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  padding: 4px !important;
+  gap: 3px !important;
+  border-radius: 15px !important;
+}
+#workspaceZoneBar::-webkit-scrollbar {
+  display: none !important;
+  height: 0 !important;
+}
+#workspaceZoneBar .zone-tab,
+#workspaceZoneBar .v16-route-tab {
+  padding: 6px 11px !important;
+  font-size: 0.79rem !important;
+  border-radius: 10px !important;
+  gap: 5px !important;
+}
+#workspaceZoneBar .v15-new-badge {
+  display: none !important;
+}
+
+/* 顶栏右侧工具按钮：告别五颜六色彩虹拼凑，统一高级磨砂玻璃质感 */
+header button#btnOpenCmdPalette,
+header button#btnOpenCompareTop,
+header button#btnOpenQwenCfgTop,
+header button#btnToggleVisualDock,
+header button#btnFontScale,
+header button#btnToggleDarkLab,
+header button#btnOpenFeedbackTop,
+header button#btnResetTopic {
+  background: rgba(255, 255, 255, 0.85) !important;
+  background-image: none !important;
+  border: 1px solid rgba(15, 92, 84, 0.14) !important;
+  color: #1f3c36 !important;
+  box-shadow: 0 1px 2px rgba(7, 47, 41, 0.04) !important;
+  height: 32px;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  transition: all 0.18s var(--ds-ease) !important;
+}
+header button#btnOpenCmdPalette:hover,
+header button#btnOpenCompareTop:hover,
+header button#btnOpenQwenCfgTop:hover,
+header button#btnToggleVisualDock:hover,
+header button#btnFontScale:hover,
+header button#btnToggleDarkLab:hover,
+header button#btnOpenFeedbackTop:hover,
+header button#btnResetTopic:hover {
+  background: #ffffff !important;
+  border-color: rgba(15, 92, 84, 0.42) !important;
+  color: #062923 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px -4px rgba(7, 47, 41, 0.16) !important;
+}
+/* 顶栏已有独立「AI 设计」主导航页，精简重复的「智能助手」按钮仅作为轻量服务状态图标按钮 */
+header button#btnOpenQwenCfgTop {
+  border-color: rgba(201, 146, 44, 0.32) !important;
+}
+
+/* Step 1 药材卡片统一整齐质感与标题截断 */
+#step1HerbCards .pick-card {
+  min-height: 122px;
+  border-color: rgba(15, 92, 84, 0.12) !important;
+  box-shadow: 0 1px 3px rgba(7, 47, 41, 0.03);
+  transition: transform 0.18s var(--ds-ease), box-shadow 0.18s var(--ds-ease), border-color 0.18s ease !important;
+}
+#step1HerbCards .pick-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(15, 92, 84, 0.36) !important;
+  box-shadow: 0 8px 20px -8px rgba(7, 47, 41, 0.14);
+}
+#step1HerbCards .pick-card .text-base {
+  font-size: 0.94rem !important;
+  line-height: 1.35 !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* 独立走向页容器动画 */

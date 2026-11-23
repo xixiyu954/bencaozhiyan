@@ -81,13 +81,35 @@
     return null;
   }
 
-  // ---------- 1. 升级顶栏导航：清晰路由 + 零破坏兼容旧按钮 ----------
+  // ---------- 精美高清内联矢量 SVG 图标集（替代低清系统 Emoji，永不出现空框） ----------
+  const SVG_ICONS = {
+    brand: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v5.4L5.6 16.5A3 3 0 0 0 8.2 21h7.6a3 3 0 0 0 2.6-4.5L14 8.4V3"/><path d="M7.5 15.5c2-1 4 1 6.5 0s2.5-.5 2.5-.5"/></svg>`,
+    home: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/><path d="M9 21v-6h6v6"/></svg>`,
+    bank: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+    ai: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"/></svg>`,
+    diy: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>`,
+    workflow: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v5.4L5.6 16.5A3 3 0 0 0 8.2 21h7.6a3 3 0 0 0 2.6-4.5L14 8.4V3"/></svg>`
+  };
+
+  // 全局 Lucide 图标自愈渲染器：无论任意模块何时插入 <i data-lucide>，确保零空框
+  let lucideTimer = null;
+  function syncLucideIcons() {
+    if (typeof window.lucide === 'undefined' || !window.lucide.createIcons) return;
+    clearTimeout(lucideTimer);
+    lucideTimer = setTimeout(() => {
+      try {
+        if (document.querySelector('i[data-lucide]')) window.lucide.createIcons();
+      } catch (_) {}
+    }, 30);
+  }
+
+  // ---------- 1. 升级顶栏导航：清晰路由 + 矢量图标 + 零破坏兼容旧按钮 ----------
   function upgradeHeaderNav() {
     const zone = document.getElementById('workspaceZoneBar');
     if (!zone || zone.dataset.v16Upgraded === '1') return;
     zone.dataset.v16Upgraded = '1';
 
-    // 在顶栏最左侧加上品牌回首页按钮
+    // 在顶栏最左侧加上定制矢量品牌回首页按钮
     const headerRow = zone.parentElement;
     const titleWrap = headerRow && headerRow.querySelector('#headerStepTag')?.parentElement;
     if (titleWrap && !document.getElementById('v16BrandHomeBtn')) {
@@ -96,28 +118,28 @@
       brandBtn.id = 'v16BrandHomeBtn';
       brandBtn.className = 'v16-brand-btn';
       brandBtn.title = '返回本草智研首页总览';
-      brandBtn.innerHTML = '<span class="v16-brand-logo">🌿</span><span>本草智研</span>';
+      brandBtn.innerHTML = `<span class="v16-brand-logo" aria-hidden="true">${SVG_ICONS.brand}</span><span>本草智研</span>`;
       brandBtn.addEventListener('click', () => go('home'));
       titleWrap.insertBefore(brandBtn, titleWrap.firstChild);
     }
 
     const counts = getCounts();
-    const makeTab = (id, route, icon, label, pill) => {
+    const makeTab = (id, route, svgIcon, label, pill) => {
       const b = document.createElement('button');
       b.type = 'button';
       b.id = id;
       b.dataset.v16Route = route;
       b.className = 'v16-route-tab';
-      b.innerHTML = `<span>${icon}</span><span>${label}</span>${pill ? `<span class="v16-route-pill">${pill}</span>` : ''}`;
+      b.innerHTML = `${svgIcon}<span>${label}</span>${pill ? `<span class="v16-route-pill">${pill}</span>` : ''}`;
       b.addEventListener('click', () => go(route));
       return b;
     };
 
-    const tabHome = makeTab('v16NavHome', 'home', '🏠', '首页', '');
-    const tabBank = makeTab('v16NavBank', 'bank', '📚', '题库大厅', `${counts.topics}`);
-    const tabAi = makeTab('v16NavAi', 'ai', '✨', 'AI 设计', '');
-    const tabDiy = makeTab('v16NavDiy', 'diy', '🧩', 'DIY 实验室', '4合1');
-    const tabWf = makeTab('v16NavWorkflow', 'workflow', '🧪', '6步工坊', '');
+    const tabHome = makeTab('v16NavHome', 'home', SVG_ICONS.home, '首页', '');
+    const tabBank = makeTab('v16NavBank', 'bank', SVG_ICONS.bank, '题库大厅', `${counts.topics}`);
+    const tabAi = makeTab('v16NavAi', 'ai', SVG_ICONS.ai, 'AI 设计', '');
+    const tabDiy = makeTab('v16NavDiy', 'diy', SVG_ICONS.diy, 'DIY 实验室', '');
+    const tabWf = makeTab('v16NavWorkflow', 'workflow', SVG_ICONS.workflow, '6步工坊', '');
 
     // 把新五大走向按钮放在最前面，把旧按钮隐藏（保留 DOM ID 以确保旧脚本监听不报错）
     const legacyIds = ['zoneTabWorkflow', 'btnOpenDiyStudio', 'btnOpenMissionOs', 'btnOpenApparatusHub'];
@@ -202,7 +224,7 @@
       <div class="v16-footer-grid">
         <div class="v16-footer-col">
           <div class="flex items-center gap-2 mb-2.5">
-            <span class="v16-brand-logo">🌿</span>
+            <span class="v16-brand-logo" aria-hidden="true">${SVG_ICONS.brand}</span>
             <strong style="font-size:0.98rem;color:var(--ds-ink)">本草智研 · 中药化学工作台</strong>
           </div>
           <p style="margin:0;font-size:0.8rem;line-height:1.68;color:var(--ds-muted);max-width:340px">
@@ -1069,6 +1091,13 @@
     upgradeHeaderNav();
     ensureContainers();
     bindCrossModuleHooks();
+    syncLucideIcons();
+    window.addEventListener('load', syncLucideIcons, { once: true });
+    if (typeof MutationObserver !== 'undefined') {
+      new MutationObserver(() => {
+        if (document.querySelector('i[data-lucide]')) syncLucideIcons();
+      }).observe(document.body, { childList: true, subtree: true });
+    }
 
     // 若 URL 明确指定 ?step= 或 ?route= 则直达对应页；否则默认展示高端落地页 home
     const params = new URLSearchParams(window.location.search || '');
