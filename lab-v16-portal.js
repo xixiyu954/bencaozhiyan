@@ -266,17 +266,11 @@
     grid.addEventListener('click', handleGlobalDelegate);
   }
 
-  // ---------- 4. 渲染：首页完整落地页 (HOME) ----------
+  // ---------- 4. 渲染：首页完整落地页 (HOME · 100% 无痕纯净，不展示任何历史测试或进度残留) ----------
   function renderHome() {
     const mount = document.getElementById('v16HomePage');
     if (!mount) return;
     const c = getCounts();
-    const t = getCurrentTopic();
-    const ws = getCurrentWs();
-    const v15 = getV15Score();
-    const step = api() ? api().getStep() : 1;
-    const stepNum = typeof step === 'number' ? step : 1;
-    const resumeInfo = window.TCM_RESUME_BRIDGE && window.TCM_RESUME_BRIDGE.getResumeInfo ? window.TCM_RESUME_BRIDGE.getResumeInfo() : null;
 
     mount.innerHTML = `
       <div class="v16-home-wrap">
@@ -284,10 +278,10 @@
         <section class="v16-hero">
           <div class="v16-hero-grid">
             <div>
-              <span class="v16-eyebrow"><span class="v16-eyebrow-dot"></span>本草智研 v16 · 模块化分支工作台 · 国内零境外 CDN 秒开</span>
+              <span class="v16-eyebrow"><span class="v16-eyebrow-dot"></span>本草智研 · 无痕纯净版 · 每次进入自动清零重置</span>
               <h2>告别上下狂划，<br/>按你的实验目标进入<em>专属走向页</em></h2>
               <p class="v16-hero-desc">
-                无论你是零基础挑经典药材、用 AI 一句话生成整套工艺与装置，还是想在 DIY 沙盒里自由拼装复方、试拉 TLC 显色与旋蒸降沸——现在每一条路径都拥有独立清爽的沉浸工作区。
+                无论你是零基础挑经典药材、用 AI 一句话生成整套工艺与装置，还是想在 DIY 沙盒里自由拼装复方与推演实验——每次访问均为全新无痕工作台；自编课题须经用户自主申请且通过平台 AI ≥ 90 分严审方可收录。
               </p>
               <div class="v16-hero-ctas">
                 <button type="button" class="v16-btn-cta-primary" data-v16-go="ai">✨ 进入 AI 智能设计台 →</button>
@@ -295,29 +289,29 @@
                 <button type="button" class="v16-btn-cta-secondary" data-v16-go="diy">🧩 DIY 创意实验室</button>
               </div>
               <div class="v16-hero-stats">
-                <div class="v16-hero-stat"><strong>${c.topics}+</strong><span>高校/药企精编题库</span></div>
+                <div class="v16-hero-stat"><strong>${c.topics}+</strong><span>权威精编药材题库</span></div>
                 <div class="v16-hero-stat"><strong>${c.rigs} 套</strong><span>动态交互 SVG 装置</span></div>
-                <div class="v16-hero-stat"><strong>${c.literature}+</strong><span>核实学术实证文献</span></div>
-                <div class="v16-hero-stat"><strong>0 消耗</strong><span>本地计算与沙盒秒出</span></div>
+                <div class="v16-hero-stat"><strong>≥ 90 分</strong><span>AI 自编严审准入门槛</span></div>
+                <div class="v16-hero-stat"><strong>无痕重置</strong><span>每次进入零残留状态</span></div>
               </div>
             </div>
 
-            <!-- 右侧：当前工作台实时续接卡 -->
+            <!-- 右侧：平台核心规范与无痕准入声明卡（零个人进度、零测试课题残留） -->
             <div class="v16-hero-card">
               <div class="v16-hero-card-head">
-                <span class="v16-hero-card-tag">CURRENT WORKBENCH · 当前进度</span>
-                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-300/30">${v15 && Number.isFinite(v15.score) ? `设计分 ${v15.score}` : `第 0${stepNum}/06 步`}</span>
+                <span class="v16-hero-card-tag">ZERO-TRACE LAB · 平台纯净运行规范</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-300/30">无痕模式已开启</span>
               </div>
-              <h3 class="v16-hero-card-title">${esc(t.herb)} · ${esc(t.compound)}</h3>
-              <p class="v16-hero-card-sub">${esc((ws && ws.formalTitle) || `${t.herb}中${t.compound}的提取分离与检识实验`)}</p>
+              <h3 class="v16-hero-card-title">纯净重置 · 严格 AI 90 分准入</h3>
+              <p class="v16-hero-card-sub">每次打开页面自动恢复洁净初始状态，绝不残留历史测试记录，确保题库严谨有序。</p>
               <div class="v16-hero-mini-grid">
-                <div class="v16-hero-mini-cell"><span>溶剂体系</span><strong>${esc((ws && ws.solventType) || '70%乙醇')}</strong></div>
-                <div class="v16-hero-mini-cell"><span>投料 / 温度</span><strong>${esc((ws && ws.mass) || 50)}g · ${esc((ws && ws.temp) || 60)}℃</strong></div>
-                <div class="v16-hero-mini-cell"><span>预计排程</span><strong>${v15 ? `${Math.round(v15.duration)} min` : '约 3~4 学时'}</strong></div>
+                <div class="v16-hero-mini-cell"><span>会话模式</span><strong>每次自动清零</strong></div>
+                <div class="v16-hero-mini-cell"><span>收录门槛</span><strong>AI 严审 ≥90分</strong></div>
+                <div class="v16-hero-mini-cell"><span>不达标协助</span><strong>AI 一键优化</strong></div>
               </div>
               <div class="v16-hero-card-btns">
-                <button type="button" class="v16-hero-resume-btn" data-v16-resume="1">${resumeInfo ? `继续上次进度（${esc(resumeInfo.label)}）→` : `进入 6 步实验工坊 →`}</button>
-                <button type="button" class="v16-hero-pulse-btn" data-v16-trigger="v15">◎ 方案体检</button>
+                <button type="button" class="v16-hero-resume-btn" data-v16-go="workflow" data-v16-step="1">开启全新 6 步工坊 →</button>
+                <button type="button" class="v16-hero-pulse-btn" data-v16-trigger="ai-review">🛡️ 90分审核台</button>
               </div>
             </div>
           </div>
@@ -501,8 +495,9 @@
             <p>按成分大类、教学场景或关键词秒速筛选，点击卡片在右侧直接读懂药材脾气与药典标准，确认后再一键送入 6 步工坊。</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button type="button" class="v16-chip-btn gold" data-v16-trigger="diy-herb">+ 创建 DIY 药材</button>
-            <button type="button" class="v16-chip-btn" data-v16-trigger="compare">⚖️ 对比两项课题</button>
+            <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">🛡️ AI 自编 90分审核台</button>
+            <button type="button" class="v16-chip-btn" data-v16-trigger="diy-herb">+ 临时 DIY 药材</button>
+            <button type="button" class="v16-chip-btn" data-v16-trigger="compare">⚖️ 对比课题</button>
             <button type="button" class="v16-chip-btn" data-v16-go="home">← 返回首页</button>
           </div>
         </div>
@@ -517,7 +512,7 @@
               ['all', `全部 (${all.length})`],
               ['class', '★ 经典精选'],
               ['innovative', '✨ 创新拓展'],
-              ['custom', '🤖 AI/自建']
+              ['custom', `🛡️ AI自编过审 (${(api()?.getCounts?.().approvedAi) || 0})`]
             ].map(([k, lbl]) => `<button type="button" class="v16-seg-btn ${bankState.tab === k ? 'active' : ''}" data-v16-bank-tab="${k}">${lbl}</button>`).join('')}
           </div>
         </div>
@@ -645,7 +640,8 @@
             <p>专为开放性实验与竞赛设计打造的独立 AI 画布：不再挤占工作台顶部，所有灵感模板、方案推演与助教答疑集中在一处。</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button type="button" class="v16-chip-btn" data-v16-go="workflow">🧪 返回 6 步工坊</button>
+            <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">🛡️ AI 自编 90分审核与优化台</button>
+            <button type="button" class="v16-chip-btn" data-v16-go="workflow">🧪 进入 6 步工坊</button>
             <button type="button" class="v16-chip-btn" data-v16-go="home">← 返回首页</button>
           </div>
         </div>
@@ -737,7 +733,8 @@
             <p>复方配伍与三光源 TLC、旋蒸降沸与显色任务舱、15 套动态仿真装置库与零消耗科研工具箱，点击顶部标签秒切。</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button type="button" class="v16-chip-btn" data-v16-go="workflow">🧪 返回 6 步工坊</button>
+            <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">🛡️ AI 自编 90分审核与优化台</button>
+            <button type="button" class="v16-chip-btn" data-v16-go="workflow">🧪 进入 6 步工坊</button>
             <button type="button" class="v16-chip-btn" data-v16-go="home">← 返回首页</button>
           </div>
         </div>
@@ -925,6 +922,7 @@
     if (trig) {
       const act = trig.dataset.v16Trigger;
       if (act === 'v15' && window.TCM_V15_INSIGHT) window.TCM_V15_INSIGHT.open();
+      else if (act === 'ai-review' && window.TCM_AI_REVIEW) window.TCM_AI_REVIEW.open();
       else if (act === 'compare') document.getElementById('btnOpenCompareTop')?.click();
       else if (act === 'cmd') document.getElementById('btnOpenCmdPalette')?.click();
       else if (act === 'drawer') api() && api().openRightDrawer('bank');

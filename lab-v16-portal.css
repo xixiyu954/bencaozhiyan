@@ -1293,6 +1293,40 @@ body.dark-lab #dockBtnCompare {
   .v16-bento-grid, .v16-ai-template-grid, .v16-diy-tools-grid, .v16-footer-grid { grid-template-columns: 1fr; }
   .v16-cta-banner { padding: 20px; }
   .v16-subhero { padding: 18px; }
+  /* 移动端顶栏精简防裁切：隐藏桌面端次级入口（首页与底部均有直达） */
+  header button#btnOpenCompareTop,
+  header button#btnOpenQwenCfgTop {
+    display: none !important;
+  }
+  header button#btnOpenCmdPalette,
+  header button#btnFontScale,
+  header button#btnToggleDarkLab {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: 11px !important;
+  }
+  /* 移动端回顶浮球精简半透明圆钮，绝不遮挡正文 */
+  #quickAssistFab {
+    bottom: 18px !important;
+    right: 12px !important;
+  }
+  #btnFabScrollTop {
+    width: 38px !important;
+    height: 38px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    font-size: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 0.85 !important;
+  }
+  #btnFabScrollTop::before {
+    content: '↑';
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .v16-page, .v16-branch-card, .v16-bento-card, .v16-topic-card { animation: none !important; transition: none !important; }

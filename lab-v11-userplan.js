@@ -318,23 +318,19 @@
       });
     }
 
-    // 收录为案例 + 题库
+    // 申请 AI 90 分严审后编入自编库（绝不绕过审核直接入库！）
     const archBtn = mount.querySelector('#btnArchiveUserPlanCase');
     if (archBtn) {
+      archBtn.textContent = '🛡️ 申请 AI 90分严审编入自编库';
       archBtn.addEventListener('click', () => {
-        const list = loadUserCases();
-        const item = {
-          id: 'user_case_' + Date.now(),
-          createdAt: new Date().toLocaleDateString('zh-CN'),
-          ...result
-        };
-        list.unshift(item);
-        saveUserCases(list);
+        let draftObj = null;
         if (window.TCM_USER_PLAN_BRIDGE && window.TCM_USER_PLAN_BRIDGE.applyPlan) {
-          window.TCM_USER_PLAN_BRIDGE.applyPlan(item, true);
+          draftObj = window.TCM_USER_PLAN_BRIDGE.applyPlan(result);
         }
-        archBtn.textContent = '✓ 已收录进案例库与题库！';
-        archBtn.disabled = true;
+        closeModal();
+        if (window.TCM_AI_REVIEW && window.TCM_AI_REVIEW.open) {
+          window.TCM_AI_REVIEW.open(draftObj || undefined);
+        }
       });
     }
   }

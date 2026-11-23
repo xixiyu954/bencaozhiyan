@@ -1,6 +1,8 @@
 (function () {
   const STORAGE_KEY = 'bencao_tcm_chem_pro_v8';
   const LEGACY_STORAGE_KEY = 'lnutcm_tcm_chem_pro_v7';
+  const APPROVED_AI_BANK_KEY = 'bencao_ai_approved_bank_v1';
+  const AI_REVIEW_PASS_SCORE = 90;
   const AUTHOR_EMAIL = 'Chenovo495666@163.com';
   const IS_WECHAT = /MicroMessenger/i.test(navigator.userAgent || '');
 
@@ -1895,6 +1897,7 @@
   }
 
   function findTopicDef(id, customTopics) {
+    if (state && state.sessionDraftTopic && state.sessionDraftTopic.id === id) return state.sessionDraftTopic;
     if (customTopics && Object.prototype.hasOwnProperty.call(customTopics, id)) return customTopics[id];
     if (Object.prototype.hasOwnProperty.call(FEATURED_PRESETS, id)) return FEATURED_PRESETS[id];
     const entry = CATALOG_45.find(x => x.id === id);
@@ -1948,19 +1951,65 @@
 
   let yieldChartInstance = null, pendingConfirmAction = null, timerSeconds = 240 * 60, timerInterval = null, walkIdx = 0, walkTimer = null;
 
-  function loadState() {
+  function loadApprovedAiBank() {
     try {
-      const r = localStorage.getItem(STORAGE_KEY);
-      if (!r) return;
-      const parsed = JSON.parse(r);
-      if (!isRecord(parsed)) throw new Error('存档根节点不是对象');
-      state = normalizeState(parsed);
-    } catch (e) {
-      state = createDefaultState();
-      console.warn('本地存档读取失败，已使用默认状态。', e);
+      const raw = JSON.parse(localStorage.getItem(APPROVED_AI_BANK_KEY) || '{}');
+      if (!isRecord(raw)) return {};
+      const out = {};
+      Object.entries(raw).forEach(([id, item]) => {
+        if (item && item.aiReview && item.aiReview.approved === true && Number(item.aiReview.score) >= AI_REVIEW_PASS_SCORE) {
+          out[id] = item;
+        }
+      });
+      return out;
+    } catch (_) {
+      return {};
     }
   }
-  function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
+
+  function saveApprovedAiBank(map) {
+    try {
+      const clean = {};
+      Object.entries(map || {}).forEach(([id, item]) => {
+        if (item && item.aiReview && item.aiReview.approved === true && Number(item.aiReview.score) >= AI_REVIEW_PASS_SCORE) {
+          clean[id] = item;
+        }
+      });
+      localStorage.setItem(APPROVED_AI_BANK_KEY, JSON.stringify(clean));
+    } catch (_) {}
+  }
+
+  function wipeTransientTraces() {
+    const transientKeys = [
+      STORAGE_KEY,
+      LEGACY_STORAGE_KEY,
+      'bencao_v15_insight_v1',
+      'tcm_user_archived_cases_v1',
+      'tcm_lab_missions_store_v2',
+      'tcm_v8_dock_hidden'
+    ];
+    transientKeys.forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
+  }
+
+  // 无痕净享模式：每次打开/刷新网页一律彻底重置会话进度，不残留任何使用痕迹；
+  // 仅保留经过「用户主动申请 + AI 评审打分 ≥ 90 分 + 用户确认编入」的正式 AI 自编课题。
+  function loadState() {
+    wipeTransientTraces();
+    state = createDefaultState();
+    state.sessionDraftTopic = null;
+    state.customTopics = loadApprovedAiBank();
+  }
+  function saveState() {
+    // 仅在当前页面生命周期内供 v15 实时体检读取；下次重新打开/刷新时会被 loadState() 自动清空
+    try {
+      const { sessionDraftTopic, ...rest } = state;
+      const mirror = { ...rest, customTopics: { ...(state.customTopics || {}) } };
+      if (sessionDraftTopic && sessionDraftTopic.id) {
+        mirror.customTopics[sessionDraftTopic.id] = sessionDraftTopic;
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(mirror));
+    } catch (e) {}
+  }
 
   function getTopicDef() {
     return findTopicDef(state.activeTopicId, state.customTopics) || hydrateTopic(CATALOG_45[0]);
@@ -3073,14 +3122,25 @@
     document.getElementById('btnCloseDiyHerb').addEventListener('click', closeDiy);
     document.getElementById('formDiyHerb').addEventListener('submit', e => {
       e.preventDefault();
-      const id = 'diy_' + Date.now();
+      const id = 'draft_diy_' + Date.now();
       const entry = {
-        id, isCustom: true, herb: document.getElementById('dhName').value.trim(), compound: document.getElementById('dhComp').value.trim(),
+        id, isCustom: true, isDraft: true, herb: document.getElementById('dhName').value.trim(), compound: document.getElementById('dhComp').value.trim(),
         category: document.getElementById('dhCat').value, prop: document.getElementById('dhProp').value, limitVal: Number(document.getElementById('dhLimit').value) || 1.0,
         origin: document.getElementById('dhOrigin').value.trim(), innovationTag: document.getElementById('dhExtension').value.trim()
       };
       if (autoRunning) cancelActiveAI();
-      state.customTopics[id] = hydrateTopic(entry); state.activeTopicId = id; saveState(); e.target.reset(); closeDiy(); closeRightDrawer(); renderAll(); showToast(`已创建创新药材：${entry.herb}`);
+      // 作为本次临时演练草稿载入，绝不未经审核自动写入题库；用户可主动申请 AI 90 分审核编入
+      state.sessionDraftTopic = hydrateTopic(entry);
+      state.activeTopicId = id;
+      saveState();
+      e.target.reset();
+      closeDiy();
+      closeRightDrawer();
+      renderAll();
+      showToast(`已生成临时演练草稿「${entry.herb}」（未编入题库，如需收录请点击 AI 90分审核）`, 'info');
+      if (window.TCM_AI_REVIEW && window.TCM_AI_REVIEW.open) {
+        setTimeout(() => window.TCM_AI_REVIEW.open(state.sessionDraftTopic), 260);
+      }
     });
 
     // 新增文献
@@ -3632,15 +3692,17 @@
     const existingCustom = Object.entries(state.customTopics).find(([, item]) => item && item.herb === plan.herb && item.compound === plan.compound);
     let targetId = plan.matchedId && FEATURED_PRESETS[plan.matchedId] ? plan.matchedId : (existingCustom ? existingCustom[0] : null);
 
-    const createdNewInBank = !targetId || plan.isNewTopic === true; if (createdNewInBank) {
-      targetId = 'qwen_' + Date.now();
-      state.customTopics[targetId] = {
+    const createdNewDraft = !targetId || plan.isNewTopic === true;
+    if (createdNewDraft) {
+      targetId = 'draft_ai_' + Date.now();
+      // 严禁自动污染题库！新生成的 AI 方案仅作为本次临时会话草稿，必须由用户主动申请 AI 审核 ≥ 90 分后才可编入
+      state.sessionDraftTopic = {
         id: targetId,
         herb: plan.herb || '自定义药材',
         compound: plan.compound || '目标活性成分',
         latin: plan.latin || 'AI 辅助设计基原',
         category: plan.category || '黄酮',
-        isCustom: true, isAiGenerated: true, spectra: plan.spectra || null,
+        isCustom: true, isAiGenerated: true, isDraft: true, spectra: plan.spectra || null,
         defaultRig: rig,
         applicableRigs: plan.applicableRigs && plan.applicableRigs.length ? plan.applicableRigs : [rig, 'rotavap', 'filter'],
         defaultExtract: plan.defaultExtract || (rig === 'steam' ? 'steam' : rig === 'ultrasound' ? 'ultrasound' : 'reflux'),
@@ -3651,7 +3713,7 @@
         limitUnit: plan.limitUnit || '%',
         crudeUnit: rig === 'steam' ? 'mL' : 'g',
         mpRef: plan.mpRef || '按标准品实测核对',
-        origin: plan.origin || `${plan.herb}（智能设计助手定制课题）。`,
+        origin: plan.origin || `${plan.herb}（AI 临时演练草稿）。`,
         chemistry: plan.chemistry || `核心成分：${plan.compound}。`,
         pharmacopoeia: plan.pharmacopoeia || `参考限度 ≥ ${Number(plan.limitVal) || 1.0}%。`,
         integrative: plan.integrative || plan.aiAdvice || '',
@@ -3669,6 +3731,8 @@
         chemTests: Array.isArray(plan.chemTests) && plan.chemTests.length ? plan.chemTests : [{ name: '特征化学显色阳性', passed: true }, { name: 'TLC 对照品单斑一致', passed: true }],
         demoBatches: plan.sampleBatches && plan.sampleBatches.length ? plan.sampleBatches : [{ mass: Number(plan.cfg?.mass) || 50, crude: 0.85, refined: 0.62, mp: 0 }, { mass: Number(plan.cfg?.mass) || 50, crude: 0.91, refined: 0.66, mp: 0 }, { mass: Number(plan.cfg?.mass) || 50, crude: 0.88, refined: 0.64, mp: 0 }]
       };
+    } else {
+      state.sessionDraftTopic = null;
     }
 
     state.activeTopicId = targetId;
@@ -3693,22 +3757,43 @@
     }
     if (plan.tlcDefault) ws.tlc = { ...plan.tlcDefault };
     if (plan.sampleBatches && plan.sampleBatches.length) ws.batches = plan.sampleBatches.map(b => ({ ...b }));
-    if (plan.aiConclusion) ws.aiConclusion = plan.aiConclusion; if (Array.isArray(plan.recommendedRefs)) { plan.recommendedRefs.slice(0, 3).forEach(r => { if (r && !state.extraGlobalRefs.some(x => x.text === r)) state.extraGlobalRefs.unshift({ tag: 'AI推荐', text: r, url: '' }); }); } if (createdNewInBank) state.step1Tab = 'ai_custom'; saveState();
+    if (plan.aiConclusion) ws.aiConclusion = plan.aiConclusion;
+    if (Array.isArray(plan.recommendedRefs)) { plan.recommendedRefs.slice(0, 3).forEach(r => { if (r && !state.extraGlobalRefs.some(x => x.text === r)) state.extraGlobalRefs.unshift({ tag: 'AI推荐', text: r, url: '' }); }); }
+    saveState();
     renderAll();
 
     // Render automation receipt
     const rec = document.getElementById('qwenExecReceipt');
     if (rec) {
       rec.classList.remove('hidden');
-      document.getElementById('qwenReceiptTitle').textContent = `${usedRealQwen ? '智能设计助手' : '本草智研精编库'} · 已完成全流程实验编排`;
-      document.getElementById('qwenReceiptAdvice').textContent = plan.aiAdvice || plan.integrative || `已为你自动配置「${plan.herb} · ${plan.compound}」全流程实验方案。`;
+      document.getElementById('qwenReceiptTitle').textContent = `${usedRealQwen ? '智能设计助手' : '本草智研精编库'} · 已完成本次无痕推演`;
+      const bankBadge = document.getElementById('qwenBankStatusBadge');
+      if (bankBadge) {
+        bankBadge.textContent = createdNewDraft ? '临时草稿（未编入题库 · 刷新即清空）' : '已匹配权威题库';
+      }
+      // 注入用户自主决定「申请 AI 90 分审核并编入」入口按钮
+      let reviewBtn = document.getElementById('btnApplyAiReviewFromReceipt');
+      const bankBtn = document.getElementById('btnOpenBankFromReceipt');
+      if (!reviewBtn && bankBtn && bankBtn.parentElement) {
+        reviewBtn = document.createElement('button');
+        reviewBtn.id = 'btnApplyAiReviewFromReceipt';
+        reviewBtn.type = 'button';
+        reviewBtn.className = 'px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-extrabold transition shadow-xs';
+        reviewBtn.textContent = '🛡️ 申请 AI 90分审核编入自编库';
+        reviewBtn.addEventListener('click', () => {
+          if (window.TCM_AI_REVIEW && window.TCM_AI_REVIEW.open) window.TCM_AI_REVIEW.open(getTopicDef());
+        });
+        bankBtn.parentElement.insertBefore(reviewBtn, bankBtn);
+      }
+      if (reviewBtn) reviewBtn.classList.toggle('hidden', !createdNewDraft);
+      document.getElementById('qwenReceiptAdvice').textContent = plan.aiAdvice || plan.integrative || `已为你生成「${plan.herb} · ${plan.compound}」临时演练方案（刷新自动重置；如需收录进 AI 自编库，请主动点击上方「申请 AI 90分审核编入」）。`;
       const checks = [
         `✓ 锁定课题：${plan.herb} · ${plan.compound}`,
         `✓ 写入左侧参数：${ws.mass}g / ${ws.solventType} / ${ws.temp}℃ / ${ws.time}min`,
         `✓ 切换动态装置：${({ ultrasound: '超声提取装置', steam: '水蒸气蒸馏装置', reflux: '热回流提取装置', extract: '液-液萃取装置', soxhlet: '索氏提取装置', percolation: '渗漉提取装置', filter: '减压抽滤装置', funnel: '分液漏斗萃取装置', column: '柱层析分离装置', rotary: '旋转蒸发浓缩装置' })[rig] || rig}`,
         '✓ 同步 4 步工艺、SOP 与第 6 步 A4 报告'
       ];
-      document.getElementById('qwenReceiptChecks').innerHTML = checks.map(c => `<span class="px-2 py-0.5 rounded-full bg-white border border-emerald-200 text-emerald-900 font-semibold">${c}</span>`).join(''); const bankBadge = document.getElementById('qwenBankStatusBadge'); if (bankBadge) bankBadge.textContent = createdNewInBank ? '✨ 已作为新课题自动收录进网站题库' : '📚 已引用并优化站内题库课题'; const deepEl = document.getElementById('qwenDeepCards'); if (deepEl) { const refTxt = (Array.isArray(plan.recommendedRefs) && plan.recommendedRefs.length) ? plan.recommendedRefs.slice(0, 3).join('；') : (plan.integrative || `已关联课题：${plan.herb} · ${plan.compound}`); const prinTxt = plan.principle || plan.mechanism || plan.aiAdvice || `装置：${rig}（${ws.solventType} / ${ws.temp}℃ / ${ws.time}min）`; const concTxt = plan.aiConclusion || ws.aiConclusion || `已完成 ${plan.herb}（${plan.compound}）实验编排，预期结论已同步写入报告。`; deepEl.innerHTML = [{ t: '📚 题库与文献引用', b: refTxt }, { t: '⚗️ 原理与动态装置解析', b: prinTxt }, { t: '📊 AI 预期结论（已写入报告）', b: concTxt }].map(c => `<div class="p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm"><div class="text-[12px] font-bold text-slate-800 mb-1">${c.t}</div><div class="text-[12px] text-slate-600 leading-relaxed">${c.b}</div></div>`).join(''); } const bOpenBank = document.getElementById('btnOpenBankFromReceipt'); if (bOpenBank) bOpenBank.onclick = () => openRightDrawer('bank');
+      document.getElementById('qwenReceiptChecks').innerHTML = checks.map(c => `<span class="px-2 py-0.5 rounded-full bg-white border border-emerald-200 text-emerald-900 font-semibold">${c}</span>`).join(''); const bankBadge2 = document.getElementById('qwenBankStatusBadge'); if (bankBadge2) bankBadge2.textContent = createdNewDraft ? '🛡️ 临时演练草稿（需 AI 审核 ≥90分方可编入）' : '📚 已引用并优化站内权威题库'; const deepEl = document.getElementById('qwenDeepCards'); if (deepEl) { const refTxt = (Array.isArray(plan.recommendedRefs) && plan.recommendedRefs.length) ? plan.recommendedRefs.slice(0, 3).join('；') : (plan.integrative || `已关联课题：${plan.herb} · ${plan.compound}`); const prinTxt = plan.principle || plan.mechanism || plan.aiAdvice || `装置：${rig}（${ws.solventType} / ${ws.temp}℃ / ${ws.time}min）`; const concTxt = plan.aiConclusion || ws.aiConclusion || `已完成 ${plan.herb}（${plan.compound}）实验编排，预期结论已同步写入报告。`; deepEl.innerHTML = [{ t: '📚 题库与文献引用', b: refTxt }, { t: '⚗️ 原理与动态装置解析', b: prinTxt }, { t: '📊 AI 预期结论（已写入报告）', b: concTxt }].map(c => `<div class="p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm"><div class="text-[12px] font-bold text-slate-800 mb-1">${c.t}</div><div class="text-[12px] text-slate-600 leading-relaxed">${c.b}</div></div>`).join(''); } const bOpenBank = document.getElementById('btnOpenBankFromReceipt'); if (bOpenBank) bOpenBank.onclick = () => openRightDrawer('bank');
     }
     renderAiPlanShowcase(plan, { usedRealQwen: usedRealQwen, rig: rig, ws: ws, ragCtx: ragCtx || {} });
     showToast(`AI 已自动编排「${plan.herb}」全工作台，方案全景已展开！`);
@@ -4170,71 +4255,28 @@
     };
   }
 
-  if (window.TCM_USER_PLAN && typeof window.TCM_USER_PLAN.loadUserCases === 'function') {
-    window.TCM_USER_PLAN.loadUserCases().forEach(item => {
-      if (!UNIV_CASES.some(u => u.topicId === item.id)) {
-        UNIV_CASES.unshift({
-          type: '我的收录案例',
-          univ: `★ 我的收录 · ${item.createdAt || '已保存'}`,
-          title: item.title || `${item.herb}实验方案`,
-          desc: item.summaryAdvice || (item.sourceText || '').slice(0, 120),
-          topicId: item.id
-        });
-      }
-      if (!state.customTopics[item.id]) {
-        state.customTopics[item.id] = buildTopicFromUserPlan(item);
-      }
-    });
-  }
-
+  // 严禁自动把未审核的自有方案写进题库或案例库；仅作为当前无痕会话临时演练草稿
   window.TCM_USER_PLAN_BRIDGE = {
-    applyPlan: function (plan, archiveAsCase) {
+    applyPlan: function (plan) {
       const topicObj = buildTopicFromUserPlan(plan);
-      state.customTopics[topicObj.id] = topicObj;
+      topicObj.isDraft = true;
+      state.sessionDraftTopic = topicObj;
       state.activeTopicId = topicObj.id;
       const ws = getWorkState(topicObj);
       Object.assign(ws, topicObj.defaultCfg);
-      if (archiveAsCase && !UNIV_CASES.some(u => u.topicId === topicObj.id)) {
-        UNIV_CASES.unshift({
-          type: '我的收录案例',
-          univ: `★ 我的收录 · ${plan.createdAt || new Date().toLocaleDateString('zh-CN')}`,
-          title: plan.title || `${plan.herb}实验方案`,
-          desc: plan.summaryAdvice || (plan.sourceText || '').slice(0, 120),
-          topicId: topicObj.id
-        });
-      }
       saveState();
       renderAll();
-      showToast(archiveAsCase ? '已收录至「我的收录案例」与题库，并同步全工作台！' : '已将推演方案同步至工作台全部 6 步！');
-    }
+      showToast('已载入本次临时演练草稿（刷新自动清零；如需编入 AI 自编库请先通过 90 分 AI 审核）', 'info');
+      return topicObj;
+    },
+    buildTopicFromUserPlan
   };
 
-
-  // ============ 首页入口保护 & 上次进度可选续接桥接 ============
-  const urlHasStep = new URLSearchParams(window.location.search || '').has('step');
+  // ============ 无痕净享模式：禁用跨次“保留/续接进度”弹窗 ============
   window.TCM_RESUME_BRIDGE = {
-    getResumeInfo: function () {
-      if (urlHasStep) return null;
-      const ls = state.lastSavedStep;
-      if (!ls || ls === 1) return null;
-      const t = getTopicDef();
-      const label = ls === 'hub' ? '动态流程与装置库' : `第 0${ls} 步 · ${(STEP_META[ls] && STEP_META[ls].title) || ''}`;
-      return { step: ls, label, herb: t ? t.herb : '' };
-    },
-    resumeNow: function () {
-      const ls = state.lastSavedStep;
-      if (!ls || ls === 1) return;
-      state.step = ls;
-      state.lastSavedStep = 1;
-      saveState();
-      renderAll();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      showToast('已为您续接上次实验进度');
-    },
-    dismiss: function () {
-      state.lastSavedStep = 1;
-      saveState();
-    }
+    getResumeInfo: function () { return null; },
+    resumeNow: function () {},
+    dismiss: function () {}
   };
 
   window.TCM_LAB_API = {
@@ -4242,6 +4284,8 @@
       const custom = Object.values(state.customTopics || {}).map(x => ({ ...x, _isCustom: true }));
       return [...custom, ...CATALOG_45];
     },
+    getApprovedAiTopics: () => Object.values(state.customTopics || {}),
+    getSessionDraft: () => state.sessionDraftTopic || null,
     getTopicById: (id) => findTopicDef(id, state.customTopics) || getTopicDef(),
     getCurrentTopic: () => getTopicDef(),
     getCurrentWorkState: () => getWorkState(getTopicDef()),
@@ -4249,10 +4293,87 @@
     getLaymanNote: (t) => getHerbLaymanNote(t || getTopicDef()),
     getCounts: () => ({
       topics: CATALOG_45.length + Object.keys(state.customTopics || {}).length,
+      approvedAi: Object.keys(state.customTopics || {}).length,
       rigs: Object.keys(LAB_RIGS || {}).length,
       literature: GLOBAL_LITERATURE.length + (state.extraGlobalRefs ? state.extraGlobalRefs.length : 0),
       univCases: UNIV_CASES.length
     }),
+    setSessionDraft: (topicObj, wsPatch) => {
+      if (!topicObj) return null;
+      const draft = { ...hydrateTopic(topicObj), ...topicObj, isCustom: true, isDraft: true };
+      if (!draft.id || !String(draft.id).startsWith('draft_')) draft.id = 'draft_' + Date.now();
+      state.sessionDraftTopic = draft;
+      state.activeTopicId = draft.id;
+      const ws = getWorkState(draft);
+      if (draft.defaultCfg) Object.assign(ws, draft.defaultCfg);
+      if (wsPatch && typeof wsPatch === 'object') Object.assign(ws, wsPatch);
+      saveState();
+      renderAll();
+      return draft;
+    },
+    commitApprovedAiTopic: (topicObj, reviewResult) => {
+      const score = Number(reviewResult && reviewResult.score);
+      if (!reviewResult || !Number.isFinite(score) || score < AI_REVIEW_PASS_SCORE) {
+        showToast(`审核未满 ${AI_REVIEW_PASS_SCORE} 分，系统已拦截编入！请先接入 AI 协助优化。`, 'error');
+        return { ok: false, reason: 'score_below_threshold' };
+      }
+      const approvedId = 'ai_approved_' + Date.now();
+      const ws = getWorkState(topicObj);
+      const finalized = {
+        ...hydrateTopic(topicObj),
+        ...topicObj,
+        id: approvedId,
+        isCustom: true,
+        isAiGenerated: true,
+        isDraft: false,
+        defaultCfg: {
+          mass: ws.mass, ratio: ws.ratio, temp: ws.temp, time: ws.time,
+          mesh: ws.mesh, cycles: String(ws.cycles || '2'), solventType: ws.solventType, ph: ws.ph
+        },
+        aiReview: {
+          approved: true,
+          score: Math.round(score),
+          engine: reviewResult.engine || '平台 AI 评审',
+          summary: reviewResult.summary || '',
+          dimensions: Array.isArray(reviewResult.dimensions) ? reviewResult.dimensions : [],
+          reviewedAt: new Date().toLocaleString('zh-CN')
+        }
+      };
+      state.customTopics[approvedId] = finalized;
+      state.sessionDraftTopic = null;
+      state.activeTopicId = approvedId;
+      saveApprovedAiBank(state.customTopics);
+      saveState();
+      renderAll();
+      showToast(`🎉 已通过 AI 严审（${Math.round(score)} 分）并正式编入「AI 自编题库」！`);
+      return { ok: true, topic: finalized };
+    },
+    deleteApprovedAiTopic: (id) => {
+      if (!state.customTopics || !state.customTopics[id]) return;
+      delete state.customTopics[id];
+      if (state.activeTopicId === id) state.activeTopicId = CATALOG_45[0].id;
+      saveApprovedAiBank(state.customTopics);
+      saveState();
+      renderAll();
+      showToast('已从 AI 自编题库移除该课题', 'info');
+    },
+    clearApprovedAiBank: () => {
+      state.customTopics = {};
+      state.sessionDraftTopic = null;
+      state.activeTopicId = CATALOG_45[0].id;
+      saveApprovedAiBank({});
+      saveState();
+      renderAll();
+      showToast('已清空 AI 自编题库', 'info');
+    },
+    resetSessionClean: () => {
+      wipeTransientTraces();
+      state = createDefaultState();
+      state.sessionDraftTopic = null;
+      state.customTopics = loadApprovedAiBank();
+      renderAll();
+      showToast('已无痕重置工作台，恢复全新初始状态', 'info');
+    },
     selectTopic: (id, targetStep) => {
       state.activeTopicId = id;
       if (targetStep !== undefined && targetStep !== null) {

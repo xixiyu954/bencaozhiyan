@@ -28,7 +28,7 @@
   <script defer src="./vendor/html2canvas-1.4.1.min.js"></script>
   <link rel="stylesheet" href="./styles.css?v=24" />
   <link rel="stylesheet" href="./lab-v15-insight.css?v=16" />
-  <link rel="stylesheet" href="./lab-v16-portal.css?v=19" />
+  <link rel="stylesheet" href="./lab-v16-portal.css?v=20" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
@@ -1196,6 +1196,15 @@
   </div>
   <div id="toastContainer" class="no-print fixed top-4 left-1/2 -translate-x-1/2 items-center z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+<!-- 无痕净享模式早启动脚本：每次打开/刷新网页一律彻底清空临时进度、笔记、任务记录与未审核草稿，仅保留经用户主动申请且 AI 审核 ≥ 90 分的正式 AI 自编题库 -->
+<script>
+(function(){
+  try {
+    ['bencao_tcm_chem_pro_v8','lnutcm_tcm_chem_pro_v7','bencao_v15_insight_v1','tcm_user_archived_cases_v1','tcm_lab_missions_store_v2','tcm_v8_dock_hidden']
+      .forEach(function(k){ localStorage.removeItem(k); });
+  } catch (_) {}
+})();
+</script>
 <script src="./lab-data-extra.js?v=8"></script>
 <script src="./lab-data-v3.js?v=8"></script>
 <script src="./lab-v4-spectroscopy.js?v=8"></script>
@@ -1207,13 +1216,14 @@
 <script src="./lab-v8-studio.js?v=24"></script>
 <script src="./lab-v9-visuals.js?v=22"></script>
 <script src="./lab-v10-sandbox.js?v=22"></script>
-<script src="./lab-v11-userplan.js?v=22"></script>
+<script src="./lab-v11-userplan.js?v=23"></script>
 <script src="./lab-v12-diy-studio.js?v=22"></script>
 <script src="./lab-v13-mission-os.js?v=22"></script>
 <script src="./lab-v14-course-diagrams.js?v=22"></script>
 <script src="./cloud-ai.js?v=24"></script>
-<script src="./app.js?v=25"></script>
+<script src="./app.js?v=26"></script>
 <script src="./lab-v15-insight.js?v=17"></script>
-<script src="./lab-v16-portal.js?v=19"></script>
+<script src="./lab-v16-portal.js?v=20"></script>
+<script src="./lab-v17-ai-review.js?v=17"></script>
 </body>
 </html>
