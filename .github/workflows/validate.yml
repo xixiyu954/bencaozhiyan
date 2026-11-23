@@ -34,6 +34,8 @@ jobs:
           node --check lab-v15-insight.js
           node --check lab-v16-portal.js
           node --check lab-v17-ai-review.js
+          node --check lab-v18-translation-data.js
+          node --check lab-v18-translation.js
           node --input-type=module --check < functions/api/ai-proxy.js
       - name: Reject embedded provider secrets
         run: |

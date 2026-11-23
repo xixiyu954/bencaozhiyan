@@ -88,7 +88,8 @@
     bank: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
     ai: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"/></svg>`,
     diy: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>`,
-    workflow: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v5.4L5.6 16.5A3 3 0 0 0 8.2 21h7.6a3 3 0 0 0 2.6-4.5L14 8.4V3"/></svg>`
+    workflow: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v5.4L5.6 16.5A3 3 0 0 0 8.2 21h7.6a3 3 0 0 0 2.6-4.5L14 8.4V3"/></svg>`,
+    translation: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M5 20V9l5 3V9l5 3V5h4v15"/></svg>`
   };
 
   // 全局 Lucide 图标自愈渲染器：无论任意模块何时插入 <i data-lucide>，确保零空框
@@ -139,9 +140,10 @@
     const tabBank = makeTab('v16NavBank', 'bank', SVG_ICONS.bank, '药材题库', `${counts.topics}`);
     const tabAi = makeTab('v16NavAi', 'ai', SVG_ICONS.ai, '智能设计', '');
     const tabDiy = makeTab('v16NavDiy', 'diy', SVG_ICONS.diy, 'DIY 实验室', '');
+    const tabTr = makeTab('v16NavTranslation', 'translation', SVG_ICONS.translation, '产业转化', '8阶段');
     const tabWf = makeTab('v16NavWorkflow', 'workflow', SVG_ICONS.workflow, '实验工坊', '');
 
-    // 把新五大走向按钮放在最前面，把旧按钮隐藏（保留 DOM ID 以确保旧脚本监听不报错）
+    // 把新六大走向按钮放在最前面，把旧按钮隐藏（保留 DOM ID 以确保旧脚本监听不报错）
     const legacyIds = ['zoneTabWorkflow', 'btnOpenDiyStudio', 'btnOpenMissionOs', 'btnOpenApparatusHub'];
     legacyIds.forEach(lid => {
       const el = document.getElementById(lid);
@@ -149,7 +151,7 @@
     });
 
     const insertBeforeEl = zone.firstChild;
-    [tabHome, tabBank, tabAi, tabDiy, tabWf].forEach(btn => {
+    [tabHome, tabBank, tabAi, tabDiy, tabTr, tabWf].forEach(btn => {
       zone.insertBefore(btn, insertBeforeEl);
     });
   }
@@ -206,6 +208,12 @@
     diyTools.className = 'v16-page hidden no-print space-y-5';
     mainCol.appendChild(diyTools);
 
+    // (f) 独立产业转化训练走向页（8阶段主线：定位→炮制→提取→干燥→制剂→质量→放大与偏差→转化报告）
+    const trPage = document.createElement('section');
+    trPage.id = 'v18TranslationPage';
+    trPage.className = 'v16-page hidden no-print';
+    mainCol.insertBefore(trPage, wfBar);
+
     upgradeFooter();
   }
 
@@ -238,6 +246,7 @@
             <button type="button" data-v16-go="bank">药材实验题库（${fc.topics} 项）</button>
             <button type="button" data-v16-go="ai">智能实验设计</button>
             <button type="button" data-v16-go="diy">DIY 创意实验室</button>
+            <button type="button" data-v16-go="translation">产业转化训练（丹参标杆）</button>
             <button type="button" data-v16-go="workflow">六步实验工坊</button>
           </div>
         </div>
@@ -245,6 +254,7 @@
           <h6>常用工具</h6>
           <div class="v16-footer-links">
             <button type="button" data-v16-trigger="v15">实验项目中枢与体检</button>
+            <button type="button" data-v16-trigger="tr-dev">偏差调查与批间一致性</button>
             <button type="button" data-v16-go="diy" data-v16-sub="hub">实验装置与流程库</button>
             <button type="button" data-v16-trigger="compare">双课题横向对比</button>
             <button type="button" data-v16-trigger="drawer">实证文献与高校案例</button>
@@ -255,9 +265,9 @@
           <h6>开放资源</h6>
           <div class="v16-footer-links">
             <a href="https://github.com/xixiyu954/tcm-chemistry-lab" target="_blank" rel="noopener noreferrer">GitHub 开源仓库 ↗</a>
-            <a href="https://ydz.chp.org.cn/" target="_blank" rel="noopener noreferrer">《中国药典》在线检索 ↗</a>
+            <a href="https://ydz.chp.org.cn/" target="_blank" rel="noopener noreferrer">《中国药典》2025 年版在线检索 ↗</a>
             <a href="https://www.ilab-x.com/" target="_blank" rel="noopener noreferrer">国家虚拟仿真实验平台 ↗</a>
-            <button type="button" data-v16-trigger="feedback">意见反馈与建议</button>
+            <button type="button" data-v16-trigger="feedback">意见反馈与标准勘误</button>
           </div>
         </div>
       </div>
@@ -278,21 +288,22 @@
         <section class="v16-hero">
           <div class="v16-hero-grid">
             <div>
-              <span class="v16-eyebrow"><span class="v16-eyebrow-dot"></span>本草智研 · 中药化学实验设计工作台</span>
-              <h2>从药材选材到规范报告，<br/>一站完成<em>中药化学实验设计</em></h2>
+              <span class="v16-eyebrow"><span class="v16-eyebrow-dot"></span>本草智研 · 中药药学研究与小试—中试产业转化训练平台</span>
+              <h2>从提取实验设计到<br/><em>药学研究与中试产业转化</em></h2>
               <p class="v16-hero-desc">
-                面向高校药学与中药学教学及实验研究，集成经典与前沿药材题库、智能方案编排、实验装置交互仿真、数据核算与规范实验报告输出。
+                保留完整的《中药化学》教学六步实验与装置仿真，并拓展“产品定位 → 炮制对照 → 综合工艺最优 → 剂型选择 → 全过程质控 → 非线性中试放大与偏差调查 → 转化报告”八阶段产业转化主线。
               </p>
               <div class="v16-hero-ctas">
-                <button type="button" class="v16-btn-cta-primary" data-v16-go="bank">浏览 ${c.topics} 项药材题库 →</button>
+                <button type="button" class="v16-btn-cta-primary" data-v16-go="translation">进入产业转化（丹参标杆）→</button>
+                <button type="button" class="v16-btn-cta-secondary" data-v16-go="bank">浏览 ${c.topics} 项药材题库</button>
                 <button type="button" class="v16-btn-cta-secondary" data-v16-go="ai">智能实验设计</button>
-                <button type="button" class="v16-btn-cta-secondary" data-v16-go="diy">DIY 创意实验室</button>
+                <button type="button" class="v16-btn-cta-secondary" data-v16-go="diy">DIY 实验室</button>
               </div>
               <div class="v16-hero-stats">
-                <div class="v16-hero-stat"><strong>${c.topics}</strong><span>药材实验题库</span></div>
+                <div class="v16-hero-stat"><strong>${c.topics}</strong><span>药材与转化课题</span></div>
+                <div class="v16-hero-stat"><strong>8 阶段</strong><span>产业转化主线</span></div>
                 <div class="v16-hero-stat"><strong>${c.rigs} 套</strong><span>交互仿真装置</span></div>
-                <div class="v16-hero-stat"><strong>${c.literature} 篇</strong><span>实证参考文献</span></div>
-                <div class="v16-hero-stat"><strong>6 步</strong><span>完整实验工作流</span></div>
+                <div class="v16-hero-stat"><strong>2025 版</strong><span>中国药典对照基准</span></div>
               </div>
             </div>
 
@@ -317,15 +328,32 @@
           </div>
         </section>
 
-        <!-- 2. 三大核心工作区 -->
+        <!-- 2. 四大核心工作区 -->
         <section>
           <div class="v16-sec-head">
             <div>
               <h3>选择工作方式</h3>
             </div>
-            <p>按当前学习或实验任务直接进入对应工作区。</p>
+            <p>兼顾高校课程实验训练与中药小试—中试产业转化研究，按任务进入对应工作区。</p>
           </div>
-          <div class="v16-branch-grid">
+          <div class="v16-branch-grid tr-cols-4">
+            <button type="button" class="v16-branch-card" style="--branch-accent:#047857;--branch-bg:#ecfdf5;--branch-border:rgba(4,120,87,0.24)" data-v16-go="translation">
+              <div>
+                <div class="v16-branch-top">
+                  <span class="v16-branch-icon">🏭</span>
+                  <span class="v16-branch-badge">丹参标杆 · 8 阶段</span>
+                </div>
+                <h4>产业转化训练</h4>
+                <p>从实验提取走向可验证、可放大、可申报的产品方案：内置丹参、黄芩、薄荷、延胡索标杆并支持导入全部题库。</p>
+                <ul class="v16-branch-list">
+                  <li>产品定位、炮制对照、9 维综合工艺最优与剂型选择</li>
+                  <li>分级质控、三批复现、非线性放大核算与偏差 CAPA</li>
+                  <li>来源分层标注并输出《药学研究与小试转化报告》</li>
+                </ul>
+              </div>
+              <div class="v16-branch-foot"><span>进入产业转化</span><span class="v16-branch-arrow">→</span></div>
+            </button>
+
             <button type="button" class="v16-branch-card" style="--branch-accent:#0f5c54;--branch-bg:#ecfdf5;--branch-border:rgba(15,92,84,0.18)" data-v16-go="bank">
               <div>
                 <div class="v16-branch-top">
@@ -602,6 +630,9 @@
               <button type="button" class="v16-chip-btn justify-center py-2" data-v16-lock-topic="${esc(preview.id)}" data-v16-target-step="1">从第 1 步开始</button>
               <button type="button" class="v16-chip-btn gold justify-center py-2" data-v16-ai-herb="${esc(preview.herb)}" data-v16-ai-comp="${esc(preview.compound)}">智能定制方案</button>
             </div>
+            <button type="button" class="v16-chip-btn justify-center py-2" style="width:100%;border-color:rgba(4,120,87,0.35);color:#065f46;background:rgba(236,253,245,0.65)" data-v16-to-translation="${esc(preview.id)}">
+              🏭 转入产业转化研究（剂型 / 放大 / 质控）→
+            </button>
           </div>
         </aside>
       </div>
@@ -666,7 +697,7 @@
         <div class="space-y-3">
           <div class="flex items-center justify-between">
             <h3 style="margin:0;font-size:1.05rem;font-weight:850;color:var(--ds-ink)">🎯 精选场景灵感模板（点击自动填入上方指令框）</h3>
-            <span style="font-size:0.76rem;color:var(--ds-muted)">支持直接修改文字后再点「一键生成实验方案」</span>
+            <span style="font-size:0.76rem;color:var(--ds-muted)">支持直接修改文字后再点「生成研究 / 小试模拟方案」</span>
           </div>
           <div class="v16-ai-template-grid">
             ${AI_TEMPLATES.map(tpl => `
@@ -798,6 +829,7 @@
       </div>
       <div class="v16-wf-actions">
         <button type="button" class="v16-chip-btn" data-v16-go="bank">🔄 换药材</button>
+        <button type="button" class="v16-chip-btn" data-v16-to-translation="${esc(t.id)}">🏭 产业转化</button>
         <button type="button" class="v16-chip-btn gold" data-v16-go="ai">✨ AI 编排与助教</button>
         <button type="button" class="v16-chip-btn" data-v16-go="diy">🧩 DIY 实验室</button>
         <button type="button" class="v16-chip-btn" data-v16-trigger="v15">◎ 体检</button>
@@ -822,6 +854,7 @@
     show('v16AiExtra', currentRoute === 'ai');
     show('v16DiyHeader', currentRoute === 'diy');
     show('v16DiyToolsPage', currentRoute === 'diy' && diySubTab === 'tools');
+    show('v18TranslationPage', currentRoute === 'translation');
     show('v16WorkflowBar', currentRoute === 'workflow');
 
     // 更新顶栏激活态与标题
@@ -834,8 +867,9 @@
     const metaMap = {
       home: ['PORTAL', '总览首页'],
       bank: ['BANK', '药材题库大厅'],
-      ai: ['AI STUDIO', 'AI 智能设计台'],
-      diy: ['DIY LAB', 'DIY 创意实验室']
+      ai: ['AI STUDIO', '智能实验设计台'],
+      diy: ['DIY LAB', 'DIY 创意实验室'],
+      translation: ['TRANSLATION', '产业转化训练']
     };
     if (currentRoute !== 'workflow' && metaMap[currentRoute]) {
       if (stepTag) stepTag.textContent = metaMap[currentRoute][0];
@@ -846,7 +880,9 @@
     else if (currentRoute === 'bank') renderBank();
     else if (currentRoute === 'ai') renderAi();
     else if (currentRoute === 'diy') renderDiy();
-    else if (currentRoute === 'workflow') {
+    else if (currentRoute === 'translation') {
+      if (window.TCM_TRANSLATION && window.TCM_TRANSLATION.init) window.TCM_TRANSLATION.init();
+    } else if (currentRoute === 'workflow') {
       // 确保 workflow 显示当前数字步骤的 wpanel，并同步顶栏标题与驾驶舱重绘
       const step = api() ? api().getStep() : 1;
       if (typeof step !== 'number') {
@@ -869,7 +905,7 @@
   }
 
   function go(route, opts = {}) {
-    const valid = ['home', 'bank', 'ai', 'diy', 'workflow'];
+    const valid = ['home', 'bank', 'ai', 'diy', 'translation', 'workflow'];
     if (!valid.includes(route)) route = 'home';
     currentRoute = route;
     if (route === 'ai' && opts.subTab) aiSubTab = opts.subTab;
@@ -917,12 +953,24 @@
       const act = trig.dataset.v16Trigger;
       if (act === 'v15' && window.TCM_V15_INSIGHT) window.TCM_V15_INSIGHT.open();
       else if (act === 'ai-review' && window.TCM_AI_REVIEW) window.TCM_AI_REVIEW.open();
+      else if (act === 'tr-dev' && window.TCM_TRANSLATION) window.TCM_TRANSLATION.openDeviation('yield');
       else if (act === 'compare') document.getElementById('btnOpenCompareTop')?.click();
       else if (act === 'cmd') document.getElementById('btnOpenCmdPalette')?.click();
       else if (act === 'drawer') api() && api().openRightDrawer('bank');
       else if (act === 'diy-herb') document.getElementById('btnOpenDiyHerbHero')?.click();
       else if (act === 'user-plan') document.getElementById('btnOpenUserPlanModal')?.click();
       else if (act === 'feedback') document.getElementById('btnOpenFeedbackFooter')?.click();
+      return;
+    }
+
+    const toTrBtn = e.target.closest('[data-v16-to-translation]');
+    if (toTrBtn) {
+      const tid = toTrBtn.dataset.v16ToTranslation;
+      if (window.TCM_TRANSLATION && window.TCM_TRANSLATION.importBankTopic && tid) {
+        window.TCM_TRANSLATION.importBankTopic(tid);
+      } else {
+        go('translation');
+      }
       return;
     }
 
@@ -1051,6 +1099,7 @@
       else if (k === 'b') { e.preventDefault(); go('bank'); }
       else if (k === 'a') { e.preventDefault(); go('ai'); }
       else if (k === 'd') { e.preventDefault(); go('diy'); }
+      else if (k === 't') { e.preventDefault(); go('translation'); }
     });
   }
 
@@ -1095,7 +1144,7 @@
     const params = new URLSearchParams(window.location.search || '');
     const urlRoute = params.get('route');
     const urlStep = params.get('step');
-    if (urlRoute && ['home', 'bank', 'ai', 'diy', 'workflow'].includes(urlRoute)) {
+    if (urlRoute && ['home', 'bank', 'ai', 'diy', 'translation', 'workflow'].includes(urlRoute)) {
       currentRoute = urlRoute;
     } else if (urlStep) {
       currentRoute = 'workflow';

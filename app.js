@@ -18,7 +18,8 @@
 
   // 全库真实核实的中医药与中西医结合文献库（不写具体页码占位，聚焦真实权威期刊与高校成果）
   const GLOBAL_LITERATURE = [
-    { tag: '药典教材', text: '国家药典委员会. 中华人民共和国药典: 2020年版一部[S]. 北京: 中国医药科技出版社, 2020.', url: 'https://ydz.chp.org.cn/' },
+    { tag: '药典教材', text: '国家药典委员会. 中华人民共和国药典: 2025年版一部（2025年10月1日施行）[S]. 北京: 中国医药科技出版社, 2025.', url: 'https://ydz.chp.org.cn/' },
+    { tag: '药典教材', text: '国家药典委员会. 中华人民共和国药典: 2020年版一部（过渡比对参考）[S]. 北京: 中国医药科技出版社, 2020.', url: 'https://ydz.chp.org.cn/' },
     { tag: '药典教材', text: '冯卫生. 中药化学[M]. 第4版(十四五规划教材). 北京: 中国中医药出版社, 2021.', url: 'http://www.zgkjcx.com/Article/ShowArticle.asp?ArticleID=27121' },
     { tag: '中药化学', text: '钟琳, 王盼, 苗丽坤. 薄荷提取工艺、药理作用及应用研究进展[J]. 食品与机械, 2022.', url: 'https://www.ifoodmm.cn/cgi/viewcontent.cgi?article=1075&context=journal' },
     { tag: '中西医结合', text: 'Li B, Xiao T, Xu Y, et al. Oxymatrine-fatty acid deep eutectic solvents as novel penetration enhancers for transdermal drug delivery[J]. Int J Pharm, 2023, 637: 122880.', url: 'https://sps.sysu.edu.cn/teacher/xuyuehong' },
@@ -3958,7 +3959,7 @@
           clearInterval(pInt);
           if (pBox) pBox.classList.add('hidden');
           btnEl.disabled = false;
-          btnTxt.textContent = '一键生成实验方案';
+          btnTxt.textContent = '生成研究 / 小试模拟方案';
           autoRunning = false;
           activeAIController = null;
           updateQwenStatusUI();
@@ -4054,7 +4055,7 @@
           if (requestId === autoRequestSeq) {
             if (pBox) pBox.classList.add('hidden');
             btnEl.disabled = false;
-            btnTxt.textContent = '一键生成实验方案';
+            btnTxt.textContent = '生成研究 / 小试模拟方案';
             autoRunning = false;
             activeAIController = null;
             updateQwenStatusUI();

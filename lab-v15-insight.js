@@ -278,7 +278,7 @@
   function projectHero(c) {
     const status = c.score >= 90 ? '方案状态优秀' : c.score >= 75 ? '方案可继续优化' : '建议先完成关键复核';
     return `<section class="v15-project-hero">
-      <div class="v15-project-copy"><div class="v15-overline"><span class="v15-live-dot"></span> 当前项目 · ${esc(c.topic.category)}</div><h3>${esc(c.topic.herb)} <span>×</span> ${esc(c.topic.compound)}</h3><p>${esc(c.ws.formalTitle || '尚未填写正式实验题目')}</p><div class="v15-project-tags"><span>${esc(c.ws.solventType)}</span><span>${fmt(c.mass)} g 投料</span><span>${c.cycles} 次提取</span><span>${esc(c.ws.mesh || '粒度待确认')}</span></div></div>
+      <div class="v15-project-copy"><div class="v15-overline"><span class="v15-live-dot"></span> 当前项目 · ${esc(c.topic.category)}</div><h3>${esc(c.topic.herb)} <span>×</span> ${esc(c.topic.compound)}</h3><p>${esc(c.ws.formalTitle || '尚未填写正式实验题目')}</p><div class="v15-project-tags"><span>${esc(c.ws.solventType)}</span><span>${fmt(c.mass)} g 投料</span><span>${c.cycles} 次提取</span><span>${esc(c.ws.mesh || '粒度待确认')}</span></div><div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="v15-btn" data-v15-action="open-deviation" style="min-height:32px;padding:5px 11px;font-size:11px;background:rgba(255,255,255,0.14);color:#ecfdf5;border:1px solid rgba(255,255,255,0.28)">偏差调查与批间一致性 →</button><button type="button" class="v15-btn" data-v15-action="open-translation" style="min-height:32px;padding:5px 11px;font-size:11px;background:rgba(16,185,129,0.25);color:#ecfdf5;border:1px solid rgba(110,231,183,0.4)">转入产业转化（8阶段）→</button></div></div>
       <div class="v15-score-ring" style="--score:${c.score * 3.6}deg"><div><strong>${c.score}</strong><span>综合设计分</span><small>${status}</small></div></div>
     </section>`;
   }
@@ -355,6 +355,21 @@
     if (!btn) return;
     const action = btn.dataset.v15Action;
     if (action === 'close') close();
+    if (action === 'open-deviation') {
+      close();
+      if (window.TCM_TRANSLATION && window.TCM_TRANSLATION.openDeviation) window.TCM_TRANSLATION.openDeviation('repro');
+      return;
+    }
+    if (action === 'open-translation') {
+      const curId = getContext().id;
+      close();
+      if (window.TCM_TRANSLATION && window.TCM_TRANSLATION.importBankTopic && curId) {
+        window.TCM_TRANSLATION.importBankTopic(curId);
+      } else if (window.TCM_V16_PORTAL) {
+        window.TCM_V16_PORTAL.go('translation');
+      }
+      return;
+    }
     if (action === 'show-quality') { activeTab = 'quality'; render(); }
     if (action === 'go-step') {
       const step = btn.dataset.step;

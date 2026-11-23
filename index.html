@@ -28,7 +28,8 @@
   <script defer src="./vendor/html2canvas-1.4.1.min.js"></script>
   <link rel="stylesheet" href="./styles.css?v=24" />
   <link rel="stylesheet" href="./lab-v15-insight.css?v=16" />
-  <link rel="stylesheet" href="./lab-v16-portal.css?v=20" />
+  <link rel="stylesheet" href="./lab-v16-portal.css?v=21" />
+  <link rel="stylesheet" href="./lab-v18-translation.css?v=1" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
@@ -387,7 +388,7 @@
         <form id="qwenAutoForm" class="flex flex-col sm:flex-row gap-2">
           <input id="qwenPromptInput" type="text" placeholder="输入实验想法，如：2小时无毒提取陈皮橙皮苷并配置装置..." class="flex-1 min-w-0 w-full px-4 py-2.5 text-xs sm:text-sm rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:border-[#0f5c54] focus:ring-2 focus:ring-teal-500/15 transition" />
           <button id="btnRunQwenAuto" type="submit" class="shrink-0 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#0a3630] to-[#0f5c54] hover:from-[#062420] hover:to-[#0a3630] text-white text-xs sm:text-sm font-extrabold shadow-sm transition flex items-center justify-center gap-1.5">
-            <i data-lucide="wand-2" class="w-3.5 h-3.5 text-amber-300"></i><span id="btnRunQwenText">一键生成实验方案</span>
+            <i data-lucide="wand-2" class="w-3.5 h-3.5 text-amber-300"></i><span id="btnRunQwenText">生成研究 / 小试模拟方案</span>
           </button>
         </form>
 
@@ -1093,7 +1094,7 @@
           <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">① 云端智能设计：支持自由输入自然语言需求，定制提取与分离工艺</div>
           <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">② 站内精编方案库：离线或网络波动时自动平滑衔接，保障实验课全程顺畅</div>
         </div>
-        <p class="text-[10px] leading-relaxed text-slate-400">AI 生成内容仅作实验设计草稿，药典限度、文献和实验安全条件须由指导教师复核。</p>
+        <p class="text-[10px] leading-relaxed text-slate-400">智能生成的方案与推演数据仅作研究与小试模拟草稿，药典限度须以《中国药典》2025 年版原文核对，实际实验与生产须经实验验证、工艺验证及质量审核。</p>
         <div id="qwenCfgStatus" class="hidden p-2.5 rounded-xl text-[11px] leading-relaxed"></div>
         <div class="flex flex-wrap gap-2 pt-1">
           <button id="btnTestQwenCfg" type="button" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">检测连接状态</button>
@@ -1220,10 +1221,12 @@
 <script src="./lab-v12-diy-studio.js?v=22"></script>
 <script src="./lab-v13-mission-os.js?v=22"></script>
 <script src="./lab-v14-course-diagrams.js?v=22"></script>
-<script src="./cloud-ai.js?v=24"></script>
-<script src="./app.js?v=27"></script>
-<script src="./lab-v15-insight.js?v=18"></script>
-<script src="./lab-v16-portal.js?v=21"></script>
+<script src="./cloud-ai.js?v=25"></script>
+<script src="./app.js?v=28"></script>
+<script src="./lab-v15-insight.js?v=19"></script>
+<script src="./lab-v16-portal.js?v=22"></script>
 <script src="./lab-v17-ai-review.js?v=18"></script>
+<script src="./lab-v18-translation-data.js?v=1"></script>
+<script src="./lab-v18-translation.js?v=1"></script>
 </body>
 </html>
