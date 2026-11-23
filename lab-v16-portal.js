@@ -834,15 +834,22 @@
     else if (currentRoute === 'ai') renderAi();
     else if (currentRoute === 'diy') renderDiy();
     else if (currentRoute === 'workflow') {
-      // 确保 workflow 显示当前数字步骤的 wpanel
+      // 确保 workflow 显示当前数字步骤的 wpanel，并同步顶栏标题与驾驶舱重绘
       const step = api() ? api().getStep() : 1;
       if (typeof step !== 'number') {
         api() && api().goStep(1);
         return;
       }
+      const stepMeta = { 1: '选材', 2: '定题', 3: '原理与方案', 4: '装置与流程', 5: '数据', 6: '报告' };
+      if (stepTag) stepTag.textContent = `0${step} / 06`;
+      if (titleEl) titleEl.textContent = stepMeta[step] || '实验工坊';
+      document.querySelectorAll('.wpanel').forEach(p => p.classList.add('hidden'));
+      const curPanel = document.getElementById(`wpanel-${step}`);
+      if (curPanel) curPanel.classList.remove('hidden');
       renderWorkflowBar();
       const qBar = document.getElementById('qwenCommandBar');
       if (qBar) qBar.style.display = '';
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 40);
     }
 
     if (typeof lucide !== 'undefined') lucide.createIcons();

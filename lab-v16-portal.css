@@ -1180,6 +1180,16 @@ body.dark-lab .v16-chip-btn.gold {
   border-color: rgba(245, 158, 11, 0.4);
   color: #fde68a;
 }
+body.dark-lab #dockBtnGoHub {
+  background: rgba(201, 146, 44, 0.18) !important;
+  border-color: rgba(245, 158, 11, 0.38) !important;
+  color: #fde68a !important;
+}
+body.dark-lab #dockBtnCompare {
+  background: rgba(16, 185, 129, 0.18) !important;
+  border-color: rgba(52, 211, 153, 0.36) !important;
+  color: #a7f3d0 !important;
+}
 
 /* ---------- 响应式适配 ---------- */
 @media (max-width: 1080px) {
