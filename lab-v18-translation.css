@@ -151,7 +151,10 @@ body[data-v16-route="translation"] .wpanel {
   color: #062b26;
   background: rgba(240, 253, 244, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.45);
-  max-width: 240px;
+  max-width: 245px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 法规与数据可信度状态带 */
@@ -652,6 +655,25 @@ body.dark-lab .tr-step-btn.active { background: #10b981; color: #04211c; border-
 body.dark-lab .tr-chip.active { background: #10b981; color: #04211c; border-color: #10b981; }
 body.dark-lab .tr-btn-primary { background: #10b981; color: #04211c; border-color: #10b981; }
 body.dark-lab .tr-btn-primary:hover { background: #34d399; color: #04211c; }
+body.dark-lab .tr-btn-light {
+  background: #10b981 !important;
+  color: #04211c !important;
+  border-color: #34d399 !important;
+}
+body.dark-lab .tr-btn-light:hover {
+  background: #34d399 !important;
+  color: #04211c !important;
+}
+body.dark-lab .tr-proj-pill.active {
+  background: #10b981 !important;
+  color: #04211c !important;
+  border-color: #34d399 !important;
+}
+body.dark-lab .tr-bank-select {
+  background: #0d2621 !important;
+  color: #e6f4ef !important;
+  border-color: rgba(52, 211, 153, 0.38) !important;
+}
 
 @media print {
   body.tr-printing-report > *:not(#trReportModal) { display: none !important; }

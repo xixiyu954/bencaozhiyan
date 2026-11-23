@@ -1788,7 +1788,18 @@
   }
 
   // ---------------- 主渲染器 ----------------
+  let deferredRenderTimer = null;
+  function scheduleNumericRender() {
+    clearTimeout(deferredRenderTimer);
+    deferredRenderTimer = setTimeout(() => {
+      deferredRenderTimer = null;
+      render();
+    }, 150);
+  }
+
   function render() {
+    clearTimeout(deferredRenderTimer);
+    deferredRenderTimer = null;
     const mount = document.getElementById('v18TranslationPage');
     const data = D();
     if (!mount || !data) return;
@@ -1835,7 +1846,7 @@
               </button>
             `).join('')}
             <select class="tr-bank-select" data-tr-import-bank="1" aria-label="从全站药材题库导入任意课题进入产业转化">
-              <option value="">＋ 从 ${bankTopics.length || 119} 项题库导入任意药材…</option>
+              <option value="">＋ 导入题库药材（${bankTopics.length || 119} 项）…</option>
               ${bankTopics.map((t) => `<option value="${esc(t.id)}" ${proj.bankTopicId === t.id ? 'selected' : ''}>${esc(t.herb)} · ${esc(t.compound || t.category || '')}</option>`).join('')}
             </select>
           </div>
@@ -2147,7 +2158,7 @@
           state.batchRows[rIdx].vals[bIdx] = num(t.value, 0);
           state.batchRows[rIdx].isUser = true;
           state.batchEdited = true;
-          render();
+          scheduleNumericRender();
         }
         return;
       }
@@ -2155,12 +2166,12 @@
         const i = Number(t.dataset.trSim);
         state.similarity[i] = Math.min(1, Math.max(0, num(t.value, 0.95)));
         state.batchEdited = true;
-        render();
+        scheduleNumericRender();
         return;
       }
       if (t.matches('[data-tr-scale]')) {
         state.scaleCfg[t.dataset.trScale] = num(t.value, 1);
-        render();
+        scheduleNumericRender();
         return;
       }
       if (t.matches('[data-tr-clue]')) {
@@ -2173,7 +2184,7 @@
         const row = state.fmeaRows[Number(i)];
         if (row) {
           row[col] = Math.min(5, Math.max(1, num(t.value, 3)));
-          render();
+          scheduleNumericRender();
         }
         return;
       }
@@ -2190,7 +2201,7 @@
         const [oid, field] = t.dataset.trProcVal.split(':');
         if (!state.procUserData[oid]) state.procUserData[oid] = {};
         state.procUserData[oid][field] = t.value === '' ? null : num(t.value, 0);
-        render();
+        scheduleNumericRender();
       }
     });
 

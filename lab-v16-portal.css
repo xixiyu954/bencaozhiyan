@@ -1203,6 +1203,11 @@ body.dark-lab header button#btnToggleDarkLab:hover {
   border-color: rgba(52, 211, 153, 0.5) !important;
   color: #ffffff !important;
 }
+body.dark-lab header button#btnOpenCmdPalette kbd {
+  background: rgba(16, 185, 129, 0.20) !important;
+  color: #a7f3d0 !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}
 body.dark-lab #step1TabBar {
   background: rgba(10, 32, 28, 0.92) !important;
   border-color: rgba(52, 211, 153, 0.2) !important;
