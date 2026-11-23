@@ -303,7 +303,7 @@
             `).join('')}
           </div>
           <div class="grid grid-cols-2 gap-2 pt-1">
-            <button type="button" id="dockBtnGoHub" class="py-2 px-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-[11px] font-extrabold transition">⚙️ 13套装置库</button>
+            <button type="button" id="dockBtnGoHub" class="py-2 px-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-[11px] font-extrabold transition">⚙️ 15套装置库</button>
             <button type="button" id="dockBtnCompare" class="py-2 px-2.5 rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200 text-[#0a3630] text-[11px] font-extrabold transition">⚖️ 双课题对比</button>
           </div>
         </section>
@@ -363,7 +363,7 @@
 
     const el = id => document.getElementById(id);
     if (el('dockPhaseTag')) el('dockPhaseTag').textContent = theme.label;
-    if (el('dockHerbMini')) el('dockHerbMini').textContent = topic ? `${topic.herb} · ${topic.comp}` : '薄荷 · 挥发油';
+    if (el('dockHerbMini')) el('dockHerbMini').textContent = topic ? `${topic.herb} · ${topic.compound || topic.comp || topic.category || '核心成分'}` : '薄荷 · 挥发油';
     if (el('dockTempBadge')) el('dockTempBadge').textContent = `${m.temp} ℃`;
     if (el('dockStatRatio')) el('dockStatRatio').textContent = `${m.mass}g · 1:${m.ratio}`;
     if (el('dockStatSolvent')) el('dockStatSolvent').textContent = m.solvent;

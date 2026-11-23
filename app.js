@@ -2684,6 +2684,7 @@
   function renderHub() {
     const RIG_CATS = {
       steam: '提取装置', reflux: '提取装置', soxhlet: '提取装置', ultrasound: '提取装置', percolation: '提取装置',
+      supercritical: '提取装置', microwave: '提取装置',
       extract: '分离纯化', column: '分离纯化', resin: '分离纯化',
       rotavap: '浓缩与保活', filter: '浓缩与保活', freeze_dry: '浓缩与保活', tlc: '精密分析', hplc: '精密分析'
     };
@@ -2706,13 +2707,15 @@
       gridEl.innerHTML = keys.map(k => {
         const r = LAB_RIGS[k];
         const sel = k === activeKey;
+        const rTitle = r.title || r.name || k;
+        const rEquip = (r.equipment && r.equipment.length) ? r.equipment.slice(0, 3).join(' · ') : (r.shortDesc || r.tag || '');
         return `<button type="button" data-hub-rig="${k}" class="pick-card ${sel ? 'selected' : ''} text-left p-3.5 rounded-2xl bg-white border border-slate-200 space-y-1">
           <div class="flex items-center justify-between gap-1.5">
-            <span class="px-2 py-0.5 rounded-full bg-teal-50 text-[#0f5c54] text-[10px] font-bold">${r.stageTag || RIG_CATS[k] || '实验装置'}</span>
+            <span class="px-2 py-0.5 rounded-full bg-teal-50 text-[#0f5c54] text-[10px] font-bold">${r.stageTag || r.category || RIG_CATS[k] || '实验装置'}</span>
             <span class="text-[10px] text-slate-400 font-semibold">${(r.subSteps || []).length} 个小分支</span>
           </div>
-          <div class="text-xs sm:text-sm font-extrabold text-slate-900 leading-snug">${aiEsc(r.title)}</div>
-          <div class="text-[11px] text-slate-500 line-clamp-1">${aiEsc((r.equipment || []).slice(0, 3).join(' · '))}</div>
+          <div class="text-xs sm:text-sm font-extrabold text-slate-900 leading-snug">${aiEsc(rTitle)}</div>
+          <div class="text-[11px] text-slate-500 line-clamp-1">${aiEsc(rEquip)}</div>
         </button>`;
       }).join('');
       gridEl.querySelectorAll('[data-hub-rig]').forEach(b => b.addEventListener('click', () => { state.hubRig = b.dataset.hubRig; hubHotspotId = 1; saveState(); renderHub(); }));
@@ -2721,36 +2724,44 @@
     const mount = document.getElementById('hubRigDetailMount');
     const rig = LAB_RIGS[activeKey];
     if (!mount || !rig) return;
-    const hs = (rig.hotspots || []).find(h => h.id === hubHotspotId) || rig.hotspots[0];
+    const rigTitle = rig.title || rig.name || activeKey;
+    const hsList = Array.isArray(rig.hotspots) ? rig.hotspots : [];
+    const hs = hsList.find(h => h.id === hubHotspotId) || hsList[0] || {
+      id: 1,
+      name: rigTitle,
+      desc: rig.shortDesc || rig.plainTheory || '点击下方 4 大分步小分支查看装置搭建与操作细节。',
+      warn: rig.safety || '操作前请核查装置气密性、控温上限与通风防护要求。'
+    };
     const matchedHerbs = Object.values(FEATURED_PRESETS).filter(p => p.defaultRig === activeKey || (Array.isArray(p.applicableRigs) && p.applicableRigs.includes(activeKey))).slice(0, 8);
     const subs = Array.isArray(rig.subSteps) ? rig.subSteps : [];
+    const equipList = (rig.equipment && rig.equipment.length) ? rig.equipment : [rigTitle, rig.tag || '温控与安全防护单元'];
 
     mount.innerHTML = `
       <div class="lab-card rounded-3xl p-5 sm:p-6 space-y-5">
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
           <div>
-            <span class="px-2.5 py-0.5 rounded-full bg-teal-50 text-[#0f5c54] text-[11px] font-bold">${aiEsc(rig.stageTag || RIG_CATS[activeKey] || '实验室装置')}</span>
-            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-1">${aiEsc(rig.title)}</h3>
+            <span class="px-2.5 py-0.5 rounded-full bg-teal-50 text-[#0f5c54] text-[11px] font-bold">${aiEsc(rig.stageTag || rig.category || RIG_CATS[activeKey] || '实验室装置')}</span>
+            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-1">${aiEsc(rigTitle)}</h3>
           </div>
-          <a href="${biliUrl(rig.videoKw)}" target="_blank" rel="noopener noreferrer" class="bili-pill">▶ B站搜「${aiEsc(rig.videoKw)}」 ↗</a>
+          <a href="${biliUrl(rig.videoKw || rigTitle)}" target="_blank" rel="noopener noreferrer" class="bili-pill">▶ B站搜「${aiEsc(rig.videoKw || rigTitle)}」 ↗</a>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           <div class="lg:col-span-7 rounded-2xl bg-gradient-to-b from-[#fbfcfa] to-[#e9f4f1] border border-slate-200 p-4 flex flex-col justify-between space-y-3">
             <div id="hubSvgWrap" class="w-full flex items-center justify-center py-2 rig-live">${rig.svg}</div>
-            <div class="text-xs text-[#0a3630] bg-white/90 rounded-xl px-3.5 py-2.5 border border-teal-100"><strong>搭建顺序：</strong>${aiEsc(rig.order)}</div>
-            <div class="text-xs text-amber-950 bg-amber-50/90 rounded-xl px-3.5 py-2.5 border border-amber-200"><strong class="text-amber-900">💡 装置原理大白话：</strong>${aiEsc(rig.plainTheory || '')}</div>
+            <div class="text-xs text-[#0a3630] bg-white/90 rounded-xl px-3.5 py-2.5 border border-teal-100"><strong>搭建顺序：</strong>${aiEsc(rig.order || '请按下方 4 大分步小分支依次完成装样、密封、控温与终点判定。')}</div>
+            <div class="text-xs text-amber-950 bg-amber-50/90 rounded-xl px-3.5 py-2.5 border border-amber-200"><strong class="text-amber-900">💡 装置原理大白话：</strong>${aiEsc(rig.plainTheory || rig.shortDesc || '')}</div>
           </div>
           <div class="lg:col-span-5 flex flex-col justify-between gap-3">
             <div class="rounded-2xl bg-[#062420] text-white p-5 space-y-2">
-              <span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 text-xs font-bold">组件 #${hs.id}（点击左图编号切换）</span>
+              <span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 text-xs font-bold">组件 #${hs.id}${hsList.length > 1 ? '（点击左图编号切换）' : '（核心要点）'}</span>
               <h4 class="text-base font-bold">${aiEsc(hs.name)}</h4>
               <p class="text-xs text-teal-50/90 leading-relaxed">${aiEsc(hs.desc)}</p>
               <div class="p-2.5 rounded-xl bg-amber-400/15 border border-amber-300/30 text-xs text-amber-100"><strong class="text-amber-300">安全警示：</strong>${aiEsc(hs.warn)}</div>
             </div>
             <div class="rounded-2xl bg-white border border-slate-200 p-4 space-y-2">
               <div class="text-xs font-extrabold text-slate-800">核心器材清单</div>
-              <div class="flex flex-wrap gap-1.5">${(rig.equipment || []).map(e => `<span class="px-2.5 py-1 rounded-lg bg-[#f4f3ee] text-slate-700 text-xs font-medium">${aiEsc(e)}</span>`).join('')}</div>
+              <div class="flex flex-wrap gap-1.5">${equipList.map(e => `<span class="px-2.5 py-1 rounded-lg bg-[#f4f3ee] text-slate-700 text-xs font-medium">${aiEsc(e)}</span>`).join('')}</div>
             </div>
             <div class="rounded-2xl bg-teal-50/60 border border-teal-200/80 p-4 space-y-2">
               <div class="text-xs font-extrabold text-[#0a3630]">适用代表药材（点击一键载入工作台）</div>
@@ -2772,10 +2783,10 @@
                     <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-[#0a3630] text-emerald-200 text-[11px] font-extrabold shrink-0">${s.code || (idx + 1)}</span>
                     <div class="text-xs sm:text-sm font-extrabold text-slate-900">${aiEsc(s.title)}</div>
                   </div>
-                  <a href="${biliUrl(s.biliKw || rig.videoKw)}" target="_blank" rel="noopener noreferrer" class="bili-pill shrink-0">▶ ${aiEsc(s.biliKw || '看演示')} ↗</a>
+                  <a href="${biliUrl(s.biliKw || s.kw || rig.videoKw || rigTitle)}" target="_blank" rel="noopener noreferrer" class="bili-pill shrink-0">▶ ${aiEsc(s.biliKw || s.kw || '看演示')} ↗</a>
                 </div>
-                <p class="text-xs text-slate-700 leading-relaxed">${aiEsc(s.action)}</p>
-                <div class="text-[11px] text-amber-900 bg-amber-50/80 border border-amber-200/70 rounded-lg px-2.5 py-1.5"><strong>⚠ 避坑要点：</strong>${aiEsc(s.tip)}</div>
+                <p class="text-xs text-slate-700 leading-relaxed">${aiEsc(s.action || s.detail || '')}</p>
+                <div class="text-[11px] text-amber-900 bg-amber-50/80 border border-amber-200/70 rounded-lg px-2.5 py-1.5"><strong>⚠ 避坑要点：</strong>${aiEsc(s.tip || rig.safety || '注意控温与密封安全检查')}</div>
               </div>`).join('')}
           </div>
         </div>

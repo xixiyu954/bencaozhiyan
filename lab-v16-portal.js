@@ -195,6 +195,7 @@
 
     const inner = footer.firstElementChild;
     if (!inner) return;
+    const fc = getCounts();
     const grid = document.createElement('div');
     grid.className = 'max-w-[1620px] mx-auto px-4 sm:px-6 xl:px-8';
     grid.innerHTML = `
@@ -212,7 +213,7 @@
           <h6>核心分支走向</h6>
           <div class="v16-footer-links">
             <button type="button" data-v16-go="home">🏠 首页总览</button>
-            <button type="button" data-v16-go="bank">📚 117+ 药材题库大厅</button>
+            <button type="button" data-v16-go="bank">📚 ${fc.topics} 项药材题库大厅</button>
             <button type="button" data-v16-go="ai">✨ AI 智能实验设计台</button>
             <button type="button" data-v16-go="diy">🧩 DIY 创意与实操实验室</button>
             <button type="button" data-v16-go="workflow">🧪 6 步实验设计工坊</button>
@@ -283,7 +284,7 @@
             <div class="v16-hero-card">
               <div class="v16-hero-card-head">
                 <span class="v16-hero-card-tag">CURRENT WORKBENCH · 当前进度</span>
-                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-300/30">${v15 ? `设计分 ${v15.score}` : `第 0${stepNum}/06 步`}</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-300/30">${v15 && Number.isFinite(v15.score) ? `设计分 ${v15.score}` : `第 0${stepNum}/06 步`}</span>
               </div>
               <h3 class="v16-hero-card-title">${esc(t.herb)} · ${esc(t.compound)}</h3>
               <p class="v16-hero-card-sub">${esc((ws && ws.formalTitle) || `${t.herb}中${t.compound}的提取分离与检识实验`)}</p>
@@ -449,7 +450,7 @@
         if (bankState.scene === 'process' && !/炮制|醋炙|炙|炒|杀酶|对照/.test(hay)) return false;
       }
       if (q) {
-        const hay = `${item.herb || ''} ${item.compound || ''} ${item.category || ''} ${item.latin || ''} ${item.origin || ''} ${item.chem || ''}`.toLowerCase();
+        const hay = `${item.herb || ''} ${item.compound || ''} ${item.category || ''} ${item.latin || ''} ${item.origin || ''} ${item.chemistry || item.chem || ''}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -527,6 +528,8 @@
               ${filtered.map(item => {
                 const isSel = item.id === bankState.previewId;
                 const isActive = item.id === cur.id;
+                const hydrated = (api() && api().getTopicById) ? api().getTopicById(item.id) : item;
+                const cardSummary = hydrated.origin || hydrated.chemistry || `${item.latin ? item.latin + ' · ' : ''}主攻成分：${item.compound || '活性成分'}`;
                 return `
                   <button type="button" class="v16-topic-card ${isSel ? 'selected' : ''}" data-v16-preview="${esc(item.id)}">
                     <div class="v16-topic-head">
@@ -534,7 +537,7 @@
                       <span class="v16-topic-cat">${esc(item.category || '中药化学')}</span>
                     </div>
                     <div class="v16-topic-comp">🎯 ${esc(item.compound || '核心活性成分')}</div>
-                    <div class="v16-topic-note">${esc(item.origin || item.chem || '点击右侧查看完整基原、成分、药典标准与小白速读。')}</div>
+                    <div class="v16-topic-note">${esc(cardSummary)}</div>
                     <div class="v16-topic-foot">
                       <span>${item._isCustom ? '🤖 自定义/AI' : (item.group === 'class' ? '★ 高校经典' : '✨ 创新前沿')}</span>
                       <span style="color:var(--ds-primary-2);font-weight:800">${isSel ? '右侧预览中' : '查看档案 →'}</span>
@@ -574,8 +577,8 @@
             </div>
           ` : ''}
           <div class="v16-preview-block"><label>🌿 基原与性味</label><p>${esc(preview.origin || '暂未填写')}</p></div>
-          <div class="v16-preview-block"><label>🧪 核心化学成分</label><p>${esc(preview.chem || '暂未填写')}</p></div>
-          <div class="v16-preview-block"><label>📖 药典与质控参考</label><p>${esc(preview.pharm || '请参照现行版《中国药典》一部')}</p></div>
+          <div class="v16-preview-block"><label>🧪 核心化学成分</label><p>${esc(preview.chemistry || preview.chem || `${preview.compound || ''}（${preview.category || '中药化学'}）`)}</p></div>
+          <div class="v16-preview-block"><label>📖 药典与质控参考${preview.limitVal ? `（限度 ≥ ${esc(preview.limitVal)}${esc(preview.limitUnit || '%')}）` : ''}</label><p>${esc(preview.pharmacopoeia || preview.pharm || '请参照现行版《中国药典》一部')}</p></div>
 
           <div class="flex flex-col gap-2 pt-1">
             <button type="button" class="v16-btn-cta-primary" style="width:100%;justify-content:center;padding:12px 16px;font-size:0.86rem" data-v16-lock-topic="${esc(preview.id)}" data-v16-target-step="2">

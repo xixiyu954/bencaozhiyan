@@ -28,7 +28,7 @@
   <script defer src="./vendor/html2canvas-1.4.1.min.js"></script>
   <link rel="stylesheet" href="./styles.css?v=23" />
   <link rel="stylesheet" href="./lab-v15-insight.css?v=16" />
-  <link rel="stylesheet" href="./lab-v16-portal.css?v=16" />
+  <link rel="stylesheet" href="./lab-v16-portal.css?v=17" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
@@ -274,7 +274,7 @@
   <div id="drawerBackdrop" class="no-print fixed inset-0 z-30 bg-black/35 backdrop-blur-xs hidden"></div>
 
   <!-- ==================== 中间主舞台：极简大标题 + 清晰留白独立板块 ==================== -->
-  <div class="flex-1 lg:pl-72 flex flex-col min-h-screen">
+  <div class="flex-1 min-w-0 w-full max-w-full lg:pl-72 flex flex-col min-h-screen overflow-x-clip">
     <div id="wechatNoticeBanner" class="no-print hidden bg-amber-50 border-b border-amber-200 px-4 py-2 text-xs text-amber-900 flex items-center justify-between gap-2">
       <span>微信内使用：第 6 步请用<strong>「生成高清报告长图」</strong>长按存相册，或右上角 <strong>···</strong> 在浏览器打开。</span>
       <button id="btnDismissWechat" type="button" class="font-bold px-1.5">×</button>
@@ -403,7 +403,7 @@
             <option value="正交工艺优化对比">模板：工艺优化对比</option>
             <option value="数据诊断与报告润色">模板：数据与报告强化</option>
           </select>
-          <label class="inline-flex items-center gap-1.5 ml-auto px-2.5 py-1 rounded-lg bg-emerald-50/80 border border-emerald-200 text-emerald-900 font-bold cursor-pointer select-none" title="优先匹配内置91项题库与本地24h缓存，大幅节省AI消耗">
+          <label class="inline-flex items-center gap-1.5 ml-auto px-2.5 py-1 rounded-lg bg-emerald-50/80 border border-emerald-200 text-emerald-900 font-bold cursor-pointer select-none" title="优先匹配内置经典题库与本地24h缓存，大幅节省AI消耗">
             <input id="aiLocalFirstToggle" type="checkbox" checked class="accent-[#0a3630] rounded" />
             <span>极速匹配（优先经典题库）</span>
           </label>
@@ -1011,7 +1011,7 @@
               STANDALONE HUB · APPARATUS &amp; PROCESS LIBRARY
             </div>
             <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">动态流程与实验装置总览库</h2>
-            <p class="text-xs sm:text-sm text-teal-100/90 leading-relaxed">无需先走完选材步骤，直接在此一站式查阅全部 13 套动态交互实验装置（覆盖提取、纯化、浓缩、HPLC 精密分析与真空冻干全链路）、组件安全热点、4 步可操作小分支、精准 B站实操视频及对应代表药材。</p>
+            <p class="text-xs sm:text-sm text-teal-100/90 leading-relaxed">无需先走完选材步骤，直接在此一站式查阅全部 15 套动态交互实验装置（覆盖提取、纯化、浓缩、索氏/超临界/微波、HPLC 精密分析与真空冻干全链路）、组件安全热点、4 步可操作小分支、精准 B站实操视频及对应代表药材。</p>
           </div>
           <button type="button" id="btnBackToWorkflow" class="shrink-0 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-extrabold transition">← 返回 6 步实验工作台</button>
         </div>
@@ -1192,7 +1192,7 @@
 <script src="./lab-v6-pro.js?v=11"></script>
 <script src="./lab-v7-media-pro.js?v=11"></script>
 <script src="./lab-v9-data.js?v=22"></script>
-<script src="./lab-v8-studio.js?v=22"></script>
+<script src="./lab-v8-studio.js?v=24"></script>
 <script src="./lab-v9-visuals.js?v=22"></script>
 <script src="./lab-v10-sandbox.js?v=22"></script>
 <script src="./lab-v11-userplan.js?v=22"></script>
@@ -1200,8 +1200,8 @@
 <script src="./lab-v13-mission-os.js?v=22"></script>
 <script src="./lab-v14-course-diagrams.js?v=22"></script>
 <script src="./cloud-ai.js?v=23"></script>
-<script src="./app.js?v=23"></script>
-<script src="./lab-v15-insight.js?v=16"></script>
-<script src="./lab-v16-portal.js?v=16"></script>
+<script src="./app.js?v=24"></script>
+<script src="./lab-v15-insight.js?v=17"></script>
+<script src="./lab-v16-portal.js?v=17"></script>
 </body>
 </html>

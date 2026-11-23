@@ -138,7 +138,7 @@
     const stepDefs = [
       { n: 1, label: '选材', detail: `${t.herb} · ${t.compound}`, pct: 100 },
       { n: 2, label: '定题', detail: `${fmt(mass)} g · ${ws.solventType}`, pct: Math.round((Number(String(ws.formalTitle || '').length >= 10) + Number(mass > 0) + Number(ratio > 0)) / 3 * 100) },
-      { n: 3, label: '原理与方案', detail: ws.diyNotes ? '已记录设计依据与创新说明' : '可补充设计依据与创新说明', pct: Math.round((Number(Boolean(ws.diyExtract)) + Number(Boolean(ws.diySeparate)) + Number(ws.diyDetects.length > 0 || ws.diyNotes)) / 3 * 100) },
+      { n: 3, label: '原理与方案', detail: ws.diyNotes ? '已记录设计依据与创新说明' : '可补充设计依据与创新说明', pct: Math.round((Number(Boolean(ws.diyExtract)) + Number(Boolean(ws.diySeparate)) + Number(Boolean(ws.diyDetects.length > 0 || ws.diyNotes))) / 3 * 100) },
       { n: 4, label: '装置与流程', detail: `SOP ${Math.round(sopRatio * 100)}% 已确认`, pct: Math.round((Number(Boolean(ws.activeRig)) * 0.45 + sopRatio * 0.55) * 100) },
       { n: 5, label: '实验数据', detail: `${batches.length} 批 · TLC ${tlcOk ? '通过' : '待复核'}`, pct: Math.round((clamp(batches.length / 3, 0, 1) * 0.5 + (Number(tlcOk) + Number(testsTotal > 0 && testsPassed === testsTotal)) / 2 * 0.5) * 100) },
       { n: 6, label: '报告', detail: `${selectedReports}/9 个板块`, pct: Math.round(clamp(reportRatio, 0, 1) * 100) }
