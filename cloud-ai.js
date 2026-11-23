@@ -6,7 +6,8 @@
   // 2. Netlify (*.netlify.app) -> 自动走同源 /.netlify/functions/ai-proxy
   // 3. GitHub Pages (xixiyu954.github.io) -> 自动在 Netlify 与 Cloudflare Pages 通道间弹性容错切换
   const NETLIFY_SITE_URL = 'https://tcm-chemistry-lab.netlify.app';
-  const CLOUDFLARE_SITE_URL = 'https://tcm-chemistry-lab.pages.dev';
+  const CLOUDFLARE_SITE_URL = 'https://bencaozhiyan-xixiyu.pages.dev';
+  const CLOUDFLARE_BACKUP_URL = 'https://tcm-chemistry-lab.pages.dev';
   const NETLIFY_PROXY_PATH = '/.netlify/functions/ai-proxy';
   const CF_PROXY_PATH = '/api/ai-proxy';
   const CUSTOM_PROXY_STORAGE_KEY = 'tcm_custom_ai_proxy';
@@ -45,8 +46,10 @@
     } catch (_) {}
 
     const cfBase = String(CLOUDFLARE_SITE_URL || '').replace(/\/+$/, '');
+    const cfBakBase = String(CLOUDFLARE_BACKUP_URL || '').replace(/\/+$/, '');
     const nfBase = String(NETLIFY_SITE_URL || '').replace(/\/+$/, '');
     const cfFull = cfBase ? `${cfBase}${CF_PROXY_PATH}` : '';
+    const cfBakFull = cfBakBase ? `${cfBakBase}${CF_PROXY_PATH}` : '';
     const nfFull = nfBase && !nfBase.includes('YOUR-SITE') ? `${nfBase}${NETLIFY_PROXY_PATH}` : '';
 
     if (host.endsWith('.pages.dev')) {
@@ -55,13 +58,14 @@
       push(NETLIFY_PROXY_PATH);
       if (cfFull) push(cfFull);
     } else if (!host || host === 'localhost' || host === '127.0.0.1' || host.endsWith('.github.io')) {
-      if (nfFull) push(nfFull);
       if (cfFull) push(cfFull);
+      if (nfFull) push(nfFull);
+      if (cfBakFull) push(cfBakFull);
     } else {
       // 自定义域名（如绑定在 Cloudflare Pages 上）优先同源 /api/ai-proxy，失败则回退
       push(CF_PROXY_PATH);
-      if (nfFull) push(nfFull);
       if (cfFull) push(cfFull);
+      if (nfFull) push(nfFull);
     }
     return list;
   }
