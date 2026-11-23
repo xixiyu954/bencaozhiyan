@@ -40,12 +40,12 @@
   ];
 
   const DIY_TOOLS = [
-    { icon: '🧱', title: '高阶 DIY 工艺积木工坊', badge: 'v9 积木编排', desc: '16 块自由提取/纯化/检识积木自由组合，实时估算总耗时、绿色环保指数与耗材清单。', action: 'go-v9-diy' },
-    { icon: '🛠️', title: '14 种器皿自由装置沙盒', badge: 'v10 物理推演', desc: '亲手插拔烧瓶、冷凝管、分液漏斗与热源，实时诊断气密性、热敏风险与暴沸隐患。', action: 'go-v10-sandbox' },
-    { icon: '🛡️', title: 'MSDS 安全废液 & TLC 调优', badge: 'v3 零消耗工具', desc: '自动识别实验溶剂危险性、废液分类桶去向，以及 10 种常用溶剂 TLC 展开剂极性微调。', action: 'go-step3-tools' },
-    { icon: '📐', title: 'L9(3⁴) 正交分析 & UV 标曲拟合', badge: 'v3/v4 数据神器', desc: '一键完成四因素三水平正交极差分析、最小二乘线性回归（R²）与实测含量自动核算。', action: 'go-step5-tools' },
-    { icon: '🏭', title: '小试 → 中试四级放大核算器', badge: 'v5 工程放大', desc: '输入小试投料量，自动推演 10L / 50L / 500L 放大投料、溶剂回收量与能耗估算。', action: 'go-step2-scale' },
-    { icon: '⚖️', title: '双课题 A vs B 十维度横向对比', badge: 'v6 决策矩阵', desc: '任选两项药材或工艺方案生成 10 维度对比矩阵，支持一键复制 Markdown 用于开题答辩。', action: 'open-compare' }
+    { icon: '🧱', title: '工艺积木编排工坊', badge: '工艺编排', desc: '自由组合提取、纯化与检识单元，实时估算总耗时、环保指数与耗材清单。', action: 'go-v9-diy' },
+    { icon: '🛠️', title: '实验装置自由组装台', badge: '装置组装', desc: '自由搭配烧瓶、冷凝管、分液漏斗与热源，实时检查气密性、温控与暴沸风险。', action: 'go-v10-sandbox' },
+    { icon: '🛡️', title: 'MSDS 安全废液与 TLC 调优', badge: '安全与薄层', desc: '快速查询实验溶剂安全规范与废液分类去向，辅助调节薄层色谱展开剂极性。', action: 'go-step3-tools' },
+    { icon: '📐', title: 'L9(3⁴) 正交分析与 UV 标曲拟合', badge: '数据统计', desc: '完成四因素三水平正交极差分析、最小二乘线性回归（R²）与实测含量核算。', action: 'go-step5-tools' },
+    { icon: '🏭', title: '小试至中试放大核算', badge: '中试放大', desc: '根据小试投料参数，推算 10L、50L、500L 放大规模的投料、溶剂回收与能耗参考。', action: 'go-step2-scale' },
+    { icon: '⚖️', title: '双课题多维度对比', badge: '方案对比', desc: '任选两项药材或工艺方案进行十项指标横向对比，支持导出对比表格用于开题讨论。', action: 'open-compare' }
   ];
 
   function api() {
@@ -136,10 +136,10 @@
     };
 
     const tabHome = makeTab('v16NavHome', 'home', SVG_ICONS.home, '首页', '');
-    const tabBank = makeTab('v16NavBank', 'bank', SVG_ICONS.bank, '题库大厅', `${counts.topics}`);
-    const tabAi = makeTab('v16NavAi', 'ai', SVG_ICONS.ai, 'AI 设计', '');
+    const tabBank = makeTab('v16NavBank', 'bank', SVG_ICONS.bank, '药材题库', `${counts.topics}`);
+    const tabAi = makeTab('v16NavAi', 'ai', SVG_ICONS.ai, '智能设计', '');
     const tabDiy = makeTab('v16NavDiy', 'diy', SVG_ICONS.diy, 'DIY 实验室', '');
-    const tabWf = makeTab('v16NavWorkflow', 'workflow', SVG_ICONS.workflow, '6步工坊', '');
+    const tabWf = makeTab('v16NavWorkflow', 'workflow', SVG_ICONS.workflow, '实验工坊', '');
 
     // 把新五大走向按钮放在最前面，把旧按钮隐藏（保留 DOM ID 以确保旧脚本监听不报错）
     const legacyIds = ['zoneTabWorkflow', 'btnOpenDiyStudio', 'btnOpenMissionOs', 'btnOpenApparatusHub'];
@@ -228,36 +228,36 @@
             <strong style="font-size:0.98rem;color:var(--ds-ink)">本草智研 · 中药化学工作台</strong>
           </div>
           <p style="margin:0;font-size:0.8rem;line-height:1.68;color:var(--ds-muted);max-width:340px">
-            面向高校药学与中药学教学、创新竞赛与研发的模块化实验设计工作台。全站核心库已本地化托管，零境外 CDN 依赖，中国大陆网络秒开稳用。
+            面向高校药学与中药学课程教学、实验设计与科研训练的中药化学综合工作台。
           </p>
         </div>
         <div class="v16-footer-col">
-          <h6>核心分支走向</h6>
+          <h6>工作区</h6>
           <div class="v16-footer-links">
-            <button type="button" data-v16-go="home">🏠 首页总览</button>
-            <button type="button" data-v16-go="bank">📚 ${fc.topics} 项药材题库大厅</button>
-            <button type="button" data-v16-go="ai">✨ AI 智能实验设计台</button>
-            <button type="button" data-v16-go="diy">🧩 DIY 创意与实操实验室</button>
-            <button type="button" data-v16-go="workflow">🧪 6 步实验设计工坊</button>
+            <button type="button" data-v16-go="home">首页</button>
+            <button type="button" data-v16-go="bank">药材实验题库（${fc.topics} 项）</button>
+            <button type="button" data-v16-go="ai">智能实验设计</button>
+            <button type="button" data-v16-go="diy">DIY 创意实验室</button>
+            <button type="button" data-v16-go="workflow">六步实验工坊</button>
           </div>
         </div>
         <div class="v16-footer-col">
-          <h6>高效科研工具</h6>
+          <h6>常用工具</h6>
           <div class="v16-footer-links">
-            <button type="button" data-v16-trigger="v15">◎ v15 方案质量体检中枢</button>
-            <button type="button" data-v16-go="diy" data-v16-sub="hub">⚙️ 15 套动态物理仿真装置</button>
-            <button type="button" data-v16-trigger="compare">⚖️ 双课题十维度横向对比</button>
-            <button type="button" data-v16-trigger="drawer">📖 实证文献与高校案例库</button>
-            <button type="button" data-v16-trigger="cmd">⌘K 全局极速检索面板</button>
+            <button type="button" data-v16-trigger="v15">实验项目中枢与体检</button>
+            <button type="button" data-v16-go="diy" data-v16-sub="hub">实验装置与流程库</button>
+            <button type="button" data-v16-trigger="compare">双课题横向对比</button>
+            <button type="button" data-v16-trigger="drawer">实证文献与高校案例</button>
+            <button type="button" data-v16-trigger="cmd">全局快捷检索</button>
           </div>
         </div>
         <div class="v16-footer-col">
-          <h6>开放资源与支持</h6>
+          <h6>开放资源</h6>
           <div class="v16-footer-links">
             <a href="https://github.com/xixiyu954/tcm-chemistry-lab" target="_blank" rel="noopener noreferrer">GitHub 开源仓库 ↗</a>
-            <a href="https://ydz.chp.org.cn/" target="_blank" rel="noopener noreferrer">《中国药典》官方检索 ↗</a>
+            <a href="https://ydz.chp.org.cn/" target="_blank" rel="noopener noreferrer">《中国药典》在线检索 ↗</a>
             <a href="https://www.ilab-x.com/" target="_blank" rel="noopener noreferrer">国家虚拟仿真实验平台 ↗</a>
-            <button type="button" data-v16-trigger="feedback">✉️ 意见反馈与功能建议</button>
+            <button type="button" data-v16-trigger="feedback">意见反馈与建议</button>
           </div>
         </div>
       </div>
@@ -266,7 +266,7 @@
     grid.addEventListener('click', handleGlobalDelegate);
   }
 
-  // ---------- 4. 渲染：首页完整落地页 (HOME · 100% 无痕纯净，不展示任何历史测试或进度残留) ----------
+  // ---------- 4. 渲染：首页 ----------
   function renderHome() {
     const mount = document.getElementById('v16HomePage');
     if (!mount) return;
@@ -278,140 +278,138 @@
         <section class="v16-hero">
           <div class="v16-hero-grid">
             <div>
-              <span class="v16-eyebrow"><span class="v16-eyebrow-dot"></span>本草智研 · 无痕纯净版 · 每次进入自动清零重置</span>
-              <h2>告别上下狂划，<br/>按你的实验目标进入<em>专属走向页</em></h2>
+              <span class="v16-eyebrow"><span class="v16-eyebrow-dot"></span>本草智研 · 中药化学实验设计工作台</span>
+              <h2>从药材选材到规范报告，<br/>一站完成<em>中药化学实验设计</em></h2>
               <p class="v16-hero-desc">
-                无论你是零基础挑经典药材、用 AI 一句话生成整套工艺与装置，还是想在 DIY 沙盒里自由拼装复方与推演实验——每次访问均为全新无痕工作台；自编课题须经用户自主申请且通过平台 AI ≥ 90 分严审方可收录。
+                面向高校药学与中药学教学及实验研究，集成经典与前沿药材题库、智能方案编排、实验装置交互仿真、数据核算与规范实验报告输出。
               </p>
               <div class="v16-hero-ctas">
-                <button type="button" class="v16-btn-cta-primary" data-v16-go="ai">✨ 进入 AI 智能设计台 →</button>
-                <button type="button" class="v16-btn-cta-secondary" data-v16-go="bank">📚 逛 ${c.topics} 项药材题库</button>
-                <button type="button" class="v16-btn-cta-secondary" data-v16-go="diy">🧩 DIY 创意实验室</button>
+                <button type="button" class="v16-btn-cta-primary" data-v16-go="bank">浏览 ${c.topics} 项药材题库 →</button>
+                <button type="button" class="v16-btn-cta-secondary" data-v16-go="ai">智能实验设计</button>
+                <button type="button" class="v16-btn-cta-secondary" data-v16-go="diy">DIY 创意实验室</button>
               </div>
               <div class="v16-hero-stats">
-                <div class="v16-hero-stat"><strong>${c.topics}+</strong><span>权威精编药材题库</span></div>
-                <div class="v16-hero-stat"><strong>${c.rigs} 套</strong><span>动态交互 SVG 装置</span></div>
-                <div class="v16-hero-stat"><strong>≥ 90 分</strong><span>AI 自编严审准入门槛</span></div>
-                <div class="v16-hero-stat"><strong>无痕重置</strong><span>每次进入零残留状态</span></div>
+                <div class="v16-hero-stat"><strong>${c.topics}</strong><span>药材实验题库</span></div>
+                <div class="v16-hero-stat"><strong>${c.rigs} 套</strong><span>交互仿真装置</span></div>
+                <div class="v16-hero-stat"><strong>${c.literature} 篇</strong><span>实证参考文献</span></div>
+                <div class="v16-hero-stat"><strong>6 步</strong><span>完整实验工作流</span></div>
               </div>
             </div>
 
-            <!-- 右侧：平台核心规范与无痕准入声明卡（零个人进度、零测试课题残留） -->
+            <!-- 右侧：实验设计快速导览卡 -->
             <div class="v16-hero-card">
               <div class="v16-hero-card-head">
-                <span class="v16-hero-card-tag">ZERO-TRACE LAB · 平台纯净运行规范</span>
-                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-300/30">无痕模式已开启</span>
+                <span class="v16-hero-card-tag">快速开始</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-300/30">标准实验流程</span>
               </div>
-              <h3 class="v16-hero-card-title">纯净重置 · 严格 AI 90 分准入</h3>
-              <p class="v16-hero-card-sub">每次打开页面自动恢复洁净初始状态，绝不残留历史测试记录，确保题库严谨有序。</p>
+              <h3 class="v16-hero-card-title">规范化中药化学实验设计</h3>
+              <p class="v16-hero-card-sub">选定目标药材或输入实验思路，即可完成工艺参数核算、机理对照、装置模拟与规范报告生成。</p>
               <div class="v16-hero-mini-grid">
-                <div class="v16-hero-mini-cell"><span>会话模式</span><strong>每次自动清零</strong></div>
-                <div class="v16-hero-mini-cell"><span>收录门槛</span><strong>AI 严审 ≥90分</strong></div>
-                <div class="v16-hero-mini-cell"><span>不达标协助</span><strong>AI 一键优化</strong></div>
+                <div class="v16-hero-mini-cell"><span>第一步</span><strong>选材与定题</strong></div>
+                <div class="v16-hero-mini-cell"><span>第二步</span><strong>工艺与装置</strong></div>
+                <div class="v16-hero-mini-cell"><span>第三步</span><strong>数据与报告</strong></div>
               </div>
               <div class="v16-hero-card-btns">
-                <button type="button" class="v16-hero-resume-btn" data-v16-go="workflow" data-v16-step="1">开启全新 6 步工坊 →</button>
-                <button type="button" class="v16-hero-pulse-btn" data-v16-trigger="ai-review">🛡️ 90分审核台</button>
+                <button type="button" class="v16-hero-resume-btn" data-v16-go="workflow" data-v16-step="1">进入实验工坊 →</button>
+                <button type="button" class="v16-hero-pulse-btn" data-v16-trigger="ai-review">自编课题审核</button>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- 2. 三大核心走向分支卡片网格 -->
+        <!-- 2. 三大核心工作区 -->
         <section>
           <div class="v16-sec-head">
             <div>
-              <div class="v16-sec-kicker">THREE FOCUSED PATHWAYS · 三大核心走向</div>
-              <h3>你想从哪一条路线开始今天的中药化学实验？</h3>
+              <h3>选择工作方式</h3>
             </div>
-            <p>每个分支都是独立清爽的专属空间，不再把所有板块塞在同一条长页面里。</p>
+            <p>按当前学习或实验任务直接进入对应工作区。</p>
           </div>
           <div class="v16-branch-grid">
             <button type="button" class="v16-branch-card" style="--branch-accent:#0f5c54;--branch-bg:#ecfdf5;--branch-border:rgba(15,92,84,0.18)" data-v16-go="bank">
               <div>
                 <div class="v16-branch-top">
                   <span class="v16-branch-icon">📚</span>
-                  <span class="v16-branch-badge">${c.topics} 项课题 · 零基础友好</span>
+                  <span class="v16-branch-badge">${c.topics} 项课题</span>
                 </div>
-                <h4>药材题库研学走向页</h4>
-                <p>面向课程作业、期末实验与开题选材。按化学大类与教学场景毫秒筛选，右侧同步预览小白脾气速读与药典标准。</p>
+                <h4>药材实验题库</h4>
+                <p>适用于课程实验、复习备考与开题选题。支持按化学成分大类与实验场景检索，即时查看基原、成分与药典标准。</p>
                 <ul class="v16-branch-list">
-                  <li>覆盖黄酮/生物碱/皂苷/蒽醌/挥发油/名方复方</li>
-                  <li>左侧网格浏览 + 右侧固定档案预览，拒绝跳转迷路</li>
-                  <li>选中药材一键锁定并带入 6 步工坊与参数单</li>
+                  <li>涵盖黄酮、生物碱、皂苷、蒽醌、挥发油及经典名方</li>
+                  <li>同步展示药材特性要点与《中国药典》质量参考</li>
+                  <li>选定药材后可直接载入实验工坊配置参数</li>
                 </ul>
               </div>
-              <div class="v16-branch-foot"><span>进入题库大厅选材</span><span class="v16-branch-arrow">→</span></div>
+              <div class="v16-branch-foot"><span>进入药材题库</span><span class="v16-branch-arrow">→</span></div>
             </button>
 
             <button type="button" class="v16-branch-card" style="--branch-accent:#b45309;--branch-bg:#fffbeb;--branch-border:rgba(180,83,9,0.2)" data-v16-go="ai">
               <div>
                 <div class="v16-branch-top">
                   <span class="v16-branch-icon">✨</span>
-                  <span class="v16-branch-badge">智谱 GLM 免费通道</span>
+                  <span class="v16-branch-badge">辅助设计与评审</span>
                 </div>
-                <h4>AI 智能设计走向页</h4>
-                <p>面向开放创新实验、竞赛设计与自有方案审核。一句话描述需求或贴入现有路线，AI 自动打通 1→6 步全链路。</p>
+                <h4>智能实验设计</h4>
+                <p>适用于创新性实验与竞赛方案构思。输入实验目标自动规划提取、分离与检识路线，支持已有方案校核与答疑。</p>
                 <ul class="v16-branch-list">
-                  <li>自然语言一键生成工艺、装置、参数与安全边界</li>
-                  <li>内置 v11 自有方案深度演算与案例永久收录</li>
-                  <li>关联上下文的 AI 实验助教，随时排查收率/TLC 故障</li>
+                  <li>根据药材、课时与安全要求生成完整实验方案</li>
+                  <li>支持提交已有实验路线进行可行性推演与风险提示</li>
+                  <li>自编课题须经评审达到 90 分以上并由本人确认编入</li>
                 </ul>
               </div>
-              <div class="v16-branch-foot"><span>进入 AI 智能设计台</span><span class="v16-branch-arrow">→</span></div>
+              <div class="v16-branch-foot"><span>进入智能设计</span><span class="v16-branch-arrow">→</span></div>
             </button>
 
             <button type="button" class="v16-branch-card" style="--branch-accent:#0369a1;--branch-bg:#f0f9ff;--branch-border:rgba(3,105,161,0.2)" data-v16-go="diy">
               <div>
                 <div class="v16-branch-top">
                   <span class="v16-branch-icon">🧩</span>
-                  <span class="v16-branch-badge">4 合 1 分页实操舱</span>
+                  <span class="v16-branch-badge">交互仿真与工具</span>
                 </div>
-                <h4>DIY 创意与实操走向页</h4>
-                <p>面向动手推演与仪器预习。用清爽子标签收拢全站所有互动仿真与计算工具，点哪个看哪个，零滚屏负担。</p>
+                <h4>DIY 创意实验室</h4>
+                <p>适用于实验前预习、工艺推演与理化现象模拟，集成复方配伍、溶剂分层、薄层显色及常用实操计算工具。</p>
                 <ul class="v16-branch-list">
-                  <li>复方配伍 · 混合溶剂试管分层 · TLC 三光源显色台</li>
-                  <li>任务看板 · 原始记录本 · 旋蒸降沸 · 8 大显色反应</li>
-                  <li>15 套动态物理仿真装置 + 14 种器皿自由组装沙盒</li>
+                  <li>复方配伍模拟、混合溶剂分层与三光源 TLC 显色台</li>
+                  <li>旋蒸真空降沸、柱层析硅胶量、显色反应与原始记录本</li>
+                  <li>15 套交互实验装置图解及常用器皿自由组装</li>
                 </ul>
               </div>
-              <div class="v16-branch-foot"><span>进入 DIY 创意实验室</span><span class="v16-branch-arrow">→</span></div>
+              <div class="v16-branch-foot"><span>进入 DIY 实验室</span><span class="v16-branch-arrow">→</span></div>
             </button>
           </div>
         </section>
 
-        <!-- 3. 特性展示 Bento Grid -->
+        <!-- 3. 核心功能 -->
         <section>
           <div class="v16-sec-head">
             <div>
-              <div class="v16-sec-kicker">WORKBENCH CAPABILITIES · 特性展示</div>
-              <h3>从理解原理到交出规范报告，全流程工具随时直达</h3>
+              <h3>核心功能</h3>
             </div>
           </div>
           <div class="v16-bento-grid">
             <button type="button" class="v16-bento-card" data-v16-go="workflow" data-v16-step="3">
               <span class="v16-bento-icon">💡</span>
-              <h5>小白 3 分钟通俗原理图谱</h5>
-              <p>拒绝纯公式劝退，用生活比喻讲清极性相似相溶、酸碱成盐、pH 沉淀与课程核心显色机理。</p>
-              <span class="v16-bento-link">直达第 3 步原理与方案 →</span>
+              <h5>原理与图谱解读</h5>
+              <p>结合成分极性、酸碱特性、沉淀规律与特征显色机理，直观理解提取与分离纯化设计依据。</p>
+              <span class="v16-bento-link">查看原理与方案 →</span>
             </button>
             <button type="button" class="v16-bento-card" data-v16-go="diy" data-v16-sub="hub">
               <span class="v16-bento-icon">⚙️</span>
-              <h5>15 套动态 SVG 仿真装置</h5>
-              <p>涵盖回流、索氏、超临界 CO₂、旋蒸、大孔树脂、HPLC、冻干等全套动态流程与 B 站真机实操视频。</p>
-              <span class="v16-bento-link">浏览装置与流程库 →</span>
+              <h5>交互仿真装置库</h5>
+              <p>覆盖回流、索氏、超临界、旋蒸、大孔树脂、高效液相与真空冻干等 15 套实验装置与实操指引。</p>
+              <span class="v16-bento-link">浏览装置库 →</span>
             </button>
             <button type="button" class="v16-bento-card" data-v16-trigger="v15">
               <span class="v16-bento-icon">◎</span>
-              <h5>v15 项目中枢与质量体检</h5>
-              <p>14 项设计合理性实时自检、绿色溶剂回收情景测算、研学便签归档与 15 份本地版本快照。</p>
-              <span class="v16-bento-link">打开实验中枢（Alt+P）→</span>
+              <h5>实验项目中枢</h5>
+              <p>核对工艺参数完整性、估算溶剂消耗与实验排程，辅助排查设计疏漏并导出项目简报。</p>
+              <span class="v16-bento-link">打开项目中枢 →</span>
             </button>
             <button type="button" class="v16-bento-card" data-v16-go="workflow" data-v16-step="6">
               <span class="v16-bento-icon">📄</span>
-              <h5>四谱解析与 A4 规范报告</h5>
-              <p>内置 UV/IR/NMR/MS 四谱解析卡、UV 标曲拟合、RSD 统计及带教师评语栏的 A4 打印/长图导出。</p>
-              <span class="v16-bento-link">直达第 6 步报告导出 →</span>
+              <h5>波谱分析与实验报告</h5>
+              <p>整合紫外、红外、核磁与质谱解析要点、标准曲线拟合及规范 A4 实验报告打印与导出。</p>
+              <span class="v16-bento-link">前往实验报告 →</span>
             </button>
           </div>
         </section>
@@ -419,7 +417,7 @@
         ${extensions.length ? `
           <section>
             <div class="v16-sec-head">
-              <div><div class="v16-sec-kicker">WORKSPACE EXTENSIONS · 扩展工作区</div><h3>已接入的扩展功能模块</h3></div>
+              <div><h3>扩展工具</h3></div>
             </div>
             <div class="v16-bento-grid">
               ${extensions.map(ext => `
@@ -427,23 +425,23 @@
                   <span class="v16-bento-icon">${esc(ext.icon || '🧩')}</span>
                   <h5>${esc(ext.title)}</h5>
                   <p>${esc(ext.desc || '')}</p>
-                  <span class="v16-bento-link">打开扩展 →</span>
+                  <span class="v16-bento-link">打开 →</span>
                 </button>
               `).join('')}
             </div>
           </section>
         ` : ''}
 
-        <!-- 4. 底部行动号召 CTA 横幅 -->
+        <!-- 4. 底部行动号召 -->
         <section class="v16-cta-banner">
           <div>
-            <h4>已经明确课题？直接进入清爽的 6 步实验工作台</h4>
-            <p>所有参数、装置、数据记录与 A4 报告自动同步在左侧配置单与右侧实时可视化驾驶舱中。</p>
+            <h4>已确定研究药材？直接进入六步实验工坊</h4>
+            <p>左侧配置工艺参数，右侧实时同步提取过程模拟与工艺指标雷达。</p>
           </div>
           <div class="v16-cta-actions">
-            <button type="button" class="v16-btn-cta-primary" style="padding:10px 18px;font-size:0.84rem" data-v16-go="workflow">🧪 进入 6 步工坊</button>
-            <button type="button" class="v16-chip-btn" style="padding:10px 14px" data-v16-trigger="compare">⚖️ 双课题对比</button>
-            <button type="button" class="v16-chip-btn" style="padding:10px 14px" data-v16-trigger="cmd">⌘K 全局搜索</button>
+            <button type="button" class="v16-btn-cta-primary" style="padding:10px 18px;font-size:0.84rem" data-v16-go="workflow">进入实验工坊</button>
+            <button type="button" class="v16-chip-btn" style="padding:10px 14px" data-v16-trigger="compare">双课题对比</button>
+            <button type="button" class="v16-chip-btn" style="padding:10px 14px" data-v16-trigger="cmd">快捷检索</button>
           </div>
         </section>
       </div>
@@ -490,14 +488,13 @@
       <div class="v16-subhero">
         <div class="v16-subhero-top">
           <div>
-            <div class="v16-sec-kicker">HERBAL TOPIC DIRECTORY · 题库研学走向页</div>
-            <h2>${all.length} 项高校与药企中药化学实验题库</h2>
-            <p>按成分大类、教学场景或关键词秒速筛选，点击卡片在右侧直接读懂药材脾气与药典标准，确认后再一键送入 6 步工坊。</p>
+            <h2>药材实验题库（${all.length} 项）</h2>
+            <p>按成分大类、实验场景或关键词筛选药材，右侧同步查看基原、化学成分、药典标准与实验要点。</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">🛡️ AI 自编 90分审核台</button>
-            <button type="button" class="v16-chip-btn" data-v16-trigger="diy-herb">+ 临时 DIY 药材</button>
-            <button type="button" class="v16-chip-btn" data-v16-trigger="compare">⚖️ 对比课题</button>
+            <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">自编课题审核</button>
+            <button type="button" class="v16-chip-btn" data-v16-trigger="diy-herb">+ 新建自定义药材</button>
+            <button type="button" class="v16-chip-btn" data-v16-trigger="compare">对比课题</button>
             <button type="button" class="v16-chip-btn" data-v16-go="home">← 返回首页</button>
           </div>
         </div>
@@ -505,14 +502,14 @@
         <div class="v16-bank-controls">
           <div class="v16-search-wrap">
             <span class="v16-search-icon">⌕</span>
-            <input id="v16BankSearch" type="text" value="${esc(bankState.query)}" placeholder="搜索药材名、目标成分、化学大类或工艺关键词（如：黄芩、芦丁、小檗碱、NADES、复方）..." />
+            <input id="v16BankSearch" type="text" value="${esc(bankState.query)}" placeholder="搜索药材名、目标成分、化学大类或工艺关键词（如：黄芩、芦丁、小檗碱、复方）..." />
           </div>
           <div class="v16-seg-bar">
             ${[
               ['all', `全部 (${all.length})`],
-              ['class', '★ 经典精选'],
-              ['innovative', '✨ 创新拓展'],
-              ['custom', `🛡️ AI自编过审 (${(api()?.getCounts?.().approvedAi) || 0})`]
+              ['class', '经典必做'],
+              ['innovative', '创新拓展'],
+              ['custom', `已过审自编 (${(api()?.getCounts?.().approvedAi) || 0})`]
             ].map(([k, lbl]) => `<button type="button" class="v16-seg-btn ${bankState.tab === k ? 'active' : ''}" data-v16-bank-tab="${k}">${lbl}</button>`).join('')}
           </div>
         </div>
@@ -580,7 +577,7 @@
         <aside class="v16-bank-preview">
           <div class="flex items-start justify-between gap-2">
             <div>
-              <div class="v16-sec-kicker">TOPIC BRIEF · 实时档案预览</div>
+              <div class="v16-sec-kicker">药材档案</div>
               <h3 style="margin:4px 0 2px;font-size:1.25rem;font-weight:900;color:var(--ds-ink)">${esc(preview.herb)} · ${esc(preview.compound)}</h3>
               <div style="font-size:0.76rem;color:var(--ds-muted);font-style:italic">${esc(preview.latin || '')}</div>
             </div>
@@ -589,21 +586,21 @@
 
           ${layman ? `
             <div class="v16-preview-block v16-preview-layman">
-              <label>💡 小白速懂 · 药材脾气与实验关键</label>
+              <label>实验关键与成分特性</label>
               <p>${esc(layman)}</p>
             </div>
           ` : ''}
-          <div class="v16-preview-block"><label>🌿 基原与性味</label><p>${esc(preview.origin || '暂未填写')}</p></div>
-          <div class="v16-preview-block"><label>🧪 核心化学成分</label><p>${esc(preview.chemistry || preview.chem || `${preview.compound || ''}（${preview.category || '中药化学'}）`)}</p></div>
-          <div class="v16-preview-block"><label>📖 药典与质控参考${preview.limitVal ? `（限度 ≥ ${esc(preview.limitVal)}${esc(preview.limitUnit || '%')}）` : ''}</label><p>${esc(preview.pharmacopoeia || preview.pharm || '请参照现行版《中国药典》一部')}</p></div>
+          <div class="v16-preview-block"><label>基原与性味</label><p>${esc(preview.origin || '暂未填写')}</p></div>
+          <div class="v16-preview-block"><label>核心化学成分</label><p>${esc(preview.chemistry || preview.chem || `${preview.compound || ''}（${preview.category || '中药化学'}）`)}</p></div>
+          <div class="v16-preview-block"><label>药典与质控参考${preview.limitVal ? `（限度 ≥ ${esc(preview.limitVal)}${esc(preview.limitUnit || '%')}）` : ''}</label><p>${esc(preview.pharmacopoeia || preview.pharm || '请参照现行版《中国药典》一部')}</p></div>
 
           <div class="flex flex-col gap-2 pt-1">
             <button type="button" class="v16-btn-cta-primary" style="width:100%;justify-content:center;padding:12px 16px;font-size:0.86rem" data-v16-lock-topic="${esc(preview.id)}" data-v16-target-step="2">
-              ✅ 锁定药材，进入 02 定题与参数 →
+              选定该药材，配置题目与参数 →
             </button>
             <div class="grid grid-cols-2 gap-2">
-              <button type="button" class="v16-chip-btn justify-center py-2" data-v16-lock-topic="${esc(preview.id)}" data-v16-target-step="1">进入完整 01 步</button>
-              <button type="button" class="v16-chip-btn gold justify-center py-2" data-v16-ai-herb="${esc(preview.herb)}" data-v16-ai-comp="${esc(preview.compound)}">✨ 带入 AI 定制</button>
+              <button type="button" class="v16-chip-btn justify-center py-2" data-v16-lock-topic="${esc(preview.id)}" data-v16-target-step="1">从第 1 步开始</button>
+              <button type="button" class="v16-chip-btn gold justify-center py-2" data-v16-ai-herb="${esc(preview.herb)}" data-v16-ai-comp="${esc(preview.compound)}">智能定制方案</button>
             </div>
           </div>
         </aside>
@@ -635,23 +632,22 @@
       <div class="v16-subhero">
         <div class="v16-subhero-top">
           <div>
-            <div class="v16-sec-kicker">AI EXPERIMENT DESIGN STUDIO · AI 智能设计走向页</div>
-            <h2>一句话编排全流程，或让 AI 深度审核你的自有方案</h2>
-            <p>专为开放性实验与竞赛设计打造的独立 AI 画布：不再挤占工作台顶部，所有灵感模板、方案推演与助教答疑集中在一处。</p>
+            <h2>智能实验设计</h2>
+            <p>输入研究目标自动规划提取、分离与检识路线，支持已有方案推演校核、实验排障答疑及 90 分自编课题审核。</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">🛡️ AI 自编 90分审核与优化台</button>
-            <button type="button" class="v16-chip-btn" data-v16-go="workflow">🧪 进入 6 步工坊</button>
+            <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">自编课题审核（≥90分）</button>
+            <button type="button" class="v16-chip-btn" data-v16-go="workflow">进入实验工坊</button>
             <button type="button" class="v16-chip-btn" data-v16-go="home">← 返回首页</button>
           </div>
         </div>
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="v16-seg-bar">
-            <button type="button" class="v16-seg-btn ${aiSubTab === 'compose' ? 'active' : ''}" data-v16-ai-tab="compose">✨ 自然语言一键编排</button>
-            <button type="button" class="v16-seg-btn ${aiSubTab === 'plan' ? 'active' : ''}" data-v16-ai-tab="plan">📋 自有方案深度演算 (v11)</button>
-            <button type="button" class="v16-seg-btn ${aiSubTab === 'chat' ? 'active' : ''}" data-v16-ai-tab="chat">💬 实验助教排障问答</button>
+            <button type="button" class="v16-seg-btn ${aiSubTab === 'compose' ? 'active' : ''}" data-v16-ai-tab="compose">智能方案编排</button>
+            <button type="button" class="v16-seg-btn ${aiSubTab === 'plan' ? 'active' : ''}" data-v16-ai-tab="plan">已有方案校核</button>
+            <button type="button" class="v16-seg-btn ${aiSubTab === 'chat' ? 'active' : ''}" data-v16-ai-tab="chat">实验助教答疑</button>
           </div>
-          <span style="font-size:0.78rem;color:var(--ds-muted)">当前关联课题：<strong style="color:var(--ds-ink)">${esc(getCurrentTopic().herb)} · ${esc(getCurrentTopic().compound)}</strong></span>
+          <span style="font-size:0.78rem;color:var(--ds-muted)">当前课题：<strong style="color:var(--ds-ink)">${esc(getCurrentTopic().herb)} · ${esc(getCurrentTopic().compound)}</strong></span>
         </div>
       </div>
     `;
@@ -688,16 +684,15 @@
         <div class="v16-subhero" style="background:linear-gradient(135deg, rgba(255,251,235,0.92), var(--ds-surface))">
           <div class="v16-subhero-top">
             <div>
-              <div class="v16-sec-kicker">USER PLAN SIMULATOR · v11 自有方案演算引擎</div>
-              <h3 style="margin:4px 0 6px;font-size:1.25rem;font-weight:900;color:var(--ds-ink)">手头已经有文献路线或自拟方案？交给系统全流程推演</h3>
-              <p>粘贴你的文字方案（如教材步骤、毕业设计初稿或专利路线），AI 将自动拆解并补全 6 步工作台参数、排查安全/热敏漏洞，还能一键永久收录到你的个人案例库。</p>
+              <h3 style="margin:0 0 6px;font-size:1.2rem;font-weight:900;color:var(--ds-ink)">提交已有实验路线进行推演与校核</h3>
+              <p>粘贴教材步骤、文献方法或自拟方案，系统将提取关键参数、评估工艺可行性与安全隐患，支持进一步提交 90 分评审。</p>
             </div>
-            <button type="button" class="v16-btn-cta-primary" data-v16-trigger="user-plan">📋 立即打开自有方案演练器 →</button>
+            <button type="button" class="v16-btn-cta-primary" data-v16-trigger="user-plan">打开方案推演器 →</button>
           </div>
           <div class="v16-ai-template-grid pt-2">
-            <div class="v16-preview-block"><label>① 自动参数结构化</label><p>从一段自然语言方案中精准抽取出投料量、料液比、温度、时间、提取次数与溶剂体系。</p></div>
-            <div class="v16-preview-block"><label>② 风险与工艺雷达诊断</label><p>自动预警热敏降解、易燃易爆溶剂、乳化风险，并生成 5 维工艺评分。</p></div>
-            <div class="v16-preview-block"><label>③ 一键同步 &amp; 永久收录</label><p>演算结果可直接覆盖同步到 6 步工作台并永久存入「我的收录案例」，随时复盘答辩。</p></div>
+            <div class="v16-preview-block"><label>参数提取与整理</label><p>自动解析方案中的投料量、料液比、温度、提取时间、次数与溶剂体系。</p></div>
+            <div class="v16-preview-block"><label>可行性与安全评估</label><p>提示热敏成分降解、易燃溶剂防护与乳化等常见实验风险。</p></div>
+            <div class="v16-preview-block"><label>工作台联动与评审</label><p>推演结果可直接同步到实验工坊演练，如需收录进自编库可申请 90 分评审。</p></div>
           </div>
         </div>
       `;
@@ -728,21 +723,20 @@
       <div class="v16-subhero">
         <div class="v16-subhero-top">
           <div>
-            <div class="v16-sec-kicker">DIY CREATIVE &amp; HANDS-ON LAB · DIY 创意与实操走向页</div>
-            <h2>4 大实操实验室分页切换，专注动手不滚屏</h2>
-            <p>复方配伍与三光源 TLC、旋蒸降沸与显色任务舱、15 套动态仿真装置库与零消耗科研工具箱，点击顶部标签秒切。</p>
+            <h2>DIY 创意实验室</h2>
+            <p>提供复方配伍与薄层显色模拟、实操计算与实验记录、15 套交互仿真装置以及常用化学计算工具。</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">🛡️ AI 自编 90分审核与优化台</button>
-            <button type="button" class="v16-chip-btn" data-v16-go="workflow">🧪 进入 6 步工坊</button>
+            <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">自编课题审核</button>
+            <button type="button" class="v16-chip-btn" data-v16-go="workflow">进入实验工坊</button>
             <button type="button" class="v16-chip-btn" data-v16-go="home">← 返回首页</button>
           </div>
         </div>
         <div class="v16-seg-bar">
-          <button type="button" class="v16-seg-btn ${diySubTab === 'studio' ? 'active' : ''}" data-v16-diy-tab="studio">🧪 复方配伍 · 分层 · TLC 三光源</button>
-          <button type="button" class="v16-seg-btn ${diySubTab === 'mission' ? 'active' : ''}" data-v16-diy-tab="mission">⚡ 实验任务舱 · 旋蒸/显色/记录本</button>
-          <button type="button" class="v16-seg-btn ${diySubTab === 'hub' ? 'active' : ''}" data-v16-diy-tab="hub">⚙️ 15 套动态装置与流程库</button>
-          <button type="button" class="v16-seg-btn ${diySubTab === 'tools' ? 'active' : ''}" data-v16-diy-tab="tools">🧰 零消耗科研工具箱</button>
+          <button type="button" class="v16-seg-btn ${diySubTab === 'studio' ? 'active' : ''}" data-v16-diy-tab="studio">复方配伍 · 分层 · TLC 显色</button>
+          <button type="button" class="v16-seg-btn ${diySubTab === 'mission' ? 'active' : ''}" data-v16-diy-tab="mission">实操工具与记录本</button>
+          <button type="button" class="v16-seg-btn ${diySubTab === 'hub' ? 'active' : ''}" data-v16-diy-tab="hub">实验装置库（15 套）</button>
+          <button type="button" class="v16-seg-btn ${diySubTab === 'tools' ? 'active' : ''}" data-v16-diy-tab="tools">专业计算工具</button>
         </div>
       </div>
     `;

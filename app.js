@@ -2451,7 +2451,7 @@
         <!-- 小白通俗大白话区域 -->
         <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-2">
           <div class="flex items-center gap-1.5 text-xs font-extrabold text-amber-900">
-            <span>💡</span><span>小白通俗大白话解读（生活比喻）</span>
+            <span>通俗原理解析</span>
           </div>
           <p class="text-xs text-amber-950 leading-relaxed">${f.plain || f.desc}</p>
         </div>
@@ -2799,7 +2799,7 @@
           <div class="lg:col-span-7 rounded-2xl bg-gradient-to-b from-[#fbfcfa] to-[#e9f4f1] border border-slate-200 p-4 flex flex-col justify-between space-y-3">
             <div id="hubSvgWrap" class="w-full flex items-center justify-center py-2 rig-live">${rig.svg}</div>
             <div class="text-xs text-[#0a3630] bg-white/90 rounded-xl px-3.5 py-2.5 border border-teal-100"><strong>搭建顺序：</strong>${aiEsc(rig.order || '请按下方 4 大分步小分支依次完成装样、密封、控温与终点判定。')}</div>
-            <div class="text-xs text-amber-950 bg-amber-50/90 rounded-xl px-3.5 py-2.5 border border-amber-200"><strong class="text-amber-900">💡 装置原理大白话：</strong>${aiEsc(rig.plainTheory || rig.shortDesc || '')}</div>
+            <div class="text-xs text-amber-950 bg-amber-50/90 rounded-xl px-3.5 py-2.5 border border-amber-200"><strong class="text-amber-900">装置原理解析：</strong>${aiEsc(rig.plainTheory || rig.shortDesc || '')}</div>
           </div>
           <div class="lg:col-span-5 flex flex-col justify-between gap-3">
             <div class="rounded-2xl bg-[#062420] text-white p-5 space-y-2">
@@ -2821,7 +2821,7 @@
 
         <div class="space-y-3 pt-2 border-t border-slate-100">
           <div class="flex items-center justify-between">
-            <h4 class="text-sm font-extrabold text-slate-900">🧩 装置搭建与实操 4 大分步小分支（附精准 B站视频）</h4>
+            <h4 class="text-sm font-extrabold text-slate-900">装置搭建与实操分步指引</h4>
             <span class="text-[11px] text-slate-400">每个小步骤独立匹配 1~2 词高命中检索</span>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -3742,7 +3742,7 @@
     ws.activeRig = rig; ws.reportRig = rig;
     if (plan.defaultExtract) ws.diyExtract = plan.defaultExtract;
     if (plan.defaultSep) ws.diySeparate = plan.defaultSep;
-    if (plan.integrative || plan.aiAdvice) ws.diyNotes = `[公共AI自动规划] ${plan.aiAdvice || plan.integrative}`;
+    if (plan.integrative || plan.aiAdvice) ws.diyNotes = `[智能方案] ${plan.aiAdvice || plan.integrative}`;
     if (plan.cfg) {
       Object.assign(ws, {
         mass: Number(plan.cfg.mass) || ws.mass,

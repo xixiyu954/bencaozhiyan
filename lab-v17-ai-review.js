@@ -217,15 +217,15 @@
       return {
         score: total,
         passed: total >= PASS_SCORE,
-        engine: '云端智谱 GLM 评审专家',
+        engine: '智能评审',
         dimensions: dims,
         issues,
-        summary: String(parsed.summary || '').trim() || (total >= PASS_SCORE ? `云端 AI 严格评审获 ${total} 分，符合 ≥ 90 分收录标准。` : `云端 AI 评审得分 ${total} 分，尚未达到 90 分准入门槛，请接入 AI 协助优化。`)
+        summary: String(parsed.summary || '').trim() || (total >= PASS_SCORE ? `评审得分 ${total} 分，已达到 90 分收录标准。` : `评审得分 ${total} 分，未达到 90 分收录标准，建议进一步优化方案。`)
       };
     } catch (_) {
       return {
         ...localRes,
-        engine: '本地五维学术规则评审（云端 AI 暂不可用自动接管）'
+        engine: '标准规则评审'
       };
     }
   }
@@ -364,9 +364,9 @@
         troubleshoot: Array.isArray(p.troubleshoot) && p.troubleshoot.length >= 2 ? p.troubleshoot : localOpt.optimized.troubleshoot
       };
       const changes = Array.isArray(p.changes) && p.changes.length ? p.changes : localOpt.changes;
-      return { optimized: merged, changes, engine: '云端智谱 GLM 协助优化' };
+      return { optimized: merged, changes, engine: '智能协助优化' };
     } catch (_) {
-      return { ...localOpt, engine: '本地专家规则优化（云端 AI 暂不可用自动接管）' };
+      return { ...localOpt, engine: '标准方案优化' };
     }
   }
 
@@ -447,9 +447,8 @@
         <!-- 头部 -->
         <div class="px-5 sm:px-6 py-4 text-white flex items-center justify-between gap-3" style="background:linear-gradient(120deg,#05221e,#0b443b 62%,#0f5c54)">
           <div class="min-w-0">
-            <div style="font-size:0.7rem;font-weight:850;letter-spacing:0.12em;color:#fde68a">AI QUALITY GATE · 90 分严格准入评审</div>
-            <h3 style="margin:2px 0 0;font-size:1.1rem;font-weight:900">AI 自编课题审核与协助优化工作台</h3>
-            <p style="margin:2px 0 0;font-size:0.76rem;color:#c7e5dc">用户自主决定是否申请 · 平台 AI 五维严格打分（必须 ≥ 90 分方可编入）· 不足 90 分可接入 AI 协助优化</p>
+            <h3 style="margin:0;font-size:1.1rem;font-weight:900">自编课题审核与优化</h3>
+            <p style="margin:3px 0 0;font-size:0.78rem;color:#c7e5dc">按科学性、参数、安全、检识与可行性五维评审；评分达 90 分以上且经本人确认后编入自编题库。</p>
           </div>
           <button type="button" id="v17CloseBtn" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xl font-bold flex items-center justify-center shrink-0">×</button>
         </div>
@@ -457,10 +456,10 @@
         <!-- 切换标签 -->
         <div class="px-5 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 border-b" style="border-color:var(--ds-line);background:var(--ds-surface-soft,#f9faf7)">
           <div class="v16-seg-bar">
-            <button type="button" class="v16-seg-btn ${modalTab === 'review' ? 'active' : ''}" data-v17-tab="review">🛡️ 申请审核与 AI 优化</button>
-            <button type="button" class="v16-seg-btn ${modalTab === 'approved' ? 'active' : ''}" data-v17-tab="approved">📚 已过审 AI 自编库 (${approvedList.length})</button>
+            <button type="button" class="v16-seg-btn ${modalTab === 'review' ? 'active' : ''}" data-v17-tab="review">提交审核与优化</button>
+            <button type="button" class="v16-seg-btn ${modalTab === 'approved' ? 'active' : ''}" data-v17-tab="approved">已收录自编题库 (${approvedList.length})</button>
           </div>
-          <span style="font-size:0.74rem;color:var(--ds-muted)">未提交编入的测试草稿刷新页面即自动无痕清空</span>
+          <span style="font-size:0.74rem;color:var(--ds-muted)">收录门槛：90 分及以上</span>
         </div>
 
         <!-- 主内容区 -->

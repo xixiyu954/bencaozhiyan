@@ -19,7 +19,7 @@
           <div class="bg-white rounded-3xl border border-slate-200 max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="px-6 py-4 bg-gradient-to-r from-[#05211d] to-[#0f5c54] text-white flex items-center justify-between gap-2">
               <div>
-                <div class="text-[10px] font-extrabold text-emerald-200 uppercase tracking-widest">V6.0 DECISION MATRIX · 0-TOKEN</div>
+                <div class="text-[10px] font-extrabold text-emerald-200 tracking-wider">课题横向对比</div>
                 <h3 class="text-base sm:text-lg font-extrabold">双课题 A vs B 十维度横向对比矩阵</h3>
               </div>
               <button id="btnCloseCompareModal" type="button" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-lg">×</button>
