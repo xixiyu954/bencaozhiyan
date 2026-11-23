@@ -2296,9 +2296,9 @@
           <div class="text-base font-extrabold text-slate-900 pt-0.5">${p.herb}</div>
           <div class="text-xs text-slate-500 truncate">${p.compound}</div>
         </div>
-        <div class="pt-1.5 mt-1 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
-          <span class="font-semibold text-[#0f5c54]">⚗️ ${rigTag}</span>
-          <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">常规实验室可做</span>
+        <div class="pt-1.5 mt-1 border-t border-slate-100 flex items-center justify-between gap-1.5 text-[10px] text-slate-500">
+          <span class="font-semibold text-[#0f5c54] truncate">⚗️ ${rigTag}</span>
+          <span class="shrink-0 whitespace-nowrap px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">常规可做</span>
         </div>
       </button>`;
     }).join('') || '<div class="col-span-full text-center text-xs text-slate-400 py-8">未找到匹配课题，可清空筛选或点击上方「创建创新 DIY 药材」</div>';

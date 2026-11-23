@@ -105,11 +105,11 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[10px] text-teal-200 mb-1">粉碎粒度</label>
-            <select id="cfgMesh" class="w-full h-9 px-2 rounded-lg bg-white/10 border border-white/15 text-white text-xs">
-              <option value="切段(1~2cm)" class="text-slate-900">切段(1~2cm)</option>
-              <option value="粗粉(10~20目)" class="text-slate-900">粗粉(10~20目)</option>
-              <option value="中粉(40目)" class="text-slate-900">中粉(40目)</option>
-              <option value="细粉(60~80目)" class="text-slate-900">细粉(60~80目)</option>
+            <select id="cfgMesh" class="w-full h-9 px-2 rounded-lg bg-white/10 border border-white/15 text-white text-[11px] whitespace-nowrap">
+              <option value="切段(1~2cm)" class="text-slate-900">切段 1~2cm</option>
+              <option value="粗粉(10~20目)" class="text-slate-900">粗粉 10~20目</option>
+              <option value="中粉(40目)" class="text-slate-900">中粉 40目</option>
+              <option value="细粉(60~80目)" class="text-slate-900">细粉 60~80目</option>
             </select>
           </div>
           <div>
@@ -321,7 +321,7 @@
 
           <!-- 右侧精简工具栏 -->
           <div class="flex flex-wrap items-center gap-1.5 shrink-0 order-2 2xl:order-3">
-            <button id="btnOpenCmdPalette" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#0f5c54] text-slate-700 text-xs font-bold transition" title="全局极速搜索 (Ctrl+K)">⌘K 搜索</button>
+            <button id="btnOpenCmdPalette" type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#0f5c54] text-slate-700 text-xs font-bold transition" title="全局极速搜索 (Ctrl+K)"><kbd class="font-mono text-[10px] px-1 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200/80 leading-none">Ctrl K</kbd><span>搜索</span></button>
             <button id="btnOpenCompareTop" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-teal-50 border border-teal-200 hover:bg-teal-100 text-[#0a3630] text-xs font-extrabold transition" title="任意两项课题十维度横向对比">⚖️ 对比</button>
             <button id="btnOpenQwenCfgTop" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-100 to-emerald-50 border border-emerald-300/80 text-[#062420] text-xs font-extrabold hover:shadow-xs transition">
               <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i><span id="qwenHeaderBtnLabel">智能助手</span>
@@ -1212,7 +1212,7 @@
 <script src="./lab-v13-mission-os.js?v=22"></script>
 <script src="./lab-v14-course-diagrams.js?v=22"></script>
 <script src="./cloud-ai.js?v=24"></script>
-<script src="./app.js?v=24"></script>
+<script src="./app.js?v=25"></script>
 <script src="./lab-v15-insight.js?v=17"></script>
 <script src="./lab-v16-portal.js?v=19"></script>
 </body>
