@@ -4200,7 +4200,6 @@
     }
   })();
 
-  try { if (window.location.hostname.endsWith('.netlify.app')) document.body.classList.add('on-netlify'); } catch (_) {}
   loadState();
   initEvents();
   updateTimerUI();

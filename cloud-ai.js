@@ -1,14 +1,11 @@
 (() => {
   'use strict';
 
-  // 多平台智能代理路由：
-  // 1. Cloudflare Pages (*.pages.dev / 自定义域名) -> 自动走同源 /api/ai-proxy（每日 10 万次免费）
-  // 2. Netlify (*.netlify.app) -> 自动走同源 /.netlify/functions/ai-proxy
-  // 3. GitHub Pages (xixiyu954.github.io) -> 自动在 Netlify 与 Cloudflare Pages 通道间弹性容错切换
-  const NETLIFY_SITE_URL = 'https://tcm-chemistry-lab.netlify.app';
+  // 智能代理路由：
+  // 1. Cloudflare Pages (*.pages.dev / 自定义域名) -> 优先走同源 /api/ai-proxy
+  // 2. GitHub Pages (xixiyu954.github.io) / 本地预览 -> 自动在主站与备用 Cloudflare Pages 通道间容错切换
   const CLOUDFLARE_SITE_URL = 'https://bencaozhiyan-xixiyu.pages.dev';
   const CLOUDFLARE_BACKUP_URL = 'https://tcm-chemistry-lab.pages.dev';
-  const NETLIFY_PROXY_PATH = '/.netlify/functions/ai-proxy';
   const CF_PROXY_PATH = '/api/ai-proxy';
   const CUSTOM_PROXY_STORAGE_KEY = 'tcm_custom_ai_proxy';
   const DEFAULT_MODEL = 'glm-4-flash-250414';
@@ -47,25 +44,21 @@
 
     const cfBase = String(CLOUDFLARE_SITE_URL || '').replace(/\/+$/, '');
     const cfBakBase = String(CLOUDFLARE_BACKUP_URL || '').replace(/\/+$/, '');
-    const nfBase = String(NETLIFY_SITE_URL || '').replace(/\/+$/, '');
     const cfFull = cfBase ? `${cfBase}${CF_PROXY_PATH}` : '';
     const cfBakFull = cfBakBase ? `${cfBakBase}${CF_PROXY_PATH}` : '';
-    const nfFull = nfBase && !nfBase.includes('YOUR-SITE') ? `${nfBase}${NETLIFY_PROXY_PATH}` : '';
 
     if (host.endsWith('.pages.dev')) {
       push(CF_PROXY_PATH);
-    } else if (host.endsWith('.netlify.app')) {
-      push(NETLIFY_PROXY_PATH);
       if (cfFull) push(cfFull);
+      if (cfBakFull) push(cfBakFull);
     } else if (!host || host === 'localhost' || host === '127.0.0.1' || host.endsWith('.github.io')) {
       if (cfFull) push(cfFull);
-      if (nfFull) push(nfFull);
       if (cfBakFull) push(cfBakFull);
     } else {
-      // 自定义域名（如绑定在 Cloudflare Pages 上）优先同源 /api/ai-proxy，失败则回退
+      // 自定义域名（如绑定在 Cloudflare Pages 上）优先同源 /api/ai-proxy，失败则回退主/备站点
       push(CF_PROXY_PATH);
       if (cfFull) push(cfFull);
-      if (nfFull) push(nfFull);
+      if (cfBakFull) push(cfBakFull);
     }
     return list;
   }
@@ -316,7 +309,7 @@
   async function callProxy(messages, expectJson, signal, onProgress) {
     const candidates = resolveProxyCandidates();
     if (!candidates.length) {
-      throw new Error('未检测到可用 AI 代理通道，请在 Cloudflare Pages 或 Netlify 配置 ZHIPU_API_KEY');
+      throw new Error('未检测到可用智能代理通道，请在 Cloudflare Pages 配置 ZHIPU_API_KEY');
     }
     let firstError = null;
     for (let i = 0; i < candidates.length; i++) {

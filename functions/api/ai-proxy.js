@@ -1,5 +1,5 @@
 // 放置路径：GitHub 仓库中的 functions/api/ai-proxy.js
-// Cloudflare Pages Functions 零成本智谱 GLM 流式代理（每日 100,000 次免费请求，彻底替代 Netlify 额度限制）
+// Cloudflare Pages Functions 智谱 GLM 流式代理（每日 100,000 次免费请求）
 // 部署到 Cloudflare Pages 后，只需在 Settings -> Environment variables 添加 ZHIPU_API_KEY 即可生效。
 
 const ALLOWED_EXACT_ORIGINS = new Set([
@@ -27,7 +27,7 @@ function isAllowedOrigin(origin, requestUrl) {
       const reqParsed = new URL(requestUrl);
       if (parsed.origin === reqParsed.origin) return true;
     }
-    if (parsed.protocol === 'https:' && (parsed.hostname.endsWith('.pages.dev') || parsed.hostname.endsWith('.netlify.app'))) {
+    if (parsed.protocol === 'https:' && parsed.hostname.endsWith('.pages.dev')) {
       return true;
     }
     if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') return true;

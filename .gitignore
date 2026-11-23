@@ -1,5 +1,5 @@
-# Netlify
-.netlify/
+# Cloudflare
+.wrangler/
 
 # Local Environment Variables & Secrets
 .env
