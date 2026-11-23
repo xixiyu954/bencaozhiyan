@@ -31,7 +31,9 @@ jobs:
           node --check lab-v12-diy-studio.js
           node --check lab-v13-mission-os.js
           node --check lab-v14-course-diagrams.js
+          node --check lab-v15-insight.js
           node --check netlify/functions/ai-proxy.mjs
+          node --input-type=module --check < functions/api/ai-proxy.js
       - name: Reject embedded provider secrets
         run: |
           ! grep -R -E "SHARED_QWEN_KEY|atob\(['\"]sk-|apiKey:[[:space:]]*['\"]sk-" --include='*.js' --include='*.html' .

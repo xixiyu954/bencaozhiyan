@@ -23,7 +23,7 @@ function isAllowedOrigin(origin) {
   if (ALLOWED_EXACT_ORIGINS.has(origin)) return true;
   try {
     const parsed = new URL(origin);
-    if (parsed.protocol === 'https:' && parsed.hostname.endsWith('.netlify.app')) return true;
+    if (parsed.protocol === 'https:' && (parsed.hostname.endsWith('.netlify.app') || parsed.hostname.endsWith('.pages.dev'))) return true;
     if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') return true;
   } catch (_) {
     return false;

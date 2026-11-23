@@ -26,14 +26,21 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
+body.dark-lab #workspaceZoneBar {
+  border-color: rgba(45, 212, 191, .22);
+  background: rgba(12, 34, 30, .86);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, .28);
+}
 .zone-tab { position: relative; transition: color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease; }
 .zone-tab:not(.active):hover { background: rgba(15, 107, 93, .065); }
 .zone-tab.active { box-shadow: 0 8px 18px rgba(6, 57, 49, .18); }
 .v15-nav-button { color: #72531b !important; }
+body.dark-lab .v15-nav-button { color: #f3d285 !important; }
 .v15-nav-button.active { color: #fff !important; background: linear-gradient(135deg, #0a443b, #0f6b5d) !important; }
-.v15-nav-orbit { font-size: 19px; line-height: 1; color: #c4933f; }
+.v15-nav-orbit { font-size: 18px; line-height: 1; color: #c4933f; }
 .v15-nav-button.active .v15-nav-orbit { color: #f4d38c; }
-.v15-new-badge { padding: 2px 5px; border-radius: 5px; background: #f4e6c6; color: #8a6320; font-size: 8px; line-height: 1.2; letter-spacing: .08em; font-weight: 900; }
+.v15-new-badge { padding: 2px 6px; border-radius: 5px; background: #f4e6c6; color: #8a6320; font-size: 10px; line-height: 1.2; letter-spacing: .06em; font-weight: 900; }
+body.dark-lab .v15-new-badge { background: rgba(244, 211, 140, .18); color: #f7dca0; }
 .v15-nav-button.active .v15-new-badge { background: rgba(255,255,255,.15); color: #f9e6b8; }
 #qwenCommandBar, #welcomePortalHero { box-shadow: 0 18px 48px rgba(18, 58, 48, .075); }
 .lab-card { border-color: rgba(15, 92, 84, .11); }
@@ -294,6 +301,26 @@ body.dark-lab .v15-green-hero { border-color: #355045; background: radial-gradie
 body.dark-lab .v15-green-score strong, body.dark-lab .v15-version-count strong { color: #a4d6bb; }
 body.dark-lab .v15-green-score span, body.dark-lab .v15-version-count span { color: #91aa9c; }
 body.dark-lab .v15-empty-success { color: #a6d9bd; border-color: #335a48; background: #143226; }
+
+/* 舒适阅读字级兜底（跟随全站 Aa 字体缩放，消除 8~10px 过小文字阅读疲劳） */
+.v15-mini-kicker, .v15-eyebrow, .v15-overline { font-size: 0.72rem; }
+.v15-mini-copy > span:last-child, .v15-header p, .v15-footer,
+.v15-project-tags span, .v15-kpi > span, .v15-kpi small,
+.v15-soft-badge, .v15-text-btn, .v15-step-info small,
+.v15-suggestion small, .v15-suggestion em, .v15-note-callout,
+.v15-timeline-grid small, .v15-card-footnote, .v15-check p,
+.v15-check > button, .v15-burden p, .v15-green-formula,
+.v15-recovery-card > p, .v15-route-grid p, .v15-quick-notes > span,
+.v15-quick-notes button, .v15-note-list p, .v15-version-main > div,
+.v15-version-actions button, .v15-save-version p { font-size: 0.78rem; }
+.v15-mini-metrics > span, .v15-score-ring span, .v15-score-ring small,
+.v15-green-score span, .v15-version-count span, .v15-range-marks,
+.v15-recovery-results span, .v15-check h4 span, .v15-note-list time { font-size: 0.72rem; }
+.v15-step-info b, .v15-suggestion b, .v15-check h4, .v15-burden > div:first-child,
+#v15NoteForm label, .v15-timeline-grid b { font-size: 0.85rem; }
+#v15NoteForm select, #v15NoteForm textarea, .v15-save-controls input { font-size: 0.85rem; }
+.v15-tabs button { font-size: 0.84rem; }
+.v15-tab-count { font-size: 0.72rem; }
 
 @media (max-width: 1120px) {
   .v15-mini-metrics > span { min-width: 75px; }

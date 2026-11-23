@@ -1,10 +1,15 @@
 (() => {
   'use strict';
 
-  // 若在 Netlify 域名打开，会自动走同源 /.netlify/functions/ai-proxy
-  // 在 GitHub Pages 访问时走跨域代理地址
+  // 多平台智能代理路由：
+  // 1. Cloudflare Pages (*.pages.dev / 自定义域名) -> 自动走同源 /api/ai-proxy（每日 10 万次免费）
+  // 2. Netlify (*.netlify.app) -> 自动走同源 /.netlify/functions/ai-proxy
+  // 3. GitHub Pages (xixiyu954.github.io) -> 自动在 Netlify 与 Cloudflare Pages 通道间弹性容错切换
   const NETLIFY_SITE_URL = 'https://tcm-chemistry-lab.netlify.app';
-  const PROXY_PATH = '/.netlify/functions/ai-proxy';
+  const CLOUDFLARE_SITE_URL = 'https://tcm-chemistry-lab.pages.dev';
+  const NETLIFY_PROXY_PATH = '/.netlify/functions/ai-proxy';
+  const CF_PROXY_PATH = '/api/ai-proxy';
+  const CUSTOM_PROXY_STORAGE_KEY = 'tcm_custom_ai_proxy';
   const DEFAULT_MODEL = 'glm-4-flash-250414';
   const CACHE_KEY = 'tcm_ai_resp_cache_v2';
   const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -17,19 +22,56 @@
   let lastProvider = null;
   let sessionCacheHits = 0;
 
-  function resolveProxyUrl() {
+  function readCustomProxy() {
     try {
-      if (window.location.hostname.endsWith('.netlify.app')) {
-        return PROXY_PATH;
-      }
+      const val = String(localStorage.getItem(CUSTOM_PROXY_STORAGE_KEY) || '').trim();
+      if (val && (/^https?:\/\//i.test(val) || val.startsWith('/'))) return val;
     } catch (_) {}
-    const base = String(NETLIFY_SITE_URL || '').replace(/\/+$/, '');
-    if (!base || base.includes('YOUR-SITE')) return '';
-    return `${base}${PROXY_PATH}`;
+    return '';
+  }
+
+  function resolveProxyCandidates() {
+    const list = [];
+    const push = (url) => {
+      if (url && !list.includes(url)) list.push(url);
+    };
+
+    const custom = readCustomProxy();
+    if (custom) push(custom);
+
+    let host = '';
+    try {
+      host = String(window.location.hostname || '').toLowerCase();
+    } catch (_) {}
+
+    const cfBase = String(CLOUDFLARE_SITE_URL || '').replace(/\/+$/, '');
+    const nfBase = String(NETLIFY_SITE_URL || '').replace(/\/+$/, '');
+    const cfFull = cfBase ? `${cfBase}${CF_PROXY_PATH}` : '';
+    const nfFull = nfBase && !nfBase.includes('YOUR-SITE') ? `${nfBase}${NETLIFY_PROXY_PATH}` : '';
+
+    if (host.endsWith('.pages.dev')) {
+      push(CF_PROXY_PATH);
+    } else if (host.endsWith('.netlify.app')) {
+      push(NETLIFY_PROXY_PATH);
+      if (cfFull) push(cfFull);
+    } else if (!host || host === 'localhost' || host === '127.0.0.1' || host.endsWith('.github.io')) {
+      if (nfFull) push(nfFull);
+      if (cfFull) push(cfFull);
+    } else {
+      // 自定义域名（如绑定在 Cloudflare Pages 上）优先同源 /api/ai-proxy，失败则回退
+      push(CF_PROXY_PATH);
+      if (nfFull) push(nfFull);
+      if (cfFull) push(cfFull);
+    }
+    return list;
+  }
+
+  function resolveProxyUrl() {
+    return resolveProxyCandidates()[0] || '';
   }
 
   function isProxyConfigured() {
-    return Boolean(resolveProxyUrl());
+    return resolveProxyCandidates().length > 0;
   }
 
   // 强容错 JSON 清洗与自动修复引擎：解决智谱 GLM 偶发截断缺 ']' / '}'、尾随逗号、字符串内未转义换行等问题
@@ -235,11 +277,7 @@
     return content;
   }
 
-  async function callProxy(messages, expectJson, signal, onProgress) {
-    const proxyUrl = resolveProxyUrl();
-    if (!proxyUrl) {
-      throw new Error('请先在 cloud-ai.js 中配置 NETLIFY_SITE_URL');
-    }
+  async function callSingleProxy(proxyUrl, messages, expectJson, signal, onProgress) {
     const response = await fetch(proxyUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -269,6 +307,26 @@
       onProgress?.(content.length, content);
     }
     return assertUsableContent(content, expectJson);
+  }
+
+  async function callProxy(messages, expectJson, signal, onProgress) {
+    const candidates = resolveProxyCandidates();
+    if (!candidates.length) {
+      throw new Error('未检测到可用 AI 代理通道，请在 Cloudflare Pages 或 Netlify 配置 ZHIPU_API_KEY');
+    }
+    let firstError = null;
+    for (let i = 0; i < candidates.length; i++) {
+      const url = candidates[i];
+      try {
+        return await callSingleProxy(url, messages, expectJson, signal, onProgress);
+      } catch (err) {
+        if (signal?.aborted) throw err;
+        if (!firstError) firstError = err;
+        // 若是最后一个候选通道则抛出首个主通道错误，便于定位
+        if (i === candidates.length - 1) throw firstError;
+      }
+    }
+    throw firstError || new Error('免费通道暂不可用');
   }
 
   async function runAttempt(provider, messages, expectJson, externalSignal, onProgress) {
@@ -356,5 +414,23 @@
     };
   }
 
-  window.TCMCloudAI = Object.freeze({ complete, testProviders, cleanJsonText, repairJsonText, getCapabilities, clearCache, getCacheStats });
+  function setCustomProxyUrl(url) {
+    try {
+      const clean = String(url || '').trim();
+      if (!clean) localStorage.removeItem(CUSTOM_PROXY_STORAGE_KEY);
+      else localStorage.setItem(CUSTOM_PROXY_STORAGE_KEY, clean);
+    } catch (_) {}
+  }
+
+  window.TCMCloudAI = Object.freeze({
+    complete,
+    testProviders,
+    cleanJsonText,
+    repairJsonText,
+    getCapabilities,
+    clearCache,
+    getCacheStats,
+    getProxyUrls: resolveProxyCandidates,
+    setCustomProxyUrl
+  });
 })();
