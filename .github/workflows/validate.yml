@@ -32,6 +32,7 @@ jobs:
           node --check lab-v13-mission-os.js
           node --check lab-v14-course-diagrams.js
           node --check lab-v15-insight.js
+          node --check lab-v16-portal.js
           node --check netlify/functions/ai-proxy.mjs
           node --input-type=module --check < functions/api/ai-proxy.js
       - name: Reject embedded provider secrets

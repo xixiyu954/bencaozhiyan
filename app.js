@@ -2982,6 +2982,7 @@
       if (window.TCM_V9) window.TCM_V9.sync(t, ws, stats, state.step);
       if (window.TCM_V10_SANDBOX) window.TCM_V10_SANDBOX.sync(t, ws, stats, state.step);
       if (window.TCM_V14_COURSE) window.TCM_V14_COURSE.sync(t, ws, stats, state.step);
+      if (window.TCM_V16_PORTAL && window.TCM_V16_PORTAL.onAppRender) window.TCM_V16_PORTAL.onAppRender(t, ws, stats, state.step);
       if (typeof lucide !== 'undefined') lucide.createIcons();
     } catch (error) {
       console.error('工作台渲染失败，请检查存档或刷新重试。', error);
@@ -4223,6 +4224,54 @@
       state.lastSavedStep = 1;
       saveState();
     }
+  };
+
+  window.TCM_LAB_API = {
+    getAllTopics: () => {
+      const custom = Object.values(state.customTopics || {}).map(x => ({ ...x, _isCustom: true }));
+      return [...custom, ...CATALOG_45];
+    },
+    getTopicById: (id) => findTopicDef(id, state.customTopics) || getTopicDef(),
+    getCurrentTopic: () => getTopicDef(),
+    getCurrentWorkState: () => getWorkState(getTopicDef()),
+    getStep: () => state.step,
+    getLaymanNote: (t) => getHerbLaymanNote(t || getTopicDef()),
+    getCounts: () => ({
+      topics: CATALOG_45.length + Object.keys(state.customTopics || {}).length,
+      rigs: Object.keys(LAB_RIGS || {}).length,
+      literature: GLOBAL_LITERATURE.length + (state.extraGlobalRefs ? state.extraGlobalRefs.length : 0),
+      univCases: UNIV_CASES.length
+    }),
+    selectTopic: (id, targetStep) => {
+      state.activeTopicId = id;
+      if (targetStep !== undefined && targetStep !== null) {
+        state.step = targetStep;
+      } else if (state.step === 'hub' || state.step === 'diy' || state.step === 'mission') {
+        state.step = 1;
+      }
+      saveState();
+      renderAll();
+      showToast(`已锁定课题：${getTopicDef().herb} · ${getTopicDef().compound}`);
+    },
+    goStep: (s) => {
+      if (s === 'hub' || s === 'diy' || s === 'mission') {
+        state.lastWorkStep = typeof state.step === 'number' ? state.step : (state.lastWorkStep || 1);
+      }
+      state.step = s;
+      saveState();
+      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    openRightDrawer: (tab) => openRightDrawer(tab || 'bank'),
+    openHubRig: (rk) => {
+      state.hubRig = rk;
+      state.hubCat = '全部';
+      state.step = 'hub';
+      saveState();
+      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    showToast
   };
 
   renderAll();
