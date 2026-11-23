@@ -1,4 +1,4 @@
-@import url('https://fonts.loli.net/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+/* 全本地原生高清字体栈（移除外部字体 @import，避免国内网络偶发阻塞首屏渲染） */
 :root {
   --canvas: #f5f4ee;
   --surface: rgba(255, 255, 255, 0.95);
@@ -11,7 +11,7 @@
 }
 
 body {
-  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
   background-color: var(--canvas);
   background-image:
     radial-gradient(at 12% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 46%),
