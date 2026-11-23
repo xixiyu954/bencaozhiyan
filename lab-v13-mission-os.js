@@ -815,8 +815,8 @@
     if (mpSlider) mpSlider.oninput = () => { mpState.curTemp = Number(mpSlider.value); renderMissionPanel(); };
     panel.querySelectorAll('[data-mp-rate]').forEach(b => b.onclick = () => { mpState.rate = Number(b.dataset.mpRate); renderMissionPanel(); });
 
-    // RSD 称量验收事件
-    panel.querySelectorAll('[data-rsd-b]').forEach(inp => inp.oninput = () => {
+    // RSD 称量验收事件（失焦/回车后重绘，防止输入多位数或小数点时被打断焦点）
+    panel.querySelectorAll('[data-rsd-b]').forEach(inp => inp.onchange = () => {
       const [idx, field] = inp.dataset.rsdB.split('|');
       rsdBatches[Number(idx)][field] = Number(inp.value) || 0;
       renderMissionPanel();
@@ -855,13 +855,13 @@
 
     const colInp = panel.querySelector('#colCrudeInp');
     const colRat = panel.querySelector('#colRatioSel');
-    if (colInp) colInp.oninput = () => { colState.crudeG = Number(colInp.value) || 0.5; renderMissionPanel(); };
+    if (colInp) colInp.onchange = () => { colState.crudeG = Number(colInp.value) || 0.5; renderMissionPanel(); };
     if (colRat) colRat.onchange = () => { colState.ratio = Number(colRat.value) || 35; renderMissionPanel(); };
 
     // 稀释计算器
     ['dilC1', 'dilC2', 'dilV2'].forEach(id => {
       const inp = panel.querySelector('#' + id);
-      if (inp) inp.oninput = () => {
+      if (inp) inp.onchange = () => {
         if (id === 'dilC1') dilState.c1 = Number(inp.value) || 0;
         if (id === 'dilC2') dilState.c2 = Number(inp.value) || 0;
         if (id === 'dilV2') dilState.v2 = Number(inp.value) || 0;

@@ -499,9 +499,7 @@
     });
   }
 
-  function renderBank() {
-    const mount = document.getElementById('v16BankPage');
-    if (!mount) return;
+  function computeBankData() {
     const all = getTopics();
     const cats = ['全部', ...Array.from(new Set(all.map(x => x.category).filter(Boolean)))];
     const filtered = filterBankTopics(all);
@@ -511,54 +509,11 @@
     }
     const preview = (api() && api().getTopicById) ? api().getTopicById(bankState.previewId) : cur;
     const layman = (api() && api().getLaymanNote) ? api().getLaymanNote(preview) : '';
+    return { all, cats, filtered, cur, preview, layman };
+  }
 
-    mount.innerHTML = `
-      <div class="v16-subhero">
-        <div class="v16-subhero-top">
-          <div>
-            <h2>药材实验题库（${all.length} 项）</h2>
-            <p>按成分大类、实验场景或关键词筛选药材，右侧同步查看基原、化学成分、药典标准与实验要点。</p>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">自编课题审核</button>
-            <button type="button" class="v16-chip-btn" data-v16-trigger="diy-herb">+ 新建自定义药材</button>
-            <button type="button" class="v16-chip-btn" data-v16-trigger="compare">对比课题</button>
-            <button type="button" class="v16-chip-btn" data-v16-go="home">← 返回首页</button>
-          </div>
-        </div>
-
-        <div class="v16-bank-controls">
-          <div class="v16-search-wrap">
-            <span class="v16-search-icon">⌕</span>
-            <input id="v16BankSearch" type="text" value="${esc(bankState.query)}" placeholder="搜索药材名、目标成分、化学大类或工艺关键词（如：黄芩、芦丁、小檗碱、复方）..." />
-          </div>
-          <div class="v16-seg-bar">
-            ${[
-              ['all', `全部 (${all.length})`],
-              ['class', '经典必做'],
-              ['innovative', '创新拓展'],
-              ['custom', `已过审自编 (${(api()?.getCounts?.().approvedAi) || 0})`]
-            ].map(([k, lbl]) => `<button type="button" class="v16-seg-btn ${bankState.tab === k ? 'active' : ''}" data-v16-bank-tab="${k}">${lbl}</button>`).join('')}
-          </div>
-        </div>
-
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div class="v16-pill-row">
-            ${cats.map(cat => `<button type="button" class="v16-filter-pill ${bankState.cat === cat ? 'active' : ''}" data-v16-bank-cat="${esc(cat)}">${esc(cat)}</button>`).join('')}
-          </div>
-          <div class="v16-pill-row">
-            ${[
-              ['all', '全部场景'],
-              ['undergrad', '🎓 本科经典'],
-              ['compound', '🏺 经典复方'],
-              ['green', '🌿 绿色工艺'],
-              ['process', '🔥 炮制对照']
-            ].map(([sc, lbl]) => `<button type="button" class="v16-filter-pill ${bankState.scene === sc ? 'active' : ''}" data-v16-bank-scene="${sc}">${lbl}</button>`).join('')}
-          </div>
-        </div>
-      </div>
-
-      <div class="v16-bank-layout">
+  function buildBankResultsHtml(filtered, cur, preview, layman) {
+    return `
         <div class="space-y-3">
           <div class="flex items-center justify-between text-xs" style="color:var(--ds-muted)">
             <span>当前筛选命中 <strong style="color:var(--ds-ink)">${filtered.length}</strong> 项课题（点击卡片右侧实时预览）</span>
@@ -635,18 +590,93 @@
             </button>
           </div>
         </aside>
+    `;
+  }
+
+  function updateBankResultsOnly() {
+    const layout = document.querySelector('#v16BankPage .v16-bank-layout');
+    if (!layout) {
+      renderBank();
+      return;
+    }
+    const { filtered, cur, preview, layman } = computeBankData();
+    layout.innerHTML = buildBankResultsHtml(filtered, cur, preview, layman);
+  }
+
+  function renderBank() {
+    const mount = document.getElementById('v16BankPage');
+    if (!mount) return;
+    const { all, cats, filtered, cur, preview, layman } = computeBankData();
+
+    mount.innerHTML = `
+      <div class="v16-subhero">
+        <div class="v16-subhero-top">
+          <div>
+            <h2>药材实验题库（${all.length} 项）</h2>
+            <p>按成分大类、实验场景或关键词筛选药材，右侧同步查看基原、化学成分、药典标准与实验要点。</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">自编课题审核</button>
+            <button type="button" class="v16-chip-btn" data-v16-trigger="diy-herb">+ 新建自定义药材</button>
+            <button type="button" class="v16-chip-btn" data-v16-trigger="compare">对比课题</button>
+            <button type="button" class="v16-chip-btn" data-v16-go="home">← 返回首页</button>
+          </div>
+        </div>
+
+        <div class="v16-bank-controls">
+          <div class="v16-search-wrap">
+            <span class="v16-search-icon">⌕</span>
+            <input id="v16BankSearch" type="text" value="${esc(bankState.query)}" placeholder="搜索药材名、目标成分、化学大类或工艺关键词（如：黄芩、芦丁、小檗碱、复方）..." />
+          </div>
+          <div class="v16-seg-bar">
+            ${[
+              ['all', `全部 (${all.length})`],
+              ['class', '经典必做'],
+              ['innovative', '创新拓展'],
+              ['custom', `已过审自编 (${(api()?.getCounts?.().approvedAi) || 0})`]
+            ].map(([k, lbl]) => `<button type="button" class="v16-seg-btn ${bankState.tab === k ? 'active' : ''}" data-v16-bank-tab="${k}">${lbl}</button>`).join('')}
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="v16-pill-row">
+            ${cats.map(cat => `<button type="button" class="v16-filter-pill ${bankState.cat === cat ? 'active' : ''}" data-v16-bank-cat="${esc(cat)}">${esc(cat)}</button>`).join('')}
+          </div>
+          <div class="v16-pill-row">
+            ${[
+              ['all', '全部场景'],
+              ['undergrad', '🎓 本科经典'],
+              ['compound', '🏺 经典复方'],
+              ['green', '🌿 绿色工艺'],
+              ['process', '🔥 炮制对照']
+            ].map(([sc, lbl]) => `<button type="button" class="v16-filter-pill ${bankState.scene === sc ? 'active' : ''}" data-v16-bank-scene="${sc}">${lbl}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="v16-bank-layout">
+        ${buildBankResultsHtml(filtered, cur, preview, layman)}
       </div>
     `;
 
-    // 绑定搜索框（保持输入焦点）
+    // 绑定搜索框（兼容桌面与移动端中文输入法，不销毁输入框 DOM）
     const inp = mount.querySelector('#v16BankSearch');
     if (inp) {
+      let isComposing = false;
+      const syncQuery = (val) => {
+        bankState.query = val;
+        updateBankResultsOnly();
+      };
+      inp.addEventListener('compositionstart', () => {
+        isComposing = true;
+      });
+      inp.addEventListener('compositionend', (e) => {
+        isComposing = false;
+        syncQuery(e.target.value);
+      });
       inp.addEventListener('input', (e) => {
-        const pos = e.target.selectionStart;
-        bankState.query = e.target.value;
-        renderBank();
-        const nextInp = document.getElementById('v16BankSearch');
-        if (nextInp) { nextInp.focus(); nextInp.setSelectionRange(pos, pos); }
+        if (isComposing || e.isComposing) return;
+        syncQuery(e.target.value);
       });
     }
   }
@@ -977,7 +1007,7 @@
     const previewBtn = e.target.closest('[data-v16-preview]');
     if (previewBtn) {
       bankState.previewId = previewBtn.dataset.v16Preview;
-      renderBank();
+      updateBankResultsOnly();
       return;
     }
 
