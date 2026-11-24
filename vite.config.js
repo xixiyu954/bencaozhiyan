@@ -109,6 +109,9 @@ export default defineConfig({
           if (id.includes('node_modules/html2canvas')) {
             return 'vendor-html2canvas';
           }
+          if (id.includes('node_modules/three')) {
+            return 'vendor-three';
+          }
           if (id.includes('lab-v18-translation') || id.includes('routes/translation-chunk')) {
             return 'route-translation';
           }
@@ -124,7 +127,10 @@ export default defineConfig({
           if (id.includes('lab-v15-insight') || id.includes('routes/insight-chunk')) {
             return 'modal-insight';
           }
-          if (id.includes('lab-v20-mol3d') || id.includes('lab-v21-spectra') || id.includes('lab-v22-visual-suite-pro.js') || id.includes('routes/visual-suite-chunk')) {
+          if (id.includes('lab-v22-vlab3d')) {
+            return 'suite-vlab3d';
+          }
+          if (id.includes('lab-v20-mol3d') || id.includes('lab-v21-spectra') || id.includes('lab-v22-visual-suite-pro.js') || id.includes('mol3d-pubchem-data') || id.includes('routes/visual-suite-chunk')) {
             return 'suite-visuals';
           }
           if (id.includes('lab-v24-gamification') || id.includes('routes/upgrade-suite-chunk')) {

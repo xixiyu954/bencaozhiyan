@@ -156,6 +156,7 @@ function renderBentoHome() {
             </p>
             <div class="v19-hero-actions">
               <button type="button" class="v19-cta-primary" data-v16-go="bank">立即探索 <span>↗</span></button>
+              <button type="button" class="v19-cta-secondary" data-v16-ext="v22_visual_suite">🕹️ 3D 虚拟实验室</button>
               <button type="button" class="v19-cta-secondary" data-v16-go="workflow" data-v16-step="1">进入实验工坊 →</button>
             </div>
             <div class="v19-hero-metrics">
@@ -192,7 +193,7 @@ function renderBentoHome() {
                 </svg>
               </div>
               <h3 class="v19-bento-title">3D 分子解析</h3>
-              <p class="v19-bento-sub">360° 立体构象旋转与粒子显色台</p>
+              <p class="v19-bento-sub">6 大 PubChem 真实 3D 构象与官能团高亮</p>
             </div>
             <div class="v19-card-stage">
               <svg viewBox="0 0 180 100" class="w-40 h-24" aria-hidden="true">
@@ -213,7 +214,7 @@ function renderBentoHome() {
                 </defs>
               </svg>
             </div>
-            <div class="v19-card-foot"><span>薄荷脑 · 丹参酮 · 黄芩苷</span><span>打开 ↗</span></div>
+            <div class="v19-card-foot"><span>丹参酮 · 黄芩苷 · 小檗碱等</span><span>打开 ↗</span></div>
           </button>
 
           <!-- 卡 2：AI 实验设计 -->

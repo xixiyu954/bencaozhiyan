@@ -2364,12 +2364,19 @@
       if (profileCard) profileCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }));
 
-    document.getElementById('s1HerbTitle').textContent = `${t.herb} · ${t.compound}`;
+    const s1TitleEl = document.getElementById('s1HerbTitle');
+    const s1ChemEl = document.getElementById('s1Chem');
+    if (window.TCM_MOL3D_REGISTRY) {
+      s1TitleEl.innerHTML = `${aiEsc(t.herb)} · ${window.TCM_MOL3D_REGISTRY.linkifyHtml(aiEsc(t.compound))}`;
+      s1ChemEl.innerHTML = window.TCM_MOL3D_REGISTRY.linkifyHtml(aiEsc(t.chemistry));
+    } else {
+      s1TitleEl.textContent = `${t.herb} · ${t.compound}`;
+      s1ChemEl.textContent = t.chemistry;
+    }
     document.getElementById('s1HerbLatin').textContent = t.latin;
     document.getElementById('s1CatBadge').textContent = t.category;
     document.getElementById('s1LimitBadge').textContent = `药典限度 ≥ ${t.limitVal}${t.limitUnit}`;
     document.getElementById('s1Origin').textContent = t.origin;
-    document.getElementById('s1Chem').textContent = t.chemistry;
     document.getElementById('s1Pharm').textContent = t.pharmacopoeia;
     const laymanEl = document.getElementById('s1Layman');
     if (laymanEl) laymanEl.textContent = getHerbLaymanNote(t);

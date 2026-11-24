@@ -1,110 +1,25 @@
 /**
- * 本草智研 v20 · 板块一第二波：3D 分子结构库 + 粒子级显色反应引擎（MVP）
- * 规范：零构建纯静态 IIFE，零外部依赖（离线可用），仅暴露 window.TCM_V20_VISUALS
+ * 本草智研 v20 · 1.2 3D 分子结构库（PubChem 真实 3D 构象版）+ 粒子级显色反应引擎
+ * 数据来源：NCBI PubChem PUG-REST 3D Conformer SDF（CID 16666/164676/64982/2353/1794427/5280343）
+ * 规范：纯前端离线零外链渲染，暴露 window.TCM_V20_VISUALS
  */
 (function () {
   "use strict";
 
   var ATOM_STYLE = {
-    C: { color: "#334155", radius: 11, name: "碳 (C)" },
-    O: { color: "#dc2626", radius: 12, name: "氧 (O)" },
-    N: { color: "#2563eb", radius: 12, name: "氮 (N)" },
-    H: { color: "#cbd5e1", radius: 7, name: "氢 (H)" }
+    C: { color: "#475569", light: "#94a3b8", dark: "#1e293b", covR: 0.36, vdwR: 1.70, name: "碳 (C)" },
+    O: { color: "#dc2626", light: "#fca5a5", dark: "#7f1d1d", covR: 0.34, vdwR: 1.52, name: "氧 (O)" },
+    N: { color: "#2563eb", light: "#93c5fd", dark: "#1e3a8a", covR: 0.35, vdwR: 1.55, name: "氮 (N)" },
+    H: { color: "#e2e8f0", light: "#ffffff", dark: "#64748b", covR: 0.22, vdwR: 1.20, name: "氢 (H)" },
+    S: { color: "#eab308", light: "#fef08a", dark: "#713f12", covR: 0.42, vdwR: 1.80, name: "硫 (S)" }
   };
 
-  var MOLECULES = {
-    menthol: {
-      name: "薄荷脑 (Menthol)",
-      herb: "薄荷",
-      formula: "C₁₀H₂₀O · 单萜醇",
-      desc: "环己烷椅式构象，含 1 个仲羟基（-OH）与异丙基，脂溶性强、易随水蒸气共沸。",
-      atoms: [
-        { x: -1.2, y: 0.4, z: 0.2, el: "C", group: "环己烷骨架" },
-        { x: -0.4, y: 1.2, z: -0.3, el: "C", group: "环己烷骨架" },
-        { x: 0.8, y: 0.8, z: 0.2, el: "C", group: "环己烷骨架" },
-        { x: 1.0, y: -0.5, z: -0.2, el: "C", group: "环己烷骨架" },
-        { x: 0.1, y: -1.3, z: 0.3, el: "C", group: "环己烷骨架" },
-        { x: -1.1, y: -0.9, z: -0.2, el: "C", group: "环己烷骨架" },
-        { x: 1.8, y: 1.5, z: 0.7, el: "O", group: "仲羟基 (-OH · 极性中心)" },
-        { x: 2.5, y: 1.2, z: 1.1, el: "H", group: "仲羟基 (-OH · 极性中心)" },
-        { x: -2.4, y: 0.8, z: 0.6, el: "C", group: "甲基 (-CH₃ · 亲脂)" },
-        { x: 2.2, y: -1.0, z: -0.7, el: "C", group: "异丙基 (亲脂区)" },
-        { x: 3.1, y: -0.3, z: -1.3, el: "C", group: "异丙基 (亲脂区)" },
-        { x: 2.3, y: -2.2, z: -1.2, el: "C", group: "异丙基 (亲脂区)" }
-      ],
-      bonds: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[2,6],[6,7],[0,8],[3,9],[9,10],[9,11]]
-    },
-    tanshinone: {
-      name: "丹参酮 IIA (Tanshinone IIA)",
-      herb: "丹参",
-      formula: "C₁₉H₁₈O₃ · 菲醌类",
-      desc: "邻菲醌共轭平面母核 + 呋喃环，显鲜明丹红色，强亲脂性，需高浓度乙醇或低极性溶剂提取。",
-      atoms: [
-        { x: -2.2, y: 0.7, z: 0.1, el: "C", group: "A环脂环区" },
-        { x: -1.1, y: 1.3, z: -0.1, el: "C", group: "A环脂环区" },
-        { x: -0.1, y: 0.6, z: 0.0, el: "C", group: "菲醌共轭母核" },
-        { x: -0.1, y: -0.7, z: 0.0, el: "C", group: "菲醌共轭母核" },
-        { x: -1.2, y: -1.3, z: 0.1, el: "C", group: "A环脂环区" },
-        { x: -2.2, y: -0.6, z: -0.1, el: "C", group: "A环脂环区" },
-        { x: 1.0, y: 1.2, z: 0.0, el: "C", group: "邻醌羰基 (发色团)" },
-        { x: 2.0, y: 0.5, z: 0.0, el: "C", group: "邻醌羰基 (发色团)" },
-        { x: 2.0, y: -0.8, z: 0.0, el: "C", group: "呋喃并环" },
-        { x: 1.0, y: -1.4, z: 0.0, el: "C", group: "菲醌共轭母核" },
-        { x: 1.1, y: 2.4, z: 0.1, el: "O", group: "邻醌羰基 (C=O · 发色团)" },
-        { x: 3.1, y: 1.0, z: -0.1, el: "O", group: "邻醌羰基 (C=O · 发色团)" },
-        { x: 3.1, y: -1.4, z: 0.0, el: "O", group: "呋喃氧环" },
-        { x: 2.7, y: -2.5, z: 0.1, el: "C", group: "呋喃并环" },
-        { x: 1.4, y: -2.5, z: 0.0, el: "C", group: "呋喃并环" }
-      ],
-      bonds: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[2,6],[6,7],[7,8],[8,9],[9,3],[6,10],[7,11],[8,12],[12,13],[13,14],[14,9]]
-    },
-    baicalin: {
-      name: "黄芩苷 (Baicalin)",
-      herb: "黄芩",
-      formula: "C₂₁H₁₈O₁₁ · 黄酮苷",
-      desc: "黄酮母核接葡萄糖醛酸，含邻酚羟基与羧基，遇酶易水解变绿，工艺核心为沸水杀酶保苷。",
-      atoms: [
-        { x: -2.3, y: 0.5, z: 0.0, el: "C", group: "黄酮A环" },
-        { x: -1.3, y: 1.2, z: 0.0, el: "C", group: "黄酮A环" },
-        { x: -0.2, y: 0.6, z: 0.0, el: "C", group: "黄酮A/C并环" },
-        { x: -0.2, y: -0.7, z: 0.0, el: "C", group: "黄酮A/C并环" },
-        { x: -1.3, y: -1.3, z: 0.0, el: "C", group: "黄酮A环" },
-        { x: -2.3, y: -0.7, z: 0.0, el: "C", group: "黄酮A环" },
-        { x: 0.9, y: 1.2, z: 0.0, el: "O", group: "吡喃酮氧 (C环)" },
-        { x: 2.0, y: 0.5, z: 0.1, el: "C", group: "黄酮C环" },
-        { x: 2.0, y: -0.7, z: 0.0, el: "C", group: "黄酮C环" },
-        { x: 0.9, y: -1.4, z: 0.0, el: "C", group: "4-位羰基 (C=O)" },
-        { x: 0.9, y: -2.5, z: 0.0, el: "O", group: "4-位羰基 (C=O · 铝盐络合点)" },
-        { x: -3.4, y: 1.0, z: 0.3, el: "O", group: "7-O-葡萄糖醛酸苷键 (酶解位点)" },
-        { x: -3.4, y: -1.3, z: -0.2, el: "O", group: "5,6-邻酚羟基 (易氧化变绿)" },
-        { x: 3.2, y: 1.0, z: 0.3, el: "C", group: "B环苯环" }
-      ],
-      bonds: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[2,6],[6,7],[7,8],[8,9],[9,3],[9,10],[0,11],[5,12],[7,13]]
-    },
-    berberine: {
-      name: "小檗碱 (Berberine)",
-      herb: "黄连",
-      formula: "C₂₀H₁₈NO₄⁺ · 季铵型生物碱",
-      desc: "四环共轭季铵碱母核，季铵氮（N⁺）使其在酸性水溶液中溶解度高，常以酸水提取盐析结晶。",
-      atoms: [
-        { x: -2.4, y: 0.6, z: 0.0, el: "C", group: "异喹啉母核" },
-        { x: -1.3, y: 1.2, z: 0.0, el: "C", group: "异喹啉母核" },
-        { x: -0.2, y: 0.6, z: 0.0, el: "N", group: "季铵氮中心 (N⁺ · 强亲水)" },
-        { x: -0.2, y: -0.7, z: 0.0, el: "C", group: "异喹啉母核" },
-        { x: -1.3, y: -1.3, z: 0.0, el: "C", group: "异喹啉母核" },
-        { x: -2.4, y: -0.6, z: 0.0, el: "C", group: "异喹啉母核" },
-        { x: 0.9, y: 1.2, z: 0.1, el: "C", group: "共轭芳环" },
-        { x: 2.0, y: 0.6, z: 0.0, el: "C", group: "共轭芳环" },
-        { x: 2.0, y: -0.7, z: 0.0, el: "C", group: "共轭芳环" },
-        { x: 0.9, y: -1.3, z: 0.0, el: "C", group: "共轭芳环" },
-        { x: -3.5, y: 0.3, z: 0.2, el: "O", group: "亚甲二氧基 (-OCH₂O-)" },
-        { x: -3.5, y: -0.9, z: -0.2, el: "O", group: "亚甲二氧基 (-OCH₂O-)" },
-        { x: 3.1, y: 1.1, z: 0.2, el: "O", group: "甲氧基 (-OCH₃)" },
-        { x: 3.1, y: -1.2, z: -0.2, el: "O", group: "甲氧基 (-OCH₃)" }
-      ],
-      bonds: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[2,6],[6,7],[7,8],[8,9],[9,3],[0,10],[5,11],[7,12],[8,13]]
+  function getMolecules() {
+    if (typeof window !== "undefined" && window.TCM_MOL3D_PUBCHEM_DATA) {
+      return window.TCM_MOL3D_PUBCHEM_DATA;
     }
-  };
+    return {};
+  }
 
   var PARTICLE_REACTIONS = [
     { id: "hcl_mg", name: "盐酸-镁粉反应", target: "黄酮类 (芦丁/黄芩苷)", base: [254, 240, 138], targetRgb: [220, 38, 38], dropColor: "#e2e8f0", bubbles: true, precip: false, desc: "镁粉与盐酸产生氢气气泡，溶液由浅黄扩散渐变为樱红/深红色。" },
@@ -115,38 +30,94 @@
 
   var modalEl = null;
   var activeTab = "mol3d";
-  var molKey = "menthol";
-  var molMode = "ballstick";
-  var rotX = 0.35, rotY = 0.55, zoom = 62;
-  var dragging = false, lastX = 0, lastY = 0, hoverAtomIdx = -1;
+  var molKey = "tanshinone";
+  var molMode = "ballstick"; // ballstick | wireframe | spacefill
+  var showHydrogens = true;
+  var autoRotate = true;
+  var rotX = 0.32;
+  var rotY = 0.58;
+  var zoom = 1.0;
+  var dragging = false;
+  var lastX = 0;
+  var lastY = 0;
+  var hoverAtomIdx = -1;
+  var hoverGroupId = null;
+  var lockedGroupId = null;
   var molRaf = null;
+  var molRenderToken = 0;
+  var rxnRenderToken = 0;
+  var activePointers = new Map();
+  var pinchStartDist = 0;
+  var pinchStartZoom = 1.0;
+  var lastTipKey = "";
+  var fpsFrames = 0;
+  var fpsLastTs = 0;
+  var currentFps = 60;
 
   var rxnIdx = 0;
   var rxnRaf = null;
   var rxnState = { progress: 0, drops: [], particles: [], ripples: [], bubbles: [] };
 
+  function getMolRadius(m) {
+    if (!m || !m.atoms || !m.atoms.length) return 4;
+    if (m._maxR) return m._maxR;
+    var maxR = 1;
+    for (var i = 0; i < m.atoms.length; i++) {
+      var a = m.atoms[i];
+      var d = Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
+      if (d > maxR) maxR = d;
+    }
+    m._maxR = maxR;
+    return maxR;
+  }
+
+  function getGroupMap(m) {
+    if (!m) return {};
+    if (m._groupMap) return m._groupMap;
+    var map = {};
+    (m.groups || []).forEach(function (g) { map[g.id] = g; });
+    m._groupMap = map;
+    return map;
+  }
+
+  function resolveMolKey(input) {
+    var mols = getMolecules();
+    if (!input) return molKey;
+    if (mols[input]) return input;
+    var s = String(input);
+    var keys = Object.keys(mols);
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      var m = mols[k];
+      if (m.shortName === s || m.name === s) return k;
+      if (m.aliases && m.aliases.some(function (al) { return s.indexOf(al) !== -1; })) return k;
+      if (m.herbs && m.herbs.some(function (hb) { return s.indexOf(hb) !== -1; })) return k;
+    }
+    return mols[molKey] ? molKey : (keys[0] || "menthol");
+  }
+
   function ensureModal() {
     if (modalEl) return modalEl;
     modalEl = document.createElement("div");
     modalEl.id = "tcmV20VisualModal";
-    modalEl.className = "no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/65 backdrop-blur-xs p-3 sm:p-5";
+    modalEl.className = "no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/70 backdrop-blur-xs p-2 sm:p-5";
     modalEl.innerHTML =
-      '<div class="bg-white rounded-3xl border border-slate-200 max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">' +
-        '<div class="px-5 py-3.5 bg-gradient-to-r from-[#062922] via-[#0a4538] to-[#0f6b58] text-white flex items-center justify-between gap-3">' +
-          '<div class="flex items-center gap-2.5">' +
-            '<span class="px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 text-[11px] font-extrabold">3D 实验室</span>' +
-            '<h3 class="text-sm sm:text-base font-extrabold">3D 分子结构库 & 粒子级显色反应实验室</h3>' +
+      '<div class="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-700 max-w-5xl w-full max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">' +
+        '<div class="px-4 sm:px-5 py-3 bg-gradient-to-r from-[#062922] via-[#0a4538] to-[#0f6b58] text-white flex items-center justify-between gap-3">' +
+          '<div class="flex items-center gap-2 min-w-0">' +
+            '<span class="shrink-0 px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 text-[11px] font-extrabold">PubChem 3D</span>' +
+            '<h3 class="text-sm sm:text-base font-extrabold truncate">3D 分子结构库 & 粒子级显色反应实验室</h3>' +
           '</div>' +
-          '<button type="button" id="v20BtnClose" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold">×</button>' +
+          '<button type="button" id="v20BtnClose" aria-label="关闭弹窗" class="shrink-0 w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-lg leading-none">×</button>' +
         '</div>' +
-        '<div class="px-5 pt-3 pb-2 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-[#f6f8f7]">' +
-          '<div class="inline-flex p-1 rounded-xl bg-white border border-slate-200 text-xs font-extrabold">' +
+        '<div class="px-4 sm:px-5 pt-2.5 pb-2 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-[#f6f8f7] dark:bg-slate-800/70">' +
+          '<div class="inline-flex p-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-extrabold">' +
             '<button type="button" data-v20-tab="mol3d" class="px-3.5 py-1.5 rounded-lg transition">🧬 3D 分子结构库</button>' +
             '<button type="button" data-v20-tab="particles" class="px-3.5 py-1.5 rounded-lg transition">🧪 粒子级显色动画</button>' +
           '</div>' +
-          '<span class="text-[11px] text-slate-500 font-semibold">纯前端物理渲染 · 零网络依赖离线可用</span>' +
+          '<span id="v20HeaderMeta" class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">PubChem 真实 3D 构象 · 悬停/点击官能团高亮</span>' +
         '</div>' +
-        '<div id="v20Body" class="flex-1 overflow-y-auto p-4 sm:p-5"></div>' +
+        '<div id="v20Body" class="flex-1 overflow-y-auto p-3.5 sm:p-5"></div>' +
       '</div>';
 
     document.body.appendChild(modalEl);
@@ -164,12 +135,16 @@
   }
 
   function stopLoops() {
+    molRenderToken++;
+    rxnRenderToken++;
     if (molRaf) { cancelAnimationFrame(molRaf); molRaf = null; }
     if (rxnRaf) { cancelAnimationFrame(rxnRaf); rxnRaf = null; }
   }
 
   function closeModal() {
     stopLoops();
+    dragging = false;
+    activePointers.clear();
     if (modalEl) {
       modalEl.classList.add("hidden");
       modalEl.classList.remove("flex");
@@ -179,7 +154,13 @@
   function openModal(tab, presetMol) {
     ensureModal();
     if (tab) activeTab = tab;
-    if (presetMol && MOLECULES[presetMol]) molKey = presetMol;
+    if (presetMol) {
+      molKey = resolveMolKey(presetMol);
+      lockedGroupId = null;
+      hoverGroupId = null;
+      hoverAtomIdx = -1;
+      zoom = 1.0;
+    }
     modalEl.classList.remove("hidden");
     modalEl.classList.add("flex");
     renderModalBody();
@@ -192,12 +173,20 @@
     if (e.key === "Escape" && modalEl && !modalEl.classList.contains("hidden")) closeModal();
   });
 
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      stopLoops();
+    } else if (modalEl && !modalEl.classList.contains("hidden")) {
+      renderModalBody();
+    }
+  });
+
   function renderModalBody() {
     stopLoops();
     var body = modalEl.querySelector("#v20Body");
     modalEl.querySelectorAll("[data-v20-tab]").forEach(function (b) {
       var on = b.getAttribute("data-v20-tab") === activeTab;
-      b.className = "px-3.5 py-1.5 rounded-lg transition " + (on ? "bg-[#064e3b] text-white" : "text-slate-600 hover:text-slate-900");
+      b.className = "px-3.5 py-1.5 rounded-lg transition " + (on ? "bg-[#064e3b] text-white" : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white");
     });
 
     if (activeTab === "mol3d") renderMol3dView(body);
@@ -205,161 +194,541 @@
   }
 
   function renderMol3dView(container) {
-    var m = MOLECULES[molKey];
-    var molBtns = Object.keys(MOLECULES).map(function (k) {
+    stopLoops();
+    var myToken = ++molRenderToken;
+    var mols = getMolecules();
+    var keys = Object.keys(mols);
+    if (!keys.length) {
+      container.innerHTML = '<div class="p-8 text-center text-sm text-slate-500">分子结构数据加载中，请稍候重试。</div>';
+      return;
+    }
+    if (!mols[molKey]) molKey = keys[0];
+    var m = mols[molKey];
+    var gMap = getGroupMap(m);
+    lastTipKey = "";
+
+    var molBtns = keys.map(function (k) {
       var on = k === molKey;
-      return '<button type="button" data-v20-mol="' + k + '" class="px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ' +
-        (on ? 'bg-[#059669] text-white border-[#059669]' : 'bg-white text-slate-700 border-slate-200 hover:border-[#059669]') + '">' +
-        MOLECULES[k].herb + " · " + MOLECULES[k].name.split(" ")[0] + "</button>";
+      var item = mols[k];
+      return '<button type="button" data-v20-mol="' + k + '" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ' +
+        (on
+          ? 'bg-[#059669] text-white border-[#059669] shadow-xs'
+          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#059669]') + '">' +
+        item.herb.split(" / ")[0] + " · " + item.shortName + "</button>";
     }).join("");
 
     var modeBtns = [
-      ["ballstick", "球棍模式"],
-      ["wireframe", "骨架模式"],
+      ["ballstick", "球棍"],
+      ["wireframe", "骨架"],
       ["spacefill", "空间填充"]
     ].map(function (pair) {
       var on = pair[0] === molMode;
-      return '<button type="button" data-v20-mode="' + pair[0] + '" class="px-2.5 py-1 rounded-lg text-xs font-bold border ' +
-        (on ? 'bg-[#f97316] text-white border-[#f97316]' : 'bg-white text-slate-700 border-slate-200') + '">' + pair[1] + "</button>";
+      return '<button type="button" data-v20-mode="' + pair[0] + '" class="px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ' +
+        (on
+          ? 'bg-[#ea580c] text-white border-[#ea580c]'
+          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-orange-400') + '">' + pair[1] + "</button>";
     }).join("");
 
-    container.innerHTML =
-      '<div class="space-y-4">' +
-        '<div class="flex flex-wrap items-center justify-between gap-2">' +
-          '<div class="flex flex-wrap gap-1.5">' + molBtns + "</div>" +
-          '<div class="flex gap-1.5">' + modeBtns + "</div>" +
-        "</div>" +
-        '<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">' +
-          '<div class="lg:col-span-8 relative rounded-2xl bg-gradient-to-br from-[#071f1c] to-[#0e3630] border border-emerald-400/25 overflow-hidden">' +
-            '<canvas id="v20MolCanvas" width="600" height="360" class="w-full h-[320px] sm:h-[360px] block cursor-grab active:cursor-grabbing"></canvas>' +
-            '<div id="v20MolHoverTip" class="pointer-events-none absolute top-3 left-3 px-3 py-1.5 rounded-xl bg-black/55 border border-white/15 text-xs text-emerald-200 font-bold">拖拽 360° 旋转 · 滚轮缩放 · 悬停原子看官能团</div>' +
-          "</div>" +
-          '<div class="lg:col-span-4 rounded-2xl bg-white border border-slate-200 p-4 flex flex-col justify-between gap-3 text-xs">' +
-            '<div class="space-y-2">' +
-              '<span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#059669] font-extrabold">' + m.formula + "</span>" +
-              '<h4 class="text-base font-extrabold text-slate-900">' + m.name + "</h4>" +
-              '<p class="text-slate-600 leading-relaxed">' + m.desc + "</p>" +
-            "</div>" +
-            '<div class="p-3 rounded-xl bg-[#f6f8f7] border border-slate-200/80 space-y-1.5">' +
-              '<div class="font-extrabold text-slate-800">原子图例 (CPK)</div>' +
-              '<div class="grid grid-cols-2 gap-1.5 text-[11px] font-bold text-slate-700">' +
-                '<span><i class="inline-block w-2.5 h-2.5 rounded-full bg-[#334155] mr-1"></i>碳 (C)</span>' +
-                '<span><i class="inline-block w-2.5 h-2.5 rounded-full bg-[#dc2626] mr-1"></i>氧 (O)</span>' +
-                '<span><i class="inline-block w-2.5 h-2.5 rounded-full bg-[#2563eb] mr-1"></i>氮 (N)</span>' +
-                '<span><i class="inline-block w-2.5 h-2.5 rounded-full bg-[#cbd5e1] border border-slate-400 mr-1"></i>氢 (H)</span>' +
-              "</div>" +
-            "</div>" +
-          "</div>" +
-        "</div>" +
-      "</div>";
+    var fgChips = (m.groups || []).map(function (g) {
+      var active = lockedGroupId === g.id;
+      return '<button type="button" data-v20-fg="' + g.id + '" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition ' +
+        (active
+          ? 'bg-amber-50 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 border-amber-400 ring-1 ring-amber-400'
+          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-emerald-400') + '">' +
+        '<span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:' + g.color + '"></span>' +
+        '<span>' + g.name + '</span>' +
+        '<span class="opacity-60 text-[10px]">(' + g.atoms.length + ')</span>' +
+      '</button>';
+    }).join("");
 
+    var heavyCount = m.atoms.filter(function (a) { return a[3] !== "H"; }).length;
+
+    container.innerHTML =
+      '<div class="space-y-3.5">' +
+        '<div class="flex flex-wrap items-center justify-between gap-2">' +
+          '<div class="flex flex-wrap gap-1.5" role="tablist" aria-label="核心成分选择">' + molBtns + "</div>" +
+          '<div class="flex flex-wrap items-center gap-1.5">' +
+            modeBtns +
+            '<button type="button" id="v20BtnToggleH" class="px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ' +
+              (showHydrogens ? 'bg-slate-800 text-white border-slate-800 dark:bg-slate-200 dark:text-slate-900' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700') + '">' +
+              (showHydrogens ? '隐 H 原子' : '显 H 原子') + '</button>' +
+          "</div>" +
+        "</div>" +
+
+        '<div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">' +
+          '<div class="lg:col-span-8 relative rounded-2xl bg-gradient-to-br from-[#061c19] via-[#0a2c27] to-[#0f3d35] border border-emerald-400/25 overflow-hidden select-none">' +
+            '<canvas id="v20MolCanvas" class="w-full h-[300px] sm:h-full min-h-[300px] sm:min-h-[420px] block cursor-grab active:cursor-grabbing" style="touch-action:none;"></canvas>' +
+            '<div id="v20MolHoverTip" class="pointer-events-none absolute top-3 left-3 right-24 sm:right-28 px-3 py-2 rounded-xl bg-slate-950/75 backdrop-blur-xs border border-emerald-300/25 text-xs text-emerald-100 leading-snug">' +
+              '<div class="font-extrabold text-emerald-200">拖拽 360° 旋转 · 滚轮/双指缩放 · 悬停原子高亮官能团</div>' +
+              '<div class="text-[11px] text-slate-300 mt-0.5">当前显示：' + m.name + '（' + m.atoms.length + ' 原子 / ' + m.bonds.length + ' 键）</div>' +
+            '</div>' +
+            '<div class="absolute top-3 right-3 flex flex-col gap-1.5">' +
+              '<button type="button" id="v20BtnZoomIn" title="放大" class="w-8 h-8 rounded-lg bg-slate-950/65 hover:bg-slate-900 text-white border border-white/15 font-extrabold text-sm">+</button>' +
+              '<button type="button" id="v20BtnZoomOut" title="缩小" class="w-8 h-8 rounded-lg bg-slate-950/65 hover:bg-slate-900 text-white border border-white/15 font-extrabold text-sm">−</button>' +
+              '<button type="button" id="v20BtnAutoRot" title="切换自动旋转" class="w-8 h-8 rounded-lg bg-slate-950/65 hover:bg-slate-900 text-white border border-white/15 text-xs">' + (autoRotate ? '⏸' : '▶') + '</button>' +
+              '<button type="button" id="v20BtnResetView" title="重置视角" class="w-8 h-8 rounded-lg bg-slate-950/65 hover:bg-slate-900 text-white border border-white/15 text-xs">↺</button>' +
+            '</div>' +
+            '<div class="pointer-events-none absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[10.5px] text-emerald-200/80 font-mono">' +
+              '<span>CID ' + m.cid + ' · 重原子 ' + heavyCount + ' / 总原子 ' + m.atoms.length + '</span>' +
+              '<span id="v20FpsBadge">60 FPS</span>' +
+            '</div>' +
+          "</div>" +
+
+          '<div class="lg:col-span-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 flex flex-col justify-between gap-3 text-xs">' +
+            '<div class="space-y-2.5">' +
+              '<div class="flex flex-wrap items-center justify-between gap-1.5">' +
+                '<span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/40 text-[#059669] dark:text-emerald-300 font-extrabold">' + m.formula + ' · ' + m.category + '</span>' +
+                '<a href="' + m.pubchemUrl + '" target="_blank" rel="noopener noreferrer" class="text-[11px] font-bold text-teal-700 dark:text-teal-300 hover:underline">PubChem CID ' + m.cid + ' ↗</a>' +
+              '</div>' +
+              '<h4 class="text-base font-extrabold text-slate-900 dark:text-white leading-tight">' + m.name + '</h4>' +
+              '<p class="text-slate-600 dark:text-slate-300 leading-relaxed">' + m.desc + '</p>' +
+
+              '<div class="grid grid-cols-3 gap-1.5 pt-0.5">' +
+                '<div class="p-2 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-700 text-center">' +
+                  '<div class="text-[10px] text-slate-500 dark:text-slate-400">分子量</div>' +
+                  '<div class="font-extrabold text-slate-800 dark:text-slate-100">' + m.mw + '</div>' +
+                '</div>' +
+                '<div class="p-2 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-700 text-center">' +
+                  '<div class="text-[10px] text-slate-500 dark:text-slate-400">XLogP3</div>' +
+                  '<div class="font-extrabold text-slate-800 dark:text-slate-100">' + m.xlogp + '</div>' +
+                '</div>' +
+                '<div class="p-2 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-700 text-center">' +
+                  '<div class="text-[10px] text-slate-500 dark:text-slate-400">TPSA (Å²)</div>' +
+                  '<div class="font-extrabold text-slate-800 dark:text-slate-100">' + m.tpsa + '</div>' +
+                '</div>' +
+              '</div>' +
+
+              '<div class="space-y-1.5 pt-1">' +
+                '<div class="flex items-center justify-between">' +
+                  '<span class="font-extrabold text-slate-800 dark:text-slate-200">官能团高亮检索（悬停或点击锁定）</span>' +
+                  (lockedGroupId ? '<button type="button" id="v20BtnClearFg" class="text-[10.5px] text-orange-600 font-bold hover:underline">清除锁定</button>' : '') +
+                '</div>' +
+                '<div class="flex flex-wrap gap-1.5" id="v20FgChipList">' + fgChips + '</div>' +
+              '</div>' +
+            '</div>' +
+
+            '<div class="p-2.5 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 space-y-1">' +
+              '<div class="font-extrabold text-slate-800 dark:text-slate-200 text-[11px]">CPK 元素色标（HBD ' + m.hbd + ' / HBA ' + m.hba + '）</div>' +
+              '<div class="grid grid-cols-4 gap-1 text-[11px] font-bold text-slate-700 dark:text-slate-300">' +
+                '<span><i class="inline-block w-2.5 h-2.5 rounded-full bg-[#475569] mr-1 align-middle"></i>C</span>' +
+                '<span><i class="inline-block w-2.5 h-2.5 rounded-full bg-[#dc2626] mr-1 align-middle"></i>O</span>' +
+                '<span><i class="inline-block w-2.5 h-2.5 rounded-full bg-[#2563eb] mr-1 align-middle"></i>N</span>' +
+                '<span><i class="inline-block w-2.5 h-2.5 rounded-full bg-[#e2e8f0] border border-slate-400 mr-1 align-middle"></i>H</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    // Bind switches
     container.querySelectorAll("[data-v20-mol]").forEach(function (b) {
-      b.addEventListener("click", function () { molKey = b.getAttribute("data-v20-mol"); renderMol3dView(container); });
+      b.addEventListener("click", function () {
+        molKey = b.getAttribute("data-v20-mol");
+        lockedGroupId = null;
+        hoverGroupId = null;
+        hoverAtomIdx = -1;
+        zoom = 1.0;
+        renderMol3dView(container);
+      });
     });
     container.querySelectorAll("[data-v20-mode]").forEach(function (b) {
-      b.addEventListener("click", function () { molMode = b.getAttribute("data-v20-mode"); renderMol3dView(container); });
+      b.addEventListener("click", function () {
+        molMode = b.getAttribute("data-v20-mode");
+        renderMol3dView(container);
+      });
+    });
+    var btnH = container.querySelector("#v20BtnToggleH");
+    if (btnH) {
+      btnH.addEventListener("click", function () {
+        showHydrogens = !showHydrogens;
+        renderMol3dView(container);
+      });
+    }
+    var btnClearFg = container.querySelector("#v20BtnClearFg");
+    if (btnClearFg) {
+      btnClearFg.addEventListener("click", function () {
+        lockedGroupId = null;
+        renderMol3dView(container);
+      });
+    }
+
+    container.querySelectorAll("[data-v20-fg]").forEach(function (chip) {
+      var gid = chip.getAttribute("data-v20-fg");
+      chip.addEventListener("mouseenter", function () {
+        hoverGroupId = gid;
+        hoverAtomIdx = -1;
+        updateTooltip(gMap, m);
+      });
+      chip.addEventListener("mouseleave", function () {
+        hoverGroupId = null;
+        updateTooltip(gMap, m);
+      });
+      chip.addEventListener("click", function () {
+        lockedGroupId = (lockedGroupId === gid) ? null : gid;
+        renderMol3dView(container);
+      });
     });
 
     var canvas = container.querySelector("#v20MolCanvas");
     var tip = container.querySelector("#v20MolHoverTip");
+    var fpsBadge = container.querySelector("#v20FpsBadge");
     var ctx = canvas.getContext("2d");
-    var projected = [];
+    var projectedAtoms = [];
+    var dpr = 1;
+    var cssW = 600;
+    var cssH = 380;
 
-    canvas.addEventListener("pointerdown", function (e) { dragging = true; lastX = e.clientX; lastY = e.clientY; });
-    window.addEventListener("pointerup", function () { dragging = false; });
-    canvas.addEventListener("pointermove", function (e) {
+    function syncCanvasSize() {
       var rect = canvas.getBoundingClientRect();
-      var mx = (e.clientX - rect.left) * (canvas.width / rect.width);
-      var my = (e.clientY - rect.top) * (canvas.height / rect.height);
+      cssW = Math.max(260, Math.round(rect.width || 600));
+      cssH = Math.max(240, Math.round(rect.height || 360));
+      var maxDpr = cssW < 480 ? 1.5 : 2;
+      dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+      var targetW = Math.round(cssW * dpr);
+      var targetH = Math.round(cssH * dpr);
+      if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    syncCanvasSize();
+
+    function updateTooltip(groupMap, mol) {
+      var activeGid = hoverGroupId || lockedGroupId;
+      var key = (activeGid || "none") + "|" + hoverAtomIdx;
+      if (key === lastTipKey) return;
+      lastTipKey = key;
+      if (activeGid && groupMap[activeGid]) {
+        var g = groupMap[activeGid];
+        var atomLabel = "";
+        if (hoverAtomIdx >= 0 && mol.atoms[hoverAtomIdx]) {
+          var el = mol.atoms[hoverAtomIdx][3];
+          atomLabel = " · " + (ATOM_STYLE[el] ? ATOM_STYLE[el].name : el);
+        }
+        tip.innerHTML =
+          '<div class="font-extrabold flex items-center gap-1.5" style="color:' + g.color + '">' +
+            '<span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:' + g.color + '"></span>' +
+            '<span>官能团高亮：' + g.name + atomLabel + '（共 ' + g.atoms.length + ' 原子）</span>' +
+          '</div>' +
+          '<div class="text-[11px] text-slate-200 mt-0.5">' + g.note + '</div>';
+      } else {
+        tip.innerHTML =
+          '<div class="font-extrabold text-emerald-200">拖拽 360° 旋转 · 滚轮/双指缩放 · 悬停原子高亮官能团</div>' +
+          '<div class="text-[11px] text-slate-300 mt-0.5">当前显示：' + mol.name + '（' + mol.atoms.length + ' 原子 / ' + mol.bonds.length + ' 键）</div>';
+      }
+    }
+    updateTooltip(gMap, m);
+
+    container.querySelector("#v20BtnZoomIn").addEventListener("click", function () {
+      zoom = Math.min(2.2, zoom * 1.18);
+    });
+    container.querySelector("#v20BtnZoomOut").addEventListener("click", function () {
+      zoom = Math.max(0.55, zoom / 1.18);
+    });
+    container.querySelector("#v20BtnAutoRot").addEventListener("click", function (e) {
+      autoRotate = !autoRotate;
+      e.currentTarget.textContent = autoRotate ? "⏸" : "▶";
+    });
+    container.querySelector("#v20BtnResetView").addEventListener("click", function () {
+      rotX = 0.32;
+      rotY = 0.58;
+      zoom = 1.0;
+      lockedGroupId = null;
+      hoverGroupId = null;
+      hoverAtomIdx = -1;
+      updateTooltip(gMap, m);
+    });
+
+    function hitTestAtom(mx, my) {
+      for (var i = projectedAtoms.length - 1; i >= 0; i--) {
+        var p = projectedAtoms[i];
+        var dx = mx - p.sx;
+        var dy = my - p.sy;
+        var hitR = Math.max(p.r + 5, 11);
+        if (dx * dx + dy * dy <= hitR * hitR) return p;
+      }
+      return null;
+    }
+
+    canvas.addEventListener("pointerdown", function (e) {
+      canvas.setPointerCapture(e.pointerId);
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (activePointers.size === 1) {
+        dragging = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        var rect = canvas.getBoundingClientRect();
+        var hit = hitTestAtom(e.clientX - rect.left, e.clientY - rect.top);
+        if (hit && e.pointerType === "touch") {
+          hoverAtomIdx = hit.idx;
+          hoverGroupId = hit.fg;
+          updateTooltip(gMap, m);
+        }
+      } else if (activePointers.size === 2) {
+        dragging = false;
+        var pts = Array.from(activePointers.values());
+        pinchStartDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1;
+        pinchStartZoom = zoom;
+      }
+    });
+
+    canvas.addEventListener("pointerup", function (e) {
+      activePointers.delete(e.pointerId);
+      if (activePointers.size < 2) pinchStartDist = 0;
+      if (activePointers.size === 0) dragging = false;
+    });
+    canvas.addEventListener("pointercancel", function (e) {
+      activePointers.delete(e.pointerId);
+      dragging = false;
+    });
+
+    canvas.addEventListener("pointermove", function (e) {
+      if (activePointers.has(e.pointerId)) {
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      }
+      if (activePointers.size === 2 && pinchStartDist > 0) {
+        var pts = Array.from(activePointers.values());
+        var curDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        zoom = Math.max(0.55, Math.min(2.2, pinchStartZoom * (curDist / pinchStartDist)));
+        return;
+      }
       if (dragging) {
-        rotY += (e.clientX - lastX) * 0.012;
-        rotX += (e.clientY - lastY) * 0.012;
+        rotY += (e.clientX - lastX) * 0.011;
+        rotX += (e.clientY - lastY) * 0.011;
         lastX = e.clientX;
         lastY = e.clientY;
         return;
       }
-      hoverAtomIdx = -1;
-      for (var i = projected.length - 1; i >= 0; i--) {
-        var p = projected[i];
-        var dx = mx - p.sx, dy = my - p.sy;
-        if (dx * dx + dy * dy <= (p.r + 5) * (p.r + 5)) {
-          hoverAtomIdx = p.idx;
-          break;
-        }
-      }
-      if (hoverAtomIdx >= 0) {
-        var at = m.atoms[hoverAtomIdx];
-        tip.textContent = "官能团高亮：" + at.group + " · " + (ATOM_STYLE[at.el] ? ATOM_STYLE[at.el].name : at.el);
+      var rect = canvas.getBoundingClientRect();
+      var hit = hitTestAtom(e.clientX - rect.left, e.clientY - rect.top);
+      if (hit) {
+        hoverAtomIdx = hit.idx;
+        hoverGroupId = hit.fg;
       } else {
-        tip.textContent = "拖拽 360° 旋转 · 滚轮缩放 · 悬停原子看官能团";
+        hoverAtomIdx = -1;
+        hoverGroupId = null;
+      }
+      updateTooltip(gMap, m);
+    });
+
+    canvas.addEventListener("pointerleave", function () {
+      if (!dragging) {
+        hoverAtomIdx = -1;
+        hoverGroupId = null;
+        updateTooltip(gMap, m);
       }
     });
+
     canvas.addEventListener("wheel", function (e) {
       e.preventDefault();
-      zoom = Math.max(36, Math.min(105, zoom - e.deltaY * 0.05));
+      var factor = e.deltaY < 0 ? 1.09 : 0.92;
+      zoom = Math.max(0.55, Math.min(2.2, zoom * factor));
     }, { passive: false });
 
-    function drawMol() {
-      if (!dragging) rotY += 0.004;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var molRadius = getMolRadius(m);
+    fpsFrames = 0;
+    fpsLastTs = performance.now();
+    var lastFrameTs = fpsLastTs;
 
-      var cx = canvas.width / 2, cy = canvas.height / 2;
+    function drawMol(ts) {
+      if (myToken !== molRenderToken) return;
+      var dt = Math.min(0.05, Math.max(0, (ts - lastFrameTs) / 1000));
+      lastFrameTs = ts;
+      if (autoRotate && !dragging && !hoverGroupId) rotY += 0.30 * dt;
+      syncCanvasSize();
+      ctx.clearRect(0, 0, cssW, cssH);
+
+      var cx = cssW / 2;
+      var cy = cssH * (cssW < 420 ? 0.61 : 0.54);
+      var baseScale = (Math.min(cssW, cssH) * 0.36 / Math.max(2.6, molRadius)) * zoom;
       var cosX = Math.cos(rotX), sinX = Math.sin(rotX);
       var cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+      var camDist = molRadius * 4.2 + 12;
+      var activeGid = hoverGroupId || lockedGroupId;
 
-      var pts = m.atoms.map(function (a, idx) {
-        var x1 = a.x * cosY - a.z * sinY;
-        var z1 = a.x * sinY + a.z * cosY;
-        var y2 = a.y * cosX - z1 * sinX;
-        var z2 = a.y * sinX + z1 * cosX;
-        var scale = 320 / (320 - z2 * 35);
-        var st = ATOM_STYLE[a.el] || ATOM_STYLE.C;
-        var r = molMode === "spacefill" ? st.radius * 2.1 : (molMode === "wireframe" ? 3.5 : st.radius);
-        return { idx: idx, el: a.el, sx: cx + x1 * zoom * scale, sy: cy + y2 * zoom * scale, z: z2, r: r * scale, color: st.color };
-      });
-
-      ctx.lineWidth = molMode === "wireframe" ? 3 : 4;
-      m.bonds.forEach(function (pair) {
-        var p1 = pts[pair[0]], p2 = pts[pair[1]];
-        if (!p1 || !p2) return;
-        ctx.strokeStyle = "rgba(226, 232, 240, 0.72)";
-        ctx.beginPath();
-        ctx.moveTo(p1.sx, p1.sy);
-        ctx.lineTo(p2.sx, p2.sy);
-        ctx.stroke();
-      });
-
-      projected = pts.slice().sort(function (a, b) { return a.z - b.z; });
-      projected.forEach(function (p) {
-        var isHover = p.idx === hoverAtomIdx;
-        ctx.beginPath();
-        ctx.arc(p.sx, p.sy, p.r, 0, Math.PI * 2);
-        var grad = ctx.createRadialGradient(p.sx - p.r * 0.3, p.sy - p.r * 0.3, p.r * 0.1, p.sx, p.sy, p.r);
-        grad.addColorStop(0, "#ffffff");
-        grad.addColorStop(0.35, p.color);
-        grad.addColorStop(1, "#0f172a");
-        ctx.fillStyle = grad;
-        ctx.fill();
-        if (isHover) {
-          ctx.lineWidth = 3;
-          ctx.strokeStyle = "#fde047";
-          ctx.stroke();
+      var pts = new Array(m.atoms.length);
+      var visibleAtoms = [];
+      for (var i = 0; i < m.atoms.length; i++) {
+        var a = m.atoms[i];
+        var el = a[3];
+        if (!showHydrogens && el === "H") {
+          pts[i] = null;
+          continue;
         }
-      });
+        var x1 = a[0] * cosY - a[2] * sinY;
+        var z1 = a[0] * sinY + a[2] * cosY;
+        var y2 = a[1] * cosX - z1 * sinX;
+        var z2 = a[1] * sinX + z1 * cosX;
+        var persp = camDist / Math.max(4, camDist - z2);
+        var st = ATOM_STYLE[el] || ATOM_STYLE.C;
+        var r;
+        if (molMode === "spacefill") {
+          r = st.vdwR * baseScale * 0.56 * persp;
+        } else if (molMode === "wireframe") {
+          r = Math.max(2.2, 0.14 * baseScale * persp);
+        } else {
+          r = st.covR * baseScale * persp;
+        }
+        var pt = {
+          kind: "atom",
+          idx: i,
+          el: el,
+          fg: a[4],
+          sx: cx + x1 * baseScale * persp,
+          sy: cy - y2 * baseScale * persp,
+          z: z2,
+          r: r,
+          st: st
+        };
+        pts[i] = pt;
+        visibleAtoms.push(pt);
+      }
+
+      // Build depth-sorted draw queue (bonds + atoms interleaved by z)
+      var drawList = visibleAtoms.slice();
+      if (molMode !== "spacefill") {
+        for (var bi = 0; bi < m.bonds.length; bi++) {
+          var b = m.bonds[bi];
+          var p1 = pts[b[0]];
+          var p2 = pts[b[1]];
+          if (!p1 || !p2) continue;
+          drawList.push({
+            kind: "bond",
+            p1: p1,
+            p2: p2,
+            order: b[2] || 1,
+            z: (p1.z + p2.z) * 0.5 - 0.05
+          });
+        }
+      }
+      drawList.sort(function (u, v) { return u.z - v.z; });
+
+      var activeColor = activeGid && gMap[activeGid] ? gMap[activeGid].color : "#fde047";
+
+      for (var di = 0; di < drawList.length; di++) {
+        var item = drawList[di];
+        if (item.kind === "bond") {
+          var p1 = item.p1, p2 = item.p2;
+          var bondInGroup = activeGid && (p1.fg === activeGid && p2.fg === activeGid);
+          var bondDim = activeGid && !bondInGroup;
+          var dx = p2.sx - p1.sx;
+          var dy = p2.sy - p1.sy;
+          var len = Math.hypot(dx, dy) || 1;
+          var nx = -dy / len;
+          var ny = dx / len;
+          var lw = molMode === "wireframe" ? Math.max(2.6, baseScale * 0.13) : Math.max(2.0, baseScale * 0.11);
+
+          ctx.lineCap = "round";
+          if (item.order === 2) {
+            var off = Math.max(2.2, lw * 0.72);
+            for (var s = -1; s <= 1; s += 2) {
+              drawSplitBond(ctx, p1.sx + nx * off * s, p1.sy + ny * off * s, p2.sx + nx * off * s, p2.sy + ny * off * s, p1, p2, lw * 0.78, bondInGroup, bondDim, activeColor);
+            }
+          } else {
+            drawSplitBond(ctx, p1.sx, p1.sy, p2.sx, p2.sy, p1, p2, lw, bondInGroup, bondDim, activeColor);
+          }
+        } else {
+          var p = item;
+          var inGroup = activeGid && p.fg === activeGid;
+          var isDim = activeGid && !inGroup;
+          var depthAlpha = Math.max(0.45, Math.min(1, 0.78 + p.z / (molRadius * 3.5)));
+          ctx.save();
+          ctx.globalAlpha = isDim ? depthAlpha * 0.34 : depthAlpha;
+
+          if (inGroup) {
+            ctx.beginPath();
+            ctx.arc(p.sx, p.sy, p.r + (molMode === "wireframe" ? 5 : 4.5), 0, Math.PI * 2);
+            ctx.fillStyle = activeColor + "40";
+            ctx.fill();
+          }
+
+          ctx.beginPath();
+          ctx.arc(p.sx, p.sy, p.r, 0, Math.PI * 2);
+          if (molMode === "wireframe") {
+            ctx.fillStyle = inGroup ? activeColor : p.st.color;
+            ctx.fill();
+          } else {
+            var grad = ctx.createRadialGradient(p.sx - p.r * 0.32, p.sy - p.r * 0.32, p.r * 0.08, p.sx, p.sy, p.r);
+            grad.addColorStop(0, p.st.light);
+            grad.addColorStop(0.42, p.st.color);
+            grad.addColorStop(1, p.st.dark);
+            ctx.fillStyle = grad;
+            ctx.fill();
+          }
+
+          if (inGroup) {
+            ctx.lineWidth = p.idx === hoverAtomIdx ? 2.6 : 1.7;
+            ctx.strokeStyle = activeColor;
+            ctx.stroke();
+          } else if (molMode === "spacefill") {
+            ctx.lineWidth = 0.7;
+            ctx.strokeStyle = "rgba(15, 23, 42, 0.35)";
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+      }
+
+      projectedAtoms = visibleAtoms.sort(function (a, b) { return a.z - b.z; });
+
+      fpsFrames++;
+      if (ts - fpsLastTs >= 600) {
+        currentFps = Math.round((fpsFrames * 1000) / (ts - fpsLastTs));
+        if (fpsBadge) fpsBadge.textContent = Math.min(60, currentFps) + " FPS";
+        fpsFrames = 0;
+        fpsLastTs = ts;
+      }
 
       molRaf = requestAnimationFrame(drawMol);
     }
-    drawMol();
+
+    function drawSplitBond(c, x1, y1, x2, y2, p1, p2, lw, highlight, dim, hiColor) {
+      var mx = (x1 + x2) * 0.5;
+      var my = (y1 + y2) * 0.5;
+      c.save();
+      c.globalAlpha = dim ? 0.25 : 0.92;
+      c.lineWidth = highlight ? lw * 1.25 : lw;
+      if (highlight) {
+        c.strokeStyle = hiColor;
+        c.beginPath();
+        c.moveTo(x1, y1);
+        c.lineTo(x2, y2);
+        c.stroke();
+      } else if (molMode === "wireframe") {
+        c.strokeStyle = p1.st.color === "#475569" ? "#cbd5e1" : p1.st.color;
+        c.beginPath();
+        c.moveTo(x1, y1);
+        c.lineTo(mx, my);
+        c.stroke();
+        c.strokeStyle = p2.st.color === "#475569" ? "#cbd5e1" : p2.st.color;
+        c.beginPath();
+        c.moveTo(mx, my);
+        c.lineTo(x2, y2);
+        c.stroke();
+      } else {
+        c.strokeStyle = "rgba(226, 232, 240, 0.82)";
+        c.beginPath();
+        c.moveTo(x1, y1);
+        c.lineTo(x2, y2);
+        c.stroke();
+      }
+      c.restore();
+    }
+
+    molRaf = requestAnimationFrame(drawMol);
   }
 
   function renderParticlesView(container) {
+    stopLoops();
+    var myRxnToken = ++rxnRenderToken;
     var rxn = PARTICLE_REACTIONS[rxnIdx];
     rxnState = { progress: 0, drops: [], particles: [], ripples: [], bubbles: [] };
 
     var rxnBtns = PARTICLE_REACTIONS.map(function (r, i) {
       var on = i === rxnIdx;
       return '<button type="button" data-v20-rxn="' + i + '" class="px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ' +
-        (on ? 'bg-[#059669] text-white border-[#059669]' : 'bg-white text-slate-700 border-slate-200 hover:border-[#059669]') + '">' + r.name + "</button>";
+        (on ? 'bg-[#059669] text-white border-[#059669]' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#059669]') + '">' + r.name + "</button>";
     }).join("");
 
     container.innerHTML =
@@ -368,21 +737,21 @@
           '<div class="flex flex-wrap gap-1.5">' + rxnBtns + "</div>" +
           '<div class="flex gap-2">' +
             '<button type="button" id="v20BtnDrop" class="px-4 py-1.5 rounded-xl bg-[#f97316] hover:bg-[#ea580c] text-white text-xs font-extrabold shadow-sm">💧 滴加检识试液</button>' +
-            '<button type="button" id="v20BtnResetRxn" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-bold">↺ 清洗试管</button>' +
+            '<button type="button" id="v20BtnResetRxn" class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold">↺ 清洗试管</button>' +
           "</div>" +
         "</div>" +
         '<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">' +
           '<div class="lg:col-span-7 rounded-2xl bg-gradient-to-b from-[#071f1c] to-[#0b2d24] border border-emerald-400/25 overflow-hidden flex justify-center">' +
             '<canvas id="v20RxnCanvas" width="460" height="340" class="w-full max-w-[460px] h-[320px] block"></canvas>' +
           "</div>" +
-          '<div class="lg:col-span-5 rounded-2xl bg-white border border-slate-200 p-4 space-y-3 text-xs">' +
-            '<span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-900 font-extrabold">' + rxn.target + "</span>" +
-            '<h4 class="text-base font-extrabold text-slate-900">' + rxn.name + "</h4>" +
-            '<p class="text-slate-600 leading-relaxed">' + rxn.desc + "</p>" +
-            '<div class="p-3 rounded-xl bg-[#f6f8f7] border border-slate-200/80 space-y-1">' +
-              '<div class="font-extrabold text-slate-800">反应进程</div>' +
-              '<div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden"><div id="v20RxnBar" class="h-full bg-[#059669] transition-all duration-200" style="width:0%"></div></div>' +
-              '<div id="v20RxnStatus" class="text-[11px] text-slate-600 pt-1">点击「滴加检识试液」观察液面冲击波与粒子扩散渐变。</div>' +
+          '<div class="lg:col-span-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 space-y-3 text-xs">' +
+            '<span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 font-extrabold">' + rxn.target + "</span>" +
+            '<h4 class="text-base font-extrabold text-slate-900 dark:text-white">' + rxn.name + "</h4>" +
+            '<p class="text-slate-600 dark:text-slate-300 leading-relaxed">' + rxn.desc + "</p>" +
+            '<div class="p-3 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 space-y-1">' +
+              '<div class="font-extrabold text-slate-800 dark:text-slate-200">反应进程</div>' +
+              '<div class="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div id="v20RxnBar" class="h-full bg-[#059669] transition-all duration-200" style="width:0%"></div></div>' +
+              '<div id="v20RxnStatus" class="text-[11px] text-slate-600 dark:text-slate-400 pt-1">点击「滴加检识试液」观察液面冲击波与粒子扩散渐变。</div>' +
             "</div>" +
           "</div>" +
         "</div>" +
@@ -409,6 +778,7 @@
     });
 
     function drawRxn() {
+      if (myRxnToken !== rxnRenderToken) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       ctx.fillStyle = "#cbd5e1";
@@ -520,31 +890,19 @@
         id: "v20_mol3d",
         icon: "🧬",
         title: "3D 分子结构与粒子显色台",
-        desc: "360° 旋转观察丹参酮、黄芩苷、薄荷脑、小檗碱立体构象，体验粒子级滴加显色动画。",
+        desc: "基于 PubChem 真实 3D 构象：薄荷脑、丹参酮IIA、黄芩苷、小檗碱、绿原酸、槲皮素（支持官能团高亮与三模式切换）。",
         onOpen: function () { openModal("mol3d"); }
       });
-    }
-
-    var s1Title = document.getElementById("s1HerbTitle");
-    if (s1Title && s1Title.parentNode && !document.getElementById("v20BtnQuickMol")) {
-      var btn = document.createElement("button");
-      btn.id = "v20BtnQuickMol";
-      btn.type = "button";
-      btn.className = "mt-1.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#059669] hover:bg-[#047857] text-white text-xs font-extrabold transition";
-      btn.textContent = "🧬 查看 3D 分子与粒子显色";
-      btn.addEventListener("click", function () {
-        var txt = (s1Title.textContent || "");
-        var key = /丹参/.test(txt) ? "tanshinone" : (/黄芩/.test(txt) ? "baicalin" : (/黄连|小檗/.test(txt) ? "berberine" : "menthol"));
-        openModal("mol3d", key);
-      });
-      s1Title.parentNode.appendChild(btn);
     }
   }
 
   window.TCM_V20_VISUALS = {
-    version: "1.0.0",
+    version: "2.0.0-pubchem-3d",
     openMol3d: function (key) { openModal("mol3d", key); },
-    openParticles: function () { openModal("particles"); }
+    openParticles: function () { openModal("particles"); },
+    getMoleculeKeys: function () { return Object.keys(getMolecules()); },
+    getCurrentFps: function () { return currentFps; },
+    getRotY: function () { return rotY; }
   };
 
   if (document.readyState === "loading") {

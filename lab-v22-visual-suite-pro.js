@@ -8,6 +8,7 @@
   var modalEl = null;
   var activeTab = "vlab";
   var animId = null;
+  var vlab3dInstance = null;
 
   var vlab = {
     x: 240,
@@ -64,21 +65,21 @@
     modalEl.id = "tcmV22Modal";
     modalEl.className = "no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/65 backdrop-blur-xs p-3 sm:p-5";
     modalEl.innerHTML =
-      '<div class="bg-white rounded-3xl border border-slate-200 max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">' +
+      '<div class="bg-white rounded-3xl border border-slate-200 max-w-6xl w-full max-h-[93vh] flex flex-col shadow-2xl overflow-hidden">' +
         '<div class="px-5 py-3.5 bg-gradient-to-r from-[#062922] via-[#0a4538] to-[#0f6b58] text-white flex items-center justify-between gap-3">' +
           '<div class="flex items-center gap-2.5">' +
-            '<span class="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 text-[11px] font-extrabold">视觉体验舱</span>' +
-            '<h3 class="text-sm sm:text-base font-extrabold">虚拟实验室 · 流体仿真 · AR 药材卡</h3>' +
+            '<span class="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 text-[11px] font-extrabold">3D 视觉体验舱</span>' +
+            '<h3 class="text-sm sm:text-base font-extrabold">Three.js 第一人称 3D 实验室 · 流体仿真 · AR 药材卡</h3>' +
           '</div>' +
-          '<button type="button" id="v22BtnClose" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold">×</button>' +
+          '<button type="button" id="v22BtnClose" aria-label="关闭弹窗" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-lg leading-none">×</button>' +
         '</div>' +
         '<div class="px-5 pt-3 pb-2 border-b border-slate-100 bg-[#f6f8f7] flex flex-wrap items-center justify-between gap-2">' +
           '<div class="inline-flex p-1 rounded-xl bg-white border border-slate-200 text-xs font-extrabold">' +
-            '<button type="button" data-v22-tab="vlab" class="px-3.5 py-1.5 rounded-lg transition">🕹️ 第一人称虚拟实验室</button>' +
+            '<button type="button" data-v22-tab="vlab" class="px-3.5 py-1.5 rounded-lg transition">🕹️ 第一人称 3D 实验室</button>' +
             '<button type="button" data-v22-tab="fluid" class="px-3.5 py-1.5 rounded-lg transition">🌊 物理流体仿真</button>' +
             '<button type="button" data-v22-tab="ar" class="px-3.5 py-1.5 rounded-lg transition">📱 AR 药材卡</button>' +
           '</div>' +
-          '<span class="text-[11px] text-slate-500 font-semibold">纯前端交互 · 零外部依赖</span>' +
+          '<span class="text-[11px] text-slate-500 font-semibold">Three.js 实景 3D · WASD / 拖拽环顾 · 冷却水安全互锁</span>' +
         '</div>' +
         '<div id="v22Body" class="flex-1 overflow-y-auto p-4 sm:p-5"></div>' +
       '</div>';
@@ -113,6 +114,10 @@
 
   function stopLoop() {
     if (animId) { cancelAnimationFrame(animId); animId = null; }
+    if (vlab3dInstance && typeof vlab3dInstance.destroy === "function") {
+      vlab3dInstance.destroy();
+      vlab3dInstance = null;
+    }
   }
 
   function stopCamera() {
@@ -151,6 +156,33 @@
   }
 
   function renderVlab(container) {
+    stopLoop();
+    if (window.TCM_V22_VLAB3D && typeof window.TCM_V22_VLAB3D.mount === "function") {
+      vlab3dInstance = window.TCM_V22_VLAB3D.mount(container);
+      return;
+    }
+    if (typeof window.__loadTcmVlab3d === "function") {
+      container.innerHTML =
+        '<div class="rounded-2xl bg-[#071f1b] border border-emerald-500/25 min-h-[420px] flex flex-col items-center justify-center gap-3 text-emerald-100 p-6">' +
+          '<div class="w-10 h-10 rounded-full border-2 border-emerald-400/30 border-t-emerald-400 animate-spin"></div>' +
+          '<div class="text-sm font-extrabold">正在按需加载 Three.js 3D 第一人称实景实验室…</div>' +
+          '<div class="text-xs text-emerald-200/75">包含 10m×8m 实验室场景、三层 17 件配型试剂架与丹参回流 7 步 SOP</div>' +
+        '</div>';
+      window.__loadTcmVlab3d().then(function () {
+        if (modalEl && !modalEl.classList.contains("hidden") && activeTab === "vlab" && window.TCM_V22_VLAB3D) {
+          vlab3dInstance = window.TCM_V22_VLAB3D.mount(container);
+        }
+      }).catch(function () {
+        if (modalEl && !modalEl.classList.contains("hidden") && activeTab === "vlab") {
+          renderVlabFallback2d(container);
+        }
+      });
+      return;
+    }
+    renderVlabFallback2d(container);
+  }
+
+  function renderVlabFallback2d(container) {
     var rigObj = FLAGSHIP_RIGS[vlab.rig];
     container.innerHTML =
       '<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">' +
@@ -500,7 +532,8 @@
   window.TCM_V22_VISUAL_SUITE = {
     version: "1.0.0",
     open: openModal,
-    togglePresentMode: togglePresentMode
+    togglePresentMode: togglePresentMode,
+    getVlab3d: function () { return vlab3dInstance; }
   };
 
   if (document.readyState === "loading") {

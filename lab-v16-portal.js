@@ -533,7 +533,7 @@
                       <span class="v16-topic-herb">${esc(item.herb)}${isActive ? ' <span style="font-size:0.68rem;color:var(--ds-emerald)">● 当前</span>' : ''}</span>
                       <span class="v16-topic-cat">${esc(item.category || '中药化学')}</span>
                     </div>
-                    <div class="v16-topic-comp">🎯 ${esc(item.compound || '核心活性成分')}</div>
+                    <div class="v16-topic-comp">🎯 ${window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(esc(item.compound || '核心活性成分'), { inlineSpan: true }) : esc(item.compound || '核心活性成分')}</div>
                     <div class="v16-topic-note">${esc(cardSummary)}</div>
                     <div class="v16-topic-foot">
                       <span>${item._isCustom ? '🤖 自定义/AI' : (item.group === 'class' ? '★ 高校经典' : '✨ 创新前沿')}</span>
@@ -561,7 +561,7 @@
           <div class="flex items-start justify-between gap-2">
             <div>
               <div class="v16-sec-kicker">药材档案</div>
-              <h3 style="margin:4px 0 2px;font-size:1.25rem;font-weight:900;color:var(--ds-ink)">${esc(preview.herb)} · ${esc(preview.compound)}</h3>
+              <h3 style="margin:4px 0 2px;font-size:1.25rem;font-weight:900;color:var(--ds-ink)">${esc(preview.herb)} · ${window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(esc(preview.compound)) : esc(preview.compound)}</h3>
               <div style="font-size:0.76rem;color:var(--ds-muted);font-style:italic">${esc(preview.latin || '')}</div>
             </div>
             <span class="v16-topic-cat">${esc(preview.category || '中药化学')}</span>
@@ -574,7 +574,16 @@
             </div>
           ` : ''}
           <div class="v16-preview-block"><label>基原与性味</label><p>${esc(preview.origin || '暂未填写')}</p></div>
-          <div class="v16-preview-block"><label>核心化学成分</label><p>${esc(preview.chemistry || preview.chem || `${preview.compound || ''}（${preview.category || '中药化学'}）`)}</p></div>
+          <div class="v16-preview-block"><label>核心化学成分（点击成分名看 3D 构象）</label><p>${(() => {
+            const raw = esc(preview.chemistry || preview.chem || `${preview.compound || ''}（${preview.category || '中药化学'}）`);
+            return window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(raw) : raw;
+          })()}</p>${(() => {
+            const reg = window.TCM_MOL3D_REGISTRY;
+            if (!reg) return '';
+            const matches = reg.matchAll(`${preview.herb || ''} ${preview.compound || ''} ${preview.chemistry || ''}`);
+            if (!matches.length) return '';
+            return `<div class="flex flex-wrap gap-1.5 pt-2">${matches.map(m => `<button type="button" class="tcm-mol3d-link" data-mol3d-open="${m.key}" style="padding:3px 9px;font-size:0.74rem">🧬 查看 ${esc(m.label)} 3D 模型 →</button>`).join('')}</div>`;
+          })()}</div>
           <div class="v16-preview-block"><label>药典与质控参考${preview.limitVal ? `（限度 ≥ ${esc(preview.limitVal)}${esc(preview.limitUnit || '%')}）` : ''}</label><p>${esc(preview.pharmacopoeia || preview.pharm || '请参照现行版《中国药典》一部')}</p></div>
 
           <div class="flex flex-col gap-2 pt-1">
