@@ -136,6 +136,9 @@ export default defineConfig({
           if (id.includes('lab-v24-gamification') || id.includes('routes/upgrade-suite-chunk')) {
             return 'suite-gamification';
           }
+          if (id.includes('knowledge-hub-data') || id.includes('lab-v26-knowledge-hub')) {
+            return 'suite-knowledge';
+          }
         }
       }
     }

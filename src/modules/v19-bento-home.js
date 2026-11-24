@@ -162,11 +162,11 @@ function renderBentoHome() {
             <div class="v19-hero-metrics">
               <span class="v19-metric-chip"><strong>${c.topics}</strong> 药材课题</span>
               <span aria-hidden="true">·</span>
+              <span class="v19-metric-chip"><strong>6 大学科</strong> 知识全库</span>
+              <span aria-hidden="true">·</span>
               <span class="v19-metric-chip"><strong>${c.rigs} 套</strong> 交互装置</span>
               <span aria-hidden="true">·</span>
               <span class="v19-metric-chip"><strong>${c.literature} 篇</strong> 实证文献</span>
-              <span aria-hidden="true">·</span>
-              <span class="v19-metric-chip"><strong>KV 云草稿</strong> 自动同步</span>
             </div>
           </div>
 
@@ -381,6 +381,24 @@ function renderBentoHome() {
             </div>
             <div class="v19-card-foot"><span>徽章解锁 · JSON 档案导出</span><span>查看 ↗</span></div>
           </button>
+        </section>
+
+        <!-- 3. 六大学科知识库 & 实践资料汇编 8 册直达条（按需懒加载，不增加首屏负担） -->
+        <section class="v19-bento-strip" aria-label="中药学六大学科知识库与实践汇编">
+          <div class="v19-bento-strip-left">
+            <span class="v19-bento-tag"><span class="v19-bento-tag-dot"></span>📚 六大学科知识库 &amp; 实践汇编</span>
+            <button type="button" class="v19-bento-pill" data-kb-open="overview">六科总览 ↗</button>
+            <button type="button" class="v19-bento-pill" data-kb-open="handbook">实践汇编</button>
+            <button type="button" class="v19-bento-pill" data-kb-open="vol01">01 中药化学</button>
+            <button type="button" class="v19-bento-pill" data-kb-open="vol02">02 中药制剂</button>
+            <button type="button" class="v19-bento-pill" data-kb-open="vol03">03 制药工艺</button>
+            <button type="button" class="v19-bento-pill" data-kb-open="vol04">04 分析化学</button>
+            <button type="button" class="v19-bento-pill" data-kb-open="vol05">05 仪器分析</button>
+            <button type="button" class="v19-bento-pill" data-kb-open="vol06">06 制剂分析</button>
+          </div>
+          <div class="v19-bento-strip-actions">
+            <button type="button" class="v19-bento-pill" data-kb-open="overview" style="border-color:rgba(16,185,129,0.45);color:#047857">全文检索 8 册 · 60 速查表 →</button>
+          </div>
         </section>
       </div>`;
 

@@ -262,6 +262,7 @@ function mountBentoFabDock() {
   dock.innerHTML =
     '<div class="v22-fab-tray" id="v22FabTray" hidden>' +
       '<button type="button" class="v22-fab-btn accent" data-v22-open="vlab">🕹️ 3D 虚拟实验室</button>' +
+      '<button type="button" class="v22-fab-btn" data-kb-open="overview">📚 六科知识库</button>' +
       '<button type="button" class="v22-fab-btn" data-v22-open="fluid">🌊 流体仿真</button>' +
       '<button type="button" class="v22-fab-btn" data-v22-open="ar">📱 AR 药材卡</button>' +
       '<button type="button" class="v22-fab-btn" id="v22BtnPresent">🖥️ 投影模式</button>' +
@@ -282,6 +283,10 @@ function mountBentoFabDock() {
   dock.addEventListener('click', (e) => {
     if (e.target.closest('#v22FabToggle')) {
       setOpen(tray.hidden);
+      return;
+    }
+    if (e.target.closest('[data-kb-open]')) {
+      setOpen(false);
       return;
     }
     const openBtn = e.target.closest('[data-v22-open]');

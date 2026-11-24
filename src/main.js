@@ -26,3 +26,4 @@ import './routes/translation-loader.js';
 import './modules/v19-bento-home.js';
 import './routes/visual-suite-loader.js';
 import './routes/upgrade-suite-loader.js';
+import './routes/knowledge-hub-loader.js';
