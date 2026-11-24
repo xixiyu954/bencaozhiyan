@@ -1,0 +1,25 @@
+{
+  "name": "tcm-chemistry-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "本草智研 · 中药化学智能实验设计工作台（Vite 渐进式构建版）",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "analyze": "vite build"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.7.0",
+    "postcss": "^8.5.33",
+    "rollup-plugin-visualizer": "^5.14.0",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.1",
+    "html2canvas": "^1.4.1",
+    "lucide": "^0.460.0"
+  }
+}

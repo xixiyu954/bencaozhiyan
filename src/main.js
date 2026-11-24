@@ -1,0 +1,23 @@
+// 本草智研 · Vite 构建入口
+import './tailwind.css';
+import '../styles.css';
+import '../lab-v16-portal.css';
+
+import './lib/lucide-lite.js';
+import './lib/lazy-vendors.js';
+import '../lab-data-extra.js';
+import '../lab-data-v3.js';
+import './modules/lab-v4-spectroscopy.js';
+import './modules/lab-v5-encyclopedia.js';
+import '../lab-tools-v3.js';
+import '../lab-v6-pro.js';
+import '../lab-v7-media-pro.js';
+import '../lab-v9-data.js';
+import '../lab-v10-sandbox.js';
+import './routes/interactive-loaders.js';
+import '../lab-v14-course-diagrams.js';
+import '../cloud-ai.js';
+import '../app.js';
+import './modules/cloud-drafts.js';
+import '../lab-v16-portal.js';
+import './routes/translation-loader.js';

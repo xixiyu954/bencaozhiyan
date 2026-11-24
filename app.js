@@ -2009,6 +2009,7 @@
         mirror.customTopics[sessionDraftTopic.id] = sessionDraftTopic;
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(mirror));
+      window.dispatchEvent(new CustomEvent('tcm:draft-changed'));
     } catch (e) {}
   }
 
@@ -2885,15 +2886,34 @@
 
     document.getElementById('chartLimitLabel').textContent = `限度 ${stats.limit}%`;
     const ctx = document.getElementById('yieldChart');
-    if (ctx && typeof Chart !== 'undefined') {
-     const labels = ws.batches.map((_, i) => `批次${i + 1}`), vals = ws.batches.map(b => Number(b.mass) > 0 ? Number((b.crude / b.mass * 100).toFixed(2)) : 0); const colors = vals.map(v => v >= stats.limit ? 'rgba(15, 92, 84, 0.85)' : 'rgba(225, 29, 72, 0.75)'); const limitData = labels.map(() => stats.limit); if (yieldChartInstance && yieldChartInstance.canvas === ctx) { yieldChartInstance.data.labels = labels; yieldChartInstance.data.datasets[0].data = vals; yieldChartInstance.data.datasets[0].backgroundColor = colors; yieldChartInstance.data.datasets[1].label = `限度(${stats.limit}%)`; yieldChartInstance.data.datasets[1].data = limitData; yieldChartInstance.update('none'); } else { if (yieldChartInstance) yieldChartInstance.destroy();
-      
-      yieldChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: { labels, datasets: [{ label: '收率(%)', data: vals, backgroundColor: vals.map(v => v >= stats.limit ? 'rgba(15, 92, 84, 0.85)' : 'rgba(225, 29, 72, 0.75)'), borderRadius: 8, maxBarThickness: 38 }, { label: `限度(${stats.limit}%)`, type: 'line', data: labels.map(() => stats.limit), borderColor: '#e11d48', borderWidth: 2, borderDash: [5, 4], pointRadius: 0, fill: false }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } }
-      });
-    } }
+    if (ctx) {
+      const drawYieldChart = (ChartCtor) => {
+        if (!ChartCtor || !document.body.contains(ctx)) return;
+        const labels = ws.batches.map((_, i) => `批次${i + 1}`), vals = ws.batches.map(b => Number(b.mass) > 0 ? Number((b.crude / b.mass * 100).toFixed(2)) : 0);
+        const colors = vals.map(v => v >= stats.limit ? 'rgba(15, 92, 84, 0.85)' : 'rgba(225, 29, 72, 0.75)');
+        const limitData = labels.map(() => stats.limit);
+        if (yieldChartInstance && yieldChartInstance.canvas === ctx) {
+          yieldChartInstance.data.labels = labels;
+          yieldChartInstance.data.datasets[0].data = vals;
+          yieldChartInstance.data.datasets[0].backgroundColor = colors;
+          yieldChartInstance.data.datasets[1].label = `限度(${stats.limit}%)`;
+          yieldChartInstance.data.datasets[1].data = limitData;
+          yieldChartInstance.update('none');
+        } else {
+          if (yieldChartInstance) yieldChartInstance.destroy();
+          yieldChartInstance = new ChartCtor(ctx, {
+            type: 'bar',
+            data: { labels, datasets: [{ label: '收率(%)', data: vals, backgroundColor: colors, borderRadius: 8, maxBarThickness: 38 }, { label: `限度(${stats.limit}%)`, type: 'line', data: limitData, borderColor: '#e11d48', borderWidth: 2, borderDash: [5, 4], pointRadius: 0, fill: false }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } }
+          });
+        }
+      };
+      if (typeof Chart !== 'undefined') {
+        drawYieldChart(Chart);
+      } else if (window.TCM_LAZY_VENDORS && window.TCM_LAZY_VENDORS.loadChartJs) {
+        window.TCM_LAZY_VENDORS.loadChartJs().then(drawYieldChart).catch(() => {});
+      }
+    }
 
     document.getElementById('tlcFront').value = ws.tlc.front; document.getElementById('tlcSample').value = ws.tlc.sample; document.getElementById('tlcRef').value = ws.tlc.ref;
     document.getElementById('tlcSampleRf').textContent = stats.sampleRf !== null ? stats.sampleRf.toFixed(3) : '--'; document.getElementById('tlcRefRf').textContent = stats.refRf !== null ? stats.refRf.toFixed(3) : '--'; document.getElementById('tlcDeltaRf').textContent = stats.deltaRf !== null ? stats.deltaRf.toFixed(3) : '--'; const errEl = document.getElementById('tlcErrorMsg'); if (errEl) { if (!stats.tlcValid) { errEl.textContent = '参数非法：需满足 0 < 供试品/对照品位移 L ≤ 前沿位移 L₀（且 L₀ > 0）'; errEl.classList.remove('hidden'); } else { errEl.classList.add('hidden'); } }
@@ -3058,10 +3078,15 @@
 
   async function generateReportImage() {
     const mount = document.getElementById('printableReportMount');
-    if (typeof html2canvas === 'undefined') { showToast('长图组件加载中，请稍候或使用复制全文', 'error'); return; }
-    showToast('正在生成高清报告长图...', 'info');
+    showToast('正在加载长图引擎并生成高清报告...', 'info');
     try {
-      const canvas = await html2canvas(mount, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+      const h2c = typeof html2canvas !== 'undefined'
+        ? html2canvas
+        : (window.TCM_LAZY_VENDORS && window.TCM_LAZY_VENDORS.loadHtml2Canvas
+            ? await window.TCM_LAZY_VENDORS.loadHtml2Canvas()
+            : null);
+      if (typeof h2c !== 'function') { showToast('长图组件加载失败，请使用复制全文或电脑打印', 'error'); return; }
+      const canvas = await h2c(mount, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
       const dataUrl = canvas.toDataURL('image/png');
       document.getElementById('generatedReportImg').src = dataUrl;
       const dl = document.getElementById('btnDownloadReportPng'); dl.href = dataUrl; dl.download = `中药化学_${getTopicDef().herb}_实验报告.png`;
@@ -4402,6 +4427,17 @@
       saveState();
       renderAll();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    exportDraftState: () => JSON.parse(JSON.stringify(state)),
+    importDraftState: (raw, silent) => {
+      if (!isRecord(raw) || typeof raw.activeTopicId !== 'string' || !raw.activeTopicId.trim()) return false;
+      const normalized = normalizeState(raw);
+      if (autoRunning) cancelActiveAI();
+      state = normalized;
+      saveState();
+      renderAll();
+      if (!silent) showToast('草稿存档已恢复');
+      return true;
     },
     showToast
   };

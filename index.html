@@ -2,8 +2,9 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>本草智研 · 中药化学智能实验设计工作台</title>
+  <link rel="canonical" href="https://bencaozhiyan-xixiyu.pages.dev/" />
   <meta name="description" content="本草智研（TCM Chemistry Lab Workbench）是面向高校药学与中药学专业的现代化智能实验设计工作台。内置 117 项高校与药企经典及创新药材实验题库、84 篇规范文献、15 套交互式动态仿真装置与自由组装实验沙盒，支持智能实验编排与规范报告一键导出。" />
   <meta name="keywords" content="中药化学, 实验设计, 智能工作台, 本草智研, 药学实验, 提取分离, 物理仿真, TLC薄层色谱, 实验报告, 中药提取分离" />
   <meta name="author" content="chenovo495666" />
@@ -18,18 +19,32 @@
   <meta property="og:title" content="本草智研 · 中药化学智能实验设计工作台" />
   <meta property="og:description" content="高校中药化学智能实验设计、工艺核算、物理动态仿真与报告一键导出工作台。" />
   <meta property="og:url" content="https://bencaozhiyan-xixiyu.pages.dev/" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "本草智研 · 中药化学智能实验设计工作台",
+    "alternateName": "TCM Chemistry Lab Workbench",
+    "url": "https://bencaozhiyan-xixiyu.pages.dev/",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Web",
+    "inLanguage": "zh-CN",
+    "isAccessibleForFree": true,
+    "description": "面向高校药学与中药学专业的现代化智能实验设计工作台，内置 119 项经典与创新药材实验题库、85 篇规范文献、15 套交互式动态仿真装置、八阶段中药产业转化训练主线及云端草稿同步功能。",
+    "featureList": [
+      "119 项高校与药企中药化学实验题库与药典标准对照",
+      "六步实验设计工坊与动态装置物理仿真",
+      "八阶段中药小试至中试产业转化训练主线",
+      "AI 辅助实验编排与规范 A4 实验报告一键导出",
+      "实验草稿云端同步与离线本地自动保存"
+    ],
+    "codeRepository": "https://github.com/xixiyu954/tcm-chemistry-lab"
+  }
+  </script>
   <!-- 站点图标与 PWA 清单 -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23062420'/%3E%3Ctext%20y='.75em'%20x='50%25'%20font-size='60'%20text-anchor='middle'%20dominant-baseline='central'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <!-- 全本地化同源依赖：零境外 CDN 依赖，同步加载核心样式/图表/图标避免空框与闪烁 -->
-  <script src="./vendor/tailwindcss-3.4.17.min.js"></script>
-  <script src="./vendor/chart-4.4.1.umd.min.js"></script>
-  <script src="./vendor/lucide-0.460.0.min.js"></script>
-  <script defer src="./vendor/html2canvas-1.4.1.min.js"></script>
-  <link rel="stylesheet" href="./styles.css?v=24" />
-  <link rel="stylesheet" href="./lab-v15-insight.css?v=16" />
-  <link rel="stylesheet" href="./lab-v16-portal.css?v=22" />
-  <link rel="stylesheet" href="./lab-v18-translation.css?v=2" />
+  <!-- 全本地化同源依赖：Tailwind 静态编译、Lucide 14 图标按需打包、Chart.js/html2canvas 按需动态 import，零 <head> 阻塞脚本 -->
   <style>.hidden{display:none!important}</style>
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col lg:flex-row antialiased pb-20 lg:pb-0">
@@ -1206,27 +1221,6 @@
   } catch (_) {}
 })();
 </script>
-<script src="./lab-data-extra.js?v=8"></script>
-<script src="./lab-data-v3.js?v=8"></script>
-<script src="./lab-v4-spectroscopy.js?v=8"></script>
-<script src="./lab-v5-encyclopedia.js?v=8"></script>
-<script src="./lab-tools-v3.js?v=8"></script>
-<script src="./lab-v6-pro.js?v=12"></script>
-<script src="./lab-v7-media-pro.js?v=11"></script>
-<script src="./lab-v9-data.js?v=22"></script>
-<script src="./lab-v8-studio.js?v=24"></script>
-<script src="./lab-v9-visuals.js?v=22"></script>
-<script src="./lab-v10-sandbox.js?v=22"></script>
-<script src="./lab-v11-userplan.js?v=23"></script>
-<script src="./lab-v12-diy-studio.js?v=22"></script>
-<script src="./lab-v13-mission-os.js?v=23"></script>
-<script src="./lab-v14-course-diagrams.js?v=22"></script>
-<script src="./cloud-ai.js?v=25"></script>
-<script src="./app.js?v=28"></script>
-<script src="./lab-v15-insight.js?v=19"></script>
-<script src="./lab-v16-portal.js?v=23"></script>
-<script src="./lab-v17-ai-review.js?v=18"></script>
-<script src="./lab-v18-translation-data.js?v=1"></script>
-<script src="./lab-v18-translation.js?v=2"></script>
+<script type="module" src="/src/main.js"></script>
 </body>
 </html>
