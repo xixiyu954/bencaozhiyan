@@ -127,8 +127,8 @@ export default defineConfig({
           if (id.includes('lab-v20-mol3d') || id.includes('lab-v21-spectra') || id.includes('lab-v22-visual-suite-pro.js') || id.includes('routes/visual-suite-chunk')) {
             return 'suite-visuals';
           }
-          if (id.includes('lab-v23-gameplay') || id.includes('lab-v24-gamification') || id.includes('lab-v25-ai-mentor') || id.includes('routes/upgrade-suite-chunk')) {
-            return 'suite-gameplay';
+          if (id.includes('lab-v24-gamification') || id.includes('routes/upgrade-suite-chunk')) {
+            return 'suite-gamification';
           }
         }
       }

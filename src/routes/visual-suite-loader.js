@@ -39,9 +39,7 @@ function mountBentoFabDock() {
     '<button type="button" class="v22-fab-btn" data-v22-open="fluid">🌊 流体仿真</button>' +
     '<button type="button" class="v22-fab-btn" data-v22-open="ar">📱 AR 药材卡</button>' +
     '<button type="button" class="v22-fab-btn" id="v22BtnPresent">🖥️ 投影模式</button>' +
-    '<button type="button" class="v22-fab-btn" id="v23BtnOpenPlay">🎮 配方沙盒 & 闯关</button>' +
-    '<button type="button" class="v22-fab-btn" id="v24BtnOpenGrowth">🏆 段位图鉴</button>' +
-    '<button type="button" class="v22-fab-btn" id="v25BtnOpenMentor">🧑‍🏫 问导师</button>';
+    '<button type="button" class="v22-fab-btn" id="v24BtnOpenGrowth">🏆 段位图鉴</button>';
 
   dock.addEventListener('click', (e) => {
     const openBtn = e.target.closest('[data-v22-open]');
@@ -54,16 +52,8 @@ function mountBentoFabDock() {
       window.TCM_V22_VISUAL_SUITE.togglePresentMode();
       return;
     }
-    if (e.target.closest('#v23BtnOpenPlay') && window.TCM_V23_GAMEPLAY) {
-      window.TCM_V23_GAMEPLAY.open('sandbox');
-      return;
-    }
     if (e.target.closest('#v24BtnOpenGrowth') && window.TCM_V24_GAMIFICATION) {
       window.TCM_V24_GAMIFICATION.open();
-      return;
-    }
-    if (e.target.closest('#v25BtnOpenMentor') && window.TCM_V25_MENTOR) {
-      window.TCM_V25_MENTOR.open();
     }
   });
   document.body.appendChild(dock);

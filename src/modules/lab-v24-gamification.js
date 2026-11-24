@@ -12,14 +12,10 @@ const RANKS = [
 ];
 
 const BADGES = [
-  { id: 'first_sandbox', icon: '🧪', name: '初出茅庐', desc: '完成首次自由配方沙盒推演' },
-  { id: 'zero_accident', icon: '🛡️', name: '零事故大师', desc: '在配方沙盒达成 90+ 分零事故方案' },
-  { id: 'green_pioneer', icon: '🌿', name: '绿色工艺先锋', desc: '绿色工艺评分达到 90 分以上' },
   { id: 'mol_explorer', icon: '🧬', name: '分子探索者', desc: '在 3D 分子结构库观察核心活性分子' },
-  { id: 'spectra_master', icon: '🌈', name: '识谱达人', desc: '体验交互式四谱工作站' },
-  { id: 'story_detective', icon: '🕵️', name: '药厂神探', desc: '破获至少 1 宗《药厂风云录》生产偏差案' },
-  { id: 'daily_streak', icon: '📅', name: '每日精进', desc: '答对每日一题工艺扰动挑战' },
-  { id: 'ask_mentor', icon: '🧑‍🏫', name: '寻师问道', desc: '向 AI 导师发起实验答疑或安全督察' }
+  { id: 'particle_player', icon: '💧', name: '显色实验员', desc: '在粒子级显色反应台完成检识模拟' },
+  { id: 'spectra_master', icon: '🌈', name: '识谱达人', desc: '体验交互式四谱工作站与峰位解析' },
+  { id: 'rig_collector', icon: '⚙️', name: '装置能手', desc: '在实验工坊或虚拟实验室操作核心装置' }
 ];
 
 const MOLECULE_ATLAS = [
@@ -91,37 +87,17 @@ export function recordEvent(detail = {}) {
       gained += 15;
       break;
     case 'particle_open':
-      gained += 10;
+      addBadge('particle_player');
+      gained += 15;
       break;
     case 'spectra_open':
       addBadge('spectra_master');
       gained += 15;
       break;
-    case 'sandbox_run':
-      addUnique(p.herbs, detail.herb);
-      addBadge('first_sandbox');
-      if (detail.zeroAccident && detail.score >= 90) addBadge('zero_accident');
-      if (detail.greenScore >= 90) addBadge('green_pioneer');
-      gained += detail.zeroAccident ? 30 : 15;
-      break;
-    case 'story_solved':
-      addUnique(p.cases, detail.caseId);
-      addBadge('story_detective');
-      gained += 40;
-      break;
-    case 'daily_pass':
-      addUnique(p.herbs, detail.herb);
-      addUnique(p.dailyDates, detail.date);
-      addBadge('daily_streak');
-      gained += 25;
-      break;
-    case 'mentor_ask':
-      addBadge('ask_mentor');
-      gained += 10;
-      break;
     case 'rig_used':
       addUnique(p.rigs, detail.rig);
-      gained += 10;
+      addBadge('rig_collector');
+      gained += 15;
       break;
     default:
       break;
