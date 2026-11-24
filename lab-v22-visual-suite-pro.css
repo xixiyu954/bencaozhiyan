@@ -1,0 +1,115 @@
+/* ==========================================================================
+   本草智研 v22 · 板块一深度补全样式（现代 Bento 风格）
+   覆盖：1.3 虚拟实验室 / 1.5 流体分层乳化 / 1.7 投影汇报模式 / 1.9 AR 药材卡
+   兼容 body.dark-lab、三档字号缩放与 A4 打印排版
+   ========================================================================== */
+
+.v22-fab-dock {
+  position: fixed;
+  left: 18px;
+  bottom: 22px;
+  z-index: 36;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: calc(100vw - 110px);
+}
+
+.v22-fab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: #0f172a;
+  font-size: 0.78rem;
+  font-weight: 800;
+  box-shadow: 0 10px 24px -8px rgba(15, 23, 42, 0.18);
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.v22-fab-btn:hover {
+  transform: translateY(-2px);
+  border-color: #10b981;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.v22-fab-btn.accent {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.v22-fab-btn.accent:hover {
+  background: linear-gradient(135deg, #047857, #059669);
+  color: #ffffff;
+}
+
+body.tcm-v22-present-mode #leftSidebar,
+body.tcm-v22-present-mode #rightVisualDock,
+body.tcm-v22-present-mode #tcmV19BentoStrip,
+body.tcm-v22-present-mode .v22-fab-dock,
+body.tcm-v22-present-mode footer {
+  display: none !important;
+}
+
+body.tcm-v22-present-mode > div.lg\:pl-72 {
+  padding-left: 0 !important;
+}
+
+body.tcm-v22-present-mode main {
+  font-size: 1.08em;
+}
+
+.v22-present-exit {
+  position: fixed;
+  right: 20px;
+  top: 72px;
+  z-index: 60;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+body.dark-lab .v22-fab-btn {
+  background: rgba(13, 38, 33, 0.92);
+  border-color: rgba(52, 211, 153, 0.25);
+  color: #e2f1ed;
+}
+
+body.dark-lab .v22-fab-btn:hover {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: #34d399;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .v22-fab-dock {
+    left: 12px;
+    bottom: 72px;
+    gap: 6px;
+  }
+  .v22-fab-btn {
+    padding: 6px 10px;
+    font-size: 0.72rem;
+  }
+}
+
+@media print {
+  .v22-fab-dock,
+  .v22-present-exit {
+    display: none !important;
+  }
+}
