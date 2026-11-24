@@ -6,30 +6,80 @@
 
 .v22-fab-dock {
   position: fixed;
-  left: 18px;
-  bottom: 22px;
+  right: 20px;
+  bottom: 20px;
   z-index: 36;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 8px;
-  max-width: calc(100vw - 110px);
+}
+
+.v22-fab-tray {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+  padding: 8px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 18px 38px -12px rgba(15, 23, 42, 0.22);
+}
+
+.v22-fab-tray[hidden] {
+  display: none !important;
+}
+
+.v22-fab-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  color: #0f172a;
+  font-size: 0.78rem;
+  font-weight: 800;
+  box-shadow: 0 10px 26px -8px rgba(15, 23, 42, 0.18);
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.v22-fab-toggle:hover,
+.v22-fab-dock.is-open .v22-fab-toggle {
+  transform: translateY(-2px);
+  border-color: rgba(16, 185, 129, 0.55);
+  box-shadow: 0 14px 30px -8px rgba(16, 185, 129, 0.28);
+}
+
+.v22-fab-toggle-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #34d399, #059669);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.22);
 }
 
 .v22-fab-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 13px;
+  padding: 7px 13px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(15, 23, 42, 0.08);
   color: #0f172a;
-  font-size: 0.78rem;
+  font-size: 0.77rem;
   font-weight: 800;
-  box-shadow: 0 10px 24px -8px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 4px 12px -6px rgba(15, 23, 42, 0.12);
   cursor: pointer;
+  white-space: nowrap;
   transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
 }
 
@@ -83,6 +133,8 @@ body.tcm-v22-present-mode main {
   cursor: pointer;
 }
 
+body.dark-lab .v22-fab-tray,
+body.dark-lab .v22-fab-toggle,
 body.dark-lab .v22-fab-btn {
   background: rgba(13, 38, 33, 0.92);
   border-color: rgba(52, 211, 153, 0.25);
@@ -97,9 +149,13 @@ body.dark-lab .v22-fab-btn:hover {
 
 @media (max-width: 768px) {
   .v22-fab-dock {
-    left: 12px;
-    bottom: 72px;
+    right: 12px;
+    bottom: 16px;
     gap: 6px;
+  }
+  .v22-fab-toggle {
+    padding: 7px 12px;
+    font-size: 0.72rem;
   }
   .v22-fab-btn {
     padding: 6px 10px;

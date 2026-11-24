@@ -240,7 +240,7 @@
           </p>
         </div>
         <div class="v16-footer-col">
-          <h6>工作区</h6>
+          <h3>工作区</h3>
           <div class="v16-footer-links">
             <button type="button" data-v16-go="home">首页</button>
             <button type="button" data-v16-go="bank">药材实验题库（${fc.topics} 项）</button>
@@ -251,7 +251,7 @@
           </div>
         </div>
         <div class="v16-footer-col">
-          <h6>常用工具</h6>
+          <h3>常用工具</h3>
           <div class="v16-footer-links">
             <button type="button" data-v16-trigger="v15">实验项目中枢与体检</button>
             <button type="button" data-v16-trigger="tr-dev">偏差调查与批间一致性</button>
@@ -262,7 +262,7 @@
           </div>
         </div>
         <div class="v16-footer-col">
-          <h6>开放资源</h6>
+          <h3>开放资源</h3>
           <div class="v16-footer-links">
             <a href="https://github.com/xixiyu954/tcm-chemistry-lab" target="_blank" rel="noopener noreferrer">GitHub 开源仓库 ↗</a>
             <a href="https://ydz.chp.org.cn/" target="_blank" rel="noopener noreferrer">《中国药典》2025 年版在线检索 ↗</a>

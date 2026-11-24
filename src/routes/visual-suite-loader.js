@@ -35,27 +35,52 @@ function mountBentoFabDock() {
   dock.id = 'tcmV22FabDock';
   dock.className = 'v22-fab-dock no-print';
   dock.innerHTML =
-    '<button type="button" class="v22-fab-btn accent" data-v22-open="vlab">🕹️ 虚拟实验室</button>' +
-    '<button type="button" class="v22-fab-btn" data-v22-open="fluid">🌊 流体仿真</button>' +
-    '<button type="button" class="v22-fab-btn" data-v22-open="ar">📱 AR 药材卡</button>' +
-    '<button type="button" class="v22-fab-btn" id="v22BtnPresent">🖥️ 投影模式</button>' +
-    '<button type="button" class="v22-fab-btn" id="v24BtnOpenGrowth">🏆 段位图鉴</button>';
+    '<div class="v22-fab-tray" id="v22FabTray" hidden>' +
+      '<button type="button" class="v22-fab-btn accent" data-v22-open="vlab">🕹️ 虚拟实验室</button>' +
+      '<button type="button" class="v22-fab-btn" data-v22-open="fluid">🌊 流体仿真</button>' +
+      '<button type="button" class="v22-fab-btn" data-v22-open="ar">📱 AR 药材卡</button>' +
+      '<button type="button" class="v22-fab-btn" id="v22BtnPresent">🖥️ 投影模式</button>' +
+      '<button type="button" class="v22-fab-btn" id="v24BtnOpenGrowth">🏆 段位图鉴</button>' +
+    '</div>' +
+    '<button type="button" class="v22-fab-toggle" id="v22FabToggle" aria-expanded="false" aria-controls="v22FabTray">' +
+      '<span class="v22-fab-toggle-dot" aria-hidden="true"></span><span>扩展舱</span>' +
+    '</button>';
+
+  const tray = dock.querySelector('#v22FabTray');
+  const toggleBtn = dock.querySelector('#v22FabToggle');
+  const setOpen = (open) => {
+    tray.hidden = !open;
+    dock.classList.toggle('is-open', open);
+    toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
 
   dock.addEventListener('click', (e) => {
+    if (e.target.closest('#v22FabToggle')) {
+      setOpen(tray.hidden);
+      return;
+    }
     const openBtn = e.target.closest('[data-v22-open]');
     if (openBtn) {
       const tab = openBtn.getAttribute('data-v22-open');
+      setOpen(false);
       window.TCM_V22_VISUAL_SUITE.open(tab);
       return;
     }
     if (e.target.closest('#v22BtnPresent')) {
+      setOpen(false);
       window.TCM_V22_VISUAL_SUITE.togglePresentMode();
       return;
     }
     if (e.target.closest('#v24BtnOpenGrowth') && window.TCM_V24_GAMIFICATION) {
+      setOpen(false);
       window.TCM_V24_GAMIFICATION.open();
     }
   });
+
+  document.addEventListener('click', (e) => {
+    if (!tray.hidden && !dock.contains(e.target)) setOpen(false);
+  });
+
   document.body.appendChild(dock);
 }
 

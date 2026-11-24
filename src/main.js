@@ -23,6 +23,6 @@ import '../app.js';
 import './modules/cloud-drafts.js';
 import '../lab-v16-portal.js';
 import './routes/translation-loader.js';
-import '../lab-v19-theme-guofeng.js';
+import './modules/v19-bento-home.js';
 import './routes/visual-suite-loader.js';
 import './routes/upgrade-suite-loader.js';

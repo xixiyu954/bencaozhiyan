@@ -1094,6 +1094,7 @@ header button#btnOpenQwenCfgTop {
   padding: 28px 0 20px;
   border-bottom: 1px solid var(--ds-line);
 }
+.v16-footer-col h3,
 .v16-footer-col h6 {
   margin: 0 0 10px;
   font-size: 0.8rem;
