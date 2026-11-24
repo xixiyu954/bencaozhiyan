@@ -18,6 +18,8 @@ import '../lab-v9-data.js';
 import '../lab-v10-sandbox.js';
 import './routes/interactive-loaders.js';
 import '../lab-v14-course-diagrams.js';
+import './modules/lab-data-v27-kb-topics.js';
+import './modules/lab-v27-bank-enrich.js';
 import '../cloud-ai.js';
 import '../app.js';
 import './modules/cloud-drafts.js';

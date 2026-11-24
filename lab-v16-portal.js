@@ -17,7 +17,7 @@
   let currentRoute = 'home'; // 'home' | 'bank' | 'ai' | 'diy' | 'workflow'
   let aiSubTab = 'compose';  // 'compose' | 'plan' | 'chat'
   let diySubTab = 'studio';  // 'studio' | 'mission' | 'hub' | 'tools'
-  let bankState = { tab: 'all', cat: '全部', scene: 'all', query: '', previewId: '' };
+  let bankState = { tab: 'all', cat: '全部', scene: 'all', sort: 'default', detailTab: 'chem', query: '', previewId: '' };
   let extensions = [];
   let inited = false;
 
@@ -476,27 +476,49 @@
     `;
   }
 
-  // ---------- 5. 渲染：独立题库走向页 (BANK) ----------
+  // ---------- 5. 渲染：独立题库走向页 (BANK · 六大学科深度增强版) ----------
   function filterBankTopics(all) {
     const q = (bankState.query || '').trim().toLowerCase();
-    return all.filter(item => {
+    const enrich = window.TCM_BANK_ENRICH;
+    const favs = enrich ? enrich.getFavorites() : new Set();
+
+    const matched = all.filter(item => {
       if (bankState.tab === 'class' && item.group !== 'class') return false;
       if (bankState.tab === 'innovative' && item.group !== 'innovative') return false;
+      if (bankState.tab === 'kbnew' && !item.isKbNew) return false;
+      if (bankState.tab === 'fav' && !favs.has(item.id)) return false;
       if (bankState.tab === 'custom' && !item._isCustom) return false;
       if (bankState.cat !== '全部' && (item.category || '') !== bankState.cat) return false;
       if (bankState.scene !== 'all') {
-        const hay = `${item.herb || ''} ${item.compound || ''} ${item.category || ''} ${item.track || ''} ${item.origin || ''} ${(item.tags || []).join(' ')}`;
+        const hydrated = (api() && api().getTopicById) ? api().getTopicById(item.id) : item;
+        const hay = `${hydrated.herb || ''} ${hydrated.compound || ''} ${hydrated.category || ''} ${hydrated.sourceTag || ''} ${hydrated.origin || ''} ${hydrated.integrative || ''} ${(hydrated.tags || []).join(' ')}`;
         if (bankState.scene === 'undergrad' && item.group !== 'class') return false;
         if (bankState.scene === 'compound' && !/复方|汤|散|丸|方/.test(hay)) return false;
         if (bankState.scene === 'green' && !/绿色|NADES|水提|低共熔|超声|微波|超临界/.test(hay)) return false;
-        if (bankState.scene === 'process' && !/炮制|醋炙|炙|炒|杀酶|对照/.test(hay)) return false;
+        if (bankState.scene === 'process' && !/炮制|醋炙|炙|炒|杀酶|对照|减毒|砂烫/.test(hay)) return false;
+        if (bankState.scene === 'mol3d' && !(enrich && enrich.hasMol3d(hydrated))) return false;
+        if (bankState.scene === 'eastwest' && !(enrich && enrich.isEastWest(hydrated))) return false;
       }
       if (q) {
-        const hay = `${item.herb || ''} ${item.compound || ''} ${item.category || ''} ${item.latin || ''} ${item.origin || ''} ${item.chemistry || item.chem || ''}`.toLowerCase();
+        const hydrated = (api() && api().getTopicById) ? api().getTopicById(item.id) : item;
+        const prof = enrich ? enrich.getProfile(hydrated) : null;
+        const hay = `${hydrated.herb || ''} ${hydrated.compound || ''} ${hydrated.category || ''} ${hydrated.latin || ''} ${hydrated.origin || ''} ${hydrated.chemistry || hydrated.chem || ''} ${hydrated.sourceTag || ''} ${prof ? prof.biosyn : ''}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
+
+    if (bankState.sort === 'limit') {
+      return [...matched].sort((a, b) => {
+        const ha = (api() && api().getTopicById) ? api().getTopicById(a.id) : a;
+        const hb = (api() && api().getTopicById) ? api().getTopicById(b.id) : b;
+        return (Number(hb.limitVal) || 0) - (Number(ha.limitVal) || 0);
+      });
+    }
+    if (bankState.sort === 'name') {
+      return [...matched].sort((a, b) => String(a.herb || '').localeCompare(String(b.herb || ''), 'zh-CN'));
+    }
+    return matched;
   }
 
   function computeBankData() {
@@ -512,34 +534,166 @@
     return { all, cats, filtered, cur, preview, layman };
   }
 
+  function buildPreviewDetailBody(preview, layman, prof, enrich) {
+    const tab = bankState.detailTab || 'chem';
+    const molReg = window.TCM_MOL3D_REGISTRY;
+    const rawChem = esc(preview.chemistry || preview.chem || `${preview.compound || ''}（${preview.category || '中药化学'}）`);
+    const linkedChem = molReg ? molReg.linkifyHtml(rawChem) : rawChem;
+    const molMatches = molReg ? molReg.matchAll(`${preview.herb || ''} ${preview.compound || ''} ${preview.chemistry || ''}`) : [];
+
+    if (tab === 'process') {
+      const cfg = preview.defaultCfg || {};
+      return `
+        <div class="v27-bank-kv-grid">
+          <div class="v27-bank-kv"><small>推荐溶剂</small><strong>${esc(cfg.solventType || '70% 乙醇 / 水')}</strong></div>
+          <div class="v27-bank-kv"><small>参考温时</small><strong>${esc(cfg.temp || 75)}℃ · ${esc(cfg.time || 60)} min</strong></div>
+          <div class="v27-bank-kv"><small>料液比/次数</small><strong>1:${esc(cfg.ratio || 10)} · ${esc(cfg.cycles || 2)} 次</strong></div>
+        </div>
+        <div class="v16-preview-block">
+          <label>03 中药制药工艺 · 提取纯化与放大要点</label>
+          <p>${esc(prof.process)}</p>
+        </div>
+        <div class="v16-preview-block">
+          <label>02 中药制剂 · 剂型适配与增溶/防潮策略</label>
+          <p>${esc(prof.formulation)}</p>
+        </div>
+        ${preview.integrative ? `<div class="v16-preview-block v16-preview-layman"><label>实验设计拓展思路</label><p>${esc(preview.integrative)}</p></div>` : ''}
+        <div class="v27-kb-link-row">
+          <button type="button" class="v27-kb-mini-link" data-kb-open="vol03" data-kb-sec="s3">📖 03 制药工艺 · 提取与放大 ↗</button>
+          <button type="button" class="v27-kb-mini-link" data-kb-open="vol02" data-kb-sec="s5">📖 02 中药制剂 · 原料难题 ↗</button>
+        </div>`;
+    }
+
+    if (tab === 'analysis') {
+      const specCat = /生物碱/.test(preview.category || '') ? '生物碱' : (/蒽醌|醌/.test(preview.category || '') ? '蒽醌与醌类' : '黄酮');
+      return `
+        <div class="v16-preview-block">
+          <label>2025 版药典质控参考${preview.limitVal ? `（限度 ≥ ${esc(preview.limitVal)}${esc(preview.limitUnit || '%')}）` : ''}</label>
+          <p>${esc(preview.pharmacopoeia || preview.pharm || '请参照现行版《中国药典》一部')}</p>
+        </div>
+        ${preview.tlcSystem ? `<div class="v16-preview-block"><label>TLC 薄层鉴别展开系统</label><p>${esc(preview.tlcSystem)}</p></div>` : ''}
+        <div class="v16-preview-block">
+          <label>05 仪器分析 · UV / IR / NMR / MS / 色谱特征</label>
+          <p>${esc(prof.instrument)}</p>
+        </div>
+        <div class="v16-preview-block">
+          <label>04 分析化学 &amp; 06 制剂分析 · 方法学与质控要点</label>
+          <p>${esc(prof.analytical)} ${esc(prof.qc)}</p>
+        </div>
+        <div class="v27-kb-link-row">
+          <button type="button" class="v27-kb-mini-link accent" data-v27-open-spectra="${esc(specCat)}">🌈 启动交互式四谱工作站 ↗</button>
+          <button type="button" class="v27-kb-mini-link" data-kb-open="vol05" data-kb-sec="s5">📖 05 仪器分析 · NMR/MS ↗</button>
+          <button type="button" class="v27-kb-mini-link" data-kb-open="vol06" data-kb-sec="s6">📖 06 制剂分析 · 含量/QAMS ↗</button>
+        </div>`;
+    }
+
+    if (tab === 'refs') {
+      const urls = enrich ? enrich.getSearchUrls(preview) : { cnki: 'https://kns.cnki.net/', wanfang: 'https://s.wanfangdata.com.cn/', pubmed: 'https://pubmed.ncbi.nlm.nih.gov/', chp: 'https://ydz.chp.org.cn/' };
+      const relLit = enrich ? enrich.findRelatedLit(preview, 4) : [];
+      return `
+        <div class="v16-preview-block">
+          <label>一键直达权威数据库（已预组本药材关键词）</label>
+          <div class="grid grid-cols-4 gap-1.5 pt-1">
+            <a href="${urls.cnki}" target="_blank" rel="noopener noreferrer" class="v27-ext-db-link">知网 ↗</a>
+            <a href="${urls.wanfang}" target="_blank" rel="noopener noreferrer" class="v27-ext-db-link">万方 ↗</a>
+            <a href="${urls.pubmed}" target="_blank" rel="noopener noreferrer" class="v27-ext-db-link sky">PubMed ↗</a>
+            <a href="${urls.chp}" target="_blank" rel="noopener noreferrer" class="v27-ext-db-link amber">2025药典 ↗</a>
+          </div>
+        </div>
+        <div class="v16-preview-block">
+          <label>关联六大学科知识库直达</label>
+          <div class="v27-kb-link-row pt-1">
+            ${(prof.kbLinks || []).map(l => `<button type="button" class="v27-kb-mini-link" data-kb-open="${esc(l.book)}" data-kb-sec="${esc(l.sec)}">📖 ${esc(l.label)} ↗</button>`).join('')}
+            <button type="button" class="v27-kb-mini-link" data-kb-open="handbook" data-kb-sec="hb-s1">📘 实践资料汇编 ↗</button>
+          </div>
+        </div>
+        <div class="v16-preview-block">
+          <label>平台关联实证文献（${relLit.length} 篇）</label>
+          <div class="space-y-1.5 pt-1">
+            ${relLit.length ? relLit.map(r => `<div class="v27-lit-mini"><span class="v27-lit-cat">${esc(r.cat || '文献')}</span>${esc(r.text)}</div>`).join('') : '<p>点击上方知网/PubMed 按钮检索最新文献。</p>'}
+          </div>
+        </div>`;
+    }
+
+    // Default tab: 'chem' (概要与化学)
+    return `
+      ${layman ? `
+        <div class="v16-preview-block v16-preview-layman">
+          <label>实验关键与成分特性</label>
+          <p>${esc(layman)}</p>
+        </div>
+      ` : ''}
+      <div class="v16-preview-block"><label>基原与性味</label><p>${esc(preview.origin || '暂未填写')}</p></div>
+      <div class="v16-preview-block">
+        <label>核心化学成分（点击 🧬 成分名看 3D 构象）</label>
+        <p>${linkedChem}</p>
+        ${molMatches.length ? `<div class="flex flex-wrap gap-1.5 pt-2">${molMatches.map(m => `<button type="button" class="tcm-mol3d-link" data-mol3d-open="${m.key}" style="padding:3px 9px;font-size:0.74rem">🧬 查看 ${esc(m.label)} 3D 模型 →</button>`).join('')}</div>` : ''}
+      </div>
+      <div class="v16-preview-block">
+        <label>01 中药化学 · 生物合成（${esc(prof.biosyn)}）与分离推导</label>
+        <p>${esc(prof.biosynDetail)} ${esc(prof.chemSep)}</p>
+      </div>
+      <div class="v27-kb-link-row">
+        <button type="button" class="v27-kb-mini-link" data-kb-open="${esc((prof.kbLinks && prof.kbLinks[0] && prof.kbLinks[0].book) || 'vol01')}" data-kb-sec="${esc((prof.kbLinks && prof.kbLinks[0] && prof.kbLinks[0].sec) || 's1')}">📖 ${esc((prof.kbLinks && prof.kbLinks[0] && prof.kbLinks[0].label) || '01 中药化学精讲')} ↗</button>
+        <button type="button" class="v27-kb-mini-link" data-kb-open="overview">🗺️ 六大学科逻辑图 ↗</button>
+      </div>`;
+  }
+
   function buildBankResultsHtml(filtered, cur, preview, layman) {
+    const enrich = window.TCM_BANK_ENRICH;
+    const favs = enrich ? enrich.getFavorites() : new Set();
+    const prof = enrich ? enrich.getProfile(preview) : { biosyn: '天然产物途径', biosynDetail: '', chemSep: '', formulation: '', process: '', analytical: '', instrument: '', qc: '', kbLinks: [] };
+    const isPreviewFav = favs.has(preview.id);
+    const hasFilter = bankState.query || bankState.cat !== '全部' || bankState.scene !== 'all' || bankState.tab !== 'all' || bankState.sort !== 'default';
+
     return `
         <div class="space-y-3">
-          <div class="flex items-center justify-between text-xs" style="color:var(--ds-muted)">
-            <span>当前筛选命中 <strong style="color:var(--ds-ink)">${filtered.length}</strong> 项课题（点击卡片右侧实时预览）</span>
-            ${bankState.query || bankState.cat !== '全部' || bankState.scene !== 'all' || bankState.tab !== 'all'
-              ? '<button type="button" id="v16BankReset" class="v16-chip-btn">重置筛选</button>' : ''}
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs" style="color:var(--ds-muted)">
+            <span>当前筛选命中 <strong style="color:var(--ds-ink)">${filtered.length}</strong> 项课题（点击卡片右侧切换六大学科档案）</span>
+            <div class="flex items-center gap-2">
+              <label class="inline-flex items-center gap-1.5 text-[11px] font-bold">
+                <span>排序</span>
+                <select id="v16BankSort" class="v27-bank-sort-select">
+                  <option value="default" ${bankState.sort === 'default' ? 'selected' : ''}>默认推荐</option>
+                  <option value="limit" ${bankState.sort === 'limit' ? 'selected' : ''}>药典限度 ↓</option>
+                  <option value="name" ${bankState.sort === 'name' ? 'selected' : ''}>按药材名称</option>
+                </select>
+              </label>
+              ${hasFilter ? '<button type="button" id="v16BankReset" class="v16-chip-btn">重置筛选</button>' : ''}
+            </div>
           </div>
           ${filtered.length ? `
             <div class="v16-bank-grid">
               ${filtered.map(item => {
                 const isSel = item.id === bankState.previewId;
                 const isActive = item.id === cur.id;
+                const isFav = favs.has(item.id);
                 const hydrated = (api() && api().getTopicById) ? api().getTopicById(item.id) : item;
+                const itemProf = enrich ? enrich.getProfile(hydrated) : null;
+                const itemHas3d = enrich ? enrich.hasMol3d(hydrated) : false;
                 const cardSummary = hydrated.origin || hydrated.chemistry || `${item.latin ? item.latin + ' · ' : ''}主攻成分：${item.compound || '活性成分'}`;
+                const badgeText = item._isCustom ? '🤖 自定义/AI' : (item.isKbNew ? '📘 六科新增' : (item.group === 'class' ? '★ 高校经典' : '✨ 创新前沿'));
                 return `
-                  <button type="button" class="v16-topic-card ${isSel ? 'selected' : ''}" data-v16-preview="${esc(item.id)}">
+                  <div class="v16-topic-card ${isSel ? 'selected' : ''}" data-v16-preview="${esc(item.id)}" role="button" tabindex="0">
                     <div class="v16-topic-head">
-                      <span class="v16-topic-herb">${esc(item.herb)}${isActive ? ' <span style="font-size:0.68rem;color:var(--ds-emerald)">● 当前</span>' : ''}</span>
-                      <span class="v16-topic-cat">${esc(item.category || '中药化学')}</span>
+                      <span class="v16-topic-herb">${esc(item.herb)}${isActive ? ' <span class="v27-active-pill">当前</span>' : ''}</span>
+                      <div class="flex items-center gap-1 shrink-0">
+                        <span class="v16-topic-cat">${esc(item.category || '中药化学')}</span>
+                        <button type="button" class="v27-fav-btn ${isFav ? 'on' : ''}" data-v27-fav="${esc(item.id)}" title="${isFav ? '取消收藏' : '收藏课题'}" aria-label="收藏课题">${isFav ? '★' : '☆'}</button>
+                      </div>
                     </div>
                     <div class="v16-topic-comp">🎯 ${window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(esc(item.compound || '核心活性成分'), { inlineSpan: true }) : esc(item.compound || '核心活性成分')}</div>
+                    <div class="v27-card-micro-tags">
+                      ${itemProf ? `<span class="v27-micro-pill">${esc(itemProf.biosyn)}</span>` : ''}
+                      ${itemHas3d ? '<span class="v27-micro-pill mint">🧬 3D构象</span>' : ''}
+                      ${hydrated.limitVal ? `<span class="v27-micro-pill">限度≥${esc(hydrated.limitVal)}${esc(hydrated.limitUnit || '%')}</span>` : ''}
+                    </div>
                     <div class="v16-topic-note">${esc(cardSummary)}</div>
                     <div class="v16-topic-foot">
-                      <span>${item._isCustom ? '🤖 自定义/AI' : (item.group === 'class' ? '★ 高校经典' : '✨ 创新前沿')}</span>
-                      <span style="color:var(--ds-primary-2);font-weight:800">${isSel ? '右侧预览中' : '查看档案 →'}</span>
+                      <span>${badgeText}</span>
+                      <span style="color:var(--ds-primary-2);font-weight:800">${isSel ? '右侧档案预览中' : '六科档案 →'}</span>
                     </div>
-                  </button>
+                  </div>
                 `;
               }).join('')}
             </div>
@@ -556,43 +710,44 @@
           `}
         </div>
 
-        <!-- 右侧固定档案预览卡 -->
+        <!-- 右侧固定六大学科全链路档案卡 -->
         <aside class="v16-bank-preview">
           <div class="flex items-start justify-between gap-2">
-            <div>
-              <div class="v16-sec-kicker">药材档案</div>
-              <h3 style="margin:4px 0 2px;font-size:1.25rem;font-weight:900;color:var(--ds-ink)">${esc(preview.herb)} · ${window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(esc(preview.compound)) : esc(preview.compound)}</h3>
-              <div style="font-size:0.76rem;color:var(--ds-muted);font-style:italic">${esc(preview.latin || '')}</div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="v16-sec-kicker">六大学科药材档案</span>
+                <span class="v27-micro-pill">${esc(prof.biosyn)}</span>
+              </div>
+              <h3 style="margin:5px 0 2px;font-size:1.18rem;font-weight:900;color:var(--ds-ink)">${esc(preview.herb)} · ${window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(esc(preview.compound)) : esc(preview.compound)}</h3>
+              <div style="font-size:0.75rem;color:var(--ds-muted);font-style:italic">${esc(preview.latin || '')}</div>
             </div>
-            <span class="v16-topic-cat">${esc(preview.category || '中药化学')}</span>
+            <div class="flex flex-col items-end gap-1.5 shrink-0">
+              <span class="v16-topic-cat">${esc(preview.category || '中药化学')}</span>
+              <button type="button" class="v27-fav-pill ${isPreviewFav ? 'on' : ''}" data-v27-fav="${esc(preview.id)}">${isPreviewFav ? '★ 已收藏' : '☆ 收藏'}</button>
+            </div>
           </div>
 
-          ${layman ? `
-            <div class="v16-preview-block v16-preview-layman">
-              <label>实验关键与成分特性</label>
-              <p>${esc(layman)}</p>
-            </div>
-          ` : ''}
-          <div class="v16-preview-block"><label>基原与性味</label><p>${esc(preview.origin || '暂未填写')}</p></div>
-          <div class="v16-preview-block"><label>核心化学成分（点击成分名看 3D 构象）</label><p>${(() => {
-            const raw = esc(preview.chemistry || preview.chem || `${preview.compound || ''}（${preview.category || '中药化学'}）`);
-            return window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(raw) : raw;
-          })()}</p>${(() => {
-            const reg = window.TCM_MOL3D_REGISTRY;
-            if (!reg) return '';
-            const matches = reg.matchAll(`${preview.herb || ''} ${preview.compound || ''} ${preview.chemistry || ''}`);
-            if (!matches.length) return '';
-            return `<div class="flex flex-wrap gap-1.5 pt-2">${matches.map(m => `<button type="button" class="tcm-mol3d-link" data-mol3d-open="${m.key}" style="padding:3px 9px;font-size:0.74rem">🧬 查看 ${esc(m.label)} 3D 模型 →</button>`).join('')}</div>`;
-          })()}</div>
-          <div class="v16-preview-block"><label>药典与质控参考${preview.limitVal ? `（限度 ≥ ${esc(preview.limitVal)}${esc(preview.limitUnit || '%')}）` : ''}</label><p>${esc(preview.pharmacopoeia || preview.pharm || '请参照现行版《中国药典》一部')}</p></div>
+          <!-- 4 标签六学科深度视角切换 -->
+          <div class="v27-detail-tabs" role="tablist" aria-label="药材六大学科档案维度">
+            ${[
+              ['chem', '概要与化学'],
+              ['process', '工艺与制剂'],
+              ['analysis', '分析与质控'],
+              ['refs', '文献与知识库']
+            ].map(([k, lbl]) => `<button type="button" role="tab" aria-selected="${bankState.detailTab === k ? 'true' : 'false'}" class="v27-detail-tab ${bankState.detailTab === k ? 'active' : ''}" data-v27-detail-tab="${k}">${lbl}</button>`).join('')}
+          </div>
 
-          <div class="flex flex-col gap-2 pt-1">
-            <button type="button" class="v16-btn-cta-primary" style="width:100%;justify-content:center;padding:12px 16px;font-size:0.86rem" data-v16-lock-topic="${esc(preview.id)}" data-v16-target-step="2">
+          <div class="space-y-2.5">
+            ${buildPreviewDetailBody(preview, layman, prof, enrich)}
+          </div>
+
+          <div class="flex flex-col gap-2 pt-2 border-t border-slate-200/70">
+            <button type="button" class="v16-btn-cta-primary" style="width:100%;justify-content:center;padding:11px 16px;font-size:0.86rem" data-v16-lock-topic="${esc(preview.id)}" data-v16-target-step="2">
               选定该药材，配置题目与参数 →
             </button>
             <div class="grid grid-cols-2 gap-2">
               <button type="button" class="v16-chip-btn justify-center py-2" data-v16-lock-topic="${esc(preview.id)}" data-v16-target-step="1">从第 1 步开始</button>
-              <button type="button" class="v16-chip-btn gold justify-center py-2" data-v16-ai-herb="${esc(preview.herb)}" data-v16-ai-comp="${esc(preview.compound)}">智能定制方案</button>
+              <button type="button" class="v16-chip-btn gold justify-center py-2" data-v16-ai-herb="${esc(preview.herb)}" data-v16-ai-comp="${esc(preview.compound)}">✨ 智能定制方案</button>
             </div>
             <button type="button" class="v16-chip-btn justify-center py-2" style="width:100%;border-color:rgba(4,120,87,0.35);color:#065f46;background:rgba(236,253,245,0.65)" data-v16-to-translation="${esc(preview.id)}">
               🏭 转入产业转化研究（剂型 / 放大 / 质控）→
@@ -610,21 +765,36 @@
     }
     const { filtered, cur, preview, layman } = computeBankData();
     layout.innerHTML = buildBankResultsHtml(filtered, cur, preview, layman);
+    bindBankSortControl();
+  }
+
+  function bindBankSortControl() {
+    const sel = document.getElementById('v16BankSort');
+    if (!sel || sel.dataset.bound === '1') return;
+    sel.dataset.bound = '1';
+    sel.addEventListener('change', () => {
+      bankState.sort = sel.value || 'default';
+      updateBankResultsOnly();
+    });
   }
 
   function renderBank() {
     const mount = document.getElementById('v16BankPage');
     if (!mount) return;
     const { all, cats, filtered, cur, preview, layman } = computeBankData();
+    const enrich = window.TCM_BANK_ENRICH;
+    const favCount = enrich ? enrich.getFavorites().size : 0;
+    const kbNewCount = all.filter(x => x.isKbNew).length;
 
     mount.innerHTML = `
       <div class="v16-subhero">
         <div class="v16-subhero-top">
           <div>
-            <h2>药材实验题库（${all.length} 项）</h2>
-            <p>按成分大类、实验场景或关键词筛选药材，右侧同步查看基原、化学成分、药典标准与实验要点。</p>
+            <h2>药材实验题库（${all.length} 项 · 六大学科全链路版）</h2>
+            <p>整合 6 大学科知识库、2025 版中国药典、PubChem 3D 分子与实践汇编；支持成分/生物合成途径检索、收藏对比与章节直达。</p>
           </div>
           <div class="flex flex-wrap gap-2">
+            <button type="button" class="v16-chip-btn" style="border-color:rgba(16,185,129,0.45);color:#047857" data-kb-open="vol01">📚 六科知识库 ↗</button>
             <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">自编课题审核</button>
             <button type="button" class="v16-chip-btn" data-v16-trigger="diy-herb">+ 新建自定义药材</button>
             <button type="button" class="v16-chip-btn" data-v16-trigger="compare">对比课题</button>
@@ -635,14 +805,16 @@
         <div class="v16-bank-controls">
           <div class="v16-search-wrap">
             <span class="v16-search-icon">⌕</span>
-            <input id="v16BankSearch" type="text" value="${esc(bankState.query)}" placeholder="搜索药材名、目标成分、化学大类或工艺关键词（如：黄芩、芦丁、小檗碱、复方）..." />
+            <input id="v16BankSearch" type="text" value="${esc(bankState.query)}" placeholder="搜索药材名、目标成分、生物合成途径、炮制或工艺关键词（如：附子、水飞蓟、绿原酸、QAMS）..." />
           </div>
           <div class="v16-seg-bar">
             ${[
               ['all', `全部 (${all.length})`],
+              ['kbnew', `📘 六科新增 (${kbNewCount})`],
               ['class', '经典必做'],
               ['innovative', '创新拓展'],
-              ['custom', `已过审自编 (${(api()?.getCounts?.().approvedAi) || 0})`]
+              ['fav', `★ 收藏 (${favCount})`],
+              ['custom', `自编 (${(api()?.getCounts?.().approvedAi) || 0})`]
             ].map(([k, lbl]) => `<button type="button" class="v16-seg-btn ${bankState.tab === k ? 'active' : ''}" data-v16-bank-tab="${k}">${lbl}</button>`).join('')}
           </div>
         </div>
@@ -654,10 +826,12 @@
           <div class="v16-pill-row">
             ${[
               ['all', '全部场景'],
+              ['mol3d', '🧬 含 3D 分子'],
               ['undergrad', '🎓 本科经典'],
               ['compound', '🏺 经典复方'],
               ['green', '🌿 绿色工艺'],
-              ['process', '🔥 炮制对照']
+              ['process', '🔥 炮制对照'],
+              ['eastwest', '🔬 中西医对照']
             ].map(([sc, lbl]) => `<button type="button" class="v16-filter-pill ${bankState.scene === sc ? 'active' : ''}" data-v16-bank-scene="${sc}">${lbl}</button>`).join('')}
           </div>
         </div>
@@ -667,6 +841,7 @@
         ${buildBankResultsHtml(filtered, cur, preview, layman)}
       </div>
     `;
+    bindBankSortControl();
 
     // 绑定搜索框（兼容桌面与移动端中文输入法，不销毁输入框 DOM）
     const inp = mount.querySelector('#v16BankSearch');
@@ -1013,6 +1188,33 @@
       return;
     }
 
+    const favBtn = e.target.closest('[data-v27-fav]');
+    if (favBtn) {
+      e.stopPropagation();
+      const id = favBtn.dataset.v27Fav;
+      if (window.TCM_BANK_ENRICH && id) {
+        window.TCM_BANK_ENRICH.toggleFavorite(id);
+        renderBank();
+      }
+      return;
+    }
+
+    const detailTabBtn = e.target.closest('[data-v27-detail-tab]');
+    if (detailTabBtn) {
+      bankState.detailTab = detailTabBtn.dataset.v27DetailTab || 'chem';
+      updateBankResultsOnly();
+      return;
+    }
+
+    const spectraBtn = e.target.closest('[data-v27-open-spectra]');
+    if (spectraBtn) {
+      const cat = spectraBtn.dataset.v27OpenSpectra || '黄酮';
+      if (window.TCM_V21_SPECTRA_LAB && typeof window.TCM_V21_SPECTRA_LAB.open === 'function') {
+        window.TCM_V21_SPECTRA_LAB.open(cat);
+      }
+      return;
+    }
+
     const previewBtn = e.target.closest('[data-v16-preview]');
     if (previewBtn) {
       bankState.previewId = previewBtn.dataset.v16Preview;
@@ -1053,7 +1255,7 @@
     if (bankScene) { bankState.scene = bankScene.dataset.v16BankScene; renderBank(); return; }
 
     if (e.target.closest('#v16BankReset') || e.target.closest('#v16BankResetEmpty')) {
-      bankState = { tab: 'all', cat: '全部', scene: 'all', query: '', previewId: bankState.previewId };
+      bankState = { tab: 'all', cat: '全部', scene: 'all', sort: 'default', detailTab: bankState.detailTab || 'chem', query: '', previewId: bankState.previewId };
       renderBank();
       return;
     }

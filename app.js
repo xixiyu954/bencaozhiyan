@@ -1712,6 +1712,37 @@
     });
   }
 
+  // ============ 合并 v27 六大学科知识库与实践汇编扩容课题（14 项旗舰药材 + 6 篇权威文献 + 4 项院校/药企案例） ============
+  const V27_DATA = window.TCM_V27_KB_DATA || {};
+  if (V27_DATA.V27_PRESETS) {
+    Object.entries(V27_DATA.V27_PRESETS).forEach(([k, preset]) => {
+      FEATURED_PRESETS[k] = preset;
+      if (!CATALOG_45.some(c => c.id === k)) {
+        CATALOG_45.push({
+          id: preset.id,
+          isInnovative: !!preset.isInnovative,
+          isClassGroup: !!preset.isClassGroup,
+          isKbNew: true,
+          featured: true,
+          herb: preset.herb,
+          compound: preset.compound,
+          category: preset.category,
+          sourceTag: preset.sourceTag || ''
+        });
+      }
+    });
+  }
+  if (Array.isArray(V27_DATA.V27_LITERATURE)) {
+    V27_DATA.V27_LITERATURE.forEach(item => {
+      if (!GLOBAL_LITERATURE.some(x => x.text === item.text)) GLOBAL_LITERATURE.push(item);
+    });
+  }
+  if (Array.isArray(V27_DATA.V27_UNIV_CASES)) {
+    V27_DATA.V27_UNIV_CASES.forEach(item => {
+      if (!UNIV_CASES.some(x => x.title === item.title)) UNIV_CASES.push(item);
+    });
+  }
+
 
   // 精准短词 B站链接生成器（1~2 词高命中，解决检索词过多导致视频偏题问题）
   function biliUrl(kw) {
@@ -2283,7 +2314,7 @@
   function renderStep1(t) {
     const el = document.getElementById('step1HerbCards');
     const CLASS_ORDER = ['coptis','ginkgo_flav','forsythia','sophora','cassia','mint','senna','sedum','lonicera','phellodendron_flav','salvia','scutellaria','glycyrrhiza','andrographis','panax','pueraria','armeniaca','polygonum','panax_quinquefolius'];
-    const EXTRA_INNO_IDS = [...Object.keys(V5_DATA.V5_PRESETS || {}), ...Object.keys(V3_DATA.V3_PRESETS || {}), ...Object.keys(EXTRA_DATA.EXTRA_PRESETS || {})];
+    const EXTRA_INNO_IDS = [...Object.keys(V27_DATA.V27_PRESETS || {}), ...Object.keys(V5_DATA.V5_PRESETS || {}), ...Object.keys(V3_DATA.V3_PRESETS || {}), ...Object.keys(EXTRA_DATA.EXTRA_PRESETS || {})];
     const INNO_ORDER = [...EXTRA_INNO_IDS, 'clove','cnidium','carthamus','sophora_flavescens','epimedium','bupleurum','astragalus','angelica_dahurica','paeonia_lactiflora','prunella','citrus','curcuma_longa','magnolia','schisandra','notoginseng','lycium','corydalis','gardenia','fraxinus','tea_caffeine','paeonia_moutan','star_anise','periploca','anemarrhena'];
     const tab = state.step1Tab || 'innovative';
     document.querySelectorAll('[data-s1-tab]').forEach(btn => {
@@ -4436,6 +4467,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     exportDraftState: () => JSON.parse(JSON.stringify(state)),
+    getAllLiterature: () => [...GLOBAL_LITERATURE, ...state.extraGlobalRefs],
     importDraftState: (raw, silent) => {
       if (!isRecord(raw) || typeof raw.activeTopicId !== 'string' || !raw.activeTopicId.trim()) return false;
       const normalized = normalizeState(raw);

@@ -815,6 +815,259 @@ body.dark-lab .v19-bento-strip {
 body.dark-lab .v19-bento-tag { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
 body.dark-lab .v19-bento-pill { background: rgba(16, 47, 41, 0.9); border-color: rgba(52, 211, 153, 0.25); color: #e2f1ed; }
 
+/* ---------- 6.5 药材题库六大学科全链路升级样式 (v27) ---------- */
+.v27-active-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  margin-left: 4px;
+  border-radius: 999px;
+  background: rgba(5, 150, 105, 0.14);
+  color: #047857;
+  font-size: 0.66rem;
+  font-weight: 850;
+  vertical-align: middle;
+}
+
+.v27-fav-btn {
+  appearance: none;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  color: #94a3b8;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.82rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.v27-fav-btn:hover,
+.v27-fav-btn.on {
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.45);
+  background: #fffbeb;
+}
+
+.v27-fav-pill {
+  appearance: none;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #ffffff;
+  color: #475569;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.v27-fav-pill.on,
+.v27-fav-pill:hover {
+  color: #b45309;
+  border-color: rgba(245, 158, 11, 0.5);
+  background: #fffbeb;
+}
+
+.v27-card-micro-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 4px 0 6px;
+}
+
+.v27-micro-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.05);
+  color: #475569;
+  font-size: 0.67rem;
+  font-weight: 750;
+}
+
+.v27-micro-pill.mint {
+  background: rgba(16, 185, 129, 0.13);
+  color: #065f46;
+}
+
+.v27-bank-sort-select {
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.v27-detail-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: 13px;
+  background: #eef4f2;
+  border: 1px solid rgba(15, 92, 84, 0.1);
+}
+
+.v27-detail-tab {
+  appearance: none;
+  border: none;
+  border-radius: 9px;
+  padding: 6px 4px;
+  background: transparent;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.v27-detail-tab:hover {
+  color: #047857;
+}
+
+.v27-detail-tab.active {
+  background: #ffffff;
+  color: #065f46;
+  box-shadow: 0 3px 10px -4px rgba(15, 23, 42, 0.16);
+}
+
+.v27-bank-kv-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.v27-bank-kv {
+  padding: 7px 9px;
+  border-radius: 11px;
+  background: #f5faf8;
+  border: 1px solid rgba(15, 92, 84, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.v27-bank-kv small {
+  font-size: 0.65rem;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.v27-bank-kv strong {
+  font-size: 0.74rem;
+  color: #0f2420;
+  font-weight: 850;
+}
+
+.v27-kb-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.v27-kb-mini-link {
+  appearance: none;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 92, 84, 0.22);
+  background: #f3faf7;
+  color: #065f46;
+  font-size: 0.71rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.v27-kb-mini-link:hover {
+  background: #059669;
+  color: #ffffff;
+  border-color: #059669;
+}
+
+.v27-kb-mini-link.accent {
+  background: linear-gradient(135deg, #059669, #047857);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.v27-ext-db-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 6px;
+  border-radius: 9px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  font-size: 0.71rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.v27-ext-db-link.sky { background: #f0f9ff; border-color: #bae6fd; color: #075985; }
+.v27-ext-db-link.amber { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+
+.v27-lit-mini {
+  padding: 7px 9px;
+  border-radius: 10px;
+  background: #f8faf9;
+  border: 1px solid rgba(15, 23, 42, 0.07);
+  font-size: 0.71rem;
+  line-height: 1.52;
+  color: #334155;
+}
+
+.v27-lit-cat {
+  display: inline-block;
+  padding: 1px 6px;
+  margin-right: 6px;
+  border-radius: 5px;
+  background: rgba(16, 185, 129, 0.14);
+  color: #047857;
+  font-size: 0.64rem;
+  font-weight: 800;
+}
+
+body.dark-lab .v27-active-pill { background: rgba(16, 185, 129, 0.25); color: #6ee7b7; }
+body.dark-lab .v27-micro-pill { background: rgba(255, 255, 255, 0.08); color: #cbd5e1; }
+body.dark-lab .v27-micro-pill.mint { background: rgba(16, 185, 129, 0.22); color: #6ee7b7; }
+body.dark-lab .v27-fav-btn,
+body.dark-lab .v27-fav-pill,
+body.dark-lab .v27-bank-sort-select {
+  background: #102a25;
+  border-color: rgba(52, 211, 153, 0.25);
+  color: #cbd5e1;
+}
+body.dark-lab .v27-fav-btn.on,
+body.dark-lab .v27-fav-pill.on { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border-color: rgba(251, 191, 36, 0.45); }
+body.dark-lab .v27-detail-tabs { background: #081c18; border-color: rgba(52, 211, 153, 0.2); }
+body.dark-lab .v27-detail-tab { color: #94a3b8; }
+body.dark-lab .v27-detail-tab.active { background: #143830; color: #6ee7b7; }
+body.dark-lab .v27-bank-kv,
+body.dark-lab .v27-lit-mini { background: #0c231e; border-color: rgba(52, 211, 153, 0.18); color: #cbd5e1; }
+body.dark-lab .v27-bank-kv strong { color: #f0fdfa; }
+body.dark-lab .v27-kb-mini-link { background: rgba(16, 185, 129, 0.16); border-color: rgba(52, 211, 153, 0.3); color: #6ee7b7; }
+body.dark-lab .v27-ext-db-link { background: rgba(16, 185, 129, 0.16); border-color: rgba(52, 211, 153, 0.3); color: #6ee7b7; }
+body.dark-lab .v27-ext-db-link.sky { background: rgba(14, 165, 233, 0.18); border-color: rgba(56, 189, 248, 0.3); color: #7dd3fc; }
+body.dark-lab .v27-ext-db-link.amber { background: rgba(245, 158, 11, 0.18); border-color: rgba(251, 191, 36, 0.3); color: #fcd34d; }
+body.dark-lab .v16-topic-card { background: rgba(13, 38, 33, 0.92) !important; border-color: rgba(52, 211, 153, 0.18) !important; color: #e2f1ed !important; }
+body.dark-lab .v16-topic-card .v16-topic-herb { color: #f0fdfa !important; }
+body.dark-lab .v16-topic-card .v16-topic-note { color: #94a3b8 !important; }
+body.dark-lab .v16-filter-pill:not(.active) { background: rgba(13, 38, 33, 0.88) !important; border-color: rgba(52, 211, 153, 0.22) !important; color: #cbd5e1 !important; }
+body.dark-lab .v16-filter-pill.active { background: #059669 !important; border-color: #10b981 !important; color: #ffffff !important; }
+body.dark-lab .v16-seg-bar { background: rgba(8, 28, 24, 0.92) !important; border-color: rgba(52, 211, 153, 0.2) !important; }
+body.dark-lab .v16-seg-btn:not(.active) { color: #94a3b8 !important; }
+body.dark-lab .v16-seg-btn.active { background: #143d34 !important; color: #f0fdfa !important; }
+
 /* ---------- 7. 响应式与打印 ---------- */
 @media (max-width: 1100px) {
   .v19-bento-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
