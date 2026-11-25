@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "本草智研 · 中药化学智能实验设计工作台（Vite 渐进式构建版）",
+  "description": "本草智研 · 现代本草智能实验设计工作台（辽宁中医药大学专属 · 非商用）",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
