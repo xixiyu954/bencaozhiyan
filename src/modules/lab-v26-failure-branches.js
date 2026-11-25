@@ -407,12 +407,12 @@
       '<div class="v26-shell">' +
         '<div class="v26-top-strip">' +
           '<div>' +
-            '<div style="font-size:15px;font-weight:900;">⚠️ 中药化学 7 大经典失败分支实验室（FMEA / CAPA 应急处置实训）</div>' +
+            '<div style="font-size:15px;font-weight:900;">现代本草 7 大经典失败分支实验室（FMEA / CAPA 应急处置实训）</div>' +
             '<div style="font-size:12px;color:#64748b;margin-top:2px;">先观察事故现场，再完成「现场应急 3 选 1」决策——选错会触发二次事故警示，选对立即演示 CAPA 修复并点亮通关勋章。</div>' +
           "</div>" +
           '<div class="v26-progress-wrap">' +
             '<span class="v26-stat-pill">图鉴浏览 ' + unlockedIds.length + "/" + FAILURE_BRANCHES.length + "</span>" +
-            '<span class="v26-stat-pill is-gold">🏅 实战通关 ' + masteredIds.length + "/" + FAILURE_BRANCHES.length + "</span>" +
+            '<span class="v26-stat-pill is-gold">实战通关 ' + masteredIds.length + "/" + FAILURE_BRANCHES.length + "</span>" +
             '<div class="v26-progress-track"><div class="v26-progress-fill" style="width:' + pct + '%;"></div></div>' +
           "</div>" +
         "</div>" +

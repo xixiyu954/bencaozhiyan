@@ -233,10 +233,10 @@
         <div class="v16-footer-col">
           <div class="flex items-center gap-2 mb-2.5">
             <span class="v16-brand-logo" aria-hidden="true">${SVG_ICONS.brand}</span>
-            <strong style="font-size:0.98rem;color:var(--ds-ink)">本草智研 · 中药化学工作台</strong>
+            <strong style="font-size:0.98rem;color:var(--ds-ink)">本草智研 · 现代本草实验工作台</strong>
           </div>
           <p style="margin:0;font-size:0.8rem;line-height:1.68;color:var(--ds-muted);max-width:340px">
-            面向高校药学与中药学课程教学、实验设计与科研训练的中药化学综合工作台。
+            面向高校药学与中药学课程教学、实验设计与科研训练的现代本草综合工作台。
           </p>
         </div>
         <div class="v16-footer-col">
@@ -291,7 +291,7 @@
               <span class="v16-eyebrow"><span class="v16-eyebrow-dot"></span>本草智研 · 中药药学研究与小试—中试产业转化训练平台</span>
               <h2>从提取实验设计到<br/><em>药学研究与中试产业转化</em></h2>
               <p class="v16-hero-desc">
-                保留完整的《中药化学》教学六步实验与装置仿真，并拓展“产品定位 → 炮制对照 → 综合工艺最优 → 剂型选择 → 全过程质控 → 非线性中试放大与偏差调查 → 转化报告”八阶段产业转化主线。
+                保留完整的现代本草教学六步实验与装置仿真，并拓展“产品定位 → 炮制对照 → 综合工艺最优 → 剂型选择 → 全过程质控 → 非线性中试放大与偏差调查 → 转化报告”八阶段产业转化主线。
               </p>
               <div class="v16-hero-ctas">
                 <button type="button" class="v16-btn-cta-primary" data-v16-go="translation">进入产业转化（丹参标杆）→</button>
@@ -313,7 +313,7 @@
                 <span class="v16-hero-card-tag">快速开始</span>
                 <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-300/30">标准实验流程</span>
               </div>
-              <h3 class="v16-hero-card-title">规范化中药化学实验设计</h3>
+              <h3 class="v16-hero-card-title">规范化现代本草实验设计</h3>
               <p class="v16-hero-card-sub">选定目标药材或输入实验思路，即可完成工艺参数核算、机理对照、装置模拟与规范报告生成。</p>
               <div class="v16-hero-mini-grid">
                 <div class="v16-hero-mini-cell"><span>第一步</span><strong>选材与定题</strong></div>
@@ -882,7 +882,7 @@
         <div class="v16-subhero-top">
           <div>
             <h2>智能实验设计</h2>
-            <p>基于智谱 GLM、腾讯云 TokenHub 与讯飞星辰多模型协同，按 5 套标准化中药化学模板完成课题评审、方案编排、已有方案校核与助教答疑。</p>
+            <p>基于智谱 GLM、腾讯云 TokenHub 与讯飞星辰多模型协同，按 5 套标准化现代本草实验模板完成课题评审、方案编排、已有方案校核与助教答疑。</p>
           </div>
           <div class="flex flex-wrap gap-2">
             <button type="button" class="v16-chip-btn" id="v16AiEngineSwitchBtn" title="切换或体检三引擎通道">${ico('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>')}<span>${esc(routeModeText)}</span></button>

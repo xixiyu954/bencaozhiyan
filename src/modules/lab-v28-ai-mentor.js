@@ -153,7 +153,7 @@
     var reply = "";
     if (window.TCMCloudAI && typeof window.TCMCloudAI.complete === "function") {
       try {
-        var sys = "你是「本草智研」中药化学 24 小时 AI 导师。请结合学生当前实验上下文给出简洁、准确、贴近实操的中文解答（120~220字）。";
+        var sys = "你是「本草智研」现代本草 24 小时科研实验导师。请结合学生当前实验上下文给出简洁、准确、贴近实操的中文解答（120~220字）。";
         var usr = "当前场景：" + JSON.stringify(ctx) + "\n学生提问：" + q;
         var res = await Promise.race([
           window.TCMCloudAI.complete({
@@ -221,7 +221,7 @@
 
     var displayMsgs = messages.length
       ? messages
-      : [{ role: "ai", text: "你好！我是你的 24 小时中药化学 AI 导师。当前已同步你在「" + ctx.routeLabel + "」的实时参数，原理、分离纯化或安全疑问都可以直接问我。" }];
+      : [{ role: "ai", text: "你好，我是「本草智研」现代本草科研实验导师。当前已同步你在「" + ctx.routeLabel + "」的实时参数，提取机理、分离纯化、质量分析或安全规范问题都可以直接提问。" }];
 
     panel.innerHTML =
       '<div class="v28-mentor-head">' +

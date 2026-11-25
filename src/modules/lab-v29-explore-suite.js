@@ -1264,7 +1264,7 @@
     modal = document.createElement("div");
     modal.id = "tcmV29ExploreModal";
     modal.innerHTML =
-      '<div class="v29-shell" role="dialog" aria-modal="true" aria-label="中药化学可视化探索中心">' +
+      '<div class="v29-shell" role="dialog" aria-modal="true" aria-label="现代本草可视化探索中心">' +
         '<div class="v29-header">' +
           '<div class="v29-tabs">' +
             '<button type="button" class="v29-tab" data-v29-tab="kg">4.1 知识图谱</button>' +

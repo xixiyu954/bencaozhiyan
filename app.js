@@ -3016,7 +3016,7 @@
 
     if (mod.cover) {
       html += `<div class="text-center border-b-2 border-slate-800 pb-4 space-y-1">
-        <div class="text-lg font-extrabold">《中药化学》实验设计与结果报告</div>
+        <div class="text-lg font-extrabold">现代本草实验设计与结果报告</div>
         <div class="text-sm font-bold text-[#0a3630]">${ws.formalTitle}</div>
         <div class="text-xs text-slate-600">班级：${state.meta.className || '______'} | 组别：${state.meta.groupName || '____'} | 日期：${state.meta.date || '______'} | 指导教师：${state.meta.teacher || '____'}</div>
       </div>
@@ -3127,7 +3127,7 @@
       const canvas = await h2c(mount, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
       const dataUrl = canvas.toDataURL('image/png');
       document.getElementById('generatedReportImg').src = dataUrl;
-      const dl = document.getElementById('btnDownloadReportPng'); dl.href = dataUrl; dl.download = `中药化学_${getTopicDef().herb}_实验报告.png`;
+      const dl = document.getElementById('btnDownloadReportPng'); dl.href = dataUrl; dl.download = `本草智研_${getTopicDef().herb}_实验报告.png`;
       const m = document.getElementById('imageExportModal'); m.classList.remove('hidden'); m.classList.add('flex');
       showToast('高清长图已生成！微信端请长按保存');
     } catch { showToast('生成失败，请使用复制全文或电脑打印', 'error'); }
@@ -3286,7 +3286,7 @@
       if (IS_WECHAT) { showToast('微信内限制 .doc 下载，请点「高清报告长图」或浏览器打开', 'info'); return; }
       const t = getTopicDef(), inner = document.getElementById('printableReportMount').innerHTML;
       const doc = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body{font-family:'SimSun','宋体',serif;font-size:12pt;line-height:1.7}table{width:100%;border-collapse:collapse;margin:8pt 0;font-size:10.5pt}th,td{border:1px solid #333;padding:4pt 6pt;text-align:left}th{background:#f2f5f4}</style></head><body>${inner}</body></html>`;
-      downloadBlob('\ufeff' + doc, `中药化学_${t.herb}_实验报告.doc`, 'application/msword;charset=utf-8'); showToast('已导出 Word');
+      downloadBlob('\ufeff' + doc, `本草智研_${t.herb}_实验报告.doc`, 'application/msword;charset=utf-8'); showToast('已导出 Word');
     });
     document.getElementById('btnCopyFullReport').addEventListener('click', () => copyText(document.getElementById('printableReportMount').innerText, '已复制报告全文'));
     document.getElementById('btnReportPresetFull').addEventListener('click', () => { REPORT_MODULES.forEach(m => getWorkState(getTopicDef()).reportModules[m.id] = true); saveState(); renderAll(); });
@@ -3311,7 +3311,7 @@
       try {
         const res = await fetch(`https://formsubmit.co/ajax/${AUTHOR_EMAIL}`, {
           method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, signal: controller.signal,
-          body: JSON.stringify({ _subject: `【中药化学实验工坊-${type}】${getTopicDef().herb}`, _template: 'table', _captcha: 'false', 反馈类型: type, 称呼: document.getElementById('fbSender').value.trim() || '匿名', 回复邮箱: document.getElementById('fbReplyEmail').value.trim() || '未填', 内容: content })
+          body: JSON.stringify({ _subject: `【本草智研实验工坊-${type}】${getTopicDef().herb}`, _template: 'table', _captcha: 'false', 反馈类型: type, 称呼: document.getElementById('fbSender').value.trim() || '匿名', 回复邮箱: document.getElementById('fbReplyEmail').value.trim() || '未填', 内容: content })
         });
         const data = await res.json();
         if (res.ok && (data.success === 'true' || data.success === true)) { sb.className = 'p-3 rounded-xl text-xs bg-emerald-50 text-emerald-800'; sb.textContent = `发送成功！已直投至 ${AUTHOR_EMAIL}。`; sb.classList.remove('hidden'); document.getElementById('fbContent').value = ''; showToast('发送成功'); }
@@ -4055,7 +4055,7 @@
           if (isQwenReady()) {
             const precondText = `【用户前置条件】实验场景：${aiScene}；绿色与溶剂约束：${aiGreen}；选定标准化设计模板：${aiTpl}。\n${tplMeta.promptRule ? '【模板硬性设计规范】' + tplMeta.promptRule + '\n' : ''}`;
             const ragText = precondText + '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '\n【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '\n';
-            const sysPrompt = ragText + `你是“本草智研 · 中药化学智能实验设计工作台”的首席课程导师与排版编排引擎。你的输出将直接渲染到网站的 6 大结构化视觉模块（1.创新设计四宫格 2.动态流程图 3.双栏四步工艺详解卡 4.可勾选SOP规程 5.题库文献区 6.排障与导师结论卡），因此必须严格遵守以下内容深度与版面均衡规范：
+            const sysPrompt = ragText + `你是“本草智研 · 现代本草智能实验设计工作台”的首席课程导师与排版编排引擎。你的输出将直接渲染到网站的 6 大结构化视觉模块（1.创新设计四宫格 2.动态流程图 3.双栏四步工艺详解卡 4.可勾选SOP规程 5.题库文献区 6.排障与导师结论卡），因此必须严格遵守以下内容深度与版面均衡规范：
 【硬性规范】
 1. 必须严格输出合法 JSON（不要 markdown 代码块、不要额外解释文字）。
 2. 四宫格字数均衡：origin、chemistry、pharmacopoeia、tlcSystem 每项严格控制在 35~65 字，信息密度对等（含拉丁基原/性味、核心母核与溶解性、《中国药典》限度与RSD<5%、展开剂精确体积比与显色法）。
@@ -4276,7 +4276,7 @@
             const waitEl = document.getElementById(waitId);
             const resObj = await window.TCMCloudAI.complete({
               messages: [
-                { role: 'system', content: `你是“本草智研”中药化学智能实验工作台的指导教师。${modeRules[chatMode] || modeRules.mechanism} 语言专业精炼，绝不编造虚假药典标准或文献。${ctx}` },
+                { role: 'system', content: `你是“本草智研”现代本草智能实验工作台的指导教师。${modeRules[chatMode] || modeRules.mechanism} 语言专业精炼，绝不编造虚假药典标准或文献。${ctx}` },
                 { role: 'user', content: q }
               ],
               expectJson: false,
@@ -4300,7 +4300,7 @@
             hitEngine = '站内知识库';
           }
         } catch (err) {
-          ans = `${localTutorAnswer(q, t, ws)}\n\n（以上解答由站内中药化学知识库即时提供）`;
+          ans = `${localTutorAnswer(q, t, ws)}\n\n（以上解答由站内现代本草科研知识库即时提供）`;
           hitEngine = '站内知识库兜底';
         } finally {
           chatRunning = false;

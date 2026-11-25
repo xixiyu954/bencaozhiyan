@@ -64,7 +64,7 @@ function initExploreProxy() {
       id: 'v29_explore',
       icon: '🔭',
       title: '知识图谱与可视化探索中心（4.1~4.5）',
-      desc: '4.1 中药化学知识图谱 · 4.2 极性三维宇宙 · 4.3 工艺流水线 · 4.4 导演时间轴 · 4.5 对比显微镜。',
+      desc: '4.1 现代本草知识图谱 · 4.2 极性三维宇宙 · 4.3 工艺流水线 · 4.4 导演时间轴 · 4.5 对比显微镜。',
       onOpen: () => window.TCM_V29_EXPLORE.open('kg')
     });
   }

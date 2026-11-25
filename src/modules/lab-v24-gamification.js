@@ -252,7 +252,7 @@ function renderModal() {
           const ok = p.rigs.includes(r.key);
           return `<button type="button" data-v24-open-rig="${esc(r.key)}" class="text-left p-3 rounded-xl border transition ${ok ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-400' : 'bg-[#f7f6f2] dark:bg-slate-800/70 border-slate-200 dark:border-slate-700 hover:border-[#0f4c3a]'} space-y-1">
             <div class="flex items-center justify-between gap-1"><span class="font-extrabold text-slate-900 dark:text-white truncate">${esc(r.title || r.key)}</span><span class="text-[10px] font-bold ${ok ? 'text-emerald-700' : 'text-slate-400'}">${ok ? '已实训' : '查看 →'}</span></div>
-            <div class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2">${esc(r.principle || r.desc || r.scope || '交互式中药化学实验装置')}</div>
+            <div class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2">${esc(r.principle || r.desc || r.scope || '交互式现代本草实验装置')}</div>
           </button>`;
         }).join('')}
       </div>`;

@@ -340,7 +340,7 @@
     var tpl = getActiveTemplate();
     var localFallback = generateAiInitialDraft(state.prompt);
     var sysPrompt =
-      "你是「本草智研」中药化学 90 分课题竞技场的 AI 出题与模板编排引擎。\n" +
+      "你是「本草智研」现代本草 90 分课题竞技场的 AI 出题与模板编排引擎。\n" +
       "请严格套用以下标准化模板：" + tpl.label + "。" + (tpl.promptRule || "") + "\n" +
       "请严格只输出一个合法 JSON 对象（不要 markdown 代码块、不要多余说明），同时包含：\n" +
       "1）一个逼真的科研初稿（刻意保留 3~4 处典型新手短板：如 cycles=1、ph='待定'、tlcSystem 偏简略、integrative 偏简略，使初稿落点在 70~80 分，供学生按扣分点迭代超越）；\n" +
@@ -427,7 +427,7 @@
         messages: [
           {
             role: "system",
-            content: "你是本草智研中药化学评审教授。请对照【" + tpl.label + "】对学生的实验方案做 140~220 字精炼中文点评：①肯定1处优点；②指出最关键的 2 处工艺/安全/质控可提升细节；③给出可直接填入的改进建议。禁止废话。"
+            content: "你是本草智研现代本草科研评审教授。请对照【" + tpl.label + "】对学生的实验方案做 140~220 字精炼中文点评：①肯定1处优点；②指出最关键的 2 处工艺/安全/质控可提升细节；③给出可直接填入的改进建议。禁止废话。"
           },
           {
             role: "user",

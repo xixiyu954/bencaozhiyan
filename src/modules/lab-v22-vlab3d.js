@@ -417,7 +417,7 @@ export function mountVlab3D(container) {
     ctx.fillStyle = '#ecfdf5';
     ctx.font = 'bold 26px "PingFang SC", "Microsoft YaHei", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('本草智研 · 中药化学实验室  |  加沸石防暴沸 · 冷凝水下进上出 · 避光控温', w / 2, 56);
+    ctx.fillText('本草智研 · 现代本草实验室  |  加沸石防暴沸 · 冷凝水下进上出 · 避光控温', w / 2, 56);
   });
   const banner = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 0.52), new THREE.MeshBasicMaterial({ map: bannerTex }));
   banner.position.set(0, 3.06, -3.96);

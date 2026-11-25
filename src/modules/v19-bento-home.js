@@ -154,7 +154,7 @@ function renderBentoHome() {
           <div class="v19-hero-copy">
             <span class="v19-hero-eyebrow"><span class="v19-hero-eyebrow-dot"></span>《中国药典》2025 版对照 · 天然产物提取与质控工作台</span>
             <h2 class="v19-hero-title">本草智研</h2>
-            <p class="v19-hero-sub">中药化学教学与科研实验台</p>
+            <p class="v19-hero-sub">现代本草教学与科研实验台</p>
             <p class="v19-hero-desc">
               涵盖药材档案、提取纯化工艺推演、四谱解析与三维实验仿真。
             </p>
