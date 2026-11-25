@@ -1,24 +1,55 @@
 (() => {
   'use strict';
 
-  // 智能代理路由：
+  // 三引擎混合智能代理路由：
   // 1. Cloudflare Pages (*.pages.dev / 自定义域名) -> 优先走同源 /api/ai-proxy
   // 2. GitHub Pages (xixiyu954.github.io) / 本地预览 -> 自动在主站与备用 Cloudflare Pages 通道间容错切换
+  // 后端支持三引擎混编：智谱 GLM + 讯飞星辰 MaaS + 阿里云通义/兼容网关（全自动故障切换）
   const CLOUDFLARE_SITE_URL = 'https://bencaozhiyan-xixiyu.pages.dev';
   const CLOUDFLARE_BACKUP_URL = 'https://tcm-chemistry-lab.pages.dev';
   const CF_PROXY_PATH = '/api/ai-proxy';
   const CUSTOM_PROXY_STORAGE_KEY = 'tcm_custom_ai_proxy';
+  const ROUTE_MODE_STORAGE_KEY = 'tcm_ai_route_mode';
   const DEFAULT_MODEL = 'glm-4-flash-250414';
-  const CACHE_KEY = 'tcm_ai_resp_cache_v2';
+  const CACHE_KEY = 'tcm_ai_resp_cache_v3';
   const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
   const MAX_CACHE_ENTRIES = 30;
 
+  const PROVIDER_NAMES = {
+    auto: '三引擎智能混编',
+    zhipu: '智谱 GLM',
+    xunfei: '讯飞星辰 MaaS',
+    aliyun: '阿里云通义'
+  };
+
   const PROVIDERS = {
-    qwen: { label: '智谱 GLM 免费通道', timeoutMs: 85000 }
+    qwen: { label: '三引擎混合智能通道', timeoutMs: 85000 }
   };
 
   let lastProvider = null;
+  let lastProxyStatus = null;
   let sessionCacheHits = 0;
+
+  function getRouteMode() {
+    try {
+      const m = String(localStorage.getItem(ROUTE_MODE_STORAGE_KEY) || 'auto').trim();
+      if (['auto', 'zhipu', 'xunfei', 'aliyun'].includes(m)) return m;
+    } catch (_) {}
+    return 'auto';
+  }
+
+  function setRouteMode(mode) {
+    const clean = ['auto', 'zhipu', 'xunfei', 'aliyun'].includes(mode) ? mode : 'auto';
+    try { localStorage.setItem(ROUTE_MODE_STORAGE_KEY, clean); } catch (_) {}
+    return clean;
+  }
+
+  function formatProviderLabel(actualProvider, actualModel, fellBack) {
+    const base = PROVIDER_NAMES[actualProvider] || '云端混合通道';
+    const shortModel = actualModel ? ` (${actualModel})` : '';
+    const fbTag = fellBack ? ' · 自动兜底' : '';
+    return `${base}${shortModel}${fbTag}`;
+  }
 
   function readCustomProxy() {
     try {
@@ -55,7 +86,6 @@
       if (cfFull) push(cfFull);
       if (cfBakFull) push(cfBakFull);
     } else {
-      // 自定义域名（如绑定在 Cloudflare Pages 上）优先同源 /api/ai-proxy，失败则回退主/备站点
       push(CF_PROXY_PATH);
       if (cfFull) push(cfFull);
       if (cfBakFull) push(cfBakFull);
@@ -63,15 +93,11 @@
     return list;
   }
 
-  function resolveProxyUrl() {
-    return resolveProxyCandidates()[0] || '';
-  }
-
   function isProxyConfigured() {
     return resolveProxyCandidates().length > 0;
   }
 
-  // 强容错 JSON 清洗与自动修复引擎：解决智谱 GLM 偶发截断缺 ']' / '}'、尾随逗号、字符串内未转义换行等问题
+  // 强容错 JSON 清洗与自动修复引擎
   function repairJsonText(raw) {
     let text = String(raw || '')
       .replace(/^\uFEFF/, '')
@@ -82,16 +108,13 @@
     const first = text.indexOf('{');
     if (first === -1) return text;
     const last = text.lastIndexOf('}');
-    // 若模型输出完整，截取最外层 {...}；若因 token 截断缺少末尾 '}'，保留至结尾供自动补全
     text = last > first ? text.slice(first, last + 1) : text.slice(first);
 
-    // 1. 尝试直接解析
     try {
       JSON.parse(text);
       return text;
     } catch (_) {}
 
-    // 2. 修复字符串内部未转义的换行/制表符，并去除尾随逗号
     let fixed = '';
     let inStr = false;
     let escaped = false;
@@ -122,7 +145,6 @@
       }
     }
 
-    // 去除非法尾随逗号（,] 或 ,}）及非法控制符
     fixed = fixed
       .replace(/,\s*([}\]])/g, '$1')
       .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
@@ -132,7 +154,6 @@
       return fixed;
     } catch (_) {}
 
-    // 3. 若发生输出截断或括号失衡（如 Expected ']'），用栈自动闭合未关闭的字符串、数组与对象
     const stack = [];
     let sInStr = false;
     let sEsc = false;
@@ -173,8 +194,8 @@
     return safe.map((item) => ({ role: item.role || 'user', content: item.content.slice(0, 24000) }));
   }
 
-  function hashKey(messages, expectJson) {
-    const raw = (expectJson ? 'J:' : 'T:') + messages.map((m) => `${m.role}:${m.content.slice(0, 800)}`).join('|');
+  function hashKey(messages, expectJson, routeMode) {
+    const raw = `${routeMode}:${expectJson ? 'J' : 'T'}:` + messages.map((m) => `${m.role}:${m.content.slice(0, 800)}`).join('|');
     let h = 2166136261;
     for (let i = 0; i < raw.length; i++) {
       h ^= raw.charCodeAt(i);
@@ -206,15 +227,15 @@
     const map = readCacheMap();
     const item = map[key];
     if (item && typeof item.content === 'string' && Date.now() - item.ts < CACHE_TTL_MS) {
-      return item.content;
+      return item;
     }
     return null;
   }
 
-  function setCachedResponse(key, content) {
+  function setCachedResponse(key, content, label) {
     if (!content || content.length > 48000) return;
     const map = readCacheMap();
-    map[key] = { content, ts: Date.now() };
+    map[key] = { content, label: label || '', ts: Date.now() };
     writeCacheMap(map);
   }
 
@@ -274,23 +295,30 @@
     return content;
   }
 
-  async function callSingleProxy(proxyUrl, messages, expectJson, signal, onProgress) {
+  async function callSingleProxy(proxyUrl, messages, expectJson, signal, onProgress, opts = {}) {
+    const wantStream = opts.stream !== false;
     const response = await fetch(proxyUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: DEFAULT_MODEL,
+        routeMode: opts.routeMode || getRouteMode(),
+        strictProvider: opts.strictProvider === true,
         messages,
-        stream: true,
+        stream: wantStream,
         temperature: expectJson ? 0.2 : 0.55,
         response_format: expectJson ? { type: 'json_object' } : undefined,
-        max_tokens: expectJson ? 4096 : 1600
+        max_tokens: opts.maxTokens || (expectJson ? 4096 : 1600)
       }),
       signal
     });
+    const actualProvider = response.headers.get('x-actual-provider') || 'zhipu';
+    const actualModel = response.headers.get('x-actual-model') || '';
+    const fellBack = response.headers.get('x-fallback') === 'true';
+
     if (!response.ok) {
-      const detail = (await response.text().catch(() => '')).slice(0, 160);
-      throw new Error(`免费通道 HTTP ${response.status}${detail ? `：${detail}` : ''}`);
+      const detail = (await response.text().catch(() => '')).slice(0, 180);
+      throw new Error(`HTTP ${response.status}${detail ? `：${detail}` : ''}`);
     }
 
     const contentType = (response.headers.get('content-type') || '').toLowerCase();
@@ -303,30 +331,35 @@
       content = data?.choices?.[0]?.message?.content || '';
       onProgress?.(content.length, content);
     }
-    return assertUsableContent(content, expectJson);
+    return {
+      content: assertUsableContent(content, expectJson),
+      actualProvider,
+      actualModel,
+      fellBack,
+      label: formatProviderLabel(actualProvider, actualModel, fellBack)
+    };
   }
 
-  async function callProxy(messages, expectJson, signal, onProgress) {
+  async function callProxy(messages, expectJson, signal, onProgress, opts = {}) {
     const candidates = resolveProxyCandidates();
     if (!candidates.length) {
-      throw new Error('未检测到可用智能代理通道，请在 Cloudflare Pages 配置 ZHIPU_API_KEY');
+      throw new Error('未检测到可用智能代理通道，请在 Cloudflare Pages 配置 AI 密钥');
     }
     let firstError = null;
     for (let i = 0; i < candidates.length; i++) {
       const url = candidates[i];
       try {
-        return await callSingleProxy(url, messages, expectJson, signal, onProgress);
+        return await callSingleProxy(url, messages, expectJson, signal, onProgress, opts);
       } catch (err) {
         if (signal?.aborted) throw err;
         if (!firstError) firstError = err;
-        // 若是最后一个候选通道则抛出首个主通道错误，便于定位
         if (i === candidates.length - 1) throw firstError;
       }
     }
-    throw firstError || new Error('免费通道暂不可用');
+    throw firstError || new Error('智能通道暂不可用');
   }
 
-  async function runAttempt(provider, messages, expectJson, externalSignal, onProgress) {
+  async function runAttempt(provider, messages, expectJson, externalSignal, onProgress, opts = {}) {
     const controller = new AbortController();
     const abortFromOutside = () => controller.abort(externalSignal?.reason);
     if (externalSignal) {
@@ -335,55 +368,86 @@
     }
     const timer = setTimeout(
       () => controller.abort(new DOMException('AI 请求超时', 'TimeoutError')),
-      PROVIDERS[provider].timeoutMs
+      opts.timeoutMs || PROVIDERS[provider].timeoutMs
     );
     try {
-      const content = await callProxy(messages, expectJson, controller.signal, onProgress);
-      return { content, provider, label: PROVIDERS[provider].label };
+      const res = await callProxy(messages, expectJson, controller.signal, onProgress, opts);
+      return {
+        content: res.content,
+        provider: res.actualProvider || provider,
+        model: res.actualModel,
+        fellBack: res.fellBack,
+        label: res.label || PROVIDERS[provider].label
+      };
     } finally {
       clearTimeout(timer);
       externalSignal?.removeEventListener('abort', abortFromOutside);
     }
   }
 
-  async function complete({ messages, expectJson = false, useCache = true, onProvider, onProgress, signal } = {}) {
+  async function getProxyStatus() {
+    const candidates = resolveProxyCandidates();
+    for (const url of candidates) {
+      try {
+        const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          lastProxyStatus = data;
+          return data;
+        }
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  async function complete({ messages, expectJson = false, useCache = true, routeMode, onProvider, onProgress, signal } = {}) {
     const normalized = normalizeMessages(messages);
     const provider = 'qwen';
-    const cKey = hashKey(normalized, expectJson);
+    const activeRouteMode = routeMode || getRouteMode();
+    const cKey = hashKey(normalized, expectJson, activeRouteMode);
 
     if (useCache) {
       const cached = getCachedResponse(cKey);
       if (cached) {
         sessionCacheHits += 1;
-        onProgress?.(cached.length, cached);
-        const result = { content: cached, provider, label: '智谱 GLM（本地缓存·0消耗）', fromCache: true };
+        onProgress?.(cached.content.length, cached.content);
+        const result = {
+          content: cached.content,
+          provider,
+          label: `${cached.label || '三引擎混编'}（本地缓存·0消耗）`,
+          fromCache: true
+        };
         lastProvider = result;
         return result;
       }
     }
 
     try {
-      onProvider?.(provider, PROVIDERS[provider].label);
-      const result = await runAttempt(provider, normalized, expectJson, signal, onProgress);
-      if (useCache) setCachedResponse(cKey, result.content);
+      const pendingLabel = PROVIDER_NAMES[activeRouteMode] || PROVIDERS[provider].label;
+      onProvider?.(provider, pendingLabel);
+      const result = await runAttempt(provider, normalized, expectJson, signal, onProgress, { routeMode: activeRouteMode });
+      onProvider?.(result.provider, result.label);
+      if (useCache) setCachedResponse(cKey, result.content, result.label);
       lastProvider = result;
       return result;
     } catch (error) {
       if (signal?.aborted) throw error;
-      // 若首次因 JSON 格式异常失败，自动用非流式精简重试 1 次
       if (expectJson && /JSON|Expected|Unexpected|parse/i.test(String(error?.message || ''))) {
         try {
           const retryMsgs = [
             ...normalized,
             { role: 'user', content: '请严格仅输出一个完整闭合的合法 JSON 对象，字段简洁完整，不要有任何多余说明文字或未闭合括号。' }
           ];
-          const retryRes = await runAttempt(provider, retryMsgs, true, signal, onProgress);
-          if (useCache) setCachedResponse(cKey, retryRes.content);
+          const retryRes = await runAttempt(provider, retryMsgs, true, signal, onProgress, {
+            routeMode: activeRouteMode,
+            stream: false
+          });
+          if (useCache) setCachedResponse(cKey, retryRes.content, retryRes.label);
           lastProvider = retryRes;
           return retryRes;
         } catch (_) {}
       }
-      throw new Error(`${PROVIDERS[provider].label}: ${error?.message || '未知错误'}`);
+      throw new Error(`${PROVIDER_NAMES[activeRouteMode] || PROVIDERS[provider].label}: ${error?.message || '未知错误'}`);
     }
   }
 
@@ -392,18 +456,50 @@
       { role: 'system', content: '你是本草智研服务连通性检查器，只返回用户要求的短句。' },
       { role: 'user', content: '请仅回复“连通成功”四个字。' }
     ]);
-    const provider = 'qwen';
-    try {
-      const result = await runAttempt(provider, messages, false);
-      return [{ provider, ok: true, label: result.label, reply: result.content.slice(0, 40) }];
-    } catch (error) {
-      return [{ provider, ok: false, label: PROVIDERS[provider].label, error: error?.message || '未知错误' }];
-    }
+
+    const status = await getProxyStatus();
+    const providerIds = ['zhipu', 'xunfei', 'aliyun'];
+    const checks = await Promise.all(
+      providerIds.map(async (pid) => {
+        const info = status?.providers?.[pid];
+        if (status && info && !info.configured) {
+          return { provider: pid, ok: false, unconfigured: true, label: PROVIDER_NAMES[pid], error: '未配置密钥' };
+        }
+        const t0 = Date.now();
+        try {
+          const res = await runAttempt('qwen', messages, false, undefined, undefined, {
+            routeMode: pid,
+            strictProvider: true,
+            stream: false,
+            maxTokens: 64,
+            timeoutMs: 16000
+          });
+          const ms = Date.now() - t0;
+          return {
+            provider: pid,
+            ok: true,
+            label: res.label || PROVIDER_NAMES[pid],
+            reply: `${res.content.trim().slice(0, 28)} (${ms}ms)`
+          };
+        } catch (err) {
+          return {
+            provider: pid,
+            ok: false,
+            label: PROVIDER_NAMES[pid],
+            error: String(err?.message || '连接异常').slice(0, 90)
+          };
+        }
+      })
+    );
+    return checks;
   }
 
   function getCapabilities() {
     return {
       qwen: isProxyConfigured(),
+      hybrid: true,
+      routeMode: getRouteMode(),
+      proxyStatus: lastProxyStatus,
       workbuddy: false,
       local: true,
       lastProvider,
@@ -422,6 +518,9 @@
   window.TCMCloudAI = Object.freeze({
     complete,
     testProviders,
+    getProxyStatus,
+    getRouteMode,
+    setRouteMode,
     cleanJsonText,
     repairJsonText,
     getCapabilities,

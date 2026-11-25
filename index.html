@@ -1102,15 +1102,24 @@
       </div>
       <form id="qwenCfgForm" class="space-y-3 text-xs">
         <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 leading-relaxed">
-          <strong>智能设计助手已就绪</strong><br />
-          支持直接输入药材名称与实验要求，自动生成完整工艺路线、装置选型与报告框架；网络波动时自动切换站内精编方案库。
+          <strong>多引擎混合智能调度已就绪</strong><br />
+          后端自动整合 <strong>智谱 GLM + 讯飞星辰 + 阿里云通义</strong> 多通道容错：日常问答自动走低延迟通道，复杂实验设计与 JSON 编排自动路由强推理通道，单通道波动时毫秒级无缝切换。
+        </div>
+        <div class="space-y-1.5">
+          <label for="aiRouteModeSelect" class="block text-[11px] font-bold text-slate-700">混合路由策略</label>
+          <select id="aiRouteModeSelect" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
+            <option value="auto">✨ 自动三引擎混编 + 故障兜底（推荐）</option>
+            <option value="zhipu">🌿 优先智谱 GLM（备选自动兜底）</option>
+            <option value="xunfei">⚡ 优先讯飞星辰 MaaS（备选自动兜底）</option>
+            <option value="aliyun">☁️ 优先阿里云通义（备选自动兜底）</option>
+          </select>
         </div>
         <div id="aiProviderList" class="grid gap-2 text-[11px] text-slate-600">
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">① 云端智能设计：支持自由输入自然语言需求，定制提取与分离工艺</div>
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">② 站内精编方案库：离线或网络波动时自动平滑衔接，保障实验课全程顺畅</div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">① 三引擎云端混编：智谱 GLM / 讯飞星辰 / 阿里云通义协同辅助与自动故障切换</div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">② 站内精编方案库：离线或全通道繁忙时自动平滑衔接，保障实验课全程顺畅</div>
         </div>
         <p class="text-[10px] leading-relaxed text-slate-400">智能生成的方案与推演数据仅作研究与小试模拟草稿，药典限度须以《中国药典》2025 年版原文核对，实际实验与生产须经实验验证、工艺验证及质量审核。</p>
-        <div id="qwenCfgStatus" class="hidden p-2.5 rounded-xl text-[11px] leading-relaxed"></div>
+        <div id="qwenCfgStatus" class="hidden p-2.5 rounded-xl text-[11px] leading-relaxed whitespace-pre-line"></div>
         <div class="flex flex-wrap gap-2 pt-1">
           <button id="btnTestQwenCfg" type="button" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">检测连接状态</button>
           <button id="btnClearQwenCfg" type="button" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">重置缓存</button>

@@ -3868,13 +3868,33 @@
     updateQwenStatusUI();
     const openCfg = () => {
       const capabilities = window.TCMCloudAI?.getCapabilities?.() || { qwen: false, workbuddy: false };
+      const routeSel = document.getElementById('aiRouteModeSelect');
+      if (routeSel && window.TCMCloudAI?.getRouteMode) {
+        routeSel.value = window.TCMCloudAI.getRouteMode();
+      }
       const cfgSt = document.getElementById('qwenCfgStatus');
-      cfgSt.className = 'p-2.5 rounded-xl text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-900';
-      cfgSt.textContent = `云端智能服务：${capabilities.qwen ? '连接正常' : '维护中'}；站内精编方案库：随时可用。`;
+      cfgSt.className = 'p-2.5 rounded-xl text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-900 whitespace-pre-line';
+      cfgSt.textContent = `云端多引擎服务：${capabilities.qwen ? '连接正常' : '维护中'}；站内精编方案库：随时可用。`;
       cfgSt.classList.remove('hidden');
       const m = document.getElementById('qwenConfigModal');
       m.classList.remove('hidden'); m.classList.add('flex');
+      if (window.TCMCloudAI?.getProxyStatus) {
+        window.TCMCloudAI.getProxyStatus().then((ps) => {
+          if (!ps?.providers) return;
+          const lines = Object.values(ps.providers).map((p) => `${p.configured ? '●' : '○'} ${p.name}（${p.model}）：${p.configured ? '已接入' : '待配置'}`);
+          cfgSt.textContent = `当前已接入 ${ps.activeCount || 0} 路云端引擎（站内方案库随时兜底）：\n` + lines.join('\n');
+        }).catch(() => {});
+      }
     };
+    const routeSelEl = document.getElementById('aiRouteModeSelect');
+    if (routeSelEl) {
+      routeSelEl.addEventListener('change', () => {
+        if (window.TCMCloudAI?.setRouteMode) {
+          window.TCMCloudAI.setRouteMode(routeSelEl.value);
+          showToast('已切换 AI 混合调度策略');
+        }
+      });
+    }
     const closeCfg = () => {
       const m = document.getElementById('qwenConfigModal');
       m.classList.add('hidden'); m.classList.remove('flex');
