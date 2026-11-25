@@ -52,37 +52,28 @@
     particles: []
   };
 
-  var AR_CARDS = [
-    { name: "丹参", comp: "丹参酮 IIA · 丹酚酸 B", polarity: "脂溶性酮类 + 水溶性酚酸", rig: "回流提取 / D101 大孔树脂", note: "脂水双提兼顾亲脂与亲水活性成分，注意防氧化与乳化。" },
-    { name: "黄芩", comp: "黄芩苷 · 汉黄芩苷", polarity: "中等极性黄酮苷", rig: "沸水杀酶 / 酸沉精制", note: "切忌常温久置酶解变绿，建议沸水短时提取。" },
-    { name: "薄荷", comp: "薄荷脑 · 挥发油", polarity: "低极性挥发性单萜", rig: "水蒸气蒸馏 / 挥发油测定器", note: "先通冷凝水再加热，注意控制蒸馏速率与防倒吸。" },
-    { name: "黄连", comp: "小檗碱", polarity: "季铵型生物碱", rig: "酸水提取 / 盐析结晶", note: "酸性条件下溶解度高，注意 pH 控制与试剂安全。" }
-  ];
-  var arIndex = 0;
-  var arStream = null;
-
   function ensureModal() {
     if (modalEl) return modalEl;
+    var ico = function (d) { return '<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true">' + d + '</svg>'; };
     modalEl = document.createElement("div");
     modalEl.id = "tcmV22Modal";
     modalEl.className = "no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/65 backdrop-blur-xs p-3 sm:p-5";
     modalEl.innerHTML =
-      '<div class="bg-white rounded-3xl border border-slate-200 max-w-6xl w-full max-h-[93vh] flex flex-col shadow-2xl overflow-hidden">' +
+      '<div class="bg-white rounded-2xl border border-slate-200 max-w-6xl w-full max-h-[93vh] flex flex-col shadow-2xl overflow-hidden">' +
         '<div class="px-5 py-3.5 bg-gradient-to-r from-[#062922] via-[#0a4538] to-[#0f6b58] text-white flex items-center justify-between gap-3">' +
           '<div class="flex items-center gap-2.5">' +
-            '<span class="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 text-[11px] font-extrabold">3D 视觉体验舱</span>' +
-            '<h3 class="text-sm sm:text-base font-extrabold">3D 虚拟实验室 · 物理流体仿真 · 驾驶舱大屏 · AR 药材卡</h3>' +
+            '<span class="px-2 py-0.5 rounded-md bg-emerald-400/20 text-emerald-200 text-[11px] font-bold">3D 实验体验舱</span>' +
+            '<h3 class="text-sm sm:text-base font-extrabold">三维虚拟实验室 · 液液萃取流体仿真 · 五维雷达驾驶舱</h3>' +
           '</div>' +
-          '<button type="button" id="v22BtnClose" aria-label="关闭弹窗" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-lg leading-none">×</button>' +
+          '<button type="button" id="v22BtnClose" aria-label="关闭弹窗" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg leading-none">×</button>' +
         '</div>' +
         '<div class="px-5 pt-3 pb-2 border-b border-slate-100 bg-[#f6f8f7] flex flex-wrap items-center justify-between gap-2">' +
-          '<div class="inline-flex flex-wrap p-1 rounded-xl bg-white border border-slate-200 text-xs font-extrabold">' +
-            '<button type="button" data-v22-tab="vlab" class="px-3.5 py-1.5 rounded-lg transition">🕹️ 第一人称 3D 实验室</button>' +
-            '<button type="button" data-v22-tab="fluid" class="px-3.5 py-1.5 rounded-lg transition">🌊 物理流体仿真</button>' +
-            '<button type="button" data-v22-tab="cockpit" class="px-3.5 py-1.5 rounded-lg transition">📊 驾驶舱大屏</button>' +
-            '<button type="button" data-v22-tab="ar" class="px-3.5 py-1.5 rounded-lg transition">📱 AR 药材卡</button>' +
+          '<div class="inline-flex flex-wrap p-1 rounded-xl bg-white border border-slate-200 text-xs font-bold gap-1">' +
+            '<button type="button" data-v22-tab="vlab" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition">' + ico('<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>') + '<span>第一人称三维实验室</span></button>' +
+            '<button type="button" data-v22-tab="fluid" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition">' + ico('<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>') + '<span>液液萃取流体仿真</span></button>' +
+            '<button type="button" data-v22-tab="cockpit" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition">' + ico('<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>') + '<span>五维雷达驾驶舱</span></button>' +
           '</div>' +
-          '<span class="text-[11px] text-slate-500 font-semibold">实时物理溶剂内核 · 3D 雷达投影 · 离线零外链</span>' +
+          '<span class="text-[11px] text-slate-500 font-semibold">全题库 136 课题联动 · 真实物理溶剂内核 · 离线零外链</span>' +
         '</div>' +
         '<div id="v22Body" class="flex-1 overflow-y-auto p-4 sm:p-5"></div>' +
       '</div>';
@@ -96,7 +87,6 @@
       if (tabBtn) {
         activeTab = tabBtn.getAttribute("data-v22-tab");
         stopLoop();
-        stopCamera();
         renderTab();
       }
     });
@@ -131,16 +121,10 @@
     }
   }
 
-  function stopCamera() {
-    if (arStream) {
-      arStream.getTracks().forEach(function (t) { t.stop(); });
-      arStream = null;
-    }
-  }
-
   function openModal(tab) {
     ensureModal();
-    if (tab) activeTab = tab;
+    if (tab && (tab === "vlab" || tab === "fluid" || tab === "cockpit")) activeTab = tab;
+    else if (tab) activeTab = "vlab";
     modalEl.classList.remove("hidden");
     modalEl.classList.add("flex");
     renderTab();
@@ -148,7 +132,6 @@
 
   function closeModal() {
     stopLoop();
-    stopCamera();
     if (modalEl) {
       modalEl.classList.add("hidden");
       modalEl.classList.remove("flex");
@@ -158,13 +141,12 @@
   function renderTab() {
     modalEl.querySelectorAll("[data-v22-tab]").forEach(function (b) {
       var on = b.getAttribute("data-v22-tab") === activeTab;
-      b.className = "px-3.5 py-1.5 rounded-lg transition " + (on ? "bg-[#064e3b] text-white" : "text-slate-600 hover:text-slate-900");
+      b.className = "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition " + (on ? "bg-[#0f4c3a] text-white" : "text-slate-600 hover:text-slate-900");
     });
     var body = modalEl.querySelector("#v22Body");
     if (activeTab === "vlab") renderVlab(body);
     else if (activeTab === "fluid") renderFluid(body);
-    else if (activeTab === "cockpit") renderCockpit(body);
-    else renderArCard(body);
+    else renderCockpit(body);
   }
 
   function renderVlab(container) {
@@ -437,68 +419,6 @@
     container.innerHTML = '<div class="p-6 text-center text-sm text-slate-500">驾驶舱数据大屏加载中...</div>';
   }
 
-  function renderArCard(container) {
-    var card = AR_CARDS[arIndex];
-    container.innerHTML =
-      '<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">' +
-        '<div class="lg:col-span-7 relative rounded-2xl bg-[#091b18] border border-emerald-500/25 overflow-hidden min-h-[290px] flex items-center justify-center">' +
-          '<video id="v22ArVideo" autoplay playsinline class="w-full h-[290px] object-cover hidden"></video>' +
-          '<div id="v22ArSimView" class="p-6 text-center space-y-2 text-white">' +
-            '<div class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-extrabold">AR 识别视角 · ' + card.name + '</div>' +
-            '<div class="text-2xl font-black tracking-wide pt-1">' + card.name + '</div>' +
-            '<div class="text-xs text-teal-200/85 max-w-md mx-auto">将教材药材卡置于镜头前，或点击右侧「启动摄像头 AR」体验实景叠加；无摄像头亦可直接切换下方药材卡。</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="lg:col-span-5 rounded-2xl bg-white border border-slate-200 p-4 space-y-3 text-xs">' +
-          '<div class="flex flex-wrap gap-1.5">' +
-            AR_CARDS.map(function (c, i) {
-              var on = i === arIndex;
-              return '<button type="button" data-v22-ar="' + i + '" class="px-3 py-1.5 rounded-xl font-extrabold border ' +
-                (on ? 'bg-[#059669] text-white border-[#059669]' : 'bg-slate-50 text-slate-700 border-slate-200') + '">' + c.name + "</button>";
-            }).join("") +
-          '</div>' +
-          '<div class="p-3.5 rounded-2xl bg-[#f6f8f7] border border-slate-200/80 space-y-1.5">' +
-            '<div class="font-extrabold text-slate-900">核心成分：' + card.comp + '</div>' +
-            '<div class="text-slate-700">极性特征：' + card.polarity + '</div>' +
-            '<div class="text-[#047857] font-bold">推荐装置：' + card.rig + '</div>' +
-            '<p class="text-slate-600 leading-relaxed pt-1">' + card.note + '</p>' +
-          '</div>' +
-          '<div class="flex gap-2">' +
-            '<button type="button" id="v22BtnCamOn" class="flex-1 py-2 rounded-xl bg-[#064e3b] text-white font-extrabold">📷 启动摄像头 AR</button>' +
-            '<button type="button" id="v22BtnCamOff" class="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold">关闭镜头</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-
-    container.querySelectorAll("[data-v22-ar]").forEach(function (b) {
-      b.addEventListener("click", function () {
-        arIndex = Number(b.getAttribute("data-v22-ar"));
-        renderTab();
-      });
-    });
-
-    var vid = container.querySelector("#v22ArVideo");
-    var sim = container.querySelector("#v22ArSimView");
-    container.querySelector("#v22BtnCamOn").addEventListener("click", function () {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function (stream) {
-        stopCamera();
-        arStream = stream;
-        vid.srcObject = stream;
-        vid.classList.remove("hidden");
-        sim.classList.add("hidden");
-      }).catch(function () {
-        if (sim) sim.innerHTML = '<div class="text-amber-300 font-bold">未检测到可用摄像头或权限已拒绝，已保持虚拟 AR 卡预览。</div>';
-      });
-    });
-
-    container.querySelector("#v22BtnCamOff").addEventListener("click", function () {
-      stopCamera();
-      if (vid) vid.classList.add("hidden");
-      if (sim) sim.classList.remove("hidden");
-    });
-  }
-
   function togglePresentMode() {
     var active = document.body.classList.toggle("tcm-v22-present-mode");
     var exitBtn = document.getElementById("v22PresentExitBtn");
@@ -523,10 +443,10 @@
     dock.id = "tcmV22FabDock";
     dock.className = "v22-fab-dock no-print";
     dock.innerHTML =
-      '<button type="button" class="v22-fab-btn accent" data-v22-open="vlab">🕹️ 虚拟实验室</button>' +
-      '<button type="button" class="v22-fab-btn" data-v22-open="fluid">🌊 流体仿真</button>' +
-      '<button type="button" class="v22-fab-btn" data-v22-open="ar">📱 AR 药材卡</button>' +
-      '<button type="button" class="v22-fab-btn" id="v22BtnPresent">🖥️ 投影模式</button>';
+      '<button type="button" class="v22-fab-btn accent" data-v22-open="vlab">三维虚拟实验室</button>' +
+      '<button type="button" class="v22-fab-btn" data-v22-open="fluid">液液萃取仿真</button>' +
+      '<button type="button" class="v22-fab-btn" data-v22-open="cockpit">五维雷达驾驶舱</button>' +
+      '<button type="button" class="v22-fab-btn" id="v22BtnPresent">教学投影模式</button>';
 
     dock.addEventListener("click", function (e) {
       var openBtn = e.target.closest("[data-v22-open]");
@@ -547,9 +467,9 @@
     if (window.TCM_V16_PORTAL && typeof window.TCM_V16_PORTAL.registerExtension === "function") {
       window.TCM_V16_PORTAL.registerExtension({
         id: "v22_visual_suite",
-        icon: "🕹️",
-        title: "虚拟实验室 & 流体/AR 体验舱",
-        desc: "包含 WASD 虚拟实验室、两相分层/乳化/滴定流体仿真及 AR 药材卡。",
+        icon: "LAB",
+        title: "三维虚拟实验室、流体仿真与驾驶舱",
+        desc: "包含第一人称 3D 实验室、液液萃取物理流体仿真与 136 课题五维雷达驾驶舱。",
         onOpen: function () { openModal("vlab"); }
       });
     }

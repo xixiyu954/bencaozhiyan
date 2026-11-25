@@ -4425,6 +4425,28 @@
       literature: GLOBAL_LITERATURE.length + (state.extraGlobalRefs ? state.extraGlobalRefs.length : 0),
       univCases: UNIV_CASES.length
     }),
+    getAllLiterature: () => [...GLOBAL_LITERATURE, ...(state.extraGlobalRefs || [])],
+    getAllUnivCases: () => [...UNIV_CASES],
+    getAllRigs: () => ({ ...LAB_RIGS }),
+    findLiteratureForTopic: (topicOrKeyword, limit = 6) => {
+      const allLit = [...GLOBAL_LITERATURE, ...(state.extraGlobalRefs || [])];
+      const t = typeof topicOrKeyword === 'string'
+        ? { herb: topicOrKeyword, compound: topicOrKeyword, category: '' }
+        : (topicOrKeyword || getTopicDef());
+      const herbClean = String(t.herb || '').split(/[（(·/\s]/)[0].trim();
+      const compTokens = String(t.compound || '').split(/[→+/、，,（()\s]+/).map(s => s.trim()).filter(s => s.length >= 2);
+      const catClean = String(t.category || '').split(/[与/]/)[0].trim();
+      const scored = allLit.map((item) => {
+        const hay = `${item.text || ''} ${item.cat || ''}`;
+        let sc = 0;
+        if (herbClean && hay.includes(herbClean)) sc += 8;
+        compTokens.forEach(tk => { if (hay.includes(tk)) sc += 5; });
+        if (catClean && hay.includes(catClean)) sc += 2;
+        return { item, sc };
+      });
+      const hits = scored.filter(x => x.sc > 0).sort((a, b) => b.sc - a.sc).slice(0, limit).map(x => x.item);
+      return hits.length ? hits : allLit.slice(0, Math.min(3, limit));
+    },
     setSessionDraft: (topicObj, wsPatch) => {
       if (!topicObj) return null;
       const draft = { ...hydrateTopic(topicObj), ...topicObj, isCustom: true, isDraft: true };

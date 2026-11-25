@@ -39,8 +39,71 @@
     { herb: "麻黄", comp: "盐酸麻黄碱", cat: "生物碱", proc: "水蒸气共沸蒸馏", rig: "水蒸气蒸馏器", det: "双缩脲反应 + HPLC 210nm", note: "有机胺类生物碱游离态具挥发性，碱化后可借水蒸气蒸馏与高沸点杂质分离。" }
   ];
 
-  function buildKgData(filterCat) {
-    var rows = filterCat === "全部" ? KG_CORE_RELATIONS : KG_CORE_RELATIONS.filter(function (r) { return r.cat === filterCat; });
+  function normalizeKgCat(catStr) {
+    var s = String(catStr || "");
+    if (/黄酮/.test(s)) return "黄酮";
+    if (/蒽醌|醌/.test(s)) return "醌类";
+    if (/生物碱/.test(s)) return "生物碱";
+    if (/苯丙素|有机酸|酚酸/.test(s)) return "苯丙素";
+    if (/挥发油/.test(s)) return "挥发油";
+    if (/内酯|环烯醚萜/.test(s)) return "萜内酯";
+    if (/香豆素|木脂素/.test(s)) return "香豆素/木脂素";
+    if (/皂苷|三萜/.test(s)) return "皂苷";
+    if (/甾体|强心苷/.test(s)) return "甾体/强心苷";
+    if (/氰苷|多糖/.test(s)) return "氰苷/多糖";
+    return "黄酮";
+  }
+
+  function getAllKgRelations() {
+    var out = KG_CORE_RELATIONS.slice();
+    var seenKey = {};
+    out.forEach(function (r) { seenKey[r.herb + "|" + r.comp] = true; });
+    var api = window.TCM_LAB_API;
+    var all = (api && api.getAllTopics) ? api.getAllTopics() : [];
+    var rigMap = {
+      reflux: "热回流提取装置", steam: "水蒸气蒸馏器", soxhlet: "索氏连续虹吸器",
+      ultrasonic: "超声辅助提取仪", percolation: "常温渗漉柱", decoction: "常压煎煮/回流",
+      sfe: "超临界 CO₂ 萃取釜", resin: "大孔吸附树脂柱", rotavap: "减压旋转蒸发仪"
+    };
+    all.forEach(function (t) {
+      var hRaw = String(t.herb || "").trim();
+      var hShort = hRaw.split("（")[0].trim();
+      if (!hShort) return;
+      var hyd = (api && api.getTopicById) ? (api.getTopicById(t.id) || t) : t;
+      var compShort = String(hyd.compound || "核心成分").slice(0, 18);
+      var k = hShort + "|" + compShort;
+      if (seenKey[k]) return;
+      seenKey[k] = true;
+      var cfg = hyd.defaultCfg || {};
+      var solv = cfg.solventType || "70%乙醇";
+      var temp = cfg.temp || 75;
+      var rig = rigMap[hyd.defaultRig] || "热回流提取装置";
+      var det = (hyd.tlcSystem ? "TLC展开" : "HPLC定量") + (hyd.limitVal ? " · 药典≥" + hyd.limitVal + (hyd.limitUnit || "%") : "");
+      out.push({
+        herb: hShort,
+        comp: compShort,
+        cat: normalizeKgCat(hyd.category),
+        proc: solv + " " + temp + "℃提取",
+        rig: rig,
+        det: det,
+        note: hyd.chemistry || hyd.pharmacopoeia || (hRaw + "核心有效成分：" + (hyd.compound || ""))
+      });
+    });
+    return out;
+  }
+
+  function buildKgData(filterCat, searchKeyword) {
+    var full = getAllKgRelations();
+    var rows = filterCat === "全部" ? full : full.filter(function (r) { return r.cat === filterCat; });
+    if (searchKeyword) {
+      var q = String(searchKeyword).trim();
+      var hits = full.filter(function (r) {
+        return (r.herb + " " + r.comp + " " + r.proc + " " + r.rig + " " + r.det + " " + r.cat).indexOf(q) >= 0;
+      });
+      if (hits.length) rows = hits;
+    }
+    var totalMatched = rows.length;
+    if (rows.length > 16) rows = rows.slice(0, 16);
     if (!rows.length) rows = KG_CORE_RELATIONS;
     var nodes = [];
     var edges = [];
@@ -74,7 +137,7 @@
       });
     });
 
-    return { nodes: nodes, edges: edges, nodeMap: nodeMap };
+    return { nodes: nodes, edges: edges, nodeMap: nodeMap, totalMatched: totalMatched, totalBank: full.length };
   }
 
   function findConnectedSet(selectedId, edges) {
@@ -98,17 +161,20 @@
     ratioA: 70
   };
 
-  // 按极性 p 严格升序排列，确保交替错层后完全零重叠
+  // 按极性 p 严格升序排列，覆盖全部 11 大中药化学成分极性谱
   var POLAR_COMPOUNDS = [
-    { id: "menthol", name: "薄荷脑", p: 2.2, bp: 212, cat: "挥发油", desc: "强亲脂单萜醇，适合石油醚/乙醇或水蒸气蒸馏。" },
+    { id: "muscone", name: "麝香酮", p: 1.2, bp: 328, cat: "大环酮挥发油", desc: "强亲脂大环酮，易溶于石油醚与正己烷。" },
+    { id: "menthol", name: "薄荷脑", p: 2.2, bp: 212, cat: "单萜挥发油", desc: "强亲脂单萜醇，适合石油醚/乙醇或水蒸气蒸馏。" },
+    { id: "artemisinin", name: "青蒿素", p: 3.1, bp: 156, cat: "倍半萜内酯", desc: "含过氧桥低极性内酯，须低温石油醚/乙醚浸提。" },
     { id: "tanshinone", name: "丹参酮 IIA", p: 4.3, bp: 205, cat: "邻菲醌", desc: "脂溶性邻菲醌，最适 95% 乙醇或乙酸乙酯。" },
-    { id: "emodin", name: "大黄素", p: 4.8, bp: 256, cat: "蒽醌", desc: "中低极性游离蒽醌，易溶于乙醇/乙酸乙酯/丙酮。" },
+    { id: "emodin", name: "大黄素", p: 4.8, bp: 256, cat: "游离蒽醌", desc: "中低极性游离蒽醌，易溶于乙醇/乙酸乙酯/丙酮。" },
     { id: "quercetin", name: "槲皮素", p: 5.5, bp: 316, cat: "黄酮醇", desc: "中等极性苷元，优选 70% 乙醇或乙酸乙酯。" },
     { id: "berberine", name: "小檗碱", p: 6.4, bp: 145, cat: "生物碱", desc: "季铵盐型偏亲水，常用酸水盐析或 70% 乙醇。" },
-    { id: "ginsenoside", name: "人参皂苷 Rg1", p: 7.1, bp: 194, cat: "皂苷", desc: "两亲性三萜皂苷，优选 70% 乙醇回流避多糖。" },
+    { id: "ginsenoside", name: "人参皂苷 Rg1", p: 7.1, bp: 194, cat: "三萜皂苷", desc: "两亲性三萜皂苷，优选 70% 乙醇回流避多糖。" },
     { id: "baicalin", name: "黄芩苷", p: 7.5, bp: 223, cat: "黄酮苷", desc: "含葡萄糖醛酸羧基，适合沸水杀酶或 50%~70% 乙醇。" },
-    { id: "chlorogenic", name: "绿原酸", p: 8.2, bp: 208, cat: "酚酸", desc: "强极性热敏酚酸，优选 50% 乙醇或微酸水低温超声。" },
-    { id: "polysacc", name: "茯苓多糖", p: 9.8, bp: 100, cat: "多糖", desc: "强亲水大分子，仅溶于纯化水，遇醇沉淀。" }
+    { id: "chlorogenic", name: "绿原酸", p: 8.2, bp: 208, cat: "苯丙素酚酸", desc: "强极性热敏酚酸，优选 50% 乙醇或微酸水低温超声。" },
+    { id: "amygdalin", name: "苦杏仁苷", p: 8.9, bp: 214, cat: "氰苷类", desc: "强亲水龙胆二糖苷，沸水燀制杀酶保苷提取。" },
+    { id: "polysacc", name: "枸杞/茯苓多糖", p: 9.8, bp: 100, cat: "中药多糖", desc: "强亲水大分子，仅溶于纯化水，80% 乙醇醇沉精制。" }
   ];
 
   function getSolventList() {
@@ -134,7 +200,10 @@
   var PIPE_PRESETS = {
     gmp: { name: "标准 GMP 稳态", params: { mesh: 40, extTemp: 78, extRatio: 10, filtPress: 0.08, concTemp: 55, resinElute: 70, dryTemp: 60, granuleHum: 4.5, qcSample: 3 } },
     rush: { name: "高温抢产（热敏警报）", params: { mesh: 65, extTemp: 96, extRatio: 10, filtPress: 0.09, concTemp: 81, resinElute: 85, dryTemp: 84, granuleHum: 6.5, qcSample: 1 } },
-    eco: { name: "低碳节能中试", params: { mesh: 35, extTemp: 72, extRatio: 10, filtPress: 0.07, concTemp: 50, resinElute: 65, dryTemp: 54, granuleHum: 4.0, qcSample: 2 } }
+    eco: { name: "低碳节能中试", params: { mesh: 35, extTemp: 72, extRatio: 10, filtPress: 0.07, concTemp: 50, resinElute: 65, dryTemp: 54, granuleHum: 4.0, qcSample: 2 } },
+    danshen_bi: { name: "丹参脂水双提标杆", params: { mesh: 30, extTemp: 76, extRatio: 8, filtPress: 0.08, concTemp: 48, resinElute: 70, dryTemp: 56, granuleHum: 4.0, qcSample: 3 } },
+    huangqin_enz: { name: "黄芩沸水杀酶酸沉", params: { mesh: 25, extTemp: 98, extRatio: 12, filtPress: 0.09, concTemp: 58, resinElute: 50, dryTemp: 60, granuleHum: 4.5, qcSample: 3 } },
+    sanqi_resin: { name: "三七血塞通树脂纯化", params: { mesh: 40, extTemp: 74, extRatio: 10, filtPress: 0.08, concTemp: 52, resinElute: 70, dryTemp: 55, granuleHum: 3.5, qcSample: 4 } }
   };
 
   var pipeState = {
@@ -244,6 +313,40 @@
     }
   };
 
+  function buildDynamicTopicScript(topicId) {
+    var api = window.TCM_LAB_API;
+    var t = (api && api.getTopicById) ? api.getTopicById(topicId) : null;
+    if (!t) return TL_SCRIPTS.danshen;
+    var cfg = t.defaultCfg || {};
+    var solv = cfg.solventType || "70% 乙醇";
+    var temp = cfg.temp || 75;
+    var ratio = cfg.ratio || 10;
+    var time = cfg.time || 60;
+    var cyc = cfg.cycles || 2;
+    var mass = cfg.mass || 50;
+    var lits = (api && api.findLiteratureForTopic) ? api.findLiteratureForTopic(t, 1) : [];
+    var litNote = lits.length ? "文献依据：" + lits[0].text : "严格遵循《中国药典》2025 版检验通则。";
+    return {
+      name: t.herb + " · " + (t.compound || t.category) + "（题库自动分镜 · 6 镜头）",
+      shots: [
+        { code: "SHOT 01", title: "药材基原核对与粉碎称量", dur: "15 min", temp: "常温干燥", solv: cfg.mesh || "中粉(40目)", risk: "基原与粒度控", detail: "核对 " + t.herb + " 饮片性状与基原（" + (t.origin || t.category || "中药饮片") + "），精密称取 " + mass + " g 置提取容器。", tip: "粒度过细易糊筛，过粗则浸出速率偏慢。" },
+        { code: "SHOT 02", title: "溶剂润湿与防暴沸准备", dur: "20 min", temp: "常温浸润", solv: solv + " 1:" + ratio, risk: "加沸石防暴沸", detail: "加入 " + (mass * ratio) + " mL " + solv + " 静置浸润 20 min 使细胞溶胀，投入 2~3 粒素瓷沸石。", tip: "严禁加热后再补加沸石，防突沸冲料。" },
+        { code: "SHOT 03", title: "装置搭建与冷却水互锁", dur: "10 min", temp: "升温至 " + temp + "℃", solv: "下进上出冷水", risk: "先通水后加热", detail: "自下而上装配核心提取装置，核验磨口密封与通风橱排风，先接通冷凝水再开启加热源。", tip: "有机溶剂严禁明火直接加热。" },
+        { code: "SHOT 04", title: "控温循环提取与传质", dur: time + " min × " + cyc, temp: temp + "℃ 恒温", solv: solv, risk: "防热敏降解", detail: "于 " + temp + "℃ 下恒温提取 " + cyc + " 次，每次 " + time + " min，实时观察目标成分（" + (t.compound || "") + "）浸出色泽变化。", tip: t.chemistry ? t.chemistry.slice(0, 68) : "保持平稳回流速率，兼顾收率与热稳定。" },
+        { code: "SHOT 05", title: "抽滤合并与低温减压浓缩", dur: "35 min", temp: "旋蒸 ≤50℃", solv: "溶剂回收", risk: "防泡沫冲料", detail: "趁热减压抽滤合并各次滤液，低温减压旋蒸回收溶剂并按极性/酸碱/树脂路线富集精制。", tip: "旋蒸须加装防暴沸缓冲球，先破真空再停泵。" },
+        { code: "SHOT 06", title: "TLC / HPLC 检识与药典对标", dur: "25 min", temp: "室温检视", solv: t.tlcSystem ? t.tlcSystem.slice(0, 26) : "标准展开剂", risk: t.limitVal ? "药典 ≥" + t.limitVal + (t.limitUnit || "%") : "药典合格", detail: (t.tlcSystem || "按对照品进行 TLC 与理化显色交叉验证") + "；质控标准：" + (t.pharmacopoeia || t.pharm || "参照《中国药典》2025 版测定含量") + "。", tip: litNote }
+      ]
+    };
+  }
+
+  function resolveTimelineScript(id) {
+    if (TL_SCRIPTS[id]) return TL_SCRIPTS[id];
+    if (String(id || "").indexOf("topic:") === 0) {
+      return buildDynamicTopicScript(String(id).slice(6));
+    }
+    return TL_SCRIPTS.danshen;
+  }
+
   function stopTimelineTimer() {
     if (tlState.timer) { clearInterval(tlState.timer); tlState.timer = null; }
     tlState.playing = false;
@@ -265,15 +368,27 @@
   }
 
   function deriveMicroSpec(t) {
-    var txt = [t.herb, t.compound, t.category].join(" ");
-    if (/丹参/.test(txt)) return { pWin: "2.4 ~ 5.8", maxT: 82, solv: "95%乙醇", rig: "热回流装置", ratio: "1:8", uvPeak: 270, uvPeak2: 355, kRate: 0.042, maxY: 88, decay: 0.0018, tlc: "甲苯-乙酸乙酯(19:1)", limit: "≥ 0.25%" };
-    if (/黄芩/.test(txt)) return { pWin: "6.2 ~ 10.2", maxT: 100, solv: "沸水(杀酶)", rig: "常压煎煮/回流", ratio: "1:12", uvPeak: 278, uvPeak2: 316, kRate: 0.048, maxY: 91, decay: 0.0006, tlc: "乙酸乙酯-丁酮-甲酸-水", limit: "≥ 9.0%" };
-    if (/金银花|绿原酸/.test(txt)) return { pWin: "6.2 ~ 10.2", maxT: 58, solv: "50%乙醇(微酸)", rig: "超声辅助仪", ratio: "1:12", uvPeak: 242, uvPeak2: 327, kRate: 0.068, maxY: 90, decay: 0.0036, tlc: "乙酸丁酯-甲酸-水", limit: "≥ 1.5%" };
-    if (/黄连|小檗碱/.test(txt)) return { pWin: "4.6 ~ 10.2", maxT: 90, solv: "0.5%硫酸水", rig: "常温渗漉柱", ratio: "1:10", uvPeak: 263, uvPeak2: 345, kRate: 0.032, maxY: 85, decay: 0.0005, tlc: "甲苯-乙酸乙酯-氨蒸气", limit: "≥ 5.5%" };
-    if (/薄荷/.test(txt)) return { pWin: "0.5 ~ 5.6", maxT: 82, solv: "纯化水(共沸)", rig: "水蒸气蒸馏器", ratio: "1:10", uvPeak: 215, uvPeak2: 245, kRate: 0.055, maxY: 82, decay: 0.0022, tlc: "甲苯-乙酸乙酯(19:1)", limit: "≥ 0.80%" };
-    if (/大黄/.test(txt)) return { pWin: "3.2 ~ 6.4", maxT: 85, solv: "乙醇/pH梯度", rig: "索氏提取器", ratio: "1:10", uvPeak: 254, uvPeak2: 430, kRate: 0.039, maxY: 86, decay: 0.0010, tlc: "石油醚-甲酸乙酯-甲酸", limit: "≥ 1.5%" };
-    if (/人参/.test(txt)) return { pWin: "5.0 ~ 8.0", maxT: 85, solv: "70%乙醇", rig: "热回流+树脂柱", ratio: "1:10", uvPeak: 203, uvPeak2: 260, kRate: 0.036, maxY: 84, decay: 0.0009, tlc: "三氯甲烷-甲醇-水", limit: "≥ 0.30%" };
-    return { pWin: "5.2 ~ 8.5", maxT: 88, solv: "70%乙醇", rig: "热回流装置", ratio: "1:10", uvPeak: 258, uvPeak2: 350, kRate: 0.044, maxY: 85, decay: 0.0011, tlc: "乙酸乙酯-甲酸-水", limit: "按药典标准" };
+    var api = window.TCM_LAB_API;
+    var hyd = (api && api.getTopicById && t && t.id) ? (api.getTopicById(t.id) || t) : (t || {});
+    var cfg = hyd.defaultCfg || {};
+    var txt = [hyd.herb, hyd.compound, hyd.category].join(" ");
+    var base;
+    if (/丹参/.test(txt)) base = { pWin: "2.4 ~ 5.8", maxT: 82, solv: "95%乙醇", rig: "热回流装置", ratio: "1:8", uvPeak: 270, uvPeak2: 355, kRate: 0.042, maxY: 88, decay: 0.0018, tlc: "甲苯-乙酸乙酯(19:1)", limit: "≥ 0.25%" };
+    else if (/黄芩/.test(txt)) base = { pWin: "6.2 ~ 10.2", maxT: 100, solv: "沸水(杀酶)", rig: "常压煎煮/回流", ratio: "1:12", uvPeak: 278, uvPeak2: 316, kRate: 0.048, maxY: 91, decay: 0.0006, tlc: "乙酸乙酯-丁酮-甲酸-水", limit: "≥ 9.0%" };
+    else if (/金银花|绿原酸/.test(txt)) base = { pWin: "6.2 ~ 10.2", maxT: 58, solv: "50%乙醇(微酸)", rig: "超声辅助仪", ratio: "1:12", uvPeak: 242, uvPeak2: 327, kRate: 0.068, maxY: 90, decay: 0.0036, tlc: "乙酸丁酯-甲酸-水", limit: "≥ 1.5%" };
+    else if (/黄连|小檗碱/.test(txt)) base = { pWin: "4.6 ~ 10.2", maxT: 90, solv: "0.5%硫酸水", rig: "常温渗漉柱", ratio: "1:10", uvPeak: 263, uvPeak2: 345, kRate: 0.032, maxY: 85, decay: 0.0005, tlc: "甲苯-乙酸乙酯-氨蒸气", limit: "≥ 5.5%" };
+    else if (/薄荷|挥发油|桂皮|丁香|艾叶|广藿香|细辛/.test(txt)) base = { pWin: "0.5 ~ 4.8", maxT: 85, solv: "纯化水(共沸)", rig: "水蒸气蒸馏器", ratio: "1:10", uvPeak: 215, uvPeak2: 280, kRate: 0.055, maxY: 82, decay: 0.0022, tlc: "甲苯-乙酸乙酯(19:1)", limit: "≥ 0.80%" };
+    else if (/大黄|蒽醌|决明|虎杖|紫草/.test(txt)) base = { pWin: "3.2 ~ 6.4", maxT: 85, solv: "乙醇/pH梯度", rig: "索氏提取器", ratio: "1:10", uvPeak: 254, uvPeak2: 430, kRate: 0.039, maxY: 86, decay: 0.0010, tlc: "石油醚-甲酸乙酯-甲酸", limit: "≥ 1.5%" };
+    else if (/人参|三七|皂苷|甘草|黄芪|柴胡|桔梗/.test(txt)) base = { pWin: "5.0 ~ 8.0", maxT: 85, solv: "70%乙醇", rig: "热回流+树脂柱", ratio: "1:10", uvPeak: 203, uvPeak2: 250, kRate: 0.036, maxY: 84, decay: 0.0009, tlc: "三氯甲烷-甲醇-水", limit: "≥ 0.30%" };
+    else if (/香豆素|木脂素|五味子|厚朴|连翘|秦皮|补骨脂|白芷/.test(txt)) base = { pWin: "3.5 ~ 6.2", maxT: 80, solv: "80%乙醇", rig: "热回流装置", ratio: "1:10", uvPeak: 248, uvPeak2: 332, kRate: 0.044, maxY: 86, decay: 0.0012, tlc: "石油醚-乙酸乙酯", limit: "按药典标准" };
+    else if (/多糖|枸杞|石斛/.test(txt)) base = { pWin: "8.0 ~ 10.2", maxT: 98, solv: "纯化水(醇沉)", rig: "常压煎煮/回流", ratio: "1:15", uvPeak: 205, uvPeak2: 260, kRate: 0.038, maxY: 89, decay: 0.0005, tlc: "PMP衍生HPLC", limit: "按药典标准" };
+    else base = { pWin: "5.2 ~ 8.5", maxT: 88, solv: "70%乙醇", rig: "热回流装置", ratio: "1:10", uvPeak: 258, uvPeak2: 350, kRate: 0.044, maxY: 85, decay: 0.0011, tlc: "乙酸乙酯-甲酸-水", limit: "按药典标准" };
+
+    if (cfg.solventType) base.solv = cfg.solventType;
+    if (cfg.ratio) base.ratio = "1:" + cfg.ratio;
+    if (hyd.tlcSystem) base.tlc = String(hyd.tlcSystem).slice(0, 28);
+    if (hyd.limitVal) base.limit = "≥ " + hyd.limitVal + (hyd.limitUnit || "%");
+    return base;
   }
 
   function buildMicroOverlaySvg(spA, spB, nameA, nameB, mode) {
@@ -386,13 +501,16 @@
 
   // ==================== 5 大子视图渲染器 ====================
   function renderKgTab(bodyEl) {
-    var kg = buildKgData(kgState.filter);
+    var kg = buildKgData(kgState.filter, kgState.search);
     if (!kg.nodeMap[kgState.selectedId]) kgState.selectedId = kg.nodes[0].id;
     var conn = findConnectedSet(kgState.selectedId, kg.edges);
     var selNode = kg.nodeMap[kgState.selectedId];
+    var selLits = (window.TCM_LAB_API && window.TCM_LAB_API.findLiteratureForTopic && selNode.herbName)
+      ? window.TCM_LAB_API.findLiteratureForTopic(selNode.herbName, 2)
+      : [];
 
     var typeColors = { "药材": "#10b981", "活性成分": "#f59e0b", "提取工艺": "#38bdf8", "实验装置": "#a855f7", "检测方法": "#f43f5e" };
-    var cats = ["全部", "黄酮", "醌类", "生物碱", "苯丙素", "挥发油", "皂苷"];
+    var cats = ["全部", "黄酮", "醌类", "生物碱", "苯丙素", "挥发油", "萜内酯", "香豆素/木脂素", "皂苷", "甾体/强心苷", "氰苷/多糖"];
 
     // 平滑三次贝塞尔连线
     var edgesSvg = kg.edges.map(function (e) {
@@ -433,7 +551,7 @@
           }).join("") +
         "</div>" +
         '<div style="display:flex;gap:6px;align-items:center;">' +
-          '<input type="text" id="v29KgSearch" class="v29-input" style="width:185px;padding:4px 10px;font-size:12px;" placeholder="🔍 定位节点（如 黄连 / 超声）" value="' + esc(kgState.search) + '"/>' +
+          '<input type="text" id="v29KgSearch" class="v29-input" style="width:185px;padding:4px 10px;font-size:12px;" placeholder="定位节点（如 黄连 / 超声）" value="' + esc(kgState.search) + '"/>' +
           '<button type="button" class="v29-btn-ghost" id="v29KgFindBtn" style="padding:4px 10px;">定位</button>' +
           (kgState.searchMsg ? '<span style="font-size:11px;color:#e11d48;font-weight:700;">' + esc(kgState.searchMsg) + '</span>' : "") +
         "</div>" +
@@ -455,18 +573,19 @@
           "</div>" +
         "</div>" +
         '<div class="v29-card">' +
-          '<div style="font-size:15px;font-weight:900;margin-bottom:6px;">🎯 当前聚焦节点：' + esc(selNode.label) + "</div>" +
-          '<div style="font-size:12px;color:#64748b;margin-bottom:10px;">节点层级：<strong>' + esc(selNode.type) + '</strong> · 大类：<strong>' + esc(selNode.extra) + '</strong> · 关联 <strong>' + relatedLabels.length + '</strong> 节点</div>' +
-          (selNode.note ? '<div style="padding:9px 11px;border-radius:11px;background:rgba(14,165,233,0.09);font-size:12px;line-height:1.55;margin-bottom:10px;"><strong>💡 化学机制要点：</strong>' + esc(selNode.note) + "</div>" : "") +
-          '<div style="display:flex;flex-direction:column;gap:6px;max-height:245px;overflow-y:auto;">' +
+          '<div style="font-size:15px;font-weight:900;margin-bottom:4px;">当前聚焦节点：' + esc(selNode.label) + "</div>" +
+          '<div style="font-size:11.5px;color:#64748b;margin-bottom:8px;">层级：<strong>' + esc(selNode.type) + '</strong> · 大类：<strong>' + esc(selNode.extra) + '</strong> · 图谱贯通 <strong>' + kg.totalBank + '</strong> 项工艺链路（当前筛选命中 ' + kg.totalMatched + ' 项）</div>' +
+          (selNode.note ? '<div style="padding:9px 11px;border-radius:10px;background:rgba(15,76,58,0.08);font-size:12px;line-height:1.55;margin-bottom:8px;"><strong>化学机制要点：</strong>' + esc(selNode.note) + "</div>" : "") +
+          (selLits.length ? '<div style="padding:8px 10px;border-radius:10px;background:rgba(17,29,25,0.04);font-size:11px;line-height:1.5;margin-bottom:8px;"><strong>关联实证文献：</strong><br/>' + selLits.map(function (l) { return "• " + esc(l.text); }).join("<br/>") + "</div>" : "") +
+          '<div style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;">' +
             relatedLabels.map(function (rn) {
               var isF = rn.id === kgState.selectedId;
               return '<button type="button" class="v29-kg-item' + (isF ? " is-focus" : "") + '" data-v29-node="' + esc(rn.id) + '"><strong>[' + esc(rn.type) + "]</strong> " + esc(rn.label) + "</button>";
             }).join("") +
           "</div>" +
           '<div style="display:flex;gap:6px;margin-top:10px;">' +
-            (selNode.herbName ? '<button type="button" class="v29-btn" id="v29KgToMicro" style="flex:1;">🔬 送入对比显微镜</button>' : "") +
-            '<button type="button" class="v29-btn-ghost" id="v29KgCopyChain" style="flex:1;">📋 复制工艺链路</button>' +
+            (selNode.herbName ? '<button type="button" class="v29-btn" id="v29KgToMicro" style="flex:1;">送入对比显微镜</button>' : "") +
+            '<button type="button" class="v29-btn-ghost" id="v29KgCopyChain" style="flex:1;">复制工艺链路</button>' +
           '</div>' +
         "</div>" +
       "</div>";
@@ -851,26 +970,37 @@
   }
 
   function renderTimelineTab(bodyEl) {
-    var script = TL_SCRIPTS[tlState.scriptId] || TL_SCRIPTS.danshen;
+    var script = resolveTimelineScript(tlState.scriptId);
     var shot = script.shots[tlState.shotIdx] || script.shots[0];
     var noteKey = tlState.scriptId + "_" + tlState.shotIdx;
     var curNote = tlState.notes[noteKey] || "";
     var pct = Math.round(((tlState.shotIdx + 1) / script.shots.length) * 100);
+    var allTopics = (window.TCM_LAB_API && window.TCM_LAB_API.getAllTopics) ? window.TCM_LAB_API.getAllTopics() : [];
 
     bodyEl.innerHTML =
       '<div class="v29-toolbar">' +
         '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' +
-          '<select class="v29-select" id="v29TlScript">' +
-            Object.keys(TL_SCRIPTS).map(function (k) {
-              return '<option value="' + k + '"' + (k === tlState.scriptId ? " selected" : "") + ">" + esc(TL_SCRIPTS[k].name) + "</option>";
-            }).join("") +
+          '<select class="v29-select" id="v29TlScript" style="max-width:340px;">' +
+            '<optgroup label="经典精编导演剧本">' +
+              Object.keys(TL_SCRIPTS).map(function (k) {
+                return '<option value="' + k + '"' + (k === tlState.scriptId ? " selected" : "") + ">" + esc(TL_SCRIPTS[k].name) + "</option>";
+              }).join("") +
+            '</optgroup>' +
+            (allTopics.length ? (
+              '<optgroup label="全题库 ' + allTopics.length + ' 味药材自动分镜剧本">' +
+                allTopics.map(function (t) {
+                  var val = "topic:" + t.id;
+                  return '<option value="' + esc(val) + '"' + (val === tlState.scriptId ? " selected" : "") + ">" + esc(t.herb + " · " + (t.compound || t.category)) + "</option>";
+                }).join("") +
+              '</optgroup>'
+            ) : "") +
           "</select>" +
-          '<button type="button" class="v29-btn" id="v29TlPlay">' + (tlState.playing ? "⏸ 暂停播放" : "▶ 播放分镜") + "</button>" +
+          '<button type="button" class="v29-btn" id="v29TlPlay">' + (tlState.playing ? "暂停播放" : "播放分镜") + "</button>" +
           [0.5, 1, 2].map(function (sp) {
             return '<button type="button" class="v29-pill' + (tlState.speed === sp ? " is-active" : "") + '" data-v29-speed="' + sp + '">' + sp + "× 倍速</button>";
           }).join("") +
         "</div>" +
-        '<div style="display:flex;gap:8px;align-items:center;"><span class="v29-kbd-hint">⌨️ ←/→ 切镜 · Space 播放</span><button type="button" class="v29-btn-ghost" id="v29TlExport">📤 导出课堂演示课件 (HTML)</button></div>' +
+        '<div style="display:flex;gap:8px;align-items:center;"><span class="v29-kbd-hint">←/→ 切镜 · Space 播放</span><button type="button" class="v29-btn-ghost" id="v29TlExport">导出课堂演示课件 (HTML)</button></div>' +
       "</div>" +
 
       '<div class="v29-tl-progress"><div style="width:' + pct + '%;"></div></div>' +
@@ -982,7 +1112,7 @@
   function startTimelinePlay() {
     stopTimelineTimer();
     tlState.playing = true;
-    var script = TL_SCRIPTS[tlState.scriptId] || TL_SCRIPTS.danshen;
+    var script = resolveTimelineScript(tlState.scriptId);
     tlState.timer = setInterval(function () {
       tlState.shotIdx = (tlState.shotIdx + 1) % script.shots.length;
       renderBody();
@@ -1015,7 +1145,13 @@
       { dim: "常规料液比", a: spA.ratio, b: spB.ratio, reason: "药材吸液膨胀率与目标成分溶解度不同。" },
       { dim: "UV 特征吸收峰", a: spA.uvPeak + " / " + spA.uvPeak2 + " nm", b: spB.uvPeak + " / " + spB.uvPeak2 + " nm", reason: "共轭双键与助色团差异导致紫外最大吸收波长偏移。" },
       { dim: "TLC 展开体系", a: spA.tlc, b: spB.tlc, reason: "展开剂极性与 pH 修饰剂须适配待测物解离特性。" },
-      { dim: "《中国药典》限度", a: spA.limit, b: spB.limit, reason: "各药材天然积累丰度与质控指标不同。" }
+      { dim: "《中国药典》限度", a: spA.limit, b: spB.limit, reason: "各药材天然积累丰度与质控指标不同。" },
+      {
+        dim: "关联实证文献",
+        a: (window.TCM_LAB_API && window.TCM_LAB_API.findLiteratureForTopic ? (window.TCM_LAB_API.findLiteratureForTopic(tA, 1)[0]?.text || "参见平台文献库") : "参见平台文献库"),
+        b: (window.TCM_LAB_API && window.TCM_LAB_API.findLiteratureForTopic ? (window.TCM_LAB_API.findLiteratureForTopic(tB, 1)[0]?.text || "参见平台文献库") : "参见平台文献库"),
+        reason: "对照平台 91 篇实证文献库提供工艺与质控实验依据。"
+      }
     ];
 
     var diffCount = rows.filter(function (r) { return r.a !== r.b; }).length;
@@ -1131,11 +1267,11 @@
       '<div class="v29-shell" role="dialog" aria-modal="true" aria-label="中药化学可视化探索中心">' +
         '<div class="v29-header">' +
           '<div class="v29-tabs">' +
-            '<button type="button" class="v29-tab" data-v29-tab="kg">4.1 🕸️ 知识图谱</button>' +
-            '<button type="button" class="v29-tab" data-v29-tab="polarity">4.2 🌌 极性宇宙</button>' +
-            '<button type="button" class="v29-tab" data-v29-tab="pipeline">4.3 🏭 流水线沙盘</button>' +
-            '<button type="button" class="v29-tab" data-v29-tab="timeline">4.4 🎬 导演时间轴</button>' +
-            '<button type="button" class="v29-tab" data-v29-tab="microscope">4.5 🔬 对比显微镜</button>' +
+            '<button type="button" class="v29-tab" data-v29-tab="kg">4.1 知识图谱</button>' +
+            '<button type="button" class="v29-tab" data-v29-tab="polarity">4.2 极性宇宙</button>' +
+            '<button type="button" class="v29-tab" data-v29-tab="pipeline">4.3 流水线沙盘</button>' +
+            '<button type="button" class="v29-tab" data-v29-tab="timeline">4.4 导演时间轴</button>' +
+            '<button type="button" class="v29-tab" data-v29-tab="microscope">4.5 对比显微镜</button>' +
           "</div>" +
           '<button type="button" class="v29-close" id="v29CloseBtn">关闭 ×</button>' +
         "</div>" +
@@ -1161,7 +1297,7 @@
       if (activeTab === "timeline") {
         var tag = (document.activeElement && document.activeElement.tagName) || "";
         if (tag === "TEXTAREA" || tag === "INPUT" || tag === "SELECT") return;
-        var script = TL_SCRIPTS[tlState.scriptId] || TL_SCRIPTS.danshen;
+        var script = resolveTimelineScript(tlState.scriptId);
         if (e.key === "ArrowRight") { e.preventDefault(); tlState.shotIdx = (tlState.shotIdx + 1) % script.shots.length; renderBody(); }
         else if (e.key === "ArrowLeft") { e.preventDefault(); tlState.shotIdx = (tlState.shotIdx - 1 + script.shots.length) % script.shots.length; renderBody(); }
         else if (e.key === " ") { e.preventDefault(); if (tlState.playing) { stopTimelineTimer(); renderBody(); } else startTimelinePlay(); }

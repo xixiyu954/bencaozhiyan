@@ -63,17 +63,91 @@ function forwardVisual(globalName, method) {
   };
 }
 
-// 1.2 轻量化成分-3D模型映射注册表（首屏常驻 <1.5 KB，供药材题库页与工坊 Step 1 成分名点击联动）
+// 1.2 全题库 136 味药材 × 65 项 PubChem 3D 分子映射注册表（首屏轻量化常驻，点击任意成分名即时按需水合 3D 分子库）
 const MOL3D_ENTRIES = [
-  { key: 'tanshinone', label: '丹参酮IIA', pattern: /丹参酮[ⅡI]{1,2}A|丹参酮IIA|丹参酮/g, herbRe: /丹参/ },
-  { key: 'baicalin', label: '黄芩苷', pattern: /黄芩苷|黄芩甙/g, herbRe: /黄芩/ },
-  { key: 'berberine', label: '小檗碱', pattern: /盐酸小檗碱|小檗碱|黄连素/g, herbRe: /黄连|黄柏|三颗针/ },
-  { key: 'menthol', label: '薄荷脑', pattern: /左旋薄荷脑|薄荷脑|薄荷醇/g, herbRe: /薄荷/ },
+  { key: 'tanshinone', label: '丹参酮IIA', pattern: /丹参酮[ⅡI]{1,2}A|丹参酮IIA|丹参酮/g, herbRe: /丹参(?!.*水溶)/ },
+  { key: 'baicalin', label: '黄芩苷', pattern: /黄芩苷|黄芩甙|黄芩素/g, herbRe: /黄芩|黄连解毒汤/ },
+  { key: 'berberine', label: '小檗碱', pattern: /盐酸小檗碱|小檗碱|黄连素|巴马汀/g, herbRe: /黄连|黄柏|三颗针/ },
+  { key: 'menthol', label: '薄荷脑', pattern: /左旋薄荷脑|薄荷脑|薄荷醇/g, herbRe: /薄荷|逍遥散/ },
   { key: 'chlorogenic', label: '绿原酸', pattern: /绿原酸/g, herbRe: /金银花|杜仲叶|茵陈/ },
-  { key: 'quercetin', label: '槲皮素', pattern: /槲皮素苷元|槲皮素/g, herbRe: /银杏|槐米|桑叶/ }
+  { key: 'quercetin', label: '槲皮素', pattern: /槲皮素苷元|槲皮素/g, herbRe: /银杏叶|槲皮|流苏石斛/ },
+  { key: 'rutin', label: '芦丁', pattern: /芦丁|芸香苷/g, herbRe: /槐米/ },
+  { key: 'puerarin', label: '葛根素', pattern: /葛根素/g, herbRe: /葛根/ },
+  { key: 'hesperidin', label: '橙皮苷', pattern: /橙皮苷/g, herbRe: /陈皮/ },
+  { key: 'nobiletin', label: '川陈皮素', pattern: /川陈皮素|橘皮素|多甲氧基黄酮/g, herbRe: /川陈皮素/ },
+  { key: 'icaritin', label: '淫羊藿素', pattern: /淫羊藿苷|朝藿定\s*C|宝藿苷[ⅠI]|脱水淫羊藿素/g, herbRe: /淫羊藿/ },
+  { key: 'daidzein', label: '大豆苷元', pattern: /大豆苷元|染料木素/g, herbRe: /大豆|淡豆豉/ },
+  { key: 'silybin', label: '水飞蓟宾', pattern: /水飞蓟宾|水飞蓟素/g, herbRe: /水飞蓟/ },
+  { key: 'vitexin', label: '牡荆素', pattern: /牡荆素鼠李糖苷|牡荆素|羟基红花黄色素\s*A/g, herbRe: /山楂叶|红花/ },
+  { key: 'eugenol', label: '丁香酚', pattern: /(?<!甲基)丁香酚/g, herbRe: /^丁香/ },
+  { key: 'methyleugenol', label: '甲基丁香酚', pattern: /甲基丁香酚|黄樟醚/g, herbRe: /细辛/ },
+  { key: 'cinnamaldehyde', label: '桂皮醛', pattern: /桂皮醛|肉桂醛/g, herbRe: /肉桂/ },
+  { key: 'ligustilide', label: '藁本内酯', pattern: /藁本内酯/g, herbRe: /当归(?!.*阿魏酸)/ },
+  { key: 'patchoulol', label: '百秋李醇', pattern: /百秋李醇|广藿香醇/g, herbRe: /广藿香/ },
+  { key: 'curcumol', label: '莪术醇', pattern: /莪术醇/g, herbRe: /莪术/ },
+  { key: 'paeonol', label: '丹皮酚', pattern: /丹皮酚|牡丹酚/g, herbRe: /牡丹皮/ },
+  { key: 'eucalyptol', label: '桉油精', pattern: /桉油精|异泽兰黄素/g, herbRe: /艾叶/ },
+  { key: 'atractylenolide_i', label: '白术内酯I', pattern: /白术内酯[ⅠIⅢ]*/g, herbRe: /白术/ },
+  { key: 'muscone', label: '麝香酮', pattern: /麝香酮/g, herbRe: /麝香/ },
+  { key: 'borneol', label: '冰片', pattern: /冰片|龙脑/g, herbRe: /冰片/ },
+  { key: 'artemisinin', label: '青蒿素', pattern: /青蒿素/g, herbRe: /青蒿/ },
+  { key: 'geniposide', label: '栀子苷', pattern: /栀子苷|西红花苷/g, herbRe: /栀子|西红花/ },
+  { key: 'andrographolide', label: '穿心莲内酯', pattern: /穿心莲内酯/g, herbRe: /穿心莲/ },
+  { key: 'ginkgolide_b', label: '银杏内酯B', pattern: /银杏内酯[A-C\s/]*/g, herbRe: /银杏内酯/ },
+  { key: 'gentiopicroside', label: '龙胆苦苷', pattern: /龙胆苦苷/g, herbRe: /龙胆/ },
+  { key: 'oridonin', label: '冬凌草甲素', pattern: /冬凌草甲素/g, herbRe: /冬凌草/ },
+  { key: 'paeoniflorin', label: '芍药苷', pattern: /芍药苷/g, herbRe: /白芍/ },
+  { key: 'triptolide', label: '雷公藤甲素', pattern: /雷公藤甲素/g, herbRe: /雷公藤/ },
+  { key: 'baccatin_iii', label: '紫杉烷母核', pattern: /紫杉醇|巴卡亭[ⅢI]+|10-DAB/g, herbRe: /红豆杉/ },
+  { key: 'matrine', label: '苦参碱', pattern: /氧化苦参碱|苦参碱/g, herbRe: /苦参/ },
+  { key: 'ephedrine', label: '麻黄碱', pattern: /盐酸麻黄碱|伪麻黄碱|麻黄碱/g, herbRe: /麻黄/ },
+  { key: 'tetrahydropalmatine', label: '延胡索乙素', pattern: /延胡索乙素|四氢巴马汀/g, herbRe: /延胡索/ },
+  { key: 'tetrandrine', label: '粉防己碱', pattern: /粉防己碱|千金藤素/g, herbRe: /防己|千金藤/ },
+  { key: 'scopolamine', label: '东莨菪碱', pattern: /东莨菪碱/g, herbRe: /洋金花/ },
+  { key: 'evodiamine', label: '吴茱萸碱', pattern: /吴茱萸碱/g, herbRe: /吴茱萸/ },
+  { key: 'sinomenine', label: '青藤碱', pattern: /青藤碱/g, herbRe: /青风藤/ },
+  { key: 'caffeine', label: '咖啡因', pattern: /咖啡因/g, herbRe: /绿茶/ },
+  { key: 'ligustrazine', label: '川芎嗪', pattern: /川芎嗪/g, herbRe: /川芎/ },
+  { key: 'huperzine_a', label: '石杉碱甲', pattern: /石杉碱甲|Huperzine\s*A/g, herbRe: /千层塔|蛇足石杉/ },
+  { key: 'camptothecin', label: '喜树碱', pattern: /喜树碱/g, herbRe: /喜树果/ },
+  { key: 'strychnine', label: '士的宁', pattern: /士的宁|马钱子碱|长春碱|长春新碱/g, herbRe: /马钱子|长春花/ },
+  { key: 'dnj', label: 'DNJ', pattern: /1-脱氧野尻霉素|\bDNJ\b/g, herbRe: /桑叶/ },
+  { key: 'aconine_core', label: '乌头原碱', pattern: /苯甲酰新乌头原碱|乌头碱|乌头原碱/g, herbRe: /附子/ },
+  { key: 'emodin', label: '大黄素', pattern: /大黄素|番泻苷/g, herbRe: /大黄|番泻叶/ },
+  { key: 'rhein', label: '大黄酸', pattern: /大黄酸/g, herbRe: /大黄酸/ },
+  { key: 'chrysophanol', label: '大黄酚', pattern: /大黄酚|橙黄决明素/g, herbRe: /决明子/ },
+  { key: 'resveratrol', label: '白藜芦醇', pattern: /白藜芦醇|虎杖苷/g, herbRe: /虎杖/ },
+  { key: 'shikonin', label: '紫草素', pattern: /左旋紫草素|紫草素/g, herbRe: /紫草/ },
+  { key: 'esculin', label: '秦皮甲素', pattern: /秦皮甲素|秦皮乙素|七叶苷/g, herbRe: /秦皮/ },
+  { key: 'osthole', label: '蛇床子素', pattern: /蛇床子素/g, herbRe: /蛇床子/ },
+  { key: 'psoralen', label: '补骨脂素', pattern: /异补骨脂素|补骨脂素/g, herbRe: /补骨脂/ },
+  { key: 'imperatorin', label: '欧前胡素', pattern: /异欧前胡素|欧前胡素|白花前胡甲素/g, herbRe: /白芷|前胡/ },
+  { key: 'schisandrin', label: '五味子醇甲', pattern: /五味子醇甲|五味子乙素/g, herbRe: /五味子/ },
+  { key: 'phillyrin', label: '连翘苷', pattern: /连翘酯苷\s*A|连翘苷|松脂醇二葡萄糖苷/g, herbRe: /连翘|杜仲(?!叶)/ },
+  { key: 'magnolol', label: '厚朴酚', pattern: /和厚朴酚|厚朴酚/g, herbRe: /厚朴/ },
+  { key: 'arctigenin', label: '牛蒡苷元', pattern: /牛蒡苷元|牛蒡苷/g, herbRe: /牛蒡子/ },
+  { key: 'ferulic', label: '阿魏酸', pattern: /阿魏酸|滨蒿内酯/g, herbRe: /阿魏酸/ },
+  { key: 'curcumin', label: '姜黄素', pattern: /去甲氧基姜黄素|姜黄素/g, herbRe: /姜黄/ },
+  { key: 'shikimic', label: '莽草酸', pattern: /莽草酸/g, herbRe: /八角茴香/ },
+  { key: 'gastrodin', label: '天麻素', pattern: /天麻素|红景天苷/g, herbRe: /天麻|红景天/ },
+  { key: 'rosmarinic', label: '迷迭香酸', pattern: /迷迭香酸|丹酚酸\s*B/g, herbRe: /夏枯草|丹参\(水溶/ },
+  { key: 'aspirin', label: '乙酰水杨酸', pattern: /乙酰水杨酸|水杨苷|阿司匹林/g, herbRe: /柳树皮/ },
+  { key: 'gallic', label: '没食子酸', pattern: /没食子酸|五倍子鞣酸|茶多酚/g, herbRe: /五倍子/ },
+  { key: 'glycyrrhetinic', label: '甘草次酸', pattern: /甘草酸单铵盐|甘草酸|甘草次酸/g, herbRe: /甘草/ },
+  { key: 'protopanaxadiol', label: '原人参二醇', pattern: /人参皂苷\s*Rg1|三七总皂苷|西洋参皂苷|原人参二醇/g, herbRe: /人参|三七|西洋参/ },
+  { key: 'ursolic', label: '熊果酸', pattern: /熊果酸|柴胡皂苷|桔梗皂苷D|茯苓酸|灵芝酸A/g, herbRe: /柴胡|桔梗|茯苓|灵芝/ },
+  { key: 'cycloastragenol', label: '环黄芪醇', pattern: /黄芪甲苷|环黄芪醇/g, herbRe: /黄芪(?!\(多糖)/ },
+  { key: 'diosgenin', label: '薯蓣皂苷元', pattern: /薯蓣皂苷元|重楼皂苷|麦冬皂苷D|知母皂苷/g, herbRe: /穿山龙|重楼|麦冬|知母/ },
+  { key: 'cinobufagin', label: '华蟾酥毒基', pattern: /华蟾酥毒基|杠柳毒苷/g, herbRe: /蟾酥|香加皮/ },
+  { key: 'amygdalin', label: '苦杏仁苷', pattern: /苦杏仁苷|垂盆草苷|黑芥子苷/g, herbRe: /苦杏仁|垂盆草|芥子/ },
+  { key: 'adenosine', label: '腺苷', pattern: /腺苷|水蛭素/g, herbRe: /冬虫夏草|水蛭/ },
+  { key: 'glucose_unit', label: '多糖吡喃糖基元', pattern: /枸杞多糖|黄芪多糖|石斛多糖/g, herbRe: /枸杞|黄芪\(多糖|石斛/ }
 ];
 
-const COMBINED_MOL_RE = /(丹参酮[ⅡI]{1,2}A|丹参酮IIA|丹参酮|黄芩苷|黄芩甙|盐酸小檗碱|小檗碱|黄连素|左旋薄荷脑|薄荷脑|薄荷醇|绿原酸|槲皮素苷元|槲皮素)/g;
+const COMBINED_MOL_RE = new RegExp(
+  '(' + MOL3D_ENTRIES.map((e) => e.pattern.source).join('|') + ')',
+  'g'
+);
 
 function lookupKeyByToken(token) {
   for (const e of MOL3D_ENTRIES) {
@@ -299,7 +373,6 @@ function mountBentoFabDock() {
       `<button type="button" class="v22-fab-btn" data-v22-open="fluid">${ico('<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>')}<span>液液萃取流体仿真</span></button>` +
       `<button type="button" class="v22-fab-btn" data-v22-open="cockpit">${ico('<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>')}<span>五维雷达驾驶舱</span></button>` +
       `<button type="button" class="v22-fab-btn" data-kb-open="overview">${ico('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>')}<span>六大学科知识库</span></button>` +
-      `<button type="button" class="v22-fab-btn" data-v22-open="ar">${ico('<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>')}<span>AR 药材卡片</span></button>` +
       `<button type="button" class="v22-fab-btn" id="v22BtnPresent">${ico('<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>')}<span>教学投影模式</span></button>` +
       `<button type="button" class="v22-fab-btn" id="v24BtnOpenGrowth">${ico('<path d="M12 15l-3.5 2 .7-4-2.9-2.8 4-.6L12 6l1.7 3.6 4 .6-2.9 2.8.7 4z"/>')}<span>实验成长档案</span></button>` +
     '</div>' +
@@ -425,23 +498,23 @@ function initVisualProxies() {
   if (window.TCM_V16_PORTAL && typeof window.TCM_V16_PORTAL.registerExtension === 'function') {
     window.TCM_V16_PORTAL.registerExtension({
       id: 'v20_mol3d',
-      icon: '🧬',
-      title: '3D 分子结构与粒子显色台',
-      desc: '基于 PubChem 真实 3D 构象：薄荷脑、丹参酮IIA、黄芩苷、小檗碱、绿原酸、槲皮素（官能团高亮与三模式切换）。',
+      icon: '3D',
+      title: '三维分子结构与显色实验室',
+      desc: '内置 65 项 PubChem 实测 3D 构象并全量贯通 136 味题库药材、91 篇文献与 12 项粒子显色反应。',
       onOpen: () => window.TCM_V20_VISUALS.openMol3d('tanshinone')
     });
     window.TCM_V16_PORTAL.registerExtension({
       id: 'v21_spectra',
-      icon: '🌈',
-      title: '交互式四谱工作站 & 猜峰挑战',
-      desc: 'UV / IR / ¹H-NMR / MS 可缩放谱图与悬停归属解析，内置猜峰小游戏。',
+      icon: 'UV',
+      title: '交互式四谱工作站与猜峰训练',
+      desc: '覆盖 11 大类中药成分的 UV / IR / ¹H-NMR / MS 交互谱图，直连 136 味药材药典波长与实证文献。',
       onOpen: () => window.TCM_V21_SPECTRA_LAB.open('黄酮')
     });
     window.TCM_V16_PORTAL.registerExtension({
       id: 'v22_visual_suite',
-      icon: '🕹️',
-      title: '3D 第一人称虚拟实验室 & 流体/AR 体验舱',
-      desc: '基于 Three.js 构建 10m×8m 实景 3D 实验室与丹参 7 步回流 SOP，内置安全互锁、流体仿真与 AR 药材卡。',
+      icon: 'LAB',
+      title: '三维虚拟实验室、流体仿真与驾驶舱',
+      desc: '基于 Three.js 构建 10m×8m 实景 3D 实验室与多课题 SOP，内置液液萃取流体仿真与 136 题五维雷达驾驶舱。',
       onOpen: () => window.TCM_V22_VISUAL_SUITE.open('vlab')
     });
   }

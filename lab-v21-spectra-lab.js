@@ -163,6 +163,268 @@
           { x: 179, h: 0.45, name: "咖啡酸碎片离子 (179)", detail: "确证咖啡酰基单元存在。" }
         ]
       }
+    },
+    "香豆素与木脂素": {
+      label: "香豆素与木脂素（补骨脂素 / 五味子醇甲）",
+      UV: {
+        xMin: 200, xMax: 420, unit: "nm", reverse: false, type: "curve",
+        shiftReagent: { label: "+ NaOH 内酯开环红移 (+38 nm 显黄绿荧光)", shift: 38, targetIdx: 2 },
+        peaks: [
+          { x: 246, h: 0.92, name: "246 nm 苯环共轭强带", detail: "苯并 α-吡喃酮母核苯环 π→π* 强吸收。" },
+          { x: 292, h: 0.74, name: "292 nm 呋喃/甲氧基带", detail: "线型呋喃香豆素（补骨脂素/欧前胡素）特征吸收带。" },
+          { x: 332, h: 0.68, name: "332 nm α-吡喃酮发色带", detail: "320~340 nm 吸收并伴 365 nm 天蓝色强荧光（秦皮甲素/蛇床子素）。" }
+        ]
+      },
+      IR: {
+        xMin: 500, xMax: 4000, unit: "cm⁻¹", reverse: true, type: "ir",
+        peaks: [
+          { x: 1725, h: 0.94, w: 26, name: "α-吡喃酮内酯 C=O", detail: "1715~1745 cm⁻¹ 极强尖峰，香豆素不饱和六元内酯标志峰。" },
+          { x: 1620, h: 0.78, w: 28, name: "共轭烯键/芳环 C=C", detail: "1625、1565、1500 cm⁻¹ 三组芳环与烯键骨架吸收。" },
+          { x: 1120, h: 0.72, w: 38, name: "内酯/甲氧基 C-O-C", detail: "1100~1250 cm⁻¹ 芳醚与内酯环碳氧单键伸缩。" }
+        ]
+      },
+      NMR: {
+        xMin: 0, xMax: 10, unit: "ppm", reverse: true, type: "nmr",
+        peaks: [
+          { x: 7.72, h: 0.86, mult: "d", integ: "1H", name: "H-4 顺式烯氢 (J=9.5 Hz)", detail: "δ 7.6~8.0 (d, J=9.5 Hz, 1H)，与 H-3 构成香豆素特征 AB 偶合双峰。" },
+          { x: 6.32, h: 0.84, mult: "d", integ: "1H", name: "H-3 顺式烯氢 (J=9.5 Hz)", detail: "δ 6.2~6.4 (d, J=9.5 Hz, 1H)，顺式偶合常数 J≈9.5 Hz 具专属性。" },
+          { x: 7.05, h: 0.72, mult: "s", integ: "2H", name: "芳环质子 H-5 / H-8", detail: "δ 6.8~7.5 苯环质子信号，可判定 6,7-取代或呋喃环并合方向。" },
+          { x: 3.92, h: 0.92, mult: "s", integ: "3H", name: "芳甲氧基 (-OCH₃)", detail: "δ 3.85~4.00 单峰，蛇床子素与五味子木脂素常见甲氧基取代。" }
+        ]
+      },
+      MS: {
+        xMin: 80, xMax: 300, unit: "m/z", reverse: false, type: "ms",
+        losses: [{ from: 244, to: 216, label: "-28 (脱 CO)" }, { from: 216, to: 189, label: "-27 (异戊烯裂解)" }],
+        peaks: [
+          { x: 244, h: 0.94, name: "分子离子峰 M⁺ (244)", detail: "如蛇床子素 M=244（补骨脂素 M=186），分子离子基峰稳定。" },
+          { x: 216, h: 0.72, name: "[M-CO]⁺ (m/z -28)", detail: "α-吡喃酮环脱去一分子 CO 收缩生成稳定苯并呋喃阳离子。" },
+          { x: 189, h: 0.64, name: "侧链断裂碎片 (189)", detail: "异戊烯基或甲氧基断裂特征峰。" }
+        ]
+      }
+    },
+    "挥发油与萜类": {
+      label: "挥发油与单萜（薄荷脑 / 桂皮醛 / 丁香酚）",
+      UV: {
+        xMin: 200, xMax: 380, unit: "nm", reverse: false, type: "curve",
+        shiftReagent: { label: "+ NaOH 酚类红移 (丁香酚 280 → 298 nm)", shift: 18, targetIdx: 1 },
+        peaks: [
+          { x: 214, h: 0.82, name: "214 nm 末端吸收", detail: "脂肪族单萜（薄荷脑/桉油精）仅具末端短波吸收，通常采用 GC 定量。" },
+          { x: 288, h: 0.94, name: "288 nm 共轭芳香醛/酚带", detail: "桂皮醛 (290 nm) 与丁香酚 (280 nm) 因苯环共轭具显著紫外吸收。" }
+        ]
+      },
+      IR: {
+        xMin: 500, xMax: 4000, unit: "cm⁻¹", reverse: true, type: "ir",
+        peaks: [
+          { x: 3340, h: 0.76, w: 120, name: "单萜醇 -OH 伸缩", detail: "薄荷脑/龙脑仲羟基缔合宽峰（桉油精/桂皮醛此区无峰）。" },
+          { x: 2925, h: 0.95, w: 60, name: "饱和 C-H 伸缩强带", detail: "2960/2925/2870 cm⁻¹ 极强甲基/亚甲基伸缩，反映强疏水萜烷骨架。" },
+          { x: 1680, h: 0.80, w: 28, name: "共轭醛/酮 C=O", detail: "桂皮醛 1678 cm⁻¹ 或麝香酮 1712 cm⁻¹ 特征羰基峰。" },
+          { x: 1045, h: 0.72, w: 36, name: "仲醇 C-O 伸缩", detail: "1045 cm⁻¹ 环己醇仲羟基碳氧伸缩特征峰。" }
+        ]
+      },
+      NMR: {
+        xMin: 0, xMax: 10, unit: "ppm", reverse: true, type: "nmr",
+        peaks: [
+          { x: 9.68, h: 0.62, mult: "d", integ: "1H", name: "醛基质子 -CHO (桂皮醛)", detail: "δ 9.6~9.8 极低场双峰，芳香醛类挥发油专属性标志信号。" },
+          { x: 3.41, h: 0.78, mult: "m", integ: "1H", name: "连氧次甲基 H-3 (薄荷脑)", detail: "δ 3.35~3.50 多重峰，证实仲醇羟基位置及轴向/赤道向构型。" },
+          { x: 1.62, h: 0.72, mult: "m", integ: "6H", name: "环己烷亚甲基群", detail: "δ 1.0~2.0 密集脂肪环质子包。" },
+          { x: 0.91, h: 0.96, mult: "d", integ: "9H", name: "三个甲基 (异丙基+环甲基)", detail: "δ 0.80~0.95 三组双峰甲基信号，单萜对孟烷骨架铁证。" }
+        ]
+      },
+      MS: {
+        xMin: 40, xMax: 180, unit: "m/z", reverse: false, type: "ms",
+        losses: [{ from: 156, to: 138, label: "-18 (脱水 H₂O)" }, { from: 138, to: 95, label: "-43 (失异丙基)" }],
+        peaks: [
+          { x: 156, h: 0.32, name: "分子离子 M⁺ (156)", detail: "薄荷脑 EI-MS 易脱水故分子离子峰较弱（GC-MS 70 eV）。" },
+          { x: 138, h: 0.78, name: "[M-H₂O]⁺ (138)", detail: "仲醇极易消除一分子水生成薄荷烯离子。" },
+          { x: 95, h: 0.96, name: "单萜裂解基峰 (95 / 81)", detail: "脱去异丙基自由基 (-43) 生成高丰度环己烯阳离子基峰。" },
+          { x: 71, h: 0.88, name: "含氧麦氏重排峰 (71)", detail: "薄荷脑经典特征诊断碎片离子。" }
+        ]
+      }
+    },
+    "萜类内酯与环烯醚萜": {
+      label: "萜内酯与环烯醚萜（青蒿素 / 栀子苷 / 银杏内酯）",
+      UV: {
+        xMin: 195, xMax: 320, unit: "nm", reverse: false, type: "curve",
+        shiftReagent: { label: "+ NaOH 衍生化 (青蒿素 203 → 292 nm 定量)", shift: 89, targetIdx: 0 },
+        peaks: [
+          { x: 203, h: 0.85, name: "203 nm 孤立内酯末端吸收", detail: "青蒿素/银杏内酯缺乏大共轭，药典多采用 HPLC-ELSD 或碱衍生 292 nm 测定。" },
+          { x: 238, h: 0.94, name: "238 nm 环烯醚萜共轭带", detail: "栀子苷/龙胆苦苷 C3=C4-COOCH₃ 共轭烯醇酯特征强吸收。" }
+        ]
+      },
+      IR: {
+        xMin: 500, xMax: 4000, unit: "cm⁻¹", reverse: true, type: "ir",
+        peaks: [
+          { x: 1742, h: 0.95, w: 28, name: "δ-/γ-内酯 C=O 强峰", detail: "1735~1775 cm⁻¹ 极强吸收，确证青蒿素、穿心莲内酯、银杏内酯内酯环。" },
+          { x: 1638, h: 0.74, w: 26, name: "烯醇醚 C=C (环烯醚萜)", detail: "1630~1650 cm⁻¹ 环烯醚萜吡喃双键伸缩振动。" },
+          { x: 882, h: 0.66, w: 24, name: "过氧桥 -O-O- (青蒿素)", detail: "831 / 882 / 1115 cm⁻¹ 1,2,4-三噁烷过氧桥特征伸缩振动。" }
+        ]
+      },
+      NMR: {
+        xMin: 0, xMax: 9, unit: "ppm", reverse: true, type: "nmr",
+        peaks: [
+          { x: 7.52, h: 0.82, mult: "s", integ: "1H", name: "H-3 烯醇醚低场峰 (栀子苷)", detail: "δ 7.4~7.6 单峰，环烯醚萜 C3 氧邻位烯氢特征信号。" },
+          { x: 5.86, h: 0.92, mult: "s", integ: "1H", name: "H-12 缩醛单峰 (青蒿素)", detail: "δ 5.86 (s, 1H)，青蒿素过氧桥缩醛质子唯一尖锐单峰。" },
+          { x: 3.38, h: 0.68, mult: "m", integ: "1H", name: "内酯 α-CH 次甲基", detail: "δ 3.2~3.5 毗邻内酯羰基的去屏蔽次甲基质子。" },
+          { x: 1.44, h: 0.96, mult: "s", integ: "3H", name: "角甲基 / 叔丁基 (银杏内酯)", detail: "青蒿素 C3-CH₃ δ 1.44 (s)；银杏内酯具特征 9H 叔丁基单峰 δ 1.12。" }
+        ]
+      },
+      MS: {
+        xMin: 100, xMax: 420, unit: "m/z", reverse: false, type: "ms",
+        losses: [{ from: 283, to: 265, label: "-18 (H₂O)" }, { from: 265, to: 247, label: "-18 / 过氧桥裂解" }],
+        peaks: [
+          { x: 283, h: 0.88, name: "[M+H]⁺ (青蒿素 283)", detail: "ESI-MS 正离子模式温和电离保留完整过氧桥准分子峰。" },
+          { x: 265, h: 0.72, name: "[M+H-H₂O]⁺ (265)", detail: "内酯/半缩醛脱水裂解离子。" },
+          { x: 247, h: 0.95, name: "过氧桥特征裂解基峰 (247)", detail: "同时用于青蒿素 LC-MS/MS 定量监测离子对 (283 → 247)。" }
+        ]
+      }
+    },
+    "皂苷与三萜": {
+      label: "三萜皂苷（人参皂苷 Rg1 / 甘草酸 / 柴胡皂苷）",
+      UV: {
+        xMin: 195, xMax: 300, unit: "nm", reverse: false, type: "curve",
+        shiftReagent: { label: "对比甘草酸共轭烯酮 (+47 nm 至 250 nm)", shift: 47, targetIdx: 0 },
+        peaks: [
+          { x: 203, h: 0.94, name: "203 nm 末端吸收 (人参/三七皂苷)", detail: "达玛烷型三萜皂苷无共轭双键，药典采用乙腈-水梯度于 203 nm 检测。" },
+          { x: 250, h: 0.86, name: "250 nm α,β-不饱和酮 (甘草酸)", detail: "甘草次酸 11-酮-12-烯共轭体系赋予其 250 nm 强紫外吸收。" }
+        ]
+      },
+      IR: {
+        xMin: 500, xMax: 4000, unit: "cm⁻¹", reverse: true, type: "ir",
+        peaks: [
+          { x: 3410, h: 0.92, w: 155, name: "多糖链羟基 -OH 强宽带", detail: "皂苷连接多个糖基，3400 cm⁻¹ 呈极强宽峰。" },
+          { x: 2940, h: 0.88, w: 65, name: "三萜多环 C-H 伸缩", detail: "2940/2870 cm⁻¹ 五环/四环三萜密集饱和烃基峰。" },
+          { x: 1705, h: 0.72, w: 32, name: "羧基 / 11-位酮基 C=O", detail: "甘草酸/齐墩果酸/柴胡酸羧基羰基峰。" },
+          { x: 1075, h: 0.86, w: 50, name: "糖环 C-O-C 强伸缩", detail: "1030~1080 cm⁻¹ 吡喃糖苷键特征强峰群。" }
+        ]
+      },
+      NMR: {
+        xMin: 0, xMax: 7, unit: "ppm", reverse: true, type: "nmr",
+        peaks: [
+          { x: 5.32, h: 0.68, mult: "m", integ: "1H", name: "Δ¹²-三萜烯氢 H-12", detail: "δ 5.2~5.6，齐墩果烷/乌苏烷型三萜 C12=C13 双键特征峰。" },
+          { x: 4.95, h: 0.76, mult: "d", integ: "2H", name: "糖端基质子 H-1' (β构型)", detail: "δ 4.5~5.1 (d, J=7.5 Hz)，端基峰个数直接对应糖基数目。" },
+          { x: 3.45, h: 0.84, mult: "m", integ: "10H", name: "糖环 CH-OH 密集区", detail: "δ 3.1~4.2 多糖环质子重叠包。" },
+          { x: 0.98, h: 0.98, mult: "s", integ: "24H", name: "7~8 组角甲基单峰群", detail: "δ 0.75~1.35 密集甲基单峰，三萜母核最直观的 ¹H-NMR 指纹。" }
+        ]
+      },
+      MS: {
+        xMin: 400, xMax: 850, unit: "m/z", reverse: false, type: "ms",
+        losses: [{ from: 823, to: 661, label: "-162 (失第1分子葡萄糖)" }, { from: 661, to: 499, label: "-162 (得苷元)" }],
+        peaks: [
+          { x: 823, h: 0.86, name: "[M+Na]⁺ (人参皂苷 Rg1 823)", detail: "高极性多糖苷易加钠电离生成强 [M+Na]⁺ 峰（M=800）。" },
+          { x: 661, h: 0.74, name: "逐级脱糖 [M+Na-162]⁺", detail: "脱去一分子己糖 (-162)，用于测定糖链组成与连接顺序。" },
+          { x: 499, h: 0.96, name: "苷元核心碎片 (原人参三醇)", detail: "脱尽糖链暴露三萜苷元骨架离子。" }
+        ]
+      }
+    },
+    "甾体与强心苷": {
+      label: "甾体皂苷与强心苷（薯蓣皂苷元 / 杠柳毒苷 / 华蟾酥毒基）",
+      UV: {
+        xMin: 200, xMax: 350, unit: "nm", reverse: false, type: "curve",
+        shiftReagent: { label: "对比乙型强心苷六元环 (+80 nm 至 298 nm)", shift: 80, targetIdx: 0 },
+        peaks: [
+          { x: 218, h: 0.92, name: "218 nm 甲型强心苷五元内酯", detail: "C17β-丁烯酸内酯环（杠柳毒苷/洋地黄毒苷）217~220 nm 特征峰。" },
+          { x: 298, h: 0.86, name: "298 nm 乙型强心苷六元内酯", detail: "华蟾酥毒基 α-吡喃酮六元双烯内酯 295~300 nm 强吸收，一目了然区分甲/乙型。" }
+        ]
+      },
+      IR: {
+        xMin: 500, xMax: 4000, unit: "cm⁻¹", reverse: true, type: "ir",
+        peaks: [
+          { x: 1745, h: 0.90, w: 30, name: "不饱和内酯双峰 (强心苷)", detail: "1745/1780 cm⁻¹ 费米共振双峰，确认五元不饱和内酯环。" },
+          { x: 980, h: 0.84, w: 22, name: "螺甾烷缩酮四特征峰 (980)", detail: "980、920、900、866 cm⁻¹ 四重指纹峰（薯蓣皂苷元/重楼皂苷）。" },
+          { x: 900, h: 0.88, w: 20, name: "25R 构型判据 (900 > 920)", detail: "900 cm⁻¹ 强于 920 cm⁻¹ 确证 25R 异螺甾烷醇型（如薯蓣皂苷元）。" }
+        ]
+      },
+      NMR: {
+        xMin: 0, xMax: 8, unit: "ppm", reverse: true, type: "nmr",
+        peaks: [
+          { x: 5.92, h: 0.82, mult: "s", integ: "1H", name: "H-22 内酯烯氢 (甲型强心苷)", detail: "δ 5.8~6.0 单峰，与 δ 4.90 AB 双峰构成五元不饱和内酯特征。" },
+          { x: 4.42, h: 0.76, mult: "m", integ: "1H", name: "H-16 螺缩酮次甲基", detail: "δ 4.35~4.50 多重峰，甾体皂苷 E 环氧邻位特征信号。" },
+          { x: 1.02, h: 0.94, mult: "s", integ: "6H", name: "C18 / C19 角甲基", detail: "甾体四环母核仅含 2 个角甲基，显著少于三萜的 7~8 个甲基。" },
+          { x: 0.82, h: 0.88, mult: "d", integ: "6H", name: "C21 / C27 仲甲基双峰", detail: "δ 0.78~0.98 两组双峰甲基，区分甾体与三萜的关键依据。" }
+        ]
+      },
+      MS: {
+        xMin: 100, xMax: 460, unit: "m/z", reverse: false, type: "ms",
+        losses: [{ from: 414, to: 139, label: "E/F 环螺缩酮裂解 → 139" }],
+        peaks: [
+          { x: 414, h: 0.76, name: "分子离子峰 M⁺ (薯蓣皂苷元 414)", detail: "对应 C₂₇H₄₂O₃ 完整甾体皂苷元分子。" },
+          { x: 282, h: 0.64, name: "脱 F 环碎片 (282)", detail: "螺缩酮 E/F 环开裂失去侧链。" },
+          { x: 139, h: 0.98, name: "螺甾烷诊断基峰 m/z 139", detail: "螺甾烷醇型甾体皂苷元最具专属性的 EI-MS 诊断基峰！" }
+        ]
+      }
+    },
+    "氰苷类": {
+      label: "氰苷与硫苷（苦杏仁苷 / 垂盆草苷 / 黑芥子苷）",
+      UV: {
+        xMin: 200, xMax: 300, unit: "nm", reverse: false, type: "curve",
+        shiftReagent: { label: "酶解生成苯甲醛 (+42 nm 至 249 nm)", shift: 42, targetIdx: 0 },
+        peaks: [
+          { x: 207, h: 0.94, name: "207 nm 苯环短波定量峰", detail: "苦杏仁苷孤立苯环未与氰基直接共轭，药典 HPLC 于 207 nm 测定（≥3.0%）。" },
+          { x: 257, h: 0.45, name: "257 nm 苯环 B 带精细峰", detail: "单取代苯环弱特征吸收峰。" }
+        ]
+      },
+      IR: {
+        xMin: 500, xMax: 4000, unit: "cm⁻¹", reverse: true, type: "ir",
+        peaks: [
+          { x: 3400, h: 0.88, w: 140, name: "龙胆二糖 -OH 宽峰", detail: "双葡萄糖链多羟基缔合强吸收。" },
+          { x: 2255, h: 0.72, w: 18, name: "氰基 -C≡N 特征尖峰", detail: "2240~2260 cm⁻¹ 位于三键无干扰区，一针见血确证氰苷结构。" },
+          { x: 1075, h: 0.90, w: 46, name: "糖苷键 C-O-C 强峰", detail: "β-龙胆二糖骨架伸缩吸收。" }
+        ]
+      },
+      NMR: {
+        xMin: 0, xMax: 9, unit: "ppm", reverse: true, type: "nmr",
+        peaks: [
+          { x: 7.48, h: 0.92, mult: "m", integ: "5H", name: "单取代苯环 5H 信号", detail: "δ 7.38~7.58 五个芳香质子多重峰。" },
+          { x: 5.96, h: 0.84, mult: "s", integ: "1H", name: "α-羟腈次甲基 Ph-CH(CN)-O", detail: "δ 5.9~6.0 尖锐单峰，同时受苯环、氰基与氧苷键三重去屏蔽。" },
+          { x: 4.56, h: 0.78, mult: "d", integ: "2H", name: "龙胆二糖双端基氢", detail: "δ 4.4~4.7 两个 β-D-葡萄糖端基质子双峰 (J=7.8 Hz)。" }
+        ]
+      },
+      MS: {
+        xMin: 150, xMax: 500, unit: "m/z", reverse: false, type: "ms",
+        losses: [{ from: 458, to: 325, label: "-133 (失苯甲醛氰醇)" }],
+        peaks: [
+          { x: 458, h: 0.84, name: "[M+H]⁺ / [M+Na]⁺ (458/480)", detail: "苦杏仁苷完整分子离子（M=457）。" },
+          { x: 325, h: 0.96, name: "龙胆二糖基峰 (325)", detail: "氧苷键断裂失去扁桃腈生成完整二糖碎片。" },
+          { x: 163, h: 0.62, name: "单糖碎片离子 (163)", detail: "葡萄糖残基特征离子。" }
+        ]
+      }
+    },
+    "多糖类": {
+      label: "中药多糖与核苷（枸杞多糖 LBP / 黄芪多糖 / 腺苷）",
+      UV: {
+        xMin: 200, xMax: 340, unit: "nm", reverse: false, type: "curve",
+        shiftReagent: { label: "检查蛋白/核酸杂质 (260/280 nm 应无吸收)", shift: 0, targetIdx: 1 },
+        peaks: [
+          { x: 205, h: 0.86, name: "205 nm 多糖纯品末端吸收", detail: "纯多糖无发色团；若 260/280 nm 出现吸收峰，说明 Sevag 脱蛋白不彻底（腺苷纯品在 260 nm 强吸收）。" },
+          { x: 280, h: 0.22, name: "280 nm 残余蛋白监控位", detail: "作为纯化质控指标：经 Sevag 法或 DEAE 柱纯化后此峰应趋近基线。" }
+        ]
+      },
+      IR: {
+        xMin: 500, xMax: 4000, unit: "cm⁻¹", reverse: true, type: "ir",
+        peaks: [
+          { x: 3400, h: 0.96, w: 170, name: "多糖 O-H 强宽伸缩峰", detail: "3400 cm⁻¹ 极宽极强分子间氢键羟基带。" },
+          { x: 1615, h: 0.68, w: 42, name: "糖醛酸 -COO⁻ / 结合水", detail: "酸性杂多糖（果胶/黄芪多糖）羧酸根不对称伸缩。" },
+          { x: 1080, h: 0.94, w: 58, name: "吡喃糖环 C-O-C 三重峰", detail: "1020~1150 cm⁻¹ 三重强峰确证六元吡喃糖骨架。" },
+          { x: 890, h: 0.72, w: 22, name: "β-糖苷键判据 (890 vs 840)", detail: "890 cm⁻¹ 指示 β-构型糖苷键，840 cm⁻¹ 指示 α-构型糖苷键。" }
+        ]
+      },
+      NMR: {
+        xMin: 0, xMax: 7, unit: "ppm", reverse: true, type: "nmr",
+        peaks: [
+          { x: 5.18, h: 0.84, mult: "s", integ: "1H", name: "α-端基质子区 (δ 5.0~5.5)", detail: "小偶合常数低场端基峰指示 α-D-吡喃糖连接方式。" },
+          { x: 4.52, h: 0.88, mult: "d", integ: "1H", name: "β-端基质子区 (δ 4.4~4.8)", detail: "大偶合常数 (J≈7.8 Hz) 指示 β-D-吡喃糖（如黄芪/茯苓 β-葡聚糖）。" },
+          { x: 3.68, h: 0.96, mult: "m", integ: "6H", name: "糖环 H-2 ~ H-6 共振包", detail: "δ 3.2~4.1 密集重叠的吡喃糖骨架质子信号。" }
+        ]
+      },
+      MS: {
+        xMin: 150, xMax: 600, unit: "m/z", reverse: false, type: "ms",
+        losses: [{ from: 505, to: 343, label: "-162 (己糖单元)" }, { from: 343, to: 181, label: "-162 (单糖)" }],
+        peaks: [
+          { x: 505, h: 0.66, name: "三糖寡聚碎片 (m/z 505)", detail: "部分酸水解/MALDI-TOF-MS 呈现等差 Δm/z 162（己糖）或 132（戊糖）阶梯峰。" },
+          { x: 343, h: 0.82, name: "二糖碎片 [2Hex+H]⁺ (343)", detail: "用于解析单糖重复单元组成。" },
+          { x: 181, h: 0.94, name: "己糖单体 [Hex+H]⁺ (181)", detail: "配合 PMP 柱前衍生 HPLC 精确测定单糖摩尔比（Glc/Gal/Ara/Man）。" }
+        ]
+      }
     }
   };
 
@@ -206,9 +468,28 @@
     if (modalEl) { modalEl.classList.add("hidden"); modalEl.classList.remove("flex"); }
   }
 
+  function mapTopicCategoryToSpec(catStr) {
+    var s = String(catStr || "");
+    if (/生物碱/.test(s)) return "生物碱";
+    if (/蒽醌|醌/.test(s)) return "蒽醌与醌类";
+    if (/苯丙素|有机酸|酚酸/.test(s)) return "酚酸类";
+    if (/香豆素|木脂素/.test(s)) return "香豆素与木脂素";
+    if (/挥发油/.test(s)) return "挥发油与萜类";
+    if (/内酯|环烯醚萜/.test(s)) return "萜类内酯与环烯醚萜";
+    if (/皂苷|三萜/.test(s)) return "皂苷与三萜";
+    if (/甾体|强心苷/.test(s)) return "甾体与强心苷";
+    if (/氰苷/.test(s)) return "氰苷类";
+    if (/多糖/.test(s)) return "多糖类";
+    return "黄酮";
+  }
+
+  var curTopicId = "";
+
   function openModal(cat) {
     ensureModal();
-    if (cat && SPECTRA_PROFILES[cat]) curCat = cat;
+    if (cat) {
+      curCat = SPECTRA_PROFILES[cat] ? cat : mapTopicCategoryToSpec(cat);
+    }
     view = { zoom: 1, panX: 0 };
     hoverIdx = -1; lockedIdx = -1; quizMode = false;
     modalEl.classList.remove("hidden");
@@ -260,26 +541,39 @@
     var prof = SPECTRA_PROFILES[curCat];
     var sp = prof[curSpec];
 
+    var allTopics = (window.TCM_LAB_API && window.TCM_LAB_API.getAllTopics) ? window.TCM_LAB_API.getAllTopics() : [];
+    var matchedTopic = curTopicId && window.TCM_LAB_API && window.TCM_LAB_API.getTopicById
+      ? window.TCM_LAB_API.getTopicById(curTopicId)
+      : (allTopics.find(function (t) { return mapTopicCategoryToSpec(t.category) === curCat; }) || null);
+    var relLit = (window.TCM_LAB_API && window.TCM_LAB_API.findLiteratureForTopic)
+      ? window.TCM_LAB_API.findLiteratureForTopic(matchedTopic || { category: curCat }, 2)
+      : [];
+    var topicOptsHtml = '<option value="">按全题库 136 味药材联动定位四谱...</option>' +
+      allTopics.map(function (t) {
+        var sel = matchedTopic && matchedTopic.id === t.id ? " selected" : "";
+        return '<option value="' + t.id + '"' + sel + '>' + t.herb + ' · ' + (t.compound || t.category) + '</option>';
+      }).join("");
+
     var catBtns = Object.keys(SPECTRA_PROFILES).map(function (k) {
       var on = k === curCat;
-      return '<button type="button" data-v21-cat="' + k + '" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ' +
-        (on ? 'bg-[#059669] text-white border-[#059669]' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#059669]') + '">' + k + "</button>";
+      return '<button type="button" data-v21-cat="' + k + '" class="px-2.5 py-1 rounded-lg text-[11.5px] font-bold border transition ' +
+        (on ? 'bg-[#0f4c3a] text-white border-[#0f4c3a]' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#0f4c3a]') + '">' + k + "</button>";
     }).join("");
 
     var specBtns = ["UV", "IR", "NMR", "MS"].map(function (s) {
       var on = s === curSpec;
-      return '<button type="button" data-v21-spec="' + s + '" class="px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ' +
-        (on ? 'bg-[#064e3b] text-white border-[#064e3b]' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700') + '">' + (s === "NMR" ? "¹H-NMR" : s) + "</button>";
+      return '<button type="button" data-v21-spec="' + s + '" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition ' +
+        (on ? 'bg-[#111d19] text-white border-[#111d19] dark:bg-[#5fb89c] dark:text-[#091713]' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700') + '">' + (s === "NMR" ? "¹H-NMR" : s) + "</button>";
     }).join("");
 
     // Context-specific scientific feature toggle
     var extraSpecCtrl = "";
     if (curSpec === "UV" && sp.shiftReagent) {
-      extraSpecCtrl = '<button type="button" id="v21BtnUvShift" class="px-2.5 py-1.5 rounded-xl text-xs font-extrabold border transition ' +
-        (showUvShift ? 'bg-amber-500 text-white border-amber-500' : 'bg-amber-50 text-amber-900 border-amber-300') + '">🧪 ' + (showUvShift ? "隐藏诊断位移" : "叠加诊断试剂位移") + '</button>';
+      extraSpecCtrl = '<button type="button" id="v21BtnUvShift" class="px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ' +
+        (showUvShift ? 'bg-[#9a4a24] text-white border-[#9a4a24]' : 'bg-[#f7f6f2] text-[#9a4a24] border-[#9a4a24]/30') + '">' + (showUvShift ? "隐藏诊断位移" : "叠加诊断试剂位移") + '</button>';
     } else if (curSpec === "NMR") {
-      extraSpecCtrl = '<button type="button" id="v21BtnNmrInteg" class="px-2.5 py-1.5 rounded-xl text-xs font-extrabold border transition ' +
-        (showNmrInteg ? 'bg-sky-600 text-white border-sky-600' : 'bg-sky-50 text-sky-900 border-sky-300') + '">∫ 积分曲线</button>';
+      extraSpecCtrl = '<button type="button" id="v21BtnNmrInteg" class="px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ' +
+        (showNmrInteg ? 'bg-[#0f4c3a] text-white border-[#0f4c3a]' : 'bg-[#f7f6f2] text-slate-700 border-slate-200') + '">∫ 积分曲线</button>';
     }
 
     var peakChipsHtml = !quizMode
@@ -311,19 +605,19 @@
       quizHtml =
         '<div class="rounded-2xl bg-amber-50/90 dark:bg-amber-950/35 border border-amber-300/80 p-4 space-y-3">' +
           '<div class="flex flex-wrap items-center justify-between gap-2">' +
-            '<div class="text-xs sm:text-sm font-extrabold text-amber-950 dark:text-amber-200">🎯 猜峰挑战（第 ' + Math.min(quizState.maxRounds, quizState.total + (quizState.answered ? 0 : 1)) + '/' + quizState.maxRounds + ' 题）：橙红高亮峰（' + targetPeak.x + " " + sp.unit + "）归属于？</div>" +
+            '<div class="text-xs sm:text-sm font-extrabold text-amber-950 dark:text-amber-200">猜峰训练（第 ' + Math.min(quizState.maxRounds, quizState.total + (quizState.answered ? 0 : 1)) + '/' + quizState.maxRounds + ' 题）：橙红高亮峰（' + targetPeak.x + " " + sp.unit + "）归属于？</div>" +
             '<div class="flex items-center gap-2 text-xs font-extrabold">' +
               '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900">得分：' + quizState.score + " / " + quizState.total + "（" + acc + "%）</span>" +
-              '<span class="px-2 py-0.5 rounded-full bg-amber-200 text-amber-950">🔥 连胜 ' + quizState.streak + "</span>" +
+              '<span class="px-2 py-0.5 rounded-full bg-amber-200 text-amber-950">连胜 ' + quizState.streak + "</span>" +
             "</div>" +
           "</div>" +
           '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">' + optHtml + "</div>" +
           (quizState.answered
             ? '<div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs text-slate-700 dark:text-slate-300">' +
-                '<span><strong>' + (quizState.options[quizState.picked] === targetPeak.name ? "✅ 回答正确！" : "❌ 正确答案：" + targetPeak.name + "。") + '</strong> ' + targetPeak.detail + "</span>" +
+                '<span><strong>' + (quizState.options[quizState.picked] === targetPeak.name ? "回答正确：" : "正确答案：" + targetPeak.name + "。") + '</strong> ' + targetPeak.detail + "</span>" +
                 (finished
-                  ? '<button type="button" id="v21BtnRestartQuiz" class="shrink-0 px-3.5 py-1.5 rounded-xl bg-[#ea580c] text-white font-extrabold">🏆 本轮 ' + acc + '% · 再来一局</button>'
-                  : '<button type="button" id="v21BtnNextQuiz" class="shrink-0 px-3.5 py-1.5 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-extrabold">下一题 →</button>') +
+                  ? '<button type="button" id="v21BtnRestartQuiz" class="shrink-0 px-3.5 py-1.5 rounded-xl bg-[#9a4a24] text-white font-extrabold">本轮 ' + acc + '% · 再来一局</button>'
+                  : '<button type="button" id="v21BtnNextQuiz" class="shrink-0 px-3.5 py-1.5 rounded-xl bg-[#0f4c3a] hover:bg-[#0a382b] text-white font-extrabold">下一题 →</button>') +
               "</div>"
             : "") +
         "</div>";
@@ -337,17 +631,25 @@
     }
 
     body.innerHTML =
-      '<div class="flex flex-wrap items-center justify-between gap-2">' +
-        '<div class="flex flex-wrap items-center gap-1.5">' + catBtns + '<span class="mx-1 text-slate-300">|</span>' + specBtns + "</div>" +
-        '<div class="flex flex-wrap items-center gap-1.5">' +
-          extraSpecCtrl +
-          '<button type="button" id="v21BtnZoomIn" class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold text-slate-700 dark:text-slate-200">+ 放大</button>' +
-          '<button type="button" id="v21BtnZoomOut" class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold text-slate-700 dark:text-slate-200">− 缩小</button>' +
-          '<span id="v21ZoomBadge" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-mono font-bold text-slate-600 dark:text-slate-300">' + view.zoom.toFixed(1) + '×</span>' +
-          '<button type="button" id="v21BtnResetView" class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200">↺ 复位</button>' +
-          '<button type="button" id="v21BtnExportPng" class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-teal-700 dark:text-emerald-300">📸 导出谱图</button>' +
-          '<button type="button" id="v21BtnToggleQuiz" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition ' +
-            (quizMode ? 'bg-amber-400 text-[#062420]' : 'bg-[#ea580c] hover:bg-[#c2410c] text-white') + '">' + (quizMode ? "退出猜峰" : "🎮 猜峰小游戏") + "</button>" +
+      '<div class="p-3 rounded-xl bg-[#f7f6f2] dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 space-y-2">' +
+        '<div class="flex flex-wrap items-center justify-between gap-2">' +
+          '<div class="flex flex-wrap items-center gap-1">' + catBtns + '</div>' +
+          '<div class="flex items-center gap-2">' +
+            '<span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">关联药材题库：</span>' +
+            '<select id="v21TopicSelect" class="max-w-[340px] px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200">' + topicOptsHtml + '</select>' +
+          '</div>' +
+        '</div>' +
+        '<div class="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-200/70 dark:border-slate-700">' +
+          '<div class="flex flex-wrap items-center gap-1.5">' + specBtns + extraSpecCtrl + '</div>' +
+          '<div class="flex flex-wrap items-center gap-1.5">' +
+            '<button type="button" id="v21BtnZoomIn" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200">+ 放大</button>' +
+            '<button type="button" id="v21BtnZoomOut" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200">− 缩小</button>' +
+            '<span id="v21ZoomBadge" class="px-2 py-1 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[11px] font-mono font-bold text-slate-600 dark:text-slate-300 tabular-nums">' + view.zoom.toFixed(1) + '×</span>' +
+            '<button type="button" id="v21BtnResetView" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200">复位</button>' +
+            '<button type="button" id="v21BtnExportPng" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-[#0f4c3a] dark:text-emerald-300">导出谱图</button>' +
+            '<button type="button" id="v21BtnToggleQuiz" class="px-3 py-1 rounded-lg text-xs font-bold transition ' +
+              (quizMode ? 'bg-amber-400 text-[#062420]' : 'bg-[#9a4a24] hover:bg-[#7d3a1b] text-white') + '">' + (quizMode ? "退出猜峰" : "猜峰训练") + "</button>" +
+          "</div>" +
         "</div>" +
       "</div>" +
 
@@ -355,16 +657,38 @@
         '<canvas id="v21SpecCanvas" width="840" height="315" class="w-full h-[275px] sm:h-[315px] block cursor-grab active:cursor-grabbing" style="touch-action:none;"></canvas>' +
         '<div id="v21FloatTip" style="background:rgba(6,36,32,0.96);color:#f8fafc;border:1.5px solid #fbbf24;" class="pointer-events-none hidden absolute z-20 max-w-[290px] p-3 rounded-xl shadow-2xl text-xs leading-snug"></div>' +
         peakChipsHtml +
-        '<div id="v21PeakCard" class="mt-2 p-2.5 rounded-xl bg-[#f6f8f7] dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200">' +
+        '<div id="v21PeakCard" class="mt-2 p-2.5 rounded-xl bg-[#f7f6f2] dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200">' +
           '<strong>操作提示：</strong>滚轮或点击 +/- 缩放谱图、拖拽平移；悬停/点击任意谱峰或上方特征峰芯片立即弹出归属解析卡。' +
         "</div>" +
+        (matchedTopic ? (
+          '<div class="mt-2 p-2.5 rounded-xl bg-white dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 text-[11.5px] text-slate-700 dark:text-slate-300 space-y-1">' +
+            '<div><strong class="text-[#0f4c3a] dark:text-emerald-300">关联题库与药典标准（' + matchedTopic.herb + '）：</strong>' + (matchedTopic.pharmacopoeia || matchedTopic.pharm || matchedTopic.tlcSystem || matchedTopic.compound || "") + '</div>' +
+            (relLit.length ? '<div class="text-[11px] text-slate-500 dark:text-slate-400">关联文献：' + relLit.map(function (l) { return l.text; }).join(" ； ") + '</div>' : '') +
+          '</div>'
+        ) : "") +
       "</div>" +
       quizHtml +
-      (v4Note ? '<div class="p-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/35 border border-emerald-200 dark:border-emerald-800 text-xs text-slate-700 dark:text-slate-300 leading-relaxed"><strong class="text-[#064e3b] dark:text-emerald-300">📚 站内四谱规则库速查：</strong>' + v4Note + "</div>" : "");
+      (v4Note ? '<div class="p-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/35 border border-emerald-200 dark:border-emerald-800 text-xs text-slate-700 dark:text-slate-300 leading-relaxed"><strong class="text-[#064e3b] dark:text-emerald-300">站内四谱规则库速查：</strong>' + v4Note + "</div>" : "");
 
     body.querySelectorAll("[data-v21-cat]").forEach(function (b) {
-      b.addEventListener("click", function () { curCat = b.getAttribute("data-v21-cat"); view = { zoom: 1, panX: 0 }; hoverIdx = -1; lockedIdx = -1; if (quizMode) buildQuizRound(); renderAll(); });
+      b.addEventListener("click", function () { curCat = b.getAttribute("data-v21-cat"); curTopicId = ""; view = { zoom: 1, panX: 0 }; hoverIdx = -1; lockedIdx = -1; if (quizMode) buildQuizRound(); renderAll(); });
     });
+    var topicSel = body.querySelector("#v21TopicSelect");
+    if (topicSel) {
+      topicSel.addEventListener("change", function () {
+        var tid = topicSel.value;
+        if (!tid) return;
+        curTopicId = tid;
+        var tObj = window.TCM_LAB_API && window.TCM_LAB_API.getTopicById ? window.TCM_LAB_API.getTopicById(tid) : null;
+        if (tObj) {
+          curCat = mapTopicCategoryToSpec(tObj.category);
+          view = { zoom: 1, panX: 0 };
+          hoverIdx = -1;
+          lockedIdx = -1;
+          renderAll();
+        }
+      });
+    }
     body.querySelectorAll("[data-v21-spec]").forEach(function (b) {
       b.addEventListener("click", function () { curSpec = b.getAttribute("data-v21-spec"); view = { zoom: 1, panX: 0 }; hoverIdx = -1; lockedIdx = -1; if (quizMode) buildQuizRound(); renderAll(); });
     });

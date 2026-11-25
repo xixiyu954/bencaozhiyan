@@ -155,3 +155,14 @@
 - **彻底去 AI 化与矢量图标升级**（`src/modules/v19-bento-home.js`、`lab-v16-portal.js`、`src/modules/lab-v27-ai-topic-arena.js`、`src/routes/visual-suite-loader.js`、`src/modules/lab-v28-ai-mentor.js`、`src/modules/lab-v28-safety-inspector.js`、`cloud-ai.js`、`index.html`、`lab-v7-media-pro.js`）：清除脉冲圆点眉毛胶囊、彩虹标签拼盘、AI 模板高频话术（如「沉浸式」「完胜 AI」）以及主界面、导航、分段标签、下拉模板与悬浮双工具坞的原始 Emoji 杂讯，统一替换为 `14px` 单色线性 SVG 图标（`.craft-ico`）。
 - **Open Design 物理克制动效**：停用全屏 `#tcmInkVeil` 雾闪、按钮斜向扫光、鼠标追踪霓虹环、模糊路由转场与 Hero 持续漂浮，统一收束为 `180~190ms cubic-bezier(0.2, 0, 0, 1)` 物理微移与精准状态过渡。
 - **质量验证**：Hallmark 反 AI 味 DOM 审计主界面 0 Emoji、0 报错、6 个重型分包首屏零加载、移动端 `390×844` 零横向溢出零工具坞重叠；Lighthouse 达成 **Performance 87 (TBT 0 ms, CLS 0) / Accessibility 100 / Best Practices 100 / SEO 100**，全部 6 项功能回归通过。
+
+
+### 2026-11-25 v31 全扩展仓资料满配升级（77 项 PubChem 3D 构象 · 136 味全题库 · 91 篇实证文献贯通）并彻底移除 AR
+- **三维分子结构库与粒子显色实验室**（`src/data/mol3d-pubchem-data.js`、`lab-v20-mol3d-particles.js`、`src/routes/visual-suite-loader.js`、`app.js`）：通过 NCBI PubChem PUG-REST 3D 管线将三维分子库由 6 项扩充至 **77 项实测构象**（按需打包于 `suite-visuals` 懒加载分包，首页首屏零增加），支持 10 大化学分类筛选、关键词/分子式/CID 瞬时检索与 **136 味题库直连跳转**，并在右侧档案卡联动呈现 **2025 版药典标准**、一键载入六步工坊/直达四谱以及 **91 篇实证文献自动匹配**；粒子显色实验室由 5 项扩充至 **12 项经典中药化学检识反应**（覆盖全书 11 大类，去重关联药材芯片点击直达 3D 构象）。
+- **彻底删除 AR 药材卡**（`lab-v22-visual-suite-pro.js`、`src/routes/visual-suite-loader.js`）：完全移除左下角工具坞 `AR 药材卡片` 入口、弹窗 `ar` 标签页及摄像头相关逻辑，旧 `open('ar')` 调用安全回退至三维实验室 `vlab`。
+- **全站扩展仓资料补齐与精工细节**：
+  - **交互式四谱工作站**（`lab-v21-spectra-lab.js`）：由 4 类扩充至 **全部 11 大类**（黄酮、生物碱、蒽醌与醌类、酚酸类、香豆素与木脂素、挥发油与萜类、萜类内酯与环烯醚萜、皂苷与三萜、甾体与强心苷、氰苷类、多糖类），新增 **136 味题库联动下拉**与药典/文献速查。
+  - **液液萃取流体仿真 & 五维雷达驾驶舱**（`src/modules/lab-v22-fluid-sim.js`、`src/modules/lab-v22-cockpit3d.js`）：新增 **7 套题库实证萃取预设**、**136 课题快速切换联动**与实时匹配实证文献条，并清理全界面残余原始 Emoji。
+  - **知识图谱与可视化探索中心 4.1~4.5**（`src/modules/lab-v29-explore-suite.js`）：4.1 图谱贯通全库 **136 项课题工艺链路（11 大类）** 并关联实证文献；4.2 极性宇宙扩至 **12 颗特征星**；4.3 流水线沙盘扩至 **6 套标杆预设**；4.4 导演时间轴开放 **4 旗舰 + 136 全题库（共 140 套可播/可导出脚本）**；4.5 对比显微镜接入真实 `defaultCfg` / TLC / 限度及 **关联实证文献对比行**。
+  - **实验成长档案与收集图鉴**（`src/modules/lab-v24-gamification.js`、`src/modules/v19-bento-home.js`、`index.html`）：由截断演示升级为 **四库全集五标签**（`药材图鉴 0/136`、`三维分子 77`、`实验装置 15`、`实证文献 91`、`成就徽章 8`），全量支持检索与一键联动跳转。
+- **质量验证**：`npm run build`（3.73s）通过；Lighthouse **Accessibility 100 / Best Practices 100 / SEO 100 / Performance 86 (CLS 0, 首页传输 423 KB)**；全部 7 项端到端回归及扩展仓 E2E 校验通过，0 控制台报错、0 懒加载泄露。

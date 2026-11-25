@@ -22,16 +22,54 @@
   }
 
   var PARTICLE_REACTIONS = [
-    { id: "hcl_mg", name: "盐酸-镁粉反应", reagent: "浓 HCl + 镁粉", target: "黄酮类 (黄芩苷 / 槲皮素 / 芦丁)", base: [254, 243, 199], targetRgb: [220, 38, 38], dropColor: "#e2e8f0", mode: "bubbles", mech: "Mg + 2HCl → MgCl₂ + H₂↑；新生 [H] 还原黄酮 4-位羰基生成花色素盐，溶液由浅黄渐变为樱红/紫红色。", desc: "镁粉与盐酸剧烈产生 H₂ 微泡上浮，樱红色羽流自液面扩散至全管。" },
-    { id: "molish", name: "Molish 紫环反应", reagent: "α-萘酚 + 浓 H₂SO₄", target: "糖与苷类 (黄芩苷 / 人参皂苷 / 多糖)", base: [241, 245, 249], targetRgb: [126, 34, 206], dropColor: "#c084fc", mode: "ring", mech: "浓 H₂SO₄ (ρ=1.84) 沉至管底，糖苷脱水成糠醛衍生物并与 α-萘酚在两液交界处缩合生成特征紫红环。", desc: "浓硫酸沿管壁缓加沉底，两液界面精准富集深紫红色扩散环。" },
-    { id: "fecl3", name: "FeCl₃ 酚羟基络合", reagent: "1% FeCl₃ 乙醇液", target: "邻二酚羟基 (绿原酸 / 丹酚酸 B / 槲皮素)", base: [254, 249, 195], targetRgb: [15, 118, 110], dropColor: "#d97706", mode: "cloud", mech: "Fe³⁺ 与邻二酚羟基发生配位螯合，形成深墨绿/蓝黑色稳定络合物，随对流涡旋迅速扩散。", desc: "铁离子液滴冲击液面炸开墨绿色涡旋粒子云，迅速向下扩散变色。" },
-    { id: "dragendorff", name: "改良碘化铋钾", reagent: "Dragendorff 试液", target: "生物碱类 (小檗碱 / 苦参碱)", base: [254, 249, 195], targetRgb: [234, 88, 12], dropColor: "#ea580c", mode: "precip", mech: "质子化生物碱阳离子与 [BiI₄]⁻ 结合，瞬时析出难溶性橘红色无定形复盐沉淀并向管底沉降堆积。", desc: "滴入瞬间析出致密橘红色沉淀颗粒，重力沉降并在管底形成沉淀层。" },
-    { id: "borntrager", name: "Bornträger 碱液显红", reagent: "5% NaOH 碱水", target: "游离羟基蒽醌 (大黄素 / 茜草素)", base: [253, 224, 71], targetRgb: [190, 18, 60], dropColor: "#fda4af", mode: "cloud", mech: "游离酚羟基在碱液中解离形成共轭酚氧负离子，体系由亮黄迅速转为鲜明樱红/紫红色。", desc: "滴加稀碱液后游离蒽醌解离显色，樱红色扩散云团席卷整管。" }
+    { id: "hcl_mg", name: "盐酸-镁粉反应", reagent: "浓 HCl + 镁粉", target: "黄酮类 (黄芩苷 / 槲皮素 / 芦丁 / 橙皮苷)", catMatch: /黄酮/, base: [254, 243, 199], targetRgb: [220, 38, 38], dropColor: "#e2e8f0", mode: "bubbles", mech: "Mg + 2HCl → MgCl₂ + H₂↑；新生 [H] 还原黄酮 4-位羰基生成花色素盐，溶液由浅黄渐变为樱红/紫红色。", desc: "镁粉与盐酸剧烈产生 H₂ 微泡上浮，樱红色羽流自液面扩散至全管（异黄酮/查耳酮通常不显色）。" },
+    { id: "alcl3_fluor", name: "AlCl₃ 荧光络合", reagent: "1% AlCl₃ 乙醇液", target: "3-OH / 5-OH 黄酮 (槲皮素 / 芦丁 / 银杏黄酮)", catMatch: /黄酮/, base: [248, 250, 252], targetRgb: [132, 204, 22], dropColor: "#bef264", mode: "cloud", mech: "Al³⁺ 与黄酮 3-OH/4-C=O 或 5-OH/4-C=O 形成稳定螯合环，UV 365 nm 下呈现强烈亮黄绿色荧光并伴随红移。", desc: "滴加三氯化铝后生成黄绿色荧光络合云团，广泛用于黄酮 TLC 检视与 UV 诊断位移。" },
+    { id: "molish", name: "Molish 紫环反应", reagent: "α-萘酚 + 浓 H₂SO₄", target: "糖与苷类 (黄芩苷 / 人参皂苷 / 枸杞多糖)", catMatch: /多糖|皂苷|苷/, base: [241, 245, 249], targetRgb: [126, 34, 206], dropColor: "#c084fc", mode: "ring", mech: "浓 H₂SO₄ (ρ=1.84) 沉至管底，糖苷脱水成糠醛衍生物并与 α-萘酚在两液交界处缩合生成特征紫红环。", desc: "浓硫酸沿管壁缓加沉底，两液界面精准富集深紫红色扩散环。" },
+    { id: "fecl3", name: "FeCl₃ 酚羟基络合", reagent: "1% FeCl₃ 乙醇液", target: "邻二酚羟基/鞣质 (绿原酸 / 丹酚酸 B / 五倍子)", catMatch: /苯丙素|有机酸|酚|黄酮/, base: [254, 249, 195], targetRgb: [15, 118, 110], dropColor: "#d97706", mode: "cloud", mech: "Fe³⁺ 与酚羟基/邻二酚羟基发生配位螯合，形成深墨绿/蓝黑色稳定络合物，随对流涡旋迅速扩散。", desc: "铁离子液滴冲击液面炸开墨绿色涡旋粒子云，亦可用于检查阿司匹林游离水杨酸杂质。" },
+    { id: "dragendorff", name: "改良碘化铋钾", reagent: "Dragendorff 试液", target: "生物碱类 (小檗碱 / 苦参碱 / 延胡索乙素)", catMatch: /生物碱/, base: [254, 249, 195], targetRgb: [234, 88, 12], dropColor: "#ea580c", mode: "precip", mech: "质子化生物碱阳离子与 [BiI₄]⁻ 结合，瞬时析出难溶性橘红色无定形复盐沉淀并向管底沉降堆积。", desc: "滴入瞬间析出致密橘红色沉淀颗粒，重力沉降并在管底形成沉淀层（咖啡因/麻黄碱常阴性）。" },
+    { id: "mayer", name: "Mayer 碘化汞钾", reagent: "Mayer 试液 (K₂HgI₄)", target: "生物碱类 (东莨菪碱 / 士的宁 / 粉防己碱)", catMatch: /生物碱/, base: [241, 245, 249], targetRgb: [226, 232, 240], dropColor: "#f8fafc", mode: "precip", mech: "酸水中生物碱阳离子与 [HgI₄]²⁻ 结合，迅速析出类白色/淡黄色絮状沉淀，灵敏度极高。", desc: "滴加后液柱中瞬间生成致密类白色微晶云雾并沉降，常与 Dragendorff 交叉验证排除假阳性。" },
+    { id: "borntrager", name: "Bornträger 碱液显红", reagent: "5% NaOH 碱水", target: "游离羟基蒽醌 (大黄素 / 大黄酸 / 决明子)", catMatch: /蒽醌|醌/, base: [253, 224, 71], targetRgb: [190, 18, 60], dropColor: "#fda4af", mode: "cloud", mech: "游离酚羟基在碱液中解离形成共轭酚氧负离子，体系由亮黄迅速转为鲜明樱红/紫红色。", desc: "滴加稀碱液后游离蒽醌解离显色（番泻苷等蒽酮类须先氧化后显色）。" },
+    { id: "liebermann", name: "Liebermann-Burchard", reagent: "醋酐 + 浓 H₂SO₄", target: "三萜皂苷/甾体 (人参皂苷 / 甘草酸 / 薯蓣皂苷元)", catMatch: /皂苷|三萜|甾体/, base: [248, 250, 252], targetRgb: [147, 51, 234], dropColor: "#a855f7", mode: "ring", mech: "脱水氧化形成共轭多烯碳正离子，液面界面依次呈现黄→红→紫→蓝→绿多色渐变环（三萜多止于红紫，甾体偏蓝绿）。", desc: "沿管壁缓加浓硫酸，两液界面生成特征红紫色至蓝绿色渐层环带。" },
+    { id: "kedde", name: "Kedde 不饱和内酯反应", reagent: "3,5-二硝基苯甲酸 + 碱", target: "甲型强心苷/内酯 (香加皮杠柳毒苷 / 穿心莲内酯)", catMatch: /甾体|强心苷|内酯/, base: [254, 249, 195], targetRgb: [162, 28, 175], dropColor: "#e879f9", mode: "cloud", mech: "甲型强心苷 C17 五元不饱和内酯环活性亚甲基在碱性下与 3,5-二硝基苯甲酸形成紫红色梅森海默络合物。", desc: "滴加碱性试剂后溶液迅速呈现特征紫红色（乙型强心苷华蟾酥毒基六元环此反应阴性）。" },
+    { id: "hydroxamate", name: "异羟肟酸铁反应", reagent: "盐酸羟胺/碱 + FeCl₃", target: "香豆素与内酯 (补骨脂素 / 蛇床子素 / 秦皮甲素)", catMatch: /香豆素|木脂素|内酯/, base: [254, 243, 199], targetRgb: [159, 18, 57], dropColor: "#fb7185", mode: "cloud", mech: "碱性下香豆素内酯环开环与羟胺缩合生成异羟肟酸，酸化后与 Fe³⁺ 络合生成特征暗紫红色配合物。", desc: "专用于检识香豆素、萜内酯等内酯环结构，色泽深沉稳定。" },
+    { id: "vanillin", name: "香草醛-浓硫酸显色", reagent: "1% 香草醛浓硫酸", target: "挥发油/萜类/皂苷 (薄荷脑 / 青蒿素 / 人参皂苷)", catMatch: /挥发油|萜|皂苷/, base: [248, 250, 252], targetRgb: [109, 40, 217], dropColor: "#8b5cf6", mode: "cloud", mech: "强酸脱水使萜醇/皂苷形成碳正离子，与香草醛芳醛缩合生成深紫红色至蓝紫色共轭发色体。", desc: "中药 TLC 最常用通用显色剂之一，105℃ 加热后紫红色斑点极为鲜明。" },
+    { id: "fehling", name: "Fehling 还原糖沉淀", reagent: "斐林试液 A+B (热)", target: "水解多糖/还原糖 (枸杞多糖 / 黄芪多糖 / 石斛多糖)", catMatch: /多糖|氰苷/, base: [191, 219, 254], targetRgb: [180, 83, 9], dropColor: "#ea580c", mode: "precip", mech: "多糖酸水解产生的游离醛糖将碱性酒石酸铜中的 Cu²⁺（蓝色）还原为砖红色氧化亚铜（Cu₂O）沉淀。", desc: "深蓝色溶液加热滴加后迅速褪蓝并析出致密砖红色 Cu₂O 沉淀颗粒沉降管底。" }
   ];
+
+  var MOL_CATEGORIES = [
+    { id: "all", label: "全部" },
+    { id: "黄酮", label: "黄酮" },
+    { id: "挥发油", label: "挥发油与单萜" },
+    { id: "内酯", label: "萜内酯与环烯醚萜" },
+    { id: "生物碱", label: "生物碱" },
+    { id: "醌", label: "蒽醌与醌类" },
+    { id: "香豆素", label: "香豆素与木脂素" },
+    { id: "苯丙素", label: "苯丙素与酚酸" },
+    { id: "皂苷", label: "皂苷与甾体" },
+    { id: "苷多糖", label: "氰苷/核苷/多糖" }
+  ];
+
+  function matchMolCategory(m, catId) {
+    if (!catId || catId === "all") return true;
+    var c = String(m.category || "");
+    if (catId === "黄酮") return /黄酮/.test(c);
+    if (catId === "挥发油") return /挥发油|单萜|倍半萜(?!内酯)/.test(c) && !/环烯醚萜/.test(c);
+    if (catId === "内酯") return /内酯|环烯醚萜|二萜/.test(c) && !/生物碱|木脂素|苯酞/.test(c);
+    if (catId === "生物碱") return /生物碱/.test(c);
+    if (catId === "醌") return /醌|二苯乙烯/.test(c);
+    if (catId === "香豆素") return /香豆素|木脂素/.test(c) && !/黄酮木脂素/.test(c);
+    if (catId === "苯丙素") return /苯丙素|有机酸|酚酸|二芳基庚烷|酚苷|鞣质/.test(c);
+    if (catId === "皂苷") return /皂苷|三萜|甾体|强心苷/.test(c);
+    if (catId === "苷多糖") return /氰苷|核苷|多糖/.test(c);
+    return true;
+  }
 
   var modalEl = null;
   var activeTab = "mol3d";
   var molKey = "tanshinone";
+  var molCatFilter = "all";
+  var molSearchQuery = "";
+  var selectedTopicId = "";
   var molMode = "ballstick"; // ballstick | wireframe | spacefill
   var showHydrogens = true;
   var autoRotate = true;
@@ -99,24 +137,28 @@
 
   function ensureModal() {
     if (modalEl) return modalEl;
+    var molTotal = Object.keys(getMolecules()).length || 77;
+    var topicTotal = (window.TCM_LAB_API && window.TCM_LAB_API.getCounts && window.TCM_LAB_API.getCounts().topics) || 136;
+    var ICO_MOL = '<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.5"/><circle cx="6" cy="6" r="1.8"/><circle cx="18" cy="6" r="1.8"/><circle cx="6" cy="18" r="1.8"/><circle cx="18" cy="18" r="1.8"/><path d="m10.2 10.2-2.9-2.9M13.8 10.2l2.9-2.9M10.2 13.8l-2.9 2.9M13.8 13.8l2.9 2.9"/></svg>';
+    var ICO_FLASK = '<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6"/><path d="M10 3v5.4L5.6 16.5A3 3 0 0 0 8.2 21h7.6a3 3 0 0 0 2.6-4.5L14 8.4V3"/></svg>';
     modalEl = document.createElement("div");
     modalEl.id = "tcmV20VisualModal";
     modalEl.className = "no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/70 backdrop-blur-xs p-2 sm:p-5";
     modalEl.innerHTML =
-      '<div class="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-700 max-w-5xl w-full max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">' +
+      '<div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 max-w-6xl w-full max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">' +
         '<div class="px-4 sm:px-5 py-3 bg-gradient-to-r from-[#062922] via-[#0a4538] to-[#0f6b58] text-white flex items-center justify-between gap-3">' +
           '<div class="flex items-center gap-2 min-w-0">' +
-            '<span class="shrink-0 px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 text-[11px] font-extrabold">PubChem 3D</span>' +
-            '<h3 class="text-sm sm:text-base font-extrabold truncate">3D 分子结构库 & 粒子级显色反应实验室</h3>' +
+            '<span class="shrink-0 px-2 py-0.5 rounded-md bg-emerald-400/20 text-emerald-200 text-[11px] font-bold">PubChem 3D</span>' +
+            '<h3 class="text-sm sm:text-base font-extrabold truncate">三维分子结构库（' + molTotal + ' 构象 · 贯通 ' + topicTotal + ' 题库）与粒子显色实验室</h3>' +
           '</div>' +
-          '<button type="button" id="v20BtnClose" aria-label="关闭弹窗" class="shrink-0 w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-lg leading-none">×</button>' +
+          '<button type="button" id="v20BtnClose" aria-label="关闭弹窗" class="shrink-0 w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg leading-none">×</button>' +
         '</div>' +
         '<div class="px-4 sm:px-5 pt-2.5 pb-2 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-[#f6f8f7] dark:bg-slate-800/70">' +
-          '<div class="inline-flex p-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-extrabold">' +
-            '<button type="button" data-v20-tab="mol3d" class="px-3.5 py-1.5 rounded-lg transition">🧬 3D 分子结构库</button>' +
-            '<button type="button" data-v20-tab="particles" class="px-3.5 py-1.5 rounded-lg transition">🧪 粒子级显色动画</button>' +
+          '<div class="inline-flex p-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold gap-1">' +
+            '<button type="button" data-v20-tab="mol3d" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition">' + ICO_MOL + '<span>三维分子结构库 (' + molTotal + ')</span></button>' +
+            '<button type="button" data-v20-tab="particles" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition">' + ICO_FLASK + '<span>粒子显色实验室 (' + PARTICLE_REACTIONS.length + ')</span></button>' +
           '</div>' +
-          '<span id="v20HeaderMeta" class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">PubChem 真实 3D 构象 · 悬停/点击官能团高亮</span>' +
+          '<span id="v20HeaderMeta" class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">PubChem 真实 3D 构象 · 悬停/点击官能团高亮 · 直连 91 篇实证文献</span>' +
         '</div>' +
         '<div id="v20Body" class="flex-1 overflow-y-auto p-3.5 sm:p-5"></div>' +
       '</div>';
@@ -187,11 +229,30 @@
     var body = modalEl.querySelector("#v20Body");
     modalEl.querySelectorAll("[data-v20-tab]").forEach(function (b) {
       var on = b.getAttribute("data-v20-tab") === activeTab;
-      b.className = "px-3.5 py-1.5 rounded-lg transition " + (on ? "bg-[#064e3b] text-white" : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white");
+      b.className = "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition " + (on ? "bg-[#0f4c3a] text-white" : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white");
     });
 
     if (activeTab === "mol3d") renderMol3dView(body);
     else renderParticlesView(body);
+  }
+
+  function escHtml(v) {
+    return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function findTopicsForMol(m) {
+    var api = window.TCM_LAB_API;
+    if (!api || !api.getAllTopics) return [];
+    var all = api.getAllTopics();
+    var herbTokens = (m.herbs || [m.herb]).map(function (h) { return String(h).split(/[（(·/\s]/)[0].trim(); }).filter(Boolean);
+    var aliasTokens = (m.aliases || [m.shortName]).filter(function (a) { return String(a).length >= 2; });
+    return all.filter(function (t) {
+      var hay = (t.herb || "") + " " + (t.compound || "");
+      return herbTokens.some(function (hk) { return hay.indexOf(hk) !== -1; }) ||
+        aliasTokens.some(function (ak) { return hay.indexOf(ak) !== -1; });
+    }).slice(0, 6);
   }
 
   function renderMol3dView(container) {
@@ -208,15 +269,58 @@
     var gMap = getGroupMap(m);
     lastTipKey = "";
 
-    var molBtns = keys.map(function (k) {
-      var on = k === molKey;
-      var item = mols[k];
-      return '<button type="button" data-v20-mol="' + k + '" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ' +
-        (on
-          ? 'bg-[#059669] text-white border-[#059669] shadow-xs'
-          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#059669]') + '">' +
-        item.herb.split(" / ")[0] + " · " + item.shortName + "</button>";
+    var allTopics = (window.TCM_LAB_API && window.TCM_LAB_API.getAllTopics) ? window.TCM_LAB_API.getAllTopics() : [];
+    var matchedTopics = findTopicsForMol(m);
+    var activeTopic = selectedTopicId
+      ? (window.TCM_LAB_API && window.TCM_LAB_API.getTopicById ? window.TCM_LAB_API.getTopicById(selectedTopicId) : null)
+      : (matchedTopics[0] && window.TCM_LAB_API && window.TCM_LAB_API.getTopicById ? window.TCM_LAB_API.getTopicById(matchedTopics[0].id) : null);
+    var relLit = (window.TCM_LAB_API && window.TCM_LAB_API.findLiteratureForTopic)
+      ? window.TCM_LAB_API.findLiteratureForTopic(activeTopic || { herb: m.herb, compound: m.shortName, category: m.category }, 4)
+      : [];
+
+    function getFilteredKeys() {
+      var q = String(molSearchQuery || "").trim().toLowerCase();
+      return keys.filter(function (k) {
+        var item = mols[k];
+        if (!matchMolCategory(item, molCatFilter)) return false;
+        if (!q) return true;
+        var hay = [
+          k, item.name, item.shortName, item.herb, item.category, item.formula, String(item.cid || ""),
+          (item.herbs || []).join(" "), (item.aliases || []).join(" ")
+        ].join(" ").toLowerCase();
+        return hay.indexOf(q) !== -1;
+      });
+    }
+
+    function buildMolBtnHtml(filteredKeys) {
+      if (!filteredKeys.length) {
+        return '<div class="text-xs text-slate-500 py-2 px-1">未匹配到分子，可清空关键词或从右侧「136 味题库直选」切换。</div>';
+      }
+      return filteredKeys.map(function (k) {
+        var on = k === molKey;
+        var item = mols[k];
+        return '<button type="button" data-v20-mol="' + k + '" class="px-2.5 py-1 rounded-lg text-[11.5px] font-bold border transition whitespace-nowrap ' +
+          (on
+            ? 'bg-[#0f4c3a] text-white border-[#0f4c3a] shadow-xs'
+            : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#0f4c3a]') + '">' +
+          escHtml(item.herb.split(" / ")[0]) + " · " + escHtml(item.shortName) + "</button>";
+      }).join("");
+    }
+
+    var filteredKeys = getFilteredKeys();
+    var catPillsHtml = MOL_CATEGORIES.map(function (cat) {
+      var cnt = keys.filter(function (k) { return matchMolCategory(mols[k], cat.id); }).length;
+      var on = molCatFilter === cat.id;
+      return '<button type="button" data-v20-cat="' + cat.id + '" class="px-2.5 py-1 rounded-md text-[11px] font-bold border transition ' +
+        (on ? 'bg-[#111d19] text-white border-[#111d19] dark:bg-[#5fb89c] dark:text-[#091713]' : 'bg-[#f7f6f2] dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[#0f4c3a]') + '">' +
+        cat.label + ' <span class="opacity-65 tabular-nums">(' + cnt + ')</span></button>';
     }).join("");
+
+    var topicOptionsHtml = '<option value="">全题库直选（' + allTopics.length + ' 味药材课题）</option>' +
+      allTopics.map(function (t) {
+        var sel = activeTopic && activeTopic.id === t.id ? " selected" : "";
+        return '<option value="' + escHtml(t.id) + '"' + sel + '>' + escHtml(t.herb) + ' — ' + escHtml(t.compound || t.category) + '</option>';
+      }).join("");
 
     var modeBtns = [
       ["ballstick", "球棍"],
@@ -226,8 +330,8 @@
       var on = pair[0] === molMode;
       return '<button type="button" data-v20-mode="' + pair[0] + '" class="px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ' +
         (on
-          ? 'bg-[#ea580c] text-white border-[#ea580c]'
-          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-orange-400') + '">' + pair[1] + "</button>";
+          ? 'bg-[#9a4a24] text-white border-[#9a4a24]'
+          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#9a4a24]') + '">' + pair[1] + "</button>";
     }).join("");
 
     var fgChips = (m.groups || []).map(function (g) {
@@ -235,33 +339,39 @@
       return '<button type="button" data-v20-fg="' + g.id + '" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition ' +
         (active
           ? 'bg-amber-50 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 border-amber-400 ring-1 ring-amber-400'
-          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-emerald-400') + '">' +
+          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-emerald-500') + '">' +
         '<span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:' + g.color + '"></span>' +
-        '<span>' + g.name + '</span>' +
-        '<span class="opacity-60 text-[10px]">(' + g.atoms.length + ')</span>' +
+        '<span>' + escHtml(g.name) + '</span>' +
+        '<span class="opacity-60 text-[10px] tabular-nums">(' + g.atoms.length + ')</span>' +
       '</button>';
     }).join("");
 
     var heavyCount = m.atoms.filter(function (a) { return a[3] !== "H"; }).length;
+    var specCat = /生物碱/.test(m.category) ? "生物碱" : (/醌/.test(m.category) ? "蒽醌与醌类" : (/苯丙素|有机酸|酚酸|鞣质/.test(m.category) ? "酚酸类" : (/香豆素|木脂素/.test(m.category) ? "香豆素与木脂素" : (/挥发油|单萜/.test(m.category) ? "挥发油与萜类" : (/内酯|环烯醚萜|二萜/.test(m.category) ? "萜类内酯与环烯醚萜" : (/皂苷|三萜/.test(m.category) ? "皂苷与三萜" : (/甾体|强心苷/.test(m.category) ? "甾体与强心苷" : (/氰苷/.test(m.category) ? "氰苷类" : (/多糖|核苷/.test(m.category) ? "多糖类" : "黄酮")))))))));
 
     container.innerHTML =
-      '<div class="space-y-3.5">' +
-        '<div class="flex flex-wrap items-center justify-between gap-2">' +
-          '<div class="flex flex-wrap gap-1.5" role="tablist" aria-label="核心成分选择">' + molBtns + "</div>" +
-          '<div class="flex flex-wrap items-center gap-1.5">' +
-            modeBtns +
-            '<button type="button" id="v20BtnToggleH" class="px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ' +
-              (showHydrogens ? 'bg-slate-800 text-white border-slate-800 dark:bg-slate-200 dark:text-slate-900' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700') + '">' +
-              (showHydrogens ? '隐 H 原子' : '显 H 原子') + '</button>' +
-          "</div>" +
-        "</div>" +
+      '<div class="space-y-3">' +
+        '<div class="p-3 rounded-xl bg-[#f7f6f2] dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 space-y-2">' +
+          '<div class="flex flex-wrap items-center gap-2">' +
+            '<input type="text" id="v20MolSearch" value="' + escHtml(molSearchQuery) + '" placeholder="检索 77 项分子 / 136 味药材 / 分子式 / CID..." class="flex-1 min-w-[200px] px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-[#0f4c3a]" />' +
+            '<select id="v20TopicJumpSelect" class="max-w-[260px] px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200">' + topicOptionsHtml + '</select>' +
+            '<div class="flex flex-wrap items-center gap-1">' +
+              modeBtns +
+              '<button type="button" id="v20BtnToggleH" class="px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ' +
+                (showHydrogens ? 'bg-[#111d19] text-white border-[#111d19] dark:bg-slate-200 dark:text-slate-900' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700') + '">' +
+                (showHydrogens ? '隐 H 原子' : '显 H 原子') + '</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="flex flex-wrap gap-1" role="tablist" aria-label="化学大类筛选">' + catPillsHtml + '</div>' +
+          '<div id="v20MolChipGrid" class="flex flex-wrap gap-1.5 max-h-[98px] overflow-y-auto custom-scroll py-0.5 pr-1" role="tablist" aria-label="核心成分选择">' + buildMolBtnHtml(filteredKeys) + '</div>' +
+        '</div>' +
 
         '<div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">' +
-          '<div class="lg:col-span-8 relative rounded-2xl bg-gradient-to-br from-[#061c19] via-[#0a2c27] to-[#0f3d35] border border-emerald-400/25 overflow-hidden select-none">' +
-            '<canvas id="v20MolCanvas" class="w-full h-[300px] sm:h-full min-h-[300px] sm:min-h-[420px] block cursor-grab active:cursor-grabbing" style="touch-action:none;"></canvas>' +
+          '<div class="lg:col-span-7 relative rounded-2xl bg-gradient-to-br from-[#061c19] via-[#0a2c27] to-[#0f3d35] border border-emerald-400/25 overflow-hidden select-none">' +
+            '<canvas id="v20MolCanvas" class="w-full h-[310px] sm:h-full min-h-[320px] sm:min-h-[450px] block cursor-grab active:cursor-grabbing" style="touch-action:none;"></canvas>' +
             '<div id="v20MolHoverTip" class="pointer-events-none absolute top-3 left-3 right-24 sm:right-28 px-3 py-2 rounded-xl bg-slate-950/75 backdrop-blur-xs border border-emerald-300/25 text-xs text-emerald-100 leading-snug">' +
               '<div class="font-extrabold text-emerald-200">拖拽 360° 旋转 · 滚轮/双指缩放 · 悬停原子高亮官能团</div>' +
-              '<div class="text-[11px] text-slate-300 mt-0.5">当前显示：' + m.name + '（' + m.atoms.length + ' 原子 / ' + m.bonds.length + ' 键）</div>' +
+              '<div class="text-[11px] text-slate-300 mt-0.5">当前显示：' + escHtml(m.name) + '（' + m.atoms.length + ' 原子 / ' + m.bonds.length + ' 键）</div>' +
             '</div>' +
             '<div class="absolute top-3 right-3 flex flex-col gap-1.5">' +
               '<button type="button" id="v20BtnZoomIn" title="放大" class="w-8 h-8 rounded-lg bg-slate-950/65 hover:bg-slate-900 text-white border border-white/15 font-extrabold text-sm">+</button>' +
@@ -275,63 +385,151 @@
             '</div>' +
           "</div>" +
 
-          '<div class="lg:col-span-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 flex flex-col justify-between gap-3 text-xs">' +
+          '<div class="lg:col-span-5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 flex flex-col justify-between gap-2.5 text-xs max-h-[500px] overflow-y-auto custom-scroll">' +
             '<div class="space-y-2.5">' +
               '<div class="flex flex-wrap items-center justify-between gap-1.5">' +
-                '<span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/40 text-[#059669] dark:text-emerald-300 font-extrabold">' + m.formula + ' · ' + m.category + '</span>' +
-                '<a href="' + m.pubchemUrl + '" target="_blank" rel="noopener noreferrer" class="text-[11px] font-bold text-teal-700 dark:text-teal-300 hover:underline">PubChem CID ' + m.cid + ' ↗</a>' +
+                '<span class="inline-block px-2.5 py-0.5 rounded-md bg-[#f2f1ec] dark:bg-emerald-900/40 text-[#0f4c3a] dark:text-emerald-300 font-bold">' + escHtml(m.formula) + ' · ' + escHtml(m.category) + '</span>' +
+                '<a href="' + m.pubchemUrl + '" target="_blank" rel="noopener noreferrer" class="text-[11px] font-bold text-[#0f4c3a] dark:text-teal-300 hover:underline">PubChem CID ' + m.cid + ' ↗</a>' +
               '</div>' +
-              '<h4 class="text-base font-extrabold text-slate-900 dark:text-white leading-tight">' + m.name + '</h4>' +
-              '<p class="text-slate-600 dark:text-slate-300 leading-relaxed">' + m.desc + '</p>' +
+              '<h4 class="text-base font-extrabold text-slate-900 dark:text-white leading-tight">' + escHtml(m.name) + '</h4>' +
+              '<p class="text-slate-600 dark:text-slate-300 leading-relaxed">' + escHtml(m.desc) + '</p>' +
 
-              '<div class="grid grid-cols-3 gap-1.5 pt-0.5">' +
-                '<div class="p-2 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-700 text-center">' +
+              '<div class="grid grid-cols-3 gap-1.5">' +
+                '<div class="p-2 rounded-lg bg-[#f7f6f2] dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-700 text-center">' +
                   '<div class="text-[10px] text-slate-500 dark:text-slate-400">分子量</div>' +
-                  '<div class="font-extrabold text-slate-800 dark:text-slate-100">' + m.mw + '</div>' +
+                  '<div class="font-extrabold text-slate-800 dark:text-slate-100 tabular-nums">' + m.mw + '</div>' +
                 '</div>' +
-                '<div class="p-2 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-700 text-center">' +
+                '<div class="p-2 rounded-lg bg-[#f7f6f2] dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-700 text-center">' +
                   '<div class="text-[10px] text-slate-500 dark:text-slate-400">XLogP3</div>' +
-                  '<div class="font-extrabold text-slate-800 dark:text-slate-100">' + m.xlogp + '</div>' +
+                  '<div class="font-extrabold text-slate-800 dark:text-slate-100 tabular-nums">' + m.xlogp + '</div>' +
                 '</div>' +
-                '<div class="p-2 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-700 text-center">' +
+                '<div class="p-2 rounded-lg bg-[#f7f6f2] dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-700 text-center">' +
                   '<div class="text-[10px] text-slate-500 dark:text-slate-400">TPSA (Å²)</div>' +
-                  '<div class="font-extrabold text-slate-800 dark:text-slate-100">' + m.tpsa + '</div>' +
+                  '<div class="font-extrabold text-slate-800 dark:text-slate-100 tabular-nums">' + m.tpsa + '</div>' +
                 '</div>' +
               '</div>' +
 
-              '<div class="space-y-1.5 pt-1">' +
+              '<div class="space-y-1.5">' +
                 '<div class="flex items-center justify-between">' +
                   '<span class="font-extrabold text-slate-800 dark:text-slate-200">官能团高亮检索（悬停或点击锁定）</span>' +
-                  (lockedGroupId ? '<button type="button" id="v20BtnClearFg" class="text-[10.5px] text-orange-600 font-bold hover:underline">清除锁定</button>' : '') +
+                  (lockedGroupId ? '<button type="button" id="v20BtnClearFg" class="text-[10.5px] text-[#9a4a24] font-bold hover:underline">清除锁定</button>' : '') +
                 '</div>' +
                 '<div class="flex flex-wrap gap-1.5" id="v20FgChipList">' + fgChips + '</div>' +
               '</div>' +
+
+              (activeTopic ? (
+                '<div class="p-2.5 rounded-xl bg-[#f7f6f2] dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 space-y-1">' +
+                  '<div class="flex items-center justify-between gap-2">' +
+                    '<span class="font-extrabold text-[#0f4c3a] dark:text-emerald-300 text-[11px]">关联题库：' + escHtml(activeTopic.herb) + '</span>' +
+                    '<div class="flex gap-1">' +
+                      '<button type="button" id="v20BtnOpenSpectra" class="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-[10.5px] font-bold text-slate-700 dark:text-slate-200 hover:border-[#0f4c3a]">看四谱 ↗</button>' +
+                      '<button type="button" id="v20BtnLoadTopic" class="px-2 py-0.5 rounded-md bg-[#0f4c3a] text-white text-[10.5px] font-bold">载入工坊 →</button>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">' + escHtml(activeTopic.pharmacopoeia || activeTopic.pharm || activeTopic.chemistry || activeTopic.compound) + '</div>' +
+                '</div>'
+              ) : '') +
+
+              (relLit.length ? (
+                '<div class="p-2.5 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-700 space-y-1">' +
+                  '<div class="font-extrabold text-slate-800 dark:text-slate-200 text-[11px]">关联实证文献（91 篇文献库匹配）</div>' +
+                  relLit.map(function (lit) {
+                    return '<div class="text-[10.5px] text-slate-600 dark:text-slate-300 leading-snug pl-2 border-l-2 border-[#0f4c3a]/40">' + escHtml(lit.text) + '</div>';
+                  }).join("") +
+                '</div>'
+              ) : '') +
             '</div>' +
 
-            '<div class="p-2.5 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 space-y-1">' +
-              '<div class="font-extrabold text-slate-800 dark:text-slate-200 text-[11px]">CPK 元素色标（HBD ' + m.hbd + ' / HBA ' + m.hba + '）</div>' +
-              '<div class="grid grid-cols-4 gap-1 text-[11px] font-bold text-slate-700 dark:text-slate-300">' +
-                '<span><i class="inline-block w-2.5 h-2.5 rounded-full bg-[#475569] mr-1 align-middle"></i>C</span>' +
-                '<span><i class="inline-block w-2.5 h-2.5 rounded-full bg-[#dc2626] mr-1 align-middle"></i>O</span>' +
-                '<span><i class="inline-block w-2.5 h-2.5 rounded-full bg-[#2563eb] mr-1 align-middle"></i>N</span>' +
-                '<span><i class="inline-block w-2.5 h-2.5 rounded-full bg-[#e2e8f0] border border-slate-400 mr-1 align-middle"></i>H</span>' +
+            '<div class="p-2 rounded-lg bg-[#f7f6f2] dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 flex items-center justify-between gap-2 text-[10.5px] font-bold text-slate-700 dark:text-slate-300">' +
+              '<span>CPK (HBD ' + m.hbd + '/HBA ' + m.hba + ')</span>' +
+              '<div class="flex items-center gap-2">' +
+                '<span><i class="inline-block w-2 h-2 rounded-full bg-[#475569] mr-1"></i>C</span>' +
+                '<span><i class="inline-block w-2 h-2 rounded-full bg-[#dc2626] mr-1"></i>O</span>' +
+                '<span><i class="inline-block w-2 h-2 rounded-full bg-[#2563eb] mr-1"></i>N</span>' +
+                '<span><i class="inline-block w-2 h-2 rounded-full bg-[#e2e8f0] border border-slate-400 mr-1"></i>H</span>' +
               '</div>' +
             '</div>' +
           '</div>' +
         '</div>' +
       '</div>';
 
-    // Bind switches
-    container.querySelectorAll("[data-v20-mol]").forEach(function (b) {
-      b.addEventListener("click", function () {
+    // Bind molecule chip clicks (delegated so live search updates never lose listeners)
+    var chipGrid = container.querySelector("#v20MolChipGrid");
+    if (chipGrid) {
+      chipGrid.addEventListener("click", function (e) {
+        var b = e.target.closest("[data-v20-mol]");
+        if (!b) return;
         molKey = b.getAttribute("data-v20-mol");
+        selectedTopicId = "";
         lockedGroupId = null;
         hoverGroupId = null;
         hoverAtomIdx = -1;
         zoom = 1.0;
         renderMol3dView(container);
       });
+    }
+
+    container.querySelectorAll("[data-v20-cat]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        molCatFilter = b.getAttribute("data-v20-cat") || "all";
+        var fks = getFilteredKeys();
+        if (fks.length && fks.indexOf(molKey) === -1) {
+          molKey = fks[0];
+          selectedTopicId = "";
+        }
+        renderMol3dView(container);
+      });
     });
+
+    var searchInp = container.querySelector("#v20MolSearch");
+    if (searchInp) {
+      searchInp.addEventListener("input", function () {
+        molSearchQuery = searchInp.value;
+        if (chipGrid) chipGrid.innerHTML = buildMolBtnHtml(getFilteredKeys());
+      });
+    }
+
+    var topicSel = container.querySelector("#v20TopicJumpSelect");
+    if (topicSel) {
+      topicSel.addEventListener("change", function () {
+        var tid = topicSel.value;
+        if (!tid) return;
+        selectedTopicId = tid;
+        var tObj = window.TCM_LAB_API && window.TCM_LAB_API.getTopicById ? window.TCM_LAB_API.getTopicById(tid) : null;
+        if (tObj) {
+          var regKey = window.TCM_MOL3D_REGISTRY && window.TCM_MOL3D_REGISTRY.matchKey((tObj.herb || "") + " " + (tObj.compound || ""));
+          molKey = (regKey && mols[regKey]) ? regKey : resolveMolKey((tObj.herb || "") + " " + (tObj.compound || ""));
+          molCatFilter = "all";
+          lockedGroupId = null;
+          hoverGroupId = null;
+          zoom = 1.0;
+          renderMol3dView(container);
+        }
+      });
+    }
+
+    var btnLoadTopic = container.querySelector("#v20BtnLoadTopic");
+    if (btnLoadTopic && activeTopic) {
+      btnLoadTopic.addEventListener("click", function () {
+        closeModal();
+        if (window.TCM_LAB_API && window.TCM_LAB_API.selectTopic) {
+          window.TCM_LAB_API.selectTopic(activeTopic.id, 1);
+        }
+        if (window.TCM_V16_PORTAL && window.TCM_V16_PORTAL.go) {
+          window.TCM_V16_PORTAL.go("workflow", { step: 1 });
+        }
+      });
+    }
+
+    var btnOpenSpectra = container.querySelector("#v20BtnOpenSpectra");
+    if (btnOpenSpectra) {
+      btnOpenSpectra.addEventListener("click", function () {
+        closeModal();
+        if (window.TCM_V21_SPECTRA_LAB && window.TCM_V21_SPECTRA_LAB.open) {
+          window.TCM_V21_SPECTRA_LAB.open(specCat);
+        }
+      });
+    }
     container.querySelectorAll("[data-v20-mode]").forEach(function (b) {
       b.addEventListener("click", function () {
         molMode = b.getAttribute("data-v20-mode");
@@ -744,24 +942,37 @@
 
     var rxnBtns = PARTICLE_REACTIONS.map(function (r, i) {
       var on = i === rxnIdx;
-      return '<button type="button" data-v20-rxn="' + i + '" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ' +
-        (on ? 'bg-[#059669] text-white border-[#059669]' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#059669]') + '">' + r.name + "</button>";
+      return '<button type="button" data-v20-rxn="' + i + '" class="px-2.5 py-1 rounded-lg text-[11.5px] font-bold border transition ' +
+        (on ? 'bg-[#0f4c3a] text-white border-[#0f4c3a]' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#0f4c3a]') + '">' + r.name + "</button>";
     }).join("");
 
+    var rxnTopics = (function () {
+      if (!window.TCM_LAB_API || !window.TCM_LAB_API.getAllTopics || !rxn.catMatch) return [];
+      var seenHerb = {};
+      var list = [];
+      window.TCM_LAB_API.getAllTopics().forEach(function (t) {
+        if (!rxn.catMatch.test((t.category || "") + " " + (t.compound || ""))) return;
+        var h = String(t.herb || "").split("（")[0].trim();
+        if (!h || seenHerb[h]) return;
+        seenHerb[h] = true;
+        list.push(t);
+      });
+      return list.slice(0, 8);
+    })();
     var baseCss = "rgb(" + rxn.base.join(",") + ")";
     var targetCss = "rgb(" + rxn.targetRgb.join(",") + ")";
 
     container.innerHTML =
       '<div class="space-y-3.5">' +
-        '<div class="flex flex-wrap items-center justify-between gap-2">' +
+        '<div class="p-3 rounded-xl bg-[#f7f6f2] dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 space-y-2">' +
           '<div class="flex flex-wrap gap-1.5">' + rxnBtns + "</div>" +
-          '<div class="flex flex-wrap items-center gap-1.5">' +
-            '<button type="button" id="v20BtnDrop" class="px-3 py-1.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-extrabold shadow-xs">💧 滴加试液</button>' +
-            '<button type="button" id="v20BtnSwirl" class="px-3 py-1.5 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-extrabold">🌀 轻摇混匀</button>' +
-            '<button type="button" id="v20BtnPauseRxn" class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-extrabold">⏸ 暂停</button>' +
-            '<button type="button" id="v20BtnReplayRxn" class="px-3 py-1.5 rounded-xl bg-[#064e3b] hover:bg-[#062922] text-white text-xs font-extrabold">↺ 重播</button>' +
-            '<button type="button" id="v20BtnSpeedRxn" class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold">1.0×</button>' +
-            '<button type="button" id="v20BtnCtrlTube" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-bold">🧪 双管对照</button>' +
+          '<div class="flex flex-wrap items-center gap-1.5 pt-1 border-t border-slate-200/70 dark:border-slate-700">' +
+            '<button type="button" id="v20BtnDrop" class="px-3 py-1.5 rounded-lg bg-[#9a4a24] hover:bg-[#7d3a1b] text-white text-xs font-bold shadow-xs">滴加试液</button>' +
+            '<button type="button" id="v20BtnSwirl" class="px-3 py-1.5 rounded-lg bg-[#0f4c3a] hover:bg-[#0a382b] text-white text-xs font-bold">轻摇混匀</button>' +
+            '<button type="button" id="v20BtnPauseRxn" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold">暂停</button>' +
+            '<button type="button" id="v20BtnReplayRxn" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold">重播</button>' +
+            '<button type="button" id="v20BtnSpeedRxn" class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold tabular-nums">1.0×</button>' +
+            '<button type="button" id="v20BtnCtrlTube" class="px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-bold">双管对照</button>' +
           "</div>" +
         "</div>" +
         '<div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">' +
@@ -771,25 +982,35 @@
               '<span id="v20RxnStagePill" class="px-2.5 py-1 rounded-lg bg-slate-950/75 border border-emerald-400/30 text-emerald-200">滴加 → 扩散 → 变色终点</span>' +
               '<div class="flex items-center gap-1.5">' +
                 '<span id="v20DropCountBadge" class="px-2 py-1 rounded-lg bg-slate-950/75 border border-white/15 text-slate-200 font-mono">0 滴</span>' +
-                '<span id="v20RxnPauseBadge" class="hidden px-2 py-1 rounded-lg bg-amber-500/90 text-slate-950 font-extrabold">⏸ 已暂停</span>' +
+                '<span id="v20RxnPauseBadge" class="hidden px-2 py-1 rounded-lg bg-amber-500/90 text-slate-950 font-extrabold">已暂停</span>' +
               '</div>' +
             '</div>' +
           "</div>" +
           '<div class="lg:col-span-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 flex flex-col justify-between gap-3 text-xs">' +
             '<div class="space-y-2.5">' +
               '<div class="flex flex-wrap items-center gap-1.5">' +
-                '<span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 font-extrabold">' + rxn.target + "</span>" +
-                '<span class="inline-block px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 font-bold">试液：' + rxn.reagent + "</span>" +
+                '<span class="inline-block px-2.5 py-0.5 rounded-md bg-[#f2f1ec] dark:bg-amber-900/40 text-[#9a4a24] dark:text-amber-200 font-bold">' + rxn.target + "</span>" +
+                '<span class="inline-block px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-900/40 text-[#0f4c3a] dark:text-emerald-300 font-bold">试液：' + rxn.reagent + "</span>" +
               '</div>' +
               '<h4 class="text-base font-extrabold text-slate-900 dark:text-white">' + rxn.name + "</h4>" +
               '<p class="text-slate-600 dark:text-slate-300 leading-relaxed">' + rxn.desc + "</p>" +
-              '<div class="p-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/35 border border-emerald-200/80 dark:border-emerald-800 text-[11.5px] text-emerald-950 dark:text-emerald-200 leading-relaxed">' +
+              '<div class="p-2.5 rounded-xl bg-[#f7f6f2] dark:bg-emerald-950/35 border border-slate-200/80 dark:border-emerald-800 text-[11.5px] text-slate-800 dark:text-emerald-200 leading-relaxed">' +
                 '<strong>化学机理：</strong>' + rxn.mech +
               '</div>' +
+              (rxnTopics.length ? (
+                '<div class="space-y-1">' +
+                  '<div class="text-[11px] font-bold text-slate-600 dark:text-slate-300">题库典型适用药材（点击看 3D 构象）：</div>' +
+                  '<div class="flex flex-wrap gap-1">' +
+                    rxnTopics.map(function (t) {
+                      return '<button type="button" data-v20-rxn-herb="' + escHtml(t.herb + ' ' + t.compound) + '" class="px-2 py-0.5 rounded-md bg-[#f7f6f2] dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-[#0f4c3a] text-[10.5px] font-bold text-slate-700 dark:text-slate-200">' + escHtml(t.herb.split("（")[0]) + '</button>';
+                    }).join("") +
+                  '</div>' +
+                '</div>'
+              ) : '') +
               '<div class="grid grid-cols-3 gap-1.5 text-center text-[10.5px] font-bold">' +
-                '<div class="p-1.5 rounded-xl bg-[#f6f8f7] dark:bg-slate-900 border border-slate-200 dark:border-slate-700"><span class="inline-block w-4 h-4 rounded-full border border-slate-400 align-middle mr-1" style="background:' + baseCss + '"></span>空白对照</div>' +
-                '<div class="p-1.5 rounded-xl bg-[#f6f8f7] dark:bg-slate-900 border border-slate-200 dark:border-slate-700"><span id="v20CurColorDot" class="inline-block w-4 h-4 rounded-full border border-slate-400 align-middle mr-1" style="background:' + baseCss + '"></span>当前液色</div>' +
-                '<div class="p-1.5 rounded-xl bg-[#f6f8f7] dark:bg-slate-900 border border-slate-200 dark:border-slate-700"><span class="inline-block w-4 h-4 rounded-full border border-slate-400 align-middle mr-1" style="background:' + targetCss + '"></span>阳性终点</div>' +
+                '<div class="p-1.5 rounded-lg bg-[#f6f8f7] dark:bg-slate-900 border border-slate-200 dark:border-slate-700"><span class="inline-block w-3.5 h-3.5 rounded-full border border-slate-400 align-middle mr-1" style="background:' + baseCss + '"></span>空白对照</div>' +
+                '<div class="p-1.5 rounded-lg bg-[#f6f8f7] dark:bg-slate-900 border border-slate-200 dark:border-slate-700"><span id="v20CurColorDot" class="inline-block w-3.5 h-3.5 rounded-full border border-slate-400 align-middle mr-1" style="background:' + baseCss + '"></span>当前液色</div>' +
+                '<div class="p-1.5 rounded-lg bg-[#f6f8f7] dark:bg-slate-900 border border-slate-200 dark:border-slate-700"><span class="inline-block w-3.5 h-3.5 rounded-full border border-slate-400 align-middle mr-1" style="background:' + targetCss + '"></span>阳性终点</div>' +
               '</div>' +
             '</div>' +
             '<div class="p-3 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 space-y-2">' +
@@ -812,6 +1033,16 @@
       b.addEventListener("click", function () {
         rxnIdx = Number(b.getAttribute("data-v20-rxn"));
         renderParticlesView(container);
+      });
+    });
+    container.querySelectorAll("[data-v20-rxn-herb]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var q = b.getAttribute("data-v20-rxn-herb") || "";
+        var regKey = window.TCM_MOL3D_REGISTRY && window.TCM_MOL3D_REGISTRY.matchKey(q);
+        molKey = regKey || resolveMolKey(q);
+        activeTab = "mol3d";
+        molCatFilter = "all";
+        renderModalBody();
       });
     });
 

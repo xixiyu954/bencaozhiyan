@@ -53,11 +53,11 @@
 
     var diag = { level: "ok", text: "✅ 当前工艺处于高效绿色平衡区，热敏保护与溶剂经济性良好，适合课堂演示与中试放大。" };
     if (params.solventKey === "chcl3" || params.solventKey === "meoh") {
-      diag = { level: "danger", text: "⚠️ 绿色安全预警：所选「" + sv.name + "」具高挥发/毒性风险（绿色分仅 " + green + "），建议评估 70%~95% 乙醇或乙酸乙酯绿色替代。" };
+      diag = { level: "danger", text: "绿色安全预警：所选「" + sv.name + "」具高挥发/毒性风险（绿色分仅 " + green + "），建议评估 70%~95% 乙醇或乙酸乙酯绿色替代。" };
     } else if (temp > 85) {
-      diag = { level: "warn", text: "🔥 热敏降解预警：当前温度 " + temp + "℃ 过高（热敏保护跌至 " + thermal + " 分），易致酚酸/黄酮苷/挥发油分解，建议控温 65~75℃。" };
+      diag = { level: "warn", text: "热敏降解预警：当前温度 " + temp + "℃ 过高（热敏保护跌至 " + thermal + " 分），易致酚酸/黄酮苷/挥发油分解，建议控温 65~75℃。" };
     } else if (ratio > 14) {
-      diag = { level: "warn", text: "💡 溶剂经济提示：料液比 1:" + ratio + " 导致总耗液达 " + Math.round(totalVol) + " mL，后续旋蒸浓缩能耗偏高，建议优化至 1:8~1:12。" };
+      diag = { level: "warn", text: "溶剂经济提示：料液比 1:" + ratio + " 导致总耗液达 " + Math.round(totalVol) + " mL，后续旋蒸浓缩能耗偏高，建议优化至 1:8~1:12。" };
     }
 
     return {
@@ -125,6 +125,16 @@
     var rotY = 0.42, tiltX = 0.54, autoOrbit = true, dragging = false, lastX = 0, lastY = 0;
 
     function buildDom() {
+      var allTopics = (window.TCM_LAB_API && window.TCM_LAB_API.getAllTopics) ? window.TCM_LAB_API.getAllTopics() : [];
+      var curTopicObj = (window.TCM_LAB_API && window.TCM_LAB_API.getCurrentTopic) ? window.TCM_LAB_API.getCurrentTopic() : null;
+      var topicOpts = '<option value="">快速切换题库课题（' + allTopics.length + ' 项全覆盖）</option>' +
+        allTopics.map(function (t) {
+          var sel = curTopicObj && curTopicObj.id === t.id ? " selected" : "";
+          return '<option value="' + t.id + '"' + sel + '>' + t.herb + ' — ' + (t.compound || t.category) + '</option>';
+        }).join("");
+      var relLit = (window.TCM_LAB_API && window.TCM_LAB_API.findLiteratureForTopic && curTopicObj)
+        ? window.TCM_LAB_API.findLiteratureForTopic(curTopicObj, 2)
+        : [];
       var solvOpts = Object.keys(SOLVENT_PROFILES).map(function (k) {
         return '<option value="' + k + '"' + (k === params.solventKey ? " selected" : "") + '>' + SOLVENT_PROFILES[k].name + "</option>";
       }).join("");
@@ -132,23 +142,27 @@
       container.innerHTML =
         '<div id="v22CockpitRoot" class="rounded-2xl bg-gradient-to-br from-[#041b17] via-[#072923] to-[#0a362e] text-white border border-emerald-400/30 p-4 sm:p-5 space-y-3.5 transition-all">' +
           '<div class="flex flex-wrap items-center justify-between gap-3 border-b border-emerald-400/20 pb-3">' +
-            '<div class="min-w-0">' +
+            '<div class="min-w-0 flex-1">' +
               '<div class="flex flex-wrap items-center gap-2">' +
-                '<span class="px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 text-xs font-extrabold">1.7 驾驶舱数据大屏</span>' +
-                '<span class="text-xs text-emerald-300/80 font-semibold">3D 五维雷达 × 基准线框对照 × 实时参数联动</span>' +
+                '<span class="px-2 py-0.5 rounded-md bg-emerald-400/20 text-emerald-200 text-xs font-bold">五维雷达驾驶舱</span>' +
+                '<span class="text-xs text-emerald-300/80 font-semibold">3D 五维雷达 × 基准线框对照 × 136 课题实时联动</span>' +
               '</div>' +
-              '<h3 id="v22CpHerbTitle" class="text-lg sm:text-xl font-black text-white mt-1 truncate">' + params.herb + '</h3>' +
+              '<div class="flex flex-wrap items-center gap-2.5 mt-1.5">' +
+                '<h3 id="v22CpHerbTitle" class="text-base sm:text-lg font-extrabold text-white truncate">' + params.herb + '</h3>' +
+                '<select id="v22CpTopicSelect" class="max-w-[270px] px-2.5 py-1 rounded-lg bg-slate-900/90 border border-emerald-400/35 text-emerald-100 text-xs font-bold">' + topicOpts + '</select>' +
+              '</div>' +
             '</div>' +
             '<div class="flex flex-wrap items-center gap-1.5">' +
-              '<button type="button" data-cp-preset="green" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/35 border border-emerald-400/40 text-xs font-bold text-emerald-100">🌿 绿色优选</button>' +
-              '<button type="button" data-cp-preset="hot" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/40 text-xs font-bold text-amber-100">🔥 高温超载</button>' +
-              '<button type="button" data-cp-preset="toxic" class="px-2.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/35 border border-rose-400/40 text-xs font-bold text-rose-100">☣️ 含卤高危</button>' +
-              '<button type="button" id="v22CpBaselineBtn" class="px-2.5 py-1.5 rounded-xl bg-white/15 border border-cyan-300/50 text-xs font-bold text-cyan-200">⚖️ 基准对照</button>' +
-              '<button type="button" id="v22CpAutoOrbit" class="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-bold text-emerald-100">⏸</button>' +
-              '<button type="button" id="v22CpSnapBtn" class="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-bold text-emerald-100">📸 导出雷达</button>' +
-              '<button type="button" id="v22CpFullscreenBtn" class="px-3.5 py-1.5 rounded-xl bg-[#f97316] hover:bg-[#ea580c] text-white text-xs sm:text-sm font-extrabold shadow-md">🖥️ 一键全屏演示</button>' +
+              '<button type="button" data-cp-preset="green" class="px-2.5 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/35 border border-emerald-400/40 text-xs font-bold text-emerald-100">绿色优选</button>' +
+              '<button type="button" data-cp-preset="hot" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/40 text-xs font-bold text-amber-100">高温超载</button>' +
+              '<button type="button" data-cp-preset="toxic" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/35 border border-rose-400/40 text-xs font-bold text-rose-100">含卤高危</button>' +
+              '<button type="button" id="v22CpBaselineBtn" class="px-2.5 py-1.5 rounded-lg bg-white/15 border border-cyan-300/50 text-xs font-bold text-cyan-200">基准对照</button>' +
+              '<button type="button" id="v22CpAutoOrbit" class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-bold text-emerald-100">⏸</button>' +
+              '<button type="button" id="v22CpSnapBtn" class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-bold text-emerald-100">导出雷达</button>' +
+              '<button type="button" id="v22CpFullscreenBtn" class="px-3 py-1.5 rounded-lg bg-[#9a4a24] hover:bg-[#7d3a1b] text-white text-xs font-bold shadow-sm">全屏演示</button>' +
             '</div>' +
           '</div>' +
+          (relLit.length ? '<div id="v22CpLitStrip" class="px-3 py-2 rounded-xl bg-white/5 border border-emerald-400/15 text-[11px] text-emerald-100/85 leading-snug"><strong class="text-emerald-300">关联实证文献：</strong>' + relLit.map(function (l) { return l.text; }).join(" ； ") + '</div>' : '<div id="v22CpLitStrip" class="hidden"></div>') +
 
           '<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">' +
             '<div class="lg:col-span-7 flex flex-col gap-3">' +
@@ -165,7 +179,7 @@
             '<div class="lg:col-span-5 flex flex-col justify-between gap-3">' +
               '<div class="rounded-2xl bg-white/5 border border-emerald-400/20 p-4 space-y-2.5">' +
                 '<div class="flex items-center justify-between">' +
-                  '<span class="text-sm font-extrabold text-emerald-200">🎛️ 工艺参数实时联动面板</span>' +
+                  '<span class="text-sm font-extrabold text-emerald-200">工艺参数实时联动面板</span>' +
                   '<span class="text-[11px] text-emerald-300/80 font-semibold">双向同步工作台</span>' +
                 '</div>' +
                 '<div class="space-y-2 text-xs sm:text-sm">' +
@@ -240,6 +254,36 @@
       refreshScores(!!push);
     }
 
+    var cpTopicSel = container.querySelector("#v22CpTopicSelect");
+    if (cpTopicSel) {
+      cpTopicSel.addEventListener("change", function () {
+        var tid = cpTopicSel.value;
+        if (!tid || !window.TCM_LAB_API || !window.TCM_LAB_API.getTopicById) return;
+        var tObj = window.TCM_LAB_API.getTopicById(tid);
+        if (!tObj) return;
+        var cfg = tObj.defaultCfg || {};
+        params.herb = (tObj.herb || "") + " · " + (tObj.compound || "");
+        var hEl = container.querySelector("#v22CpHerbTitle");
+        if (hEl) hEl.textContent = params.herb;
+        var litEl = container.querySelector("#v22CpLitStrip");
+        if (litEl && window.TCM_LAB_API.findLiteratureForTopic) {
+          var lits = window.TCM_LAB_API.findLiteratureForTopic(tObj, 2);
+          if (lits.length) {
+            litEl.classList.remove("hidden");
+            litEl.innerHTML = '<strong class="text-emerald-300">关联实证文献：</strong>' + lits.map(function (l) { return l.text; }).join(" ； ");
+          }
+        }
+        applyParamsPatch({
+          mass: Number(cfg.mass) || 50,
+          ratio: Number(cfg.ratio) || 10,
+          temp: Number(cfg.temp) || 75,
+          time: Number(cfg.time) || 60,
+          cycles: parseInt(cfg.cycles, 10) || 2,
+          solventKey: detectSolventKey(cfg.solventType || "70%乙醇")
+        }, false);
+      });
+    }
+
     container.querySelectorAll("[data-cp-preset]").forEach(function (b) {
       b.addEventListener("click", function () {
         var p = b.getAttribute("data-cp-preset");
@@ -288,7 +332,7 @@
         rootEl.classList.remove("fixed", "inset-0", "z-[9999]", "rounded-none", "overflow-y-auto", "p-6", "sm:p-8");
         rootEl.removeAttribute("data-projection-fullscreen");
         if (h3) h3.style.fontSize = "";
-        fsBtn.textContent = "🖥️ 一键全屏演示";
+        fsBtn.textContent = "全屏演示";
         if (document.fullscreenElement && document.exitFullscreen) { try { document.exitFullscreen().catch(function () {}); } catch (_) {} }
       }
     }

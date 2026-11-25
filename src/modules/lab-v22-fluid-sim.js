@@ -81,6 +81,16 @@
     ctx.closePath();
   }
 
+  var EXTRACTION_PRESETS = [
+    { label: "丹参 · 乙酸乙酯脂水双提", solvMatch: /乙酸乙酯/, solute: "丹参酮 IIA / 酚酸", note: "乙酸乙酯 (ρ=0.90) 居上层富集亲脂性丹参酮，水相居下层保留丹酚酸 B。" },
+    { label: "大黄 · 氯仿游离蒽醌梯度萃取", solvMatch: /氯仿|三氯甲烷/, solute: "大黄酸 / 大黄素", note: "三氯甲烷 (ρ=1.49) 居下层，依次用 NaHCO₃/Na₂CO₃/NaOH 水相由上层分取不同酸性蒽醌。" },
+    { label: "苦参 · 二氯甲烷生物碱下层分配", solvMatch: /二氯甲烷/, solute: "苦参碱 / 氧化苦参碱", note: "碱化后游离苦参碱转入下层二氯甲烷 (ρ=1.33)，须通风橱密闭放气操作。" },
+    { label: "五味子 · 石油醚脱脂与木脂素富集", solvMatch: /石油醚/, solute: "五味子醇甲", note: "石油醚 (ρ=0.65) 居上层选择性萃出亲脂木脂素与油脂，极易分层。" },
+    { label: "川芎 · 乙酸乙酯酸碱分相联产", solvMatch: /乙酸乙酯/, solute: "川芎嗪 / 阿魏酸", note: "先 pH 9.5 萃出上层川芎嗪，水相再调 pH 2.0 萃出上层阿魏酸。" },
+    { label: "厚朴 · 甲苯双酚亲脂萃取", solvMatch: /甲苯/, solute: "厚朴酚 / 和厚朴酚", note: "甲苯 (ρ=0.87) 居上层，加饱和 NaCl 盐析可显著消除水相乳化层。" },
+    { label: "乙醇-水互溶对照 (不可分液)", solvMatch: /乙醇/, solute: "黄酮 / 酚酸混溶相", note: "乙醇与水无限互溶呈均一单相，演示为何液液萃取必须先旋蒸脱醇！" }
+  ];
+
   function mountFluidSim(container) {
     var destroyed = false;
     var rafId = null;
@@ -278,8 +288,8 @@
             '<div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-xl bg-[#f6f8f7] dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-[11px]">' +
               '<span class="font-bold text-slate-600 dark:text-slate-300">规则源：<code class="text-[#047857] dark:text-emerald-300">' + solventData.source + '</code></span>' +
               '<div class="flex items-center gap-1.5">' +
-                '<button type="button" id="v22SoluteToggleBtn" class="px-2 py-1 rounded-lg border font-bold ' + (sim.showSolute ? 'bg-rose-50 border-rose-300 text-rose-800' : 'bg-white border-slate-200 text-slate-600') + '">🎯 溶质示踪</button>' +
-                '<button type="button" id="v22FluidPauseBtn" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-bold text-slate-700 dark:text-slate-200">' + (sim.paused ? "▶ 继续" : "⏸ 暂停") + '</button>' +
+                '<button type="button" id="v22SoluteToggleBtn" class="px-2 py-1 rounded-lg border font-bold ' + (sim.showSolute ? 'bg-rose-50 border-rose-300 text-rose-800' : 'bg-white border-slate-200 text-slate-600') + '">溶质示踪</button>' +
+                '<button type="button" id="v22FluidPauseBtn" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-bold text-slate-700 dark:text-slate-200">' + (sim.paused ? "继续" : "暂停") + '</button>' +
               '</div>' +
             '</div>' +
           '</div>' +
@@ -287,36 +297,43 @@
           '<div class="lg:col-span-5 rounded-2xl bg-white dark:bg-slate-800/85 border border-slate-200 dark:border-slate-700 p-4 flex flex-col justify-between gap-3 text-xs">' +
             '<div class="space-y-2.5">' +
               '<div class="flex flex-wrap gap-1.5">' +
-                '<button type="button" data-v22-fmode="extract" class="px-3 py-1.5 rounded-xl font-extrabold border ' + (sim.mode === "extract" ? "bg-[#059669] text-white border-[#059669]" : "bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700") + '">⚗️ 分液漏斗流体（倾倒/分层/湍动/分液）</button>' +
-                '<button type="button" data-v22-fmode="titration" class="px-3 py-1.5 rounded-xl font-extrabold border ' + (sim.mode === "titration" ? "bg-[#059669] text-white border-[#059669]" : "bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700") + '">💧 滴定终点突变</button>' +
+                '<button type="button" data-v22-fmode="extract" class="px-3 py-1.5 rounded-xl font-extrabold border ' + (sim.mode === "extract" ? "bg-[#0f4c3a] text-white border-[#0f4c3a]" : "bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700") + '">分液漏斗流体（倾倒/分层/湍动/分液）</button>' +
+                '<button type="button" data-v22-fmode="titration" class="px-3 py-1.5 rounded-xl font-extrabold border ' + (sim.mode === "titration" ? "bg-[#0f4c3a] text-white border-[#0f4c3a]" : "bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700") + '">滴定终点突变</button>' +
               '</div>' +
               (sim.mode === "extract"
                 ? '<div class="space-y-2.5">' +
                     '<div>' +
+                      '<label class="block font-extrabold text-slate-800 dark:text-slate-200 mb-1">题库实证萃取场景预设（一键切换溶剂与示踪溶质）</label>' +
+                      '<div class="flex flex-wrap gap-1 mb-2">' +
+                        EXTRACTION_PRESETS.map(function (pr, pi) {
+                          return '<button type="button" data-v22-ext-preset="' + pi + '" class="px-2 py-0.5 rounded-md bg-[#f7f6f2] dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-[#0f4c3a] text-[10.5px] font-bold text-slate-700 dark:text-slate-200 transition">' + pr.label + '</button>';
+                        }).join("") +
+                      '</div>' +
+                      '<div id="v22PresetNote" class="hidden mb-2 p-2 rounded-lg bg-[#f7f6f2] dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10.5px] text-slate-600 dark:text-slate-300 leading-snug"></div>' +
                       '<label class="block font-extrabold text-slate-800 dark:text-slate-200 mb-1">选择有机溶剂（读取现有极性密度表）</label>' +
                       '<select id="v22SolventSelect" class="w-full px-3 py-2 rounded-xl bg-[#f6f8f7] dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white font-bold text-xs">' + solventOptions + '</select>' +
                     '</div>' +
                     '<div id="v22SolventRuleCard" class="p-2.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 space-y-1 text-[11px]"></div>' +
                     '<div class="grid grid-cols-2 gap-1.5">' +
-                      '<button type="button" id="v22BtnPour" class="py-2 px-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white font-extrabold transition">🫗 1. 倾倒溶剂</button>' +
-                      '<button type="button" id="v22BtnTurbulence" class="py-2 px-2 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-extrabold transition">🌀 2. 振摇湍动</button>' +
-                      '<button type="button" id="v22BtnStratify" class="py-2 px-2 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-extrabold transition">⚖️ 3. 静置分层</button>' +
-                      '<button type="button" id="v22BtnDrain" class="py-2 px-2 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-emerald-300 border border-emerald-400/40 font-extrabold transition">🔧 4. 旋塞放下层</button>' +
+                      '<button type="button" id="v22BtnPour" class="py-2 px-2 rounded-xl bg-[#0369a1] hover:bg-[#075985] text-white font-extrabold transition">1. 倾倒溶剂</button>' +
+                      '<button type="button" id="v22BtnTurbulence" class="py-2 px-2 rounded-xl bg-[#9a4a24] hover:bg-[#7d3a1b] text-white font-extrabold transition">2. 振摇湍动</button>' +
+                      '<button type="button" id="v22BtnStratify" class="py-2 px-2 rounded-xl bg-[#0f4c3a] hover:bg-[#0a382b] text-white font-extrabold transition">3. 静置分层</button>' +
+                      '<button type="button" id="v22BtnDrain" class="py-2 px-2 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-emerald-300 border border-emerald-400/40 font-extrabold transition">4. 旋塞放下层</button>' +
                     '</div>' +
                     '<div>' +
                       '<div class="flex justify-between font-bold text-slate-700 dark:text-slate-300 mb-1"><span>湍动振摇强度</span><span id="v22TurbVal">' + Math.round(sim.turbulence * 100) + '%</span></div>' +
                       '<input id="v22TurbSlider" type="range" min="0" max="1" step="0.05" value="' + sim.turbulence + '" class="w-full accent-emerald-600" />' +
                     '</div>' +
-                    '<button type="button" id="v22BtnSaltDemulsify" class="w-full py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 font-extrabold transition">🧂 加入饱和 NaCl 盐析破乳（水相 ρ: 1.00 → 1.19）</button>' +
+                    '<button type="button" id="v22BtnSaltDemulsify" class="w-full py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 font-extrabold transition">加入饱和 NaCl 盐析破乳（水相 ρ: 1.00 → 1.19）</button>' +
                     '<div id="v22DrainWarnBox" class="hidden p-2 rounded-xl bg-rose-50 border border-rose-300 text-rose-900 font-bold text-[11px]"></div>' +
                   '</div>'
                 : '<div class="space-y-3">' +
                     '<p class="text-slate-600 dark:text-slate-300 leading-relaxed">模拟酸碱滴定（酚酞指示剂）：滴加 0.1 mol/L NaOH 标准液，观察液滴入液瞬间局部紫红羽流扩散，及临近 10.0 mL 等当点时的全管颜色突变。</p>' +
                     '<div class="grid grid-cols-2 gap-2">' +
-                      '<button type="button" id="v22BtnTitrate" class="py-2.5 rounded-xl bg-[#064e3b] hover:bg-[#062922] text-white font-extrabold">💧 滴加 (+2.0 mL)</button>' +
-                      '<button type="button" id="v22BtnTitrateFine" class="py-2.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-extrabold">🎯 微滴 (+0.5 mL)</button>' +
+                      '<button type="button" id="v22BtnTitrate" class="py-2.5 rounded-xl bg-[#0f4c3a] hover:bg-[#0a382b] text-white font-extrabold">滴加 (+2.0 mL)</button>' +
+                      '<button type="button" id="v22BtnTitrateFine" class="py-2.5 rounded-xl bg-[#9a4a24] hover:bg-[#7d3a1b] text-white font-extrabold">微滴 (+0.5 mL)</button>' +
                     '</div>' +
-                    '<button type="button" id="v22BtnResetTitrate" class="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold">↺ 清洗锥形瓶重测</button>' +
+                    '<button type="button" id="v22BtnResetTitrate" class="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold">清洗锥形瓶重测</button>' +
                     '<div class="p-3 rounded-xl bg-[#f6f8f7] dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1">' +
                       '<div class="font-extrabold text-slate-900 dark:text-white">已滴加体积：<span id="v22TitrVal">' + sim.titrVol.toFixed(1) + ' mL</span> / 终点 10.0 mL</div>' +
                       '<div class="text-[11px] text-slate-600 dark:text-slate-400" id="v22TitrPh">当前 pH ≈ 4.6（无色酸性区）</div>' +
@@ -324,7 +341,7 @@
                   '</div>') +
             '</div>' +
             '<div class="p-2.5 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">' +
-              '<strong>操作口诀：</strong>下层由<strong>下口旋塞放出</strong>，上层由<strong>上口倒出</strong>。开启「🎯 溶质示踪」可观察脂溶性丹参酮（红点）按相似相溶自动富集到有机相。' +
+              '<strong>操作口诀：</strong>下层由<strong>下口旋塞放出</strong>，上层由<strong>上口倒出</strong>。开启「溶质示踪」可观察脂溶性有效成分（红点）按相似相溶自动富集到有机相。' +
             '</div>' +
           '</div>' +
         '</div>';
@@ -340,17 +357,17 @@
       var ruleCard = container.querySelector("#v22SolventRuleCard");
       if (ruleCard) {
         var ruleDesc = org.miscible
-          ? "⚠️ 与水<strong>完全互溶</strong>（γ=0），自由混溶为单相，禁止分液。"
+          ? "提示：与水<strong>完全互溶</strong>（γ=0），自由混溶为单相，禁止分液。"
           : (org.rho < wRho
-            ? "✅ Δρ = " + deltaRho + " < 0 → <strong>" + org.name + " 上浮至上层</strong>，水相在下层（旋塞先放水相，上口倒出有机相）。"
-            : "⚠️ Δρ = +" + deltaRho + " > 0 → <strong>" + org.name + " 下沉至下层</strong>，水相在上层（旋塞直接放出有机相）。");
+            ? "Δρ = " + deltaRho + " < 0 → <strong>" + org.name + " 上浮至上层</strong>，水相在下层（旋塞先放水相，上口倒出有机相）。"
+            : "Δρ = +" + deltaRho + " > 0 → <strong>" + org.name + " 下沉至下层</strong>，水相在上层（旋塞直接放出有机相）。");
         ruleCard.innerHTML =
           '<div class="flex flex-wrap justify-between font-extrabold text-emerald-950 dark:text-emerald-200">' +
             '<span>' + org.name + '（' + org.densityRaw + '）</span>' +
             '<span>P\'=' + org.p + ' · bp ' + org.bp + '</span>' +
           '</div>' +
           '<div class="text-slate-700 dark:text-slate-300 leading-snug">' + ruleDesc + '</div>' +
-          '<div class="text-[10.5px] text-slate-500 dark:text-slate-400">安全属性：' + org.green + (sim.naclAdded ? " · 🧂 饱和 NaCl（水相 ρ=1.19）" : "") + '</div>';
+          '<div class="text-[10.5px] text-slate-500 dark:text-slate-400">安全属性：' + org.green + (sim.naclAdded ? " · 饱和 NaCl（水相 ρ=1.19）" : "") + '</div>';
       }
       var warnBox = container.querySelector("#v22DrainWarnBox");
       if (warnBox) {
@@ -368,6 +385,26 @@
     function bindEvents() {
       container.querySelectorAll("[data-v22-fmode]").forEach(function (b) {
         b.addEventListener("click", function () { sim.mode = b.getAttribute("data-v22-fmode"); buildShell(); });
+      });
+      container.querySelectorAll("[data-v22-ext-preset]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var pr = EXTRACTION_PRESETS[Number(b.getAttribute("data-v22-ext-preset"))];
+          if (!pr) return;
+          var idx = solvents.findIndex(function (s) { return pr.solvMatch.test(s.name); });
+          if (idx >= 0) selectedIdx = idx;
+          var selEl = container.querySelector("#v22SolventSelect");
+          if (selEl) selEl.value = String(selectedIdx);
+          sim.naclAdded = false;
+          sim.behavior = "stratify";
+          sim.turbulence = 0.25;
+          initParticles(true);
+          var noteEl = container.querySelector("#v22PresetNote");
+          if (noteEl) {
+            noteEl.classList.remove("hidden");
+            noteEl.innerHTML = '<strong class="text-[#0f4c3a] dark:text-emerald-300">目标溶质：' + pr.solute + '</strong> · ' + pr.note;
+          }
+          updateUi();
+        });
       });
       var sel = container.querySelector("#v22SolventSelect");
       if (sel) {

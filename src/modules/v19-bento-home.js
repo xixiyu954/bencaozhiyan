@@ -200,7 +200,7 @@ function renderBentoHome() {
                 </svg>
               </div>
               <h3 class="v19-bento-title">三维分子与显色</h3>
-              <p class="v19-bento-sub">PubChem 实测构象、官能团高亮与经典理化显色</p>
+              <p class="v19-bento-sub">77 项 PubChem 实测构象、136 味全库映射与 12 项显色</p>
             </div>
             <div class="v19-card-stage">
               <svg viewBox="0 0 180 100" class="w-40 h-24" aria-hidden="true">
@@ -328,7 +328,7 @@ function renderBentoHome() {
                 <span class="text-xs font-bold" style="color:var(--craft-seal)">归属训练</span>
               </div>
               <h3 class="v19-bento-title">交互式四谱分析</h3>
-              <p class="v19-bento-sub">UV 诊断位移、IR、NMR 积分与 MS 裂解归属</p>
+              <p class="v19-bento-sub">全部 11 大类成分 UV/IR/NMR/MS 谱图与 136 题联动</p>
             </div>
             <div class="v19-card-stage">
               <svg viewBox="0 0 180 86" class="w-full h-20" aria-hidden="true">
@@ -370,19 +370,20 @@ function renderBentoHome() {
             <div>
               <div class="v19-bento-card-head">
                 <span class="v19-pill-tag v19-pill-violet">08 实验档案</span>
-                <span class="text-xs font-bold" style="color:var(--craft-muted)">三本图鉴</span>
+                <span class="text-xs font-bold" style="color:var(--craft-muted)">四库全集</span>
               </div>
               <h3 class="v19-bento-title">实验成长与图鉴</h3>
-              <p class="v19-bento-sub">记录已研习分子、药材与装置进度并导出档案</p>
+              <p class="v19-bento-sub">收录 77 分子、${c.topics} 药材、${c.rigs} 装置与 ${c.literature} 篇文献</p>
             </div>
             <div class="v19-card-stage">
               <div class="w-full p-3 rounded-xl space-y-2" style="background:var(--craft-surface-soft);border:1px solid var(--craft-line)" aria-hidden="true">
-                <div class="flex items-center justify-between text-[11px] font-bold" style="color:var(--craft-ink-2)"><span>研习记录进度</span><span style="color:var(--craft-accent)">三本图鉴</span></div>
+                <div class="flex items-center justify-between text-[11px] font-bold" style="color:var(--craft-ink-2)"><span>研习记录进度</span><span style="color:var(--craft-accent)">四库图鉴</span></div>
                 <div class="v19-mini-progress"><span style="width:62%;background:#0f4c3a"></span></div>
                 <div class="flex gap-1.5 text-[10px] font-bold">
                   <span class="px-2 py-0.5 rounded-md" style="background:var(--craft-surface);color:var(--craft-ink-2);border:1px solid var(--craft-line)">分子</span>
                   <span class="px-2 py-0.5 rounded-md" style="background:var(--craft-surface);color:var(--craft-ink-2);border:1px solid var(--craft-line)">药材</span>
                   <span class="px-2 py-0.5 rounded-md" style="background:var(--craft-surface);color:var(--craft-ink-2);border:1px solid var(--craft-line)">装置</span>
+                  <span class="px-2 py-0.5 rounded-md" style="background:var(--craft-surface);color:var(--craft-ink-2);border:1px solid var(--craft-line)">文献</span>
                 </div>
               </div>
             </div>
