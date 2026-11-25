@@ -1,0 +1,848 @@
+/* ==========================================================================
+   本草智研 v30 · 精工去 AI 化视觉与动效覆盖层
+   融合四大设计体系准则：
+   1. UI UX Pro Max — 60-30-10 配色约束、tabular-nums 科研数字排版、矢量图标替代 Emoji、AAA 对比度
+   2. Taste Skill   — 彻底移除 AI 味光晕、脉冲圆点眉毛条、彩虹标签堆砌、过圆塑料卡片与霓虹投影
+   3. Hallmark      — 宣纸微暖白 × 矿物石青 × 朱砂印章克制点缀，1px 建筑级细线边框与宋体衬线主标题
+   4. Open Design   — 物理克制动效（180ms 精准缓动，关闭全屏雾闪、按钮扫光、模糊转场与鼠标霓虹环）
+   ========================================================================== */
+
+:root {
+  --craft-paper: #f7f6f2;
+  --craft-surface: #ffffff;
+  --craft-surface-soft: #f2f1ec;
+  --craft-ink: #111d19;
+  --craft-ink-2: #2f3f39;
+  --craft-muted: #4c5d56;
+  --craft-line: rgba(17, 29, 25, 0.10);
+  --craft-line-strong: rgba(17, 29, 25, 0.16);
+  --craft-accent: #0f4c3a;
+  --craft-accent-hover: #0a382b;
+  --craft-accent-soft: rgba(15, 76, 58, 0.075);
+  --craft-seal: #9a4a24;
+  --craft-serif: "Songti SC", "Noto Serif SC", "Source Han Serif CN", "STSong", "SimSun", Georgia, serif;
+  --craft-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --craft-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --craft-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* 同步底层语义变量，让全站子页共享同一套高定质感 */
+  --v19-bg: var(--craft-paper);
+  --v19-surface: var(--craft-surface);
+  --v19-surface-solid: var(--craft-surface);
+  --v19-border: var(--craft-line);
+  --v19-border-hover: rgba(15, 76, 58, 0.34);
+  --v19-ink: var(--craft-ink);
+  --v19-ink-2: var(--craft-ink-2);
+  --v19-muted: var(--craft-muted);
+  --v19-emerald: var(--craft-accent);
+  --v19-emerald-deep: var(--craft-accent-hover);
+
+  --canvas: var(--craft-paper);
+  --ds-bg: var(--craft-paper);
+  --ds-surface: var(--craft-surface);
+  --ds-surface-soft: var(--craft-surface-soft);
+  --ds-line: var(--craft-line);
+  --ds-line-strong: var(--craft-line-strong);
+  --ds-ink: var(--craft-ink);
+  --ds-ink-2: var(--craft-ink-2);
+  --ds-muted: var(--craft-muted);
+  --ds-primary: var(--craft-ink);
+  --ds-primary-2: var(--craft-accent);
+}
+
+/* ---------- 1. 宣纸微暖画布与精准数字排版 ---------- */
+body.tcm-v19-guofeng:not(.dark-lab):not(.theme-clinical):not(.theme-amber) {
+  font-family: var(--craft-sans);
+  background-color: var(--craft-paper) !important;
+  background-image:
+    radial-gradient(ellipse 75% 42% at 80% 0%, rgba(15, 76, 58, 0.045) 0%, transparent 62%),
+    linear-gradient(180deg, #f8f7f3 0%, #f5f4ef 100%) !important;
+  color: var(--craft-ink);
+  font-feature-settings: "cv02", "cv03", "cv04";
+}
+
+/* 科研数据与指标统一等宽数字对齐（UI UX Pro Max 规范） */
+.v19-metric-chip strong,
+.v27-vs-score,
+.v25-val-pill,
+.v26-metric-cell strong,
+.v16-route-pill,
+#v21ZoomBadge,
+input[type="number"],
+table td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 削弱全屏节气氛围光晕，避免 AI 模板式彩色背景污染 */
+#tcmSolarPageAura {
+  opacity: 0.35 !important;
+}
+
+/* ---------- 2. 顶栏导航：克制磨砂与精准细线 ---------- */
+body.tcm-v19-guofeng:not(.dark-lab) header {
+  background: rgba(248, 247, 243, 0.86) !important;
+  backdrop-filter: blur(16px) saturate(125%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(125%) !important;
+  border-bottom: 1px solid var(--craft-line) !important;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) .v16-brand-logo {
+  border-radius: 9px !important;
+  background: var(--craft-accent) !important;
+  box-shadow: 0 1px 2px rgba(15, 76, 58, 0.25) !important;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) .v16-brand-btn {
+  font-family: var(--craft-serif);
+  letter-spacing: 0.02em;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) #workspaceZoneBar {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border: 1px solid var(--craft-line) !important;
+  box-shadow: 0 1px 3px rgba(17, 29, 25, 0.04) !important;
+  padding: 3px 4px !important;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) #workspaceZoneBar .v16-route-tab {
+  color: var(--craft-ink-2) !important;
+  font-weight: 600 !important;
+  font-size: 0.79rem !important;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) #workspaceZoneBar .v16-route-tab.active {
+  color: var(--craft-ink) !important;
+  font-weight: 750 !important;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) #workspaceZoneBar .v16-route-tab:hover {
+  color: var(--craft-accent) !important;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) #tcmNavSlideIndicator {
+  background: #ffffff !important;
+  border: 1px solid rgba(17, 29, 25, 0.09) !important;
+  box-shadow: 0 1px 4px rgba(17, 29, 25, 0.08) !important;
+  transition:
+    transform 240ms var(--craft-ease),
+    width 240ms var(--craft-ease),
+    height 200ms var(--craft-ease),
+    opacity 150ms ease !important;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) #tcmNavHoverPill {
+  background: rgba(15, 76, 58, 0.055) !important;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) .v16-route-tab .v16-route-pill {
+  background: var(--craft-surface-soft) !important;
+  color: var(--craft-ink-2) !important;
+  font-weight: 700 !important;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) .v16-route-tab.active .v16-route-pill {
+  background: var(--craft-accent-soft) !important;
+  color: var(--craft-accent) !important;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) header button#btnOpenCmdPalette,
+body.tcm-v19-guofeng:not(.dark-lab) header button#btnOpenCompareTop,
+body.tcm-v19-guofeng:not(.dark-lab) header button#btnOpenQwenCfgTop,
+body.tcm-v19-guofeng:not(.dark-lab) header button#btnToggleVisualDock,
+body.tcm-v19-guofeng:not(.dark-lab) header button#btnFontScale,
+body.tcm-v19-guofeng:not(.dark-lab) header button#btnToggleDarkLab,
+body.tcm-v19-guofeng:not(.dark-lab) header button#btnOpenFeedbackTop,
+body.tcm-v19-guofeng:not(.dark-lab) header button#btnResetTopic {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid var(--craft-line) !important;
+  color: var(--craft-ink-2) !important;
+  box-shadow: none !important;
+  font-weight: 600 !important;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) header button#btnOpenCmdPalette:hover,
+body.tcm-v19-guofeng:not(.dark-lab) header button#btnOpenQwenCfgTop:hover,
+body.tcm-v19-guofeng:not(.dark-lab) header button#btnToggleDarkLab:hover,
+body.tcm-v19-guofeng:not(.dark-lab) header button#btnResetTopic:hover {
+  background: #ffffff !important;
+  border-color: var(--craft-line-strong) !important;
+  color: var(--craft-ink) !important;
+  box-shadow: 0 2px 6px rgba(17, 29, 25, 0.06) !important;
+}
+
+/* ---------- 3. 首页 Hero：学术出版物级排版与克制留白 ---------- */
+.v19-home-shell {
+  gap: 20px;
+}
+
+.v19-hero {
+  padding: 18px 4px 8px;
+  border-radius: 0;
+  gap: 28px;
+}
+
+/* 彻底摒弃 AI 模板式脉冲绿点胶囊，改为出版物级细线眉题 */
+.v19-hero-eyebrow {
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--craft-accent) !important;
+  font-size: 0.74rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em;
+  gap: 9px !important;
+}
+
+.v19-hero-eyebrow-dot {
+  width: 18px !important;
+  height: 1.5px !important;
+  border-radius: 1px !important;
+  background: var(--craft-accent) !important;
+  box-shadow: none !important;
+}
+
+.v19-hero-title {
+  font-family: var(--craft-serif);
+  font-size: clamp(2.65rem, 4.7vw, 3.85rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: var(--craft-ink);
+}
+
+.v19-hero-sub {
+  font-size: clamp(1.24rem, 2.05vw, 1.68rem);
+  font-weight: 500;
+  color: var(--craft-ink-2);
+  letter-spacing: -0.01em;
+}
+
+.v19-hero-desc {
+  color: var(--craft-muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  max-width: 460px;
+}
+
+.v19-cta-primary {
+  padding: 11px 24px !important;
+  border-radius: 10px !important;
+  background: var(--craft-accent) !important;
+  color: #ffffff !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 2px rgba(15, 76, 58, 0.25), 0 8px 20px -10px rgba(15, 76, 58, 0.45) !important;
+  transition: background-color 180ms var(--craft-ease), transform 160ms var(--craft-ease) !important;
+}
+
+.v19-cta-primary:hover {
+  background: var(--craft-accent-hover) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(15, 76, 58, 0.28), 0 10px 24px -10px rgba(15, 76, 58, 0.48) !important;
+}
+
+.v19-cta-secondary {
+  padding: 10px 18px !important;
+  border-radius: 10px !important;
+  background: var(--craft-surface) !important;
+  border: 1px solid var(--craft-line-strong) !important;
+  color: var(--craft-ink) !important;
+  font-size: 0.85rem !important;
+  font-weight: 650 !important;
+  box-shadow: 0 1px 2px rgba(17, 29, 25, 0.04) !important;
+  transition: border-color 180ms var(--craft-ease), background-color 180ms var(--craft-ease), transform 160ms var(--craft-ease) !important;
+}
+
+.v19-cta-secondary:hover {
+  background: #ffffff !important;
+  border-color: var(--craft-accent) !important;
+  color: var(--craft-accent) !important;
+  transform: translateY(-1px) !important;
+}
+
+.v19-hero-metrics {
+  padding-top: 8px;
+  border-top: 1px solid var(--craft-line);
+  margin-top: 4px;
+  width: 100%;
+  max-width: 540px !important;
+}
+
+/* 去除 Hero 主图烦躁的循环悬浮与彩色霓虹光球 */
+.v19-hero-glow {
+  background: radial-gradient(circle, rgba(15, 76, 58, 0.08) 0%, transparent 66%) !important;
+  filter: blur(24px) !important;
+}
+
+.v19-hero-art {
+  animation: none !important;
+  filter: drop-shadow(0 14px 24px rgba(17, 29, 25, 0.08)) !important;
+  transition: transform 280ms var(--craft-ease), filter 280ms var(--craft-ease) !important;
+}
+
+.v19-hero-visual:hover .v19-hero-art {
+  transform: scale(1.018) !important;
+  filter: drop-shadow(0 18px 30px rgba(15, 76, 58, 0.14)) !important;
+}
+
+.v19-hero-visual-hint {
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid var(--craft-line) !important;
+  color: var(--craft-ink-2) !important;
+  box-shadow: 0 2px 8px rgba(17, 29, 25, 0.06) !important;
+  font-weight: 650 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- 4. Bento 矩阵：建筑级 1px 细线卡 + 统一索引标签（去彩虹糖） ---------- */
+.v19-bento-grid {
+  gap: 14px !important;
+}
+
+.v19-bento-card {
+  border-radius: 16px !important;
+  padding: 18px 18px 15px !important;
+  min-height: 224px !important;
+  background: var(--craft-surface) !important;
+  backdrop-filter: none !important;
+  border: 1px solid var(--craft-line) !important;
+  box-shadow: 0 1px 2px rgba(17, 29, 25, 0.03), 0 6px 18px -12px rgba(17, 29, 25, 0.07) !important;
+  transition:
+    transform 180ms var(--craft-ease),
+    border-color 180ms var(--craft-ease),
+    box-shadow 180ms var(--craft-ease) !important;
+}
+
+.v19-bento-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: rgba(15, 76, 58, 0.34) !important;
+  box-shadow: 0 4px 12px -4px rgba(17, 29, 25, 0.08), 0 12px 28px -16px rgba(15, 76, 58, 0.14) !important;
+}
+
+/* 统一 5 种彩虹色药丸为克制的单色索引徽标 */
+.v19-pill-tag,
+.v19-pill-mint,
+.v19-pill-coral,
+.v19-pill-sky,
+.v19-pill-violet,
+.v19-pill-amber {
+  border-radius: 6px !important;
+  padding: 3px 8px !important;
+  font-size: 0.69rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.03em;
+  background: var(--craft-surface-soft) !important;
+  color: var(--craft-ink-2) !important;
+  border: 1px solid var(--craft-line) !important;
+}
+
+.v19-bento-title {
+  font-size: 1.04rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.015em;
+  color: var(--craft-ink) !important;
+}
+
+.v19-bento-sub {
+  color: var(--craft-muted) !important;
+  font-size: 0.76rem !important;
+}
+
+.v19-card-foot {
+  border-top: 1px solid var(--craft-line) !important;
+  color: var(--craft-muted) !important;
+  font-weight: 650 !important;
+}
+
+.v19-bento-card:hover .v19-card-foot {
+  color: var(--craft-accent) !important;
+}
+
+/* 首页底部六大学科知识条精修 */
+.v19-bento-strip {
+  border-radius: 14px !important;
+  background: var(--craft-surface) !important;
+  border: 1px solid var(--craft-line) !important;
+  box-shadow: 0 1px 2px rgba(17, 29, 25, 0.03) !important;
+  padding: 12px 16px !important;
+}
+
+.v19-bento-tag {
+  color: var(--craft-ink) !important;
+  font-weight: 750 !important;
+}
+
+.v19-bento-tag-dot {
+  display: none !important;
+}
+
+.v19-bento-pill {
+  border-radius: 8px !important;
+  font-weight: 650 !important;
+  border-color: var(--craft-line) !important;
+  background: var(--craft-surface-soft) !important;
+  color: var(--craft-ink-2) !important;
+}
+
+.v19-bento-pill:hover {
+  border-color: var(--craft-accent) !important;
+  color: var(--craft-accent) !important;
+  background: #ffffff !important;
+}
+
+/* ---------- 5. 1.10 节气氛围卡：宣纸印章质感（去艳俗渐变） ---------- */
+#tcmV24SolarBanner {
+  border-radius: 16px !important;
+  border: 1px solid var(--craft-line) !important;
+  background: linear-gradient(125deg, #ffffff 0%, #faf9f5 68%, var(--tcm-solar-soft) 100%) !important;
+  box-shadow: 0 1px 2px rgba(17, 29, 25, 0.03), 0 8px 22px -16px rgba(17, 29, 25, 0.09) !important;
+  padding: 14px 18px !important;
+}
+
+.v24-solar-art {
+  opacity: 0.48 !important;
+}
+
+.v24-solar-particles {
+  opacity: 0.42 !important;
+}
+
+/* 传统印章式圆角方印（替代通用圆胶囊） */
+.v24-solar-seal {
+  border-radius: 6px !important;
+  padding: 3px 10px !important;
+  font-family: var(--craft-serif);
+  font-size: 12.5px !important;
+  letter-spacing: 0.08em !important;
+  background: var(--craft-accent) !important;
+  box-shadow: none !important;
+}
+
+.v24-term-chip {
+  border-radius: 7px !important;
+  font-weight: 650 !important;
+  border-color: var(--craft-line) !important;
+}
+
+.v24-term-chip.is-active {
+  background: var(--craft-ink) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.v24-herb-card {
+  border-radius: 11px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid var(--craft-line) !important;
+  backdrop-filter: none !important;
+}
+
+.v24-herb-card:hover {
+  transform: translateY(-1px) !important;
+  border-color: var(--craft-accent) !important;
+  box-shadow: 0 4px 12px -8px rgba(17, 29, 25, 0.14) !important;
+}
+
+/* ---------- 6. 工作区页头、分段标签与全站卡片统一建筑级圆角 ---------- */
+.v16-subhero {
+  border-radius: 16px !important;
+  padding: 20px 24px !important;
+  border: 1px solid var(--craft-line) !important;
+  box-shadow: 0 1px 2px rgba(17, 29, 25, 0.03) !important;
+}
+
+.v16-subhero h2 {
+  font-family: var(--craft-serif);
+  font-size: 1.48rem !important;
+  letter-spacing: 0.01em !important;
+}
+
+.v16-seg-bar {
+  border-radius: 11px !important;
+  padding: 4px !important;
+  background: var(--craft-surface-soft) !important;
+  border: 1px solid var(--craft-line) !important;
+}
+
+.v16-seg-btn {
+  border-radius: 8px !important;
+  font-weight: 650 !important;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+}
+
+.v16-seg-btn.active {
+  box-shadow: 0 1px 3px rgba(17, 29, 25, 0.1) !important;
+}
+
+.v16-chip-btn {
+  border-radius: 9px !important;
+  font-weight: 650 !important;
+}
+
+.v16-btn-cta-primary,
+.v27-btn-gen {
+  border-radius: 10px !important;
+  background: var(--craft-accent) !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(15, 76, 58, 0.22) !important;
+}
+
+.v16-btn-cta-primary:hover,
+.v27-btn-gen:hover {
+  background: var(--craft-accent-hover) !important;
+  color: #ffffff !important;
+}
+
+.v27-prompt-card,
+.v27-vs-bar,
+.v27-card,
+.v25-card,
+.v25-preset-bar,
+.v26-card,
+.v26-top-strip {
+  border-radius: 16px !important;
+  border-color: var(--craft-line) !important;
+  box-shadow: 0 1px 2px rgba(17, 29, 25, 0.03) !important;
+}
+
+.v27-prompt-card {
+  background: var(--craft-surface) !important;
+}
+
+/* ---------- 7. 底部双工具坞：克制仪器级胶囊（去霓虹阴影与脉冲灯） ---------- */
+.v22-fab-toggle {
+  height: 36px;
+  padding: 0 13px !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid var(--craft-line-strong) !important;
+  color: var(--craft-ink) !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 10px -4px rgba(17, 29, 25, 0.12) !important;
+}
+
+.v22-fab-toggle-dot {
+  display: none !important;
+}
+
+.v22-fab-tray {
+  border-radius: 14px !important;
+  border: 1px solid var(--craft-line-strong) !important;
+  box-shadow: 0 12px 32px -12px rgba(17, 29, 25, 0.18) !important;
+}
+
+.v22-fab-btn {
+  border-radius: 8px !important;
+  padding: 7px 12px !important;
+  font-size: 0.76rem !important;
+  font-weight: 650 !important;
+  box-shadow: none !important;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.v22-fab-btn.accent {
+  background: var(--craft-accent) !important;
+  color: #ffffff !important;
+}
+
+.v28-fab {
+  height: 36px;
+  padding: 0 13px !important;
+  border-radius: 10px !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 10px -4px rgba(17, 29, 25, 0.12) !important;
+  transition: transform 160ms var(--craft-ease), border-color 160ms var(--craft-ease), background-color 160ms var(--craft-ease) !important;
+}
+
+.v28-fab:hover {
+  transform: translateY(-1px) !important;
+}
+
+.v28-fab-mentor {
+  background: var(--craft-ink) !important;
+  color: #ffffff !important;
+}
+
+.v28-fab-safety {
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: var(--craft-accent) !important;
+  border-color: var(--craft-line-strong) !important;
+}
+
+/* ---------- 8. Open Design 物理克制动效（消除廉价 AI 炫技特效） ---------- */
+/* 关闭全屏径向雾闪、按钮斜向扫光、以及鼠标追踪霓虹光环 */
+#tcmInkVeil {
+  display: none !important;
+}
+
+#tcmRouteProgressBar {
+  height: 2px !important;
+  background: var(--craft-accent) !important;
+  box-shadow: none !important;
+}
+
+.v19-bento-card::before,
+.v19-bento-card::after,
+.v16-branch-card::before,
+.v16-branch-card::after,
+.v16-bento-card::before,
+.v16-bento-card::after,
+.v16-topic-card::before,
+.v16-topic-card::after,
+.v16-bank-card::before,
+.v16-bank-card::after,
+.v19-cta-primary::after,
+.v16-btn-cta-primary::after,
+.v16-hero-cta::after,
+.v16-hero-resume-btn::after,
+.v22-fab-btn.accent::after {
+  display: none !important;
+}
+
+/* 用干净利落的 180ms 物理微移替代模糊滤镜转场 */
+@keyframes tcmCraftEnter {
+  0% { opacity: 0; transform: translate3d(0, 6px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+.tcm-route-entering,
+.tcm-enter-from-right,
+.tcm-enter-from-left {
+  animation: tcmCraftEnter 190ms var(--craft-ease) both !important;
+}
+
+.tcm-card-anim {
+  animation: none !important;
+}
+
+/* 统一矢量图标对齐 */
+.craft-ico {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.85;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------- 9. 护眼暗色模式：深墨黑曜石与青玉细线（去赛博霓虹绿） ---------- */
+body.dark-lab {
+  --craft-paper: #0c1412;
+  --craft-surface: #121e1b;
+  --craft-surface-soft: #172622;
+  --craft-ink: #ebf2ee;
+  --craft-ink-2: #bfd0c8;
+  --craft-muted: #93a99f;
+  --craft-line: rgba(235, 242, 238, 0.10);
+  --craft-line-strong: rgba(235, 242, 238, 0.18);
+  --craft-accent: #5fb89c;
+  --craft-accent-hover: #74c9ae;
+  --craft-accent-soft: rgba(95, 184, 156, 0.14);
+}
+
+body.dark-lab.tcm-v19-guofeng {
+  background-color: #0c1412 !important;
+  background-image:
+    radial-gradient(ellipse 70% 40% at 80% 0%, rgba(95, 184, 156, 0.06) 0%, transparent 60%),
+    linear-gradient(180deg, #0c1412 0%, #0a110f 100%) !important;
+}
+
+body.dark-lab .v19-hero-title {
+  color: #f2f7f4 !important;
+}
+
+body.dark-lab .v19-hero-sub {
+  color: #c8d6d0 !important;
+}
+
+body.dark-lab .v19-hero-desc {
+  color: #8fa39a !important;
+}
+
+body.dark-lab .v19-cta-primary {
+  background: #5fb89c !important;
+  color: #091713 !important;
+}
+
+body.dark-lab .v19-cta-primary:hover {
+  background: #74c9ae !important;
+}
+
+body.dark-lab .v19-cta-secondary {
+  background: #14221e !important;
+  border-color: rgba(235, 242, 238, 0.16) !important;
+  color: #e4eee9 !important;
+}
+
+body.dark-lab .v19-bento-card,
+body.dark-lab .v19-bento-strip,
+body.dark-lab #tcmV24SolarBanner {
+  background: #121e1b !important;
+  border-color: rgba(235, 242, 238, 0.10) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.28) !important;
+}
+
+body.dark-lab .v19-bento-card:hover {
+  border-color: rgba(95, 184, 156, 0.42) !important;
+  background: #152420 !important;
+}
+
+body.dark-lab .v19-pill-tag,
+body.dark-lab .v19-pill-mint,
+body.dark-lab .v19-pill-coral,
+body.dark-lab .v19-pill-sky,
+body.dark-lab .v19-pill-violet,
+body.dark-lab .v19-pill-amber {
+  background: #192925 !important;
+  color: #b4c4bd !important;
+  border-color: rgba(235, 242, 238, 0.10) !important;
+}
+
+body.dark-lab .v19-bento-title {
+  color: #edf4f0 !important;
+}
+
+body.dark-lab .v19-bento-sub {
+  color: #8fa39a !important;
+}
+
+body.dark-lab .v19-bento-pill {
+  background: #182723 !important;
+  border-color: rgba(235, 242, 238, 0.12) !important;
+  color: #c8d6d0 !important;
+}
+
+body.dark-lab .v19-bento-pill:hover {
+  border-color: #5fb89c !important;
+  color: #74c9ae !important;
+}
+
+body.dark-lab .v24-solar-seal {
+  background: #5fb89c !important;
+  color: #091713 !important;
+}
+
+body.dark-lab .v24-term-chip.is-active {
+  background: #5fb89c !important;
+  color: #091713 !important;
+}
+
+body.dark-lab .v24-herb-card {
+  background: #162521 !important;
+  border-color: rgba(235, 242, 238, 0.10) !important;
+}
+
+body.dark-lab .v22-fab-toggle,
+body.dark-lab .v28-fab-safety {
+  background: rgba(18, 30, 27, 0.94) !important;
+  border-color: rgba(235, 242, 238, 0.16) !important;
+  color: #e4eee9 !important;
+}
+
+body.dark-lab .v28-fab-mentor {
+  background: #5fb89c !important;
+  color: #091713 !important;
+}
+
+body.dark-lab #tcmNavSlideIndicator {
+  background: rgba(95, 184, 156, 0.18) !important;
+  border: 1px solid rgba(95, 184, 156, 0.36) !important;
+  box-shadow: none !important;
+}
+
+body.dark-lab .v27-prompt-card,
+body.dark-lab .v27-card,
+body.dark-lab .v27-vs-bar {
+  background: #121e1b !important;
+  border-color: rgba(235, 242, 238, 0.10) !important;
+}
+
+/* 补齐工作区卡片（智能实验设计命令条 / 题库档案 / 暗色输入框）的一体化建筑细线质感 */
+#qwenCommandBar,
+#aiPlanShowcase,
+.v16-bank-preview,
+.v16-topic-card,
+.v16-ai-tpl {
+  border-radius: 16px !important;
+  border-color: var(--craft-line) !important;
+  box-shadow: 0 1px 2px rgba(17, 29, 25, 0.03) !important;
+}
+
+#qwenCommandBar {
+  background: var(--craft-surface) !important;
+}
+
+#btnRunQwenAuto {
+  border-radius: 10px !important;
+  background: var(--craft-accent) !important;
+  box-shadow: 0 1px 2px rgba(15, 76, 58, 0.22) !important;
+}
+
+#btnRunQwenAuto:hover {
+  background: var(--craft-accent-hover) !important;
+}
+
+#qwenPromptInput,
+#qwenChatInput,
+#v16BankSearch {
+  border-radius: 10px !important;
+}
+
+.v27-vs-badge.is-win {
+  background: var(--craft-accent-soft) !important;
+  color: var(--craft-accent) !important;
+  border: 1px solid rgba(15, 76, 58, 0.22);
+}
+
+.v27-vs-badge.is-chase {
+  background: rgba(154, 74, 36, 0.08) !important;
+  color: var(--craft-seal) !important;
+  border: 1px solid rgba(154, 74, 36, 0.22);
+}
+
+body.dark-lab #qwenCommandBar,
+body.dark-lab #aiPlanShowcase,
+body.dark-lab .v16-subhero,
+body.dark-lab .v16-bank-preview,
+body.dark-lab .v16-topic-card,
+body.dark-lab .v16-ai-tpl {
+  background: #121e1b !important;
+  border-color: rgba(235, 242, 238, 0.10) !important;
+  color: #ebf2ee !important;
+}
+
+body.dark-lab #v16InlinePlanText,
+body.dark-lab #v16InlinePlanTpl,
+body.dark-lab #v16PlanSample1,
+body.dark-lab #v16PlanSample2 {
+  background: #162521 !important;
+  border-color: rgba(235, 242, 238, 0.14) !important;
+  color: #ebf2ee !important;
+}
+
+body.dark-lab #btnRunQwenAuto,
+body.dark-lab .v16-btn-cta-primary,
+body.dark-lab .v27-btn-gen {
+  background: #5fb89c !important;
+  color: #091713 !important;
+}
+
+@media (max-width: 640px) {
+  .v22-fab-toggle,
+  .v28-fab {
+    height: 32px;
+    padding: 0 10px !important;
+    font-size: 0.72rem !important;
+  }
+}

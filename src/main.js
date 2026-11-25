@@ -7,6 +7,7 @@ import '../lab-v22-visual-suite-pro.css';
 import './styles/lab-v23-motion.css';
 import './styles/lab-v24-solar-atmosphere.css';
 import './styles/lab-v28-ai-mentor-safety.css';
+import './styles/lab-v30-craft-deai.css';
 
 import './lib/lucide-lite.js';
 import './lib/lazy-vendors.js';

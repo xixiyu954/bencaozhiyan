@@ -263,9 +263,11 @@
   function initDarkMode() {
     const KEY = 'bencao_dark_lab_v1';
     const btn = document.getElementById('btnToggleDarkLab');
+    const ICO_SUN = '<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
+    const ICO_MOON = '<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
     const apply = (isDark) => {
       document.body.classList.toggle('dark-lab', isDark);
-      if (btn) btn.textContent = isDark ? '☀️ 亮色模式' : '🌙 护眼暗色';
+      if (btn) btn.innerHTML = isDark ? `${ICO_SUN}<span>浅色模式</span>` : `${ICO_MOON}<span>暗色模式</span>`;
       try { localStorage.setItem(KEY, isDark ? '1' : '0'); } catch (_) {}
     };
     const saved = (() => { try { return localStorage.getItem(KEY) === '1'; } catch (_) { return false; } })();

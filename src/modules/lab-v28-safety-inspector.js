@@ -209,13 +209,14 @@
     var fab = document.getElementById("tcmV28SafetyFab");
 
     if (fab) {
+      var shieldIco = '<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
       fab.classList.toggle("has-danger", audit.hasDanger);
       fab.classList.toggle("has-warn", !audit.hasDanger && audit.hasWarn);
-      fab.textContent = audit.hasDanger
-        ? "🛡️ 高危预警 (" + audit.alerts.length + ")"
+      fab.innerHTML = shieldIco + "<span>" + (audit.hasDanger
+        ? "高危预警 (" + audit.alerts.length + ")"
         : audit.hasWarn
-          ? "🛡️ 安全提示 (" + audit.alerts.length + ")"
-          : "🛡️ 安全合规";
+          ? "安全提示 (" + audit.alerts.length + ")"
+          : "安全合规") + "</span>";
     }
 
     card.classList.toggle("is-open", cardOpen);
@@ -226,10 +227,10 @@
 
     card.innerHTML =
       '<div class="v28-safety-head">' +
-        '<span>' + (audit.hasDanger ? "🚨 AI 安全督察 · 高危拦截" : audit.hasWarn ? "⚠️ AI 安全督察 · 安全提示" : "🛡️ AI 安全督察 · 方案合规") + "</span>" +
+        '<span>' + (audit.hasDanger ? "安全督察 · 高危拦截" : audit.hasWarn ? "安全督察 · 风险提示" : "安全督察 · 方案合规") + "</span>" +
         '<div style="display:flex;align-items:center;gap:6px;">' +
           '<span class="v28-score-pill">安全分 ' + audit.safetyScore + '/100</span>' +
-          '<button type="button" id="v28CloseSafety" style="border:none;background:rgba(255,255,255,0.2);color:#fff;border-radius:999px;padding:2px 9px;font-weight:800;cursor:pointer;">×</button>' +
+          '<button type="button" id="v28CloseSafety" style="border:none;background:rgba(255,255,255,0.2);color:#fff;border-radius:6px;padding:2px 9px;font-weight:800;cursor:pointer;">×</button>' +
         "</div>" +
       "</div>" +
       '<div class="v28-safety-body">' +
@@ -238,13 +239,13 @@
           ? audit.alerts.map(function (a) {
               return '<div class="v28-alert-item lv-' + a.level + '"><strong>[' + esc(a.code) + "] " + esc(a.title) + "</strong><div>" + esc(a.detail) + "</div></div>";
             }).join("")
-          : '<div style="padding:8px 11px;border-radius:12px;background:rgba(16,185,129,0.1);color:#047857;font-weight:700;">未检出 MSDS 冲突、超沸点暴沸或危险装置组合，可按标准 SOP 开展实验。</div>') +
+          : '<div style="padding:8px 11px;border-radius:10px;background:rgba(15,76,58,0.08);color:#0f4c3a;font-weight:700;">未检出 MSDS 冲突、超沸点暴沸或危险装置组合，可按标准 SOP 开展实验。</div>') +
         '<div class="v28-msds-box">' +
-          '<div><strong>🧪 MSDS 防护（' + esc(audit.msds.name) + '）：</strong>' + esc(audit.msds.ppe) + "</div>" +
-          '<div style="margin-top:3px;"><strong>♻️ 废液桶归属：</strong>' + esc(audit.msds.waste) + "</div>" +
+          '<div><strong>MSDS 防护（' + esc(audit.msds.name) + '）：</strong>' + esc(audit.msds.ppe) + "</div>" +
+          '<div style="margin-top:3px;"><strong>废液桶归属：</strong>' + esc(audit.msds.waste) + "</div>" +
         "</div>" +
         '<div>' +
-          '<div style="font-size:11.5px;font-weight:800;margin-bottom:5px;display:flex;justify-content:space-between;"><span>入场前 PPE 核对清单</span><span>' + (checkedCount === PPE_ITEMS.length ? "✅ 已全项核对" : checkedCount + "/" + PPE_ITEMS.length) + "</span></div>" +
+          '<div style="font-size:11.5px;font-weight:800;margin-bottom:5px;display:flex;justify-content:space-between;"><span>入场前 PPE 核对清单</span><span>' + (checkedCount === PPE_ITEMS.length ? "已全项核对" : checkedCount + "/" + PPE_ITEMS.length) + "</span></div>" +
           '<div class="v28-ppe-grid">' +
             PPE_ITEMS.map(function (it) {
               var ck = !!ppeChecked[it.id];
@@ -253,9 +254,9 @@
           "</div>" +
         "</div>" +
         '<div class="v28-safety-actions">' +
-          (audit.hasWarn ? '<button type="button" class="v28-sbtn-fix" id="v28BtnSafeFix">✅ 一键安全替代</button>' : "") +
-          '<button type="button" class="v28-sbtn-ask" id="v28BtnAskMentor">💬 追问 AI 导师</button>' +
-          '<button type="button" class="v28-sbtn-ask" id="v28BtnCopySafety">📋 复制安全预案</button>' +
+          (audit.hasWarn ? '<button type="button" class="v28-sbtn-fix" id="v28BtnSafeFix">切换安全替代</button>' : "") +
+          '<button type="button" class="v28-sbtn-ask" id="v28BtnAskMentor">追问实验导师</button>' +
+          '<button type="button" class="v28-sbtn-ask" id="v28BtnCopySafety">复制安全预案</button>' +
         "</div>" +
       "</div>";
 

@@ -143,21 +143,25 @@ function renderBentoHome() {
   isRenderingHome = true;
   try {
     const c = getCounts();
+    const ICO_CUBE = `<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`;
+    const ICO_MOL = `<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.5"/><circle cx="6" cy="6" r="1.8"/><circle cx="18" cy="6" r="1.8"/><circle cx="6" cy="18" r="1.8"/><circle cx="18" cy="18" r="1.8"/><path d="m10.2 10.2-2.9-2.9M13.8 10.2l2.9-2.9M10.2 13.8l-2.9 2.9M13.8 13.8l2.9 2.9"/></svg>`;
+    const ICO_BOOK = `<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`;
+    const ICO_GRAPH = `<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.6M8.2 13.2l7.6 4.6"/></svg>`;
     homePage.innerHTML = `
       <div class="v19-home-shell">
-        <!-- 1. 清透浅色 Hero 主视觉（左文案 + 右 3D 磨砂玻璃本草叶片与晶透分子） -->
+        <!-- 1. 学术典籍风格 Hero 主视觉 -->
         <section class="v19-hero">
           <div class="v19-hero-copy">
-            <span class="v19-hero-eyebrow"><span class="v19-hero-eyebrow-dot"></span>2025 版中国药典对照 · 沉浸式教学科研工作台</span>
+            <span class="v19-hero-eyebrow"><span class="v19-hero-eyebrow-dot"></span>《中国药典》2025 版对照 · 天然产物提取与质控工作台</span>
             <h2 class="v19-hero-title">本草智研</h2>
-            <p class="v19-hero-sub">中药化学沉浸式实验平台</p>
+            <p class="v19-hero-sub">中药化学教学与科研实验台</p>
             <p class="v19-hero-desc">
-              通过 AI 与 3D 模拟，探索草本医学的分子奥秘
+              涵盖药材档案、提取纯化工艺推演、四谱解析与三维实验仿真。
             </p>
             <div class="v19-hero-actions">
-              <button type="button" class="v19-cta-primary" data-v16-go="bank">立即探索 <span>↗</span></button>
-              <button type="button" class="v19-cta-secondary" data-v16-ext="v22_visual_suite">🕹️ 3D 虚拟实验室</button>
-              <button type="button" class="v19-cta-secondary" data-v16-go="workflow" data-v16-step="1">进入实验工坊 →</button>
+              <button type="button" class="v19-cta-primary" data-v16-go="bank">进入药材题库 <span>→</span></button>
+              <button type="button" class="v19-cta-secondary" data-v16-ext="v22_visual_suite">${ICO_CUBE}<span>三维虚拟实验室</span></button>
+              <button type="button" class="v19-cta-secondary" data-v16-go="workflow" data-v16-step="1">六步实验工坊 →</button>
             </div>
             <div class="v19-hero-metrics">
               <span class="v19-metric-chip"><strong>${c.topics}</strong> 药材课题</span>
@@ -172,224 +176,224 @@ function renderBentoHome() {
 
           <button type="button" class="v19-hero-visual" data-v16-ext="v20_mol3d" title="点击启动 3D 分子结构库与粒子显色台">
             <div class="v19-hero-glow" aria-hidden="true"></div>
-            <img src="${heroArtUrl}" alt="本草智研 3D 磨砂玻璃本草叶片与晶透分子模型" class="v19-hero-art" width="760" height="570" fetchpriority="high" />
-            <span class="v19-hero-visual-hint">🧬 3D 分子 &amp; 粒子显色 ↗</span>
+            <img src="${heroArtUrl}" alt="本草智研本草叶片与三维分子构象模型" class="v19-hero-art" width="760" height="570" fetchpriority="high" />
+            <span class="v19-hero-visual-hint">${ICO_MOL}<span>三维构象与显色台 ↗</span></span>
           </button>
         </section>
 
         <!-- 1.5 二十四节气与新中式天气氛围推荐卡插槽（由 lab-v24-solar-atmosphere 同步挂载，零 CLS） -->
         <div id="v24SolarSlot"></div>
 
-        <!-- 2. 四列磨砂玻璃 Bento 微插画卡片矩阵（第 1 排：四大旗舰体验） -->
+        <!-- 2. 四列精工细线卡片矩阵 -->
         <section class="v19-bento-grid" aria-label="核心实验模块">
           <!-- 卡 1：3D 分子解析 -->
           <button type="button" class="v19-bento-card" data-v16-ext="v20_mol3d">
             <div>
               <div class="v19-bento-card-head">
-                <span class="v19-pill-tag v19-pill-mint">3D 解析</span>
+                <span class="v19-pill-tag v19-pill-mint">01 分子构象</span>
                 <svg viewBox="0 0 36 18" class="w-9 h-4" aria-hidden="true">
-                  <rect x="2" y="10" width="4" height="8" rx="2" fill="#10b981"/>
-                  <rect x="9" y="5" width="4" height="13" rx="2" fill="#34d399"/>
-                  <rect x="16" y="8" width="4" height="10" rx="2" fill="#0ea5e9"/>
-                  <rect x="23" y="2" width="4" height="16" rx="2" fill="#f97316"/>
-                  <rect x="30" y="6" width="4" height="12" rx="2" fill="#10b981"/>
+                  <rect x="2" y="10" width="4" height="8" rx="1.5" fill="#0f4c3a" opacity="0.45"/>
+                  <rect x="9" y="5" width="4" height="13" rx="1.5" fill="#0f4c3a" opacity="0.72"/>
+                  <rect x="16" y="8" width="4" height="10" rx="1.5" fill="#0f4c3a" opacity="0.55"/>
+                  <rect x="23" y="2" width="4" height="16" rx="1.5" fill="#9a4a24" opacity="0.82"/>
+                  <rect x="30" y="6" width="4" height="12" rx="1.5" fill="#0f4c3a" opacity="0.65"/>
                 </svg>
               </div>
-              <h3 class="v19-bento-title">3D 分子解析</h3>
-              <p class="v19-bento-sub">6 大 PubChem 真实 3D 构象与官能团高亮</p>
+              <h3 class="v19-bento-title">三维分子与显色</h3>
+              <p class="v19-bento-sub">PubChem 实测构象、官能团高亮与经典理化显色</p>
             </div>
             <div class="v19-card-stage">
               <svg viewBox="0 0 180 100" class="w-40 h-24" aria-hidden="true">
-                <ellipse cx="90" cy="82" rx="48" ry="11" fill="none" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="4 3"/>
-                <line x1="90" y1="44" x2="54" y2="62" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
-                <line x1="90" y1="44" x2="124" y2="28" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
-                <line x1="90" y1="44" x2="118" y2="68" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
-                <line x1="90" y1="44" x2="72" y2="20" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
-                <circle cx="90" cy="44" r="14" fill="url(#v19MolC)"/>
-                <circle cx="54" cy="62" r="10" fill="url(#v19MolG)"/>
-                <circle cx="124" cy="28" r="10" fill="url(#v19MolO)"/>
-                <circle cx="118" cy="68" r="8" fill="#cbd5e1"/>
-                <circle cx="72" cy="20" r="7" fill="#94a3b8"/>
+                <ellipse cx="90" cy="82" rx="48" ry="11" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4 3"/>
+                <line x1="90" y1="44" x2="54" y2="62" stroke="#64748b" stroke-width="3.5" stroke-linecap="round"/>
+                <line x1="90" y1="44" x2="124" y2="28" stroke="#64748b" stroke-width="3.5" stroke-linecap="round"/>
+                <line x1="90" y1="44" x2="118" y2="68" stroke="#64748b" stroke-width="3.5" stroke-linecap="round"/>
+                <line x1="90" y1="44" x2="72" y2="20" stroke="#94a3b8" stroke-width="2.6" stroke-linecap="round"/>
+                <circle cx="90" cy="44" r="13.5" fill="url(#v19MolC)"/>
+                <circle cx="54" cy="62" r="9.5" fill="url(#v19MolG)"/>
+                <circle cx="124" cy="28" r="9.5" fill="url(#v19MolO)"/>
+                <circle cx="118" cy="68" r="7.5" fill="#cbd5e1"/>
+                <circle cx="72" cy="20" r="6.5" fill="#94a3b8"/>
                 <defs>
-                  <radialGradient id="v19MolC" cx="35%" cy="30%"><stop offset="0%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#334155"/></radialGradient>
-                  <radialGradient id="v19MolG" cx="35%" cy="30%"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#059669"/></radialGradient>
-                  <radialGradient id="v19MolO" cx="35%" cy="30%"><stop offset="0%" stop-color="#fdba74"/><stop offset="100%" stop-color="#ea580c"/></radialGradient>
+                  <radialGradient id="v19MolC" cx="35%" cy="30%"><stop offset="0%" stop-color="#64748b"/><stop offset="100%" stop-color="#1e293b"/></radialGradient>
+                  <radialGradient id="v19MolG" cx="35%" cy="30%"><stop offset="0%" stop-color="#5fb89c"/><stop offset="100%" stop-color="#0f4c3a"/></radialGradient>
+                  <radialGradient id="v19MolO" cx="35%" cy="30%"><stop offset="0%" stop-color="#d99268"/><stop offset="100%" stop-color="#9a4a24"/></radialGradient>
                 </defs>
               </svg>
             </div>
-            <div class="v19-card-foot"><span>丹参酮 · 黄芩苷 · 小檗碱等</span><span>打开 ↗</span></div>
+            <div class="v19-card-foot"><span>丹参酮 · 黄芩苷 · 小檗碱</span><span>打开 ↗</span></div>
           </button>
 
-          <!-- 卡 2：AI 实验设计 -->
+          <!-- 卡 2：智能实验设计 -->
           <button type="button" class="v19-bento-card" data-v16-go="ai">
             <div>
               <div class="v19-bento-card-head">
-                <span class="v19-pill-tag v19-pill-mint">智能编排</span>
-                <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white text-[11px] font-black shadow-sm">AI</span>
+                <span class="v19-pill-tag v19-pill-mint">02 实验编排</span>
+                <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--craft-muted)">5 套模板</span>
               </div>
-              <h3 class="v19-bento-title">AI 实验设计</h3>
-              <p class="v19-bento-sub">90 分课题竞技 · 智能编排与方案校核</p>
+              <h3 class="v19-bento-title">智能实验设计</h3>
+              <p class="v19-bento-sub">90 分五维评审、模板编排、已有方案校核与答疑</p>
             </div>
             <div class="v19-card-stage">
               <div class="v19-mini-ide" aria-hidden="true">
                 <div class="v19-mini-ide-left">
-                  <div class="v19-mini-ide-dots"><span style="background:#f87171"></span><span style="background:#fbbf24"></span><span style="background:#34d399"></span></div>
+                  <div class="v19-mini-ide-dots"><span style="background:rgba(255,255,255,0.32)"></span><span style="background:rgba(255,255,255,0.22)"></span><span style="background:rgba(95,184,156,0.75)"></span></div>
                   <div class="v19-mini-ide-bar" style="width:76%"></div>
                   <div class="v19-mini-ide-bar" style="width:58%"></div>
-                  <div class="v19-mini-ide-bar" style="width:88%;background:rgba(52,211,153,0.55)"></div>
+                  <div class="v19-mini-ide-bar" style="width:88%;background:rgba(95,184,156,0.58)"></div>
                   <div class="v19-mini-ide-bar" style="width:66%"></div>
                 </div>
                 <div class="v19-mini-ide-right">
-                  <span class="v19-mini-chat-pill">✦ 工艺自动配置</span>
+                  <span class="v19-mini-chat-pill" style="background:var(--craft-accent-soft);color:var(--craft-accent)">标准模板校核</span>
                   <div class="v19-mini-ide-bar" style="width:85%;background:#cbd5e1"></div>
                   <div class="v19-mini-ide-bar" style="width:64%;background:#94a3b8"></div>
                   <div class="v19-mini-ide-bar" style="width:72%;background:#cbd5e1"></div>
                 </div>
               </div>
             </div>
-            <div class="v19-card-foot"><span>90分竞技 · 编排评审</span><span>进入 →</span></div>
+            <div class="v19-card-foot"><span>三引擎调度 · 规范 SOP</span><span>进入 →</span></div>
           </button>
 
-          <!-- 卡 3：智能题库 -->
+          <!-- 卡 3：药材实验题库 -->
           <button type="button" class="v19-bento-card" data-v16-go="bank">
             <div>
               <div class="v19-bento-card-head">
-                <span class="v19-pill-tag v19-pill-coral">智能题库</span>
-                <span class="text-xs font-extrabold text-slate-500">${c.topics} 项</span>
+                <span class="v19-pill-tag v19-pill-coral">03 药材题库</span>
+                <span class="text-xs font-bold tabular-nums" style="color:var(--craft-muted)">${c.topics} 项</span>
               </div>
-              <h3 class="v19-bento-title">智能题库</h3>
-              <p class="v19-bento-sub">按化学成分大类与药典标准即时检索</p>
+              <h3 class="v19-bento-title">药材实验题库</h3>
+              <p class="v19-bento-sub">按化学成分大类、生物合成途径与药典限度检索</p>
             </div>
             <div class="v19-card-stage">
               <div class="v19-mini-checklist" aria-hidden="true">
-                <div class="v19-mini-check-row"><span class="v19-mini-check-box bg-emerald-500 text-white">✓</span><span>黄芩 · 沸水杀酶保苷</span></div>
-                <div class="v19-mini-check-row"><span class="v19-mini-check-box bg-emerald-100 text-emerald-700">✓</span><span>丹参 · 脂水双提工艺</span></div>
-                <div class="v19-mini-check-row"><span class="v19-mini-check-box border border-slate-300 bg-white"></span><span class="text-slate-400">槐米 · 碱提酸沉精制</span></div>
-                <div class="v19-mini-progress"><span style="width:74%"></span></div>
+                <div class="v19-mini-check-row"><span class="v19-mini-check-box text-white" style="background:#0f4c3a">✓</span><span>黄芩 · 沸水杀酶保苷</span></div>
+                <div class="v19-mini-check-row"><span class="v19-mini-check-box" style="background:rgba(15,76,58,0.12);color:#0f4c3a">✓</span><span>丹参 · 脂水双提工艺</span></div>
+                <div class="v19-mini-check-row"><span class="v19-mini-check-box border border-slate-300 bg-white"></span><span style="color:var(--craft-muted)">槐米 · 碱提酸沉精制</span></div>
+                <div class="v19-mini-progress"><span style="width:74%;background:#0f4c3a"></span></div>
               </div>
             </div>
-            <div class="v19-card-foot"><span>题库目录 · 小白速读</span><span>浏览 →</span></div>
+            <div class="v19-card-foot"><span>六科档案 · 药典对照</span><span>浏览 →</span></div>
           </button>
 
           <!-- 卡 4：DIY 虚拟实验室 -->
           <button type="button" class="v19-bento-card" data-v16-go="diy">
             <div>
               <div class="v19-bento-card-head">
-                <span class="v19-pill-tag v19-pill-sky">虚拟实验</span>
-                <span class="text-xs font-extrabold text-slate-500">${c.rigs} 装置</span>
+                <span class="v19-pill-tag v19-pill-sky">04 虚拟沙盒</span>
+                <span class="text-xs font-bold tabular-nums" style="color:var(--craft-muted)">${c.rigs} 装置</span>
               </div>
               <h3 class="v19-bento-title">DIY 虚拟实验室</h3>
-              <p class="v19-bento-sub">自由配方沙盒 · 7 大失败分支 · TLC/装置</p>
+              <p class="v19-bento-sub">自由配方推演、7 类实验失败分支与 TLC 模拟</p>
             </div>
             <div class="v19-card-stage">
               <svg viewBox="0 0 180 100" class="w-44 h-24" aria-hidden="true">
-                <path d="M58 18 L70 18 L70 40 L88 78 Q91 84 84 86 L44 86 Q37 84 40 78 L58 40 Z" fill="#ecfdf5" stroke="#94a3b8" stroke-width="2"/>
-                <path d="M46 68 L82 68 L86 78 Q88 83 82 84 L46 84 Q40 83 42 78 Z" fill="#6ee7b7" opacity="0.7"/>
-                <path d="M112 14 L126 14 L126 42 L148 80 Q151 86 144 88 L96 88 Q89 86 92 80 L112 42 Z" fill="#f0f9ff" stroke="#64748b" stroke-width="2"/>
-                <path d="M100 64 L138 64 L145 79 Q148 85 142 86 L98 86 Q92 85 95 79 Z" fill="#34d399" opacity="0.55"/>
-                <path d="M114 75 C110 62 122 50 132 48 C132 60 124 72 114 75 Z" fill="#10b981"/>
-                <circle cx="24" cy="82" r="5" fill="#10b981"/><circle cx="38" cy="82" r="5" fill="#f97316"/><circle cx="52" cy="82" r="5" fill="#3b82f6"/>
+                <path d="M58 18 L70 18 L70 40 L88 78 Q91 84 84 86 L44 86 Q37 84 40 78 L58 40 Z" fill="#f2f1ec" stroke="#64748b" stroke-width="1.8"/>
+                <path d="M46 68 L82 68 L86 78 Q88 83 82 84 L46 84 Q40 83 42 78 Z" fill="#5fb89c" opacity="0.58"/>
+                <path d="M112 14 L126 14 L126 42 L148 80 Q151 86 144 88 L96 88 Q89 86 92 80 L112 42 Z" fill="#f7f6f2" stroke="#475569" stroke-width="1.8"/>
+                <path d="M100 64 L138 64 L145 79 Q148 85 142 86 L98 86 Q92 85 95 79 Z" fill="#0f4c3a" opacity="0.34"/>
+                <path d="M114 75 C110 62 122 50 132 48 C132 60 124 72 114 75 Z" fill="#0f4c3a" opacity="0.82"/>
+                <circle cx="24" cy="82" r="4.5" fill="#0f4c3a"/><circle cx="37" cy="82" r="4.5" fill="#9a4a24"/><circle cx="50" cy="82" r="4.5" fill="#64748b"/>
               </svg>
             </div>
-            <div class="v19-card-foot"><span>配方沙盒 · FMEA 应急 · 装置</span><span>进入 →</span></div>
+            <div class="v19-card-foot"><span>配方沙盒 · 应急 CAPA · 装置</span><span>进入 →</span></div>
           </button>
 
           <!-- 卡 5：八阶段产业转化 -->
           <button type="button" class="v19-bento-card" data-v16-go="translation">
             <div>
               <div class="v19-bento-card-head">
-                <span class="v19-pill-tag v19-pill-mint">8 阶段主线</span>
-                <span class="text-xs font-extrabold text-emerald-700">丹参标杆</span>
+                <span class="v19-pill-tag v19-pill-mint">05 产业转化</span>
+                <span class="text-xs font-bold" style="color:var(--craft-accent)">丹参标杆</span>
               </div>
               <h3 class="v19-bento-title">产业转化训练</h3>
               <p class="v19-bento-sub">定位 → 炮制 → 工艺 → 剂型 → 中试放大</p>
             </div>
             <div class="v19-card-stage">
               <div class="w-full space-y-2" aria-hidden="true">
-                <div class="flex items-center justify-between text-[10px] font-bold text-emerald-800"><span>小试研究</span><span>中试放大</span><span>注册转化</span></div>
+                <div class="flex items-center justify-between text-[10px] font-bold" style="color:var(--craft-ink-2)"><span>小试研究</span><span>中试放大</span><span>注册转化</span></div>
                 <div class="grid grid-cols-8 gap-1">
-                  ${[1,2,3,4,5,6,7,8].map((n) => `<div class="h-7 rounded-lg flex items-center justify-center text-[10px] font-extrabold ${n <= 5 ? 'bg-emerald-500 text-white' : 'bg-emerald-100 text-emerald-800'}">${n}</div>`).join('')}
+                  ${[1,2,3,4,5,6,7,8].map((n) => `<div class="h-7 rounded-md flex items-center justify-center text-[10px] font-bold tabular-nums" style="${n <= 5 ? 'background:#0f4c3a;color:#ffffff' : 'background:var(--craft-surface-soft);color:var(--craft-ink-2);border:1px solid var(--craft-line)'}">${n}</div>`).join('')}
                 </div>
-                <div class="text-[10px] text-slate-500">9 维综合工艺最优 · 偏差 CAPA · 转化报告</div>
+                <div class="text-[10px]" style="color:var(--craft-muted)">9 维综合工艺最优 · 偏差 CAPA · 转化报告</div>
               </div>
             </div>
-            <div class="v19-card-foot"><span>4 大标杆 + ${c.topics} 题导入</span><span>进入 →</span></div>
+            <div class="v19-card-foot"><span>4 大标杆 · ${c.topics} 题导入</span><span>进入 →</span></div>
           </button>
 
           <!-- 卡 6：交互式四谱工作站 -->
           <button type="button" class="v19-bento-card" data-v16-ext="v21_spectra">
             <div>
               <div class="v19-bento-card-head">
-                <span class="v19-pill-tag v19-pill-amber">四谱工作站</span>
-                <span class="text-xs font-extrabold text-amber-700">猜峰挑战</span>
+                <span class="v19-pill-tag v19-pill-amber">06 四谱解析</span>
+                <span class="text-xs font-bold" style="color:var(--craft-seal)">归属训练</span>
               </div>
               <h3 class="v19-bento-title">交互式四谱分析</h3>
-              <p class="v19-bento-sub">UV 诊断位移 · NMR 积分 · MS 裂解与猜峰</p>
+              <p class="v19-bento-sub">UV 诊断位移、IR、NMR 积分与 MS 裂解归属</p>
             </div>
             <div class="v19-card-stage">
               <svg viewBox="0 0 180 86" class="w-full h-20" aria-hidden="true">
-                <line x1="12" y1="72" x2="168" y2="72" stroke="#cbd5e1" stroke-width="1.5"/>
-                <path d="M14 72 L42 72 Q52 72 56 30 Q60 72 68 72 L94 72 Q102 72 108 16 Q114 72 122 72 L138 72 Q144 72 148 44 Q152 72 164 72" fill="none" stroke="#10b981" stroke-width="2.4" stroke-linecap="round"/>
-                <circle cx="108" cy="18" r="5" fill="#f97316"/>
-                <rect x="116" y="8" width="44" height="16" rx="6" fill="#fff7ed" stroke="#fdba74"/>
-                <text x="138" y="19" text-anchor="middle" font-size="8.5" fill="#c2410c" font-weight="800">归属峰</text>
+                <line x1="12" y1="72" x2="168" y2="72" stroke="#cbd5e1" stroke-width="1.3"/>
+                <path d="M14 72 L42 72 Q52 72 56 30 Q60 72 68 72 L94 72 Q102 72 108 16 Q114 72 122 72 L138 72 Q144 72 148 44 Q152 72 164 72" fill="none" stroke="#0f4c3a" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="108" cy="18" r="4.5" fill="#9a4a24"/>
+                <rect x="116" y="8" width="44" height="16" rx="4" fill="#f7f6f2" stroke="#9a4a24" stroke-opacity="0.45"/>
+                <text x="138" y="19" text-anchor="middle" font-size="8.5" fill="#9a4a24" font-weight="700">归属峰</text>
               </svg>
             </div>
-            <div class="v19-card-foot"><span>可拖拽缩放 · 互动猜峰</span><span>启动 ↗</span></div>
+            <div class="v19-card-foot"><span>缩放谱图 · 特征峰检视</span><span>启动 ↗</span></div>
           </button>
 
           <!-- 卡 7：六步实验工坊 -->
           <button type="button" class="v19-bento-card" data-v16-go="workflow" data-v16-step="1">
             <div>
               <div class="v19-bento-card-head">
-                <span class="v19-pill-tag v19-pill-sky">标准 6 步</span>
-                <span class="text-xs font-extrabold text-slate-500">A4 报告</span>
+                <span class="v19-pill-tag v19-pill-sky">07 规范工坊</span>
+                <span class="text-xs font-bold" style="color:var(--craft-muted)">A4 报告</span>
               </div>
               <h3 class="v19-bento-title">六步实验工坊</h3>
               <p class="v19-bento-sub">选材 → 定题 → 原理 → 装置 → 数据 → 报告</p>
             </div>
             <div class="v19-card-stage">
-              <div class="w-full grid grid-cols-3 gap-1.5 text-center text-[10px] font-extrabold" aria-hidden="true">
-                <div class="p-2 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200/70">01 选材</div>
-                <div class="p-2 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200/70">02 工艺</div>
-                <div class="p-2 rounded-xl bg-teal-50 text-teal-800 border border-teal-200/70">03 原理</div>
-                <div class="p-2 rounded-xl bg-sky-50 text-sky-800 border border-sky-200/70">04 装置</div>
-                <div class="p-2 rounded-xl bg-indigo-50 text-indigo-800 border border-indigo-200/70">05 数据</div>
-                <div class="p-2 rounded-xl bg-amber-50 text-amber-800 border border-amber-200/70">06 报告</div>
+              <div class="w-full grid grid-cols-3 gap-1.5 text-center text-[10px] font-bold tabular-nums" aria-hidden="true">
+                <div class="p-2 rounded-lg" style="background:var(--craft-surface-soft);color:var(--craft-ink-2);border:1px solid var(--craft-line)">01 选材</div>
+                <div class="p-2 rounded-lg" style="background:var(--craft-surface-soft);color:var(--craft-ink-2);border:1px solid var(--craft-line)">02 工艺</div>
+                <div class="p-2 rounded-lg" style="background:var(--craft-surface-soft);color:var(--craft-ink-2);border:1px solid var(--craft-line)">03 原理</div>
+                <div class="p-2 rounded-lg" style="background:var(--craft-surface-soft);color:var(--craft-ink-2);border:1px solid var(--craft-line)">04 装置</div>
+                <div class="p-2 rounded-lg" style="background:var(--craft-surface-soft);color:var(--craft-ink-2);border:1px solid var(--craft-line)">05 数据</div>
+                <div class="p-2 rounded-lg" style="background:var(--craft-accent-soft);color:var(--craft-accent);border:1px solid rgba(15,76,58,0.22)">06 报告</div>
               </div>
             </div>
-            <div class="v19-card-foot"><span>云草稿自动保存 · 长图/Word</span><span>进入 →</span></div>
+            <div class="v19-card-foot"><span>云草稿同步 · 长图 / Word</span><span>进入 →</span></div>
           </button>
 
-          <!-- 卡 8：段位成长与三本图鉴 -->
+          <!-- 卡 8：实验档案与图鉴 -->
           <button type="button" class="v19-bento-card" data-v16-ext="v24_gamification">
             <div>
               <div class="v19-bento-card-head">
-                <span class="v19-pill-tag v19-pill-violet">成长图鉴</span>
-                <span class="text-xs font-extrabold text-violet-700">段位徽章</span>
+                <span class="v19-pill-tag v19-pill-violet">08 实验档案</span>
+                <span class="text-xs font-bold" style="color:var(--craft-muted)">三本图鉴</span>
               </div>
-              <h3 class="v19-bento-title">段位与收集图鉴</h3>
-              <p class="v19-bento-sub">药材学徒 → 提取师 → 工艺大师 → 宗师</p>
+              <h3 class="v19-bento-title">实验成长与图鉴</h3>
+              <p class="v19-bento-sub">记录已研习分子、药材与装置进度并导出档案</p>
             </div>
             <div class="v19-card-stage">
-              <div class="w-full p-3 rounded-2xl bg-[#f8fafc] border border-slate-200/70 space-y-2" aria-hidden="true">
-                <div class="flex items-center justify-between text-[11px] font-extrabold text-slate-700"><span>🌱 探索成长进度</span><span class="text-emerald-600">三本图鉴</span></div>
-                <div class="v19-mini-progress"><span style="width:62%;background:linear-gradient(90deg,#8b5cf6,#10b981)"></span></div>
+              <div class="w-full p-3 rounded-xl space-y-2" style="background:var(--craft-surface-soft);border:1px solid var(--craft-line)" aria-hidden="true">
+                <div class="flex items-center justify-between text-[11px] font-bold" style="color:var(--craft-ink-2)"><span>研习记录进度</span><span style="color:var(--craft-accent)">三本图鉴</span></div>
+                <div class="v19-mini-progress"><span style="width:62%;background:#0f4c3a"></span></div>
                 <div class="flex gap-1.5 text-[10px] font-bold">
-                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">🧬 分子</span>
-                  <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">🌿 药材</span>
-                  <span class="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">⚙️ 装置</span>
+                  <span class="px-2 py-0.5 rounded-md" style="background:var(--craft-surface);color:var(--craft-ink-2);border:1px solid var(--craft-line)">分子</span>
+                  <span class="px-2 py-0.5 rounded-md" style="background:var(--craft-surface);color:var(--craft-ink-2);border:1px solid var(--craft-line)">药材</span>
+                  <span class="px-2 py-0.5 rounded-md" style="background:var(--craft-surface);color:var(--craft-ink-2);border:1px solid var(--craft-line)">装置</span>
                 </div>
               </div>
             </div>
-            <div class="v19-card-foot"><span>徽章解锁 · JSON 档案导出</span><span>查看 ↗</span></div>
+            <div class="v19-card-foot"><span>记录解锁 · JSON 导出</span><span>查看 ↗</span></div>
           </button>
         </section>
 
         <!-- 3. 六大学科知识库 & 实践资料汇编 8 册直达条（按需懒加载，不增加首屏负担） -->
         <section class="v19-bento-strip" aria-label="中药学六大学科知识库与实践汇编">
           <div class="v19-bento-strip-left">
-            <span class="v19-bento-tag"><span class="v19-bento-tag-dot"></span>📚 六大学科知识库 &amp; 实践汇编</span>
+            <span class="v19-bento-tag">${ICO_BOOK}<span>六大学科知识库与实践汇编</span></span>
             <button type="button" class="v19-bento-pill" data-kb-open="overview">六科总览 ↗</button>
             <button type="button" class="v19-bento-pill" data-kb-open="handbook">实践汇编</button>
             <button type="button" class="v19-bento-pill" data-kb-open="vol01">01 中药化学</button>
@@ -400,8 +404,8 @@ function renderBentoHome() {
             <button type="button" class="v19-bento-pill" data-kb-open="vol06">06 制剂分析</button>
           </div>
           <div class="v19-bento-strip-actions">
-            <button type="button" class="v19-bento-pill" data-v16-ext="v29_explore" style="border-color:rgba(14,165,233,0.45);color:#0369a1">🔭 知识图谱探索 (4.1~4.5) ↗</button>
-            <button type="button" class="v19-bento-pill" data-kb-open="overview" style="border-color:rgba(16,185,129,0.45);color:#047857">全文检索 8 册 · 60 速查表 →</button>
+            <button type="button" class="v19-bento-pill" data-v16-ext="v29_explore" style="display:inline-flex;align-items:center;gap:5px">${ICO_GRAPH}<span>知识图谱探索 ↗</span></button>
+            <button type="button" class="v19-bento-pill" data-kb-open="overview" style="color:var(--craft-accent);border-color:rgba(15,76,58,0.28)">全文检索 8 册 · 60 速查表 →</button>
           </div>
         </section>
       </div>`;

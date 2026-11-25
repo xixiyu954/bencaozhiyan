@@ -504,26 +504,26 @@
         '<div class="v27-prompt-card">' +
           '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
             '<div>' +
-              '<div style="font-size:16px;font-weight:900;">⚔️ AI 课题生成器 · 90 分五维评审竞技场</div>' +
-              '<div style="font-size:12.5px;color:#64748b;margin-top:2px;">先选标准化模板，再输入任意药材/成分，三引擎云端 AI 套模板生成初版并强制过 90 分五维评审；按扣分点修补超越 AI！</div>' +
+              '<div style="font-size:15.5px;font-weight:850;">课题评审与迭代工作台（90 分准入）</div>' +
+              '<div style="font-size:12.5px;color:#64748b;margin-top:2px;">先选定标准化模板，再输入研究药材或成分，系统按模板生成初稿并进行五维评审，按扣分项修订至 90 分以上可编入自编题库。</div>' +
             "</div>" +
             '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' +
-              '<span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(15,118,110,0.10);color:#0f766e;">☁️ ' + esc(state.engineLabel) + "</span>" +
-              '<span style="font-size:12px;font-weight:800;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.14);color:#047857;">🏆 累计完胜 AI：' + state.wins + " 次</span>" +
+              '<span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:6px;background:var(--craft-accent-soft,rgba(15,76,58,0.08));color:var(--craft-accent,#0f4c3a);">' + esc(state.engineLabel) + "</span>" +
+              '<span style="font-size:12px;font-weight:750;padding:4px 10px;border-radius:6px;background:var(--craft-surface-soft,#f2f1ec);color:var(--craft-ink-2,#3b4b45);border:1px solid var(--craft-line,rgba(17,29,25,0.09));">累计达标通关：' + state.wins + " 次</span>" +
             "</div>" +
           "</div>" +
           '<div class="v27-tpl-row" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px;">' +
-            '<span style="font-size:11.5px;font-weight:800;color:#64748b;">📐 套用设计模板：</span>' +
+            '<span style="font-size:11.5px;font-weight:750;color:#64748b;">对标模板：</span>' +
             templates.map(function (t) {
               var on = t.id === state.templateId;
               return '<button type="button" data-v27-tpl="' + esc(t.id) + '" class="v27-starter-chip' + (on ? " is-tpl-active" : "") + '" style="' +
-                (on ? "background:#059669;color:#ffffff;border-color:#059669;font-weight:800;" : "") + '">' + esc(t.label) + "</button>";
+                (on ? "background:var(--craft-accent,#0f4c3a);color:#ffffff;border-color:var(--craft-accent,#0f4c3a);font-weight:750;" : "") + '">' + esc(t.label) + "</button>";
             }).join("") +
           "</div>" +
-          '<div style="font-size:11px;color:#0f766e;margin-top:5px;opacity:0.9;">当前模板规范：' + esc(activeTpl.desc || activeTpl.promptRule || "") + "</div>" +
+          '<div style="font-size:11px;color:var(--craft-accent,#0f4c3a);margin-top:5px;opacity:0.9;">当前模板规范：' + esc(activeTpl.desc || activeTpl.promptRule || "") + "</div>" +
           '<div class="v27-input-row">' +
-            '<input type="text" id="v27PromptInput" class="v27-prompt-input" value="' + esc(state.prompt) + '" placeholder="支持输入任意药材与成分，如：我想研究青蒿素低温提取 / 葛根素大孔树脂纯化..." />' +
-            '<button type="button" id="v27BtnGenerate" class="v27-btn-gen"' + (state.isGenerating ? " disabled" : "") + '>' + (state.isGenerating ? "⏳ 三引擎按模板生成中..." : "✨ 三引擎套模板生成并评审") + "</button>" +
+            '<input type="text" id="v27PromptInput" class="v27-prompt-input" value="' + esc(state.prompt) + '" placeholder="输入任意药材与成分，如：我想研究青蒿素低温提取 / 葛根素大孔树脂纯化..." />' +
+            '<button type="button" id="v27BtnGenerate" class="v27-btn-gen"' + (state.isGenerating ? " disabled" : "") + '>' + (state.isGenerating ? "按模板生成中..." : "按模板生成并评审") + "</button>" +
           "</div>" +
           '<div class="v27-starter-row">' +
             STARTER_PROMPTS.map(function (sp) {
@@ -534,26 +534,26 @@
 
         '<div class="v27-vs-bar">' +
           '<div class="v27-vs-side">' +
-            '<span class="v27-vs-label">🤖 AI 初版方案得分</span>' +
+            '<span class="v27-vs-label">初稿基线得分</span>' +
             '<span class="v27-vs-score" style="color:#64748b;">' + state.aiInitialScore + ' <small style="font-size:14px;">/ 100</small></span>' +
           "</div>" +
-          '<div style="font-size:15px;font-weight:900;color:#94a3b8;">VS</div>' +
+          '<div style="font-size:13px;font-weight:800;color:#94a3b8;letter-spacing:0.08em;">VS</div>' +
           '<div class="v27-vs-side">' +
-            '<span class="v27-vs-label">🧑‍🔬 你的当前迭代得分（第 ' + state.round + ' 轮）</span>' +
-            '<span class="v27-vs-score" style="color:' + (rev.passed ? "#059669" : "#d97706") + ';">' + rev.score + ' <small style="font-size:14px;">/ 100</small></span>' +
+            '<span class="v27-vs-label">当前修订得分（第 ' + state.round + ' 轮）</span>' +
+            '<span class="v27-vs-score" style="color:' + (rev.passed ? "#0f4c3a" : "#9a4a24") + ';">' + rev.score + ' <small style="font-size:14px;">/ 100</small></span>' +
           "</div>" +
           '<div class="v27-vs-badge ' + (rev.passed ? "is-win" : "is-chase") + '">' +
             (beatAi
-              ? "🏆 超越 AI +" + delta + " 分 · 达标可入库！"
+              ? "已提升 +" + delta + " 分 · 达标可入库"
               : rev.passed
-                ? "✅ 已达 ≥90 分准入门槛"
+                ? "已达 ≥90 分准入门槛"
                 : "距 90 分门槛还差 " + (PASS_SCORE - rev.score) + " 分") +
           "</div>" +
         "</div>" +
 
         '<div class="v27-main-grid">' +
           '<div class="v27-card">' +
-            '<h3 class="v27-sec-title"><span>1. AI 套模板生成方案（' + esc(d.herb) + ' · ' + compBadge + '）</span><button type="button" class="v27-btn-ghost" id="v27BtnResetDraft" style="padding:4px 10px;font-size:11.5px;">🔄 重置回 AI 初版</button></h3>' +
+            '<h3 class="v27-sec-title"><span>1. 模板生成方案（' + esc(d.herb) + ' · ' + compBadge + '）</span><button type="button" class="v27-btn-ghost" id="v27BtnResetDraft" style="padding:4px 10px;font-size:11.5px;">重置回初稿</button></h3>' +
 
             '<div class="v27-field" style="margin-bottom:9px;">' +
               '<label>实验正式题目</label>' +
@@ -595,18 +595,18 @@
             "</div>" +
 
             '<div class="v27-report-box">' +
-              '<div style="font-weight:800;margin-bottom:4px;">📄 自动同步 A4 实验报告框架：</div>' +
+              '<div style="font-weight:800;margin-bottom:4px;">自动同步 A4 实验报告框架：</div>' +
               '<div style="white-space:pre-line;opacity:0.9;">' + esc(buildReportFrameworkText(d)) + "</div>" +
             "</div>" +
           "</div>" +
 
           '<div class="v27-card">' +
-            '<h3 class="v27-sec-title"><span>2. 强制 90 分五维评审台（双层雷达对照）</span><span style="font-size:11.5px;color:#64748b;">≥90分准入</span></h3>' +
+            '<h3 class="v27-sec-title"><span>2. 五维评审台（双层雷达对照）</span><span style="font-size:11.5px;color:#64748b;">≥90分准入</span></h3>' +
 
             '<div class="v27-radar-strip">' +
               '<div>' +
                 buildDualRadarSvg(state.aiInitialDims, rev.dimensions) +
-                '<div class="v27-radar-legend"><span>--- AI初版</span><span style="color:#059669;">■ 你的迭代</span></div>' +
+                '<div class="v27-radar-legend"><span>--- 初稿基线</span><span style="color:#0f4c3a;">■ 当前修订</span></div>' +
               "</div>" +
               '<div class="v27-dim-list">' +
                 rev.dimensions.map(function (dim) {
@@ -622,34 +622,34 @@
             "</div>" +
 
             '<div class="v27-issue-box' + (rev.passed ? " is-pass" : "") + '">' +
-              '<div style="font-size:13px;font-weight:900;margin-bottom:6px;">' +
+              '<div style="font-size:13px;font-weight:850;margin-bottom:6px;">' +
                 (rev.passed
-                  ? "🎉 评审通过（" + rev.score + " 分 ≥ 90 分）：已满足「AI 自编题库」收录标准！"
-                  : "🚨 当前未达标（拦截入库），共 " + rev.issues.length + " 项扣分漏洞待修补：") +
+                  ? "评审通过（" + rev.score + " 分 ≥ 90 分）：已满足自编题库收录标准"
+                  : "当前未达标（拦截入库），共 " + rev.issues.length + " 项扣分项待修订：") +
               "</div>" +
               (rev.issues.length
                 ? rev.issues.map(function (iss) {
                     return (
                       '<div class="v27-issue-item">' +
-                        '<span><strong>【' + esc(iss.dim) + "】</strong>" + esc(iss.text) + "</span>" +
-                        '<button type="button" class="v27-fix-chip" data-v27-fix="' + iss.key + '">💡 参考修补</button>' +
+                        '<span><strong>[' + esc(iss.dim) + "]</strong> " + esc(iss.text) + "</span>" +
+                        '<button type="button" class="v27-fix-chip" data-v27-fix="' + iss.key + '">参考修补</button>' +
                       "</div>"
                     );
                   }).join("")
-                : '<div style="font-size:12px;">全部 5 个维度无硬性扣分漏洞，可立即编入自编题库或导入六步工坊演练。</div>') +
+                : '<div style="font-size:12px;">全部 5 个维度无硬性扣分漏洞，可编入自编题库或导入六步工坊演练。</div>') +
             "</div>" +
 
             '<div class="v27-btn-row">' +
-              '<button type="button" class="v27-btn-gen" id="v27BtnReReview">⚖️ 提交修订并重新五维复审</button>' +
-              '<button type="button" class="v27-btn-ghost" id="v27BtnAiCritique"' + (state.isCritiquing ? " disabled" : "") + '>' + (state.isCritiquing ? "⏳ AI 教授评审中..." : "🤖 三引擎 AI 深度点评") + "</button>" +
-              '<button type="button" class="v27-btn-pass" id="v27BtnCommit"' + (rev.passed ? "" : " disabled") + ">" + (state.committed ? "✅ 已编入自编题库" : "🏆 确认编入自编题库（≥90分）") + "</button>" +
-              '<button type="button" class="v27-btn-ghost" id="v27BtnToWorkflow">🚀 导入六步工坊</button>' +
-              '<button type="button" class="v27-btn-ghost" id="v27BtnCopyFramework">📋 复制报告框架</button>' +
+              '<button type="button" class="v27-btn-gen" id="v27BtnReReview">提交修订并复审</button>' +
+              '<button type="button" class="v27-btn-ghost" id="v27BtnAiCritique"' + (state.isCritiquing ? " disabled" : "") + '>' + (state.isCritiquing ? "教授评审中..." : "专家深度点评") + "</button>" +
+              '<button type="button" class="v27-btn-pass" id="v27BtnCommit"' + (rev.passed ? "" : " disabled") + ">" + (state.committed ? "已编入自编题库" : "编入自编题库（≥90分）") + "</button>" +
+              '<button type="button" class="v27-btn-ghost" id="v27BtnToWorkflow">导入六步工坊</button>' +
+              '<button type="button" class="v27-btn-ghost" id="v27BtnCopyFramework">复制报告框架</button>' +
             "</div>" +
 
             (state.aiCritique
-              ? '<div class="v27-report-box" style="margin-top:10px;border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.08);">' +
-                  '<div style="font-weight:800;margin-bottom:4px;color:#059669;">🤖 三引擎 AI 评审教授点评（对照 ' + esc(activeTpl.short) + '）：</div>' +
+              ? '<div class="v27-report-box" style="margin-top:10px;border-color:rgba(15,76,58,0.32);background:rgba(15,76,58,0.06);">' +
+                  '<div style="font-weight:800;margin-bottom:4px;color:var(--craft-accent,#0f4c3a);">评审教授点评（对照 ' + esc(activeTpl.short) + '）：</div>' +
                   '<div style="white-space:pre-line;line-height:1.6;">' + esc(state.aiCritique) + "</div>" +
                 "</div>"
               : "") +

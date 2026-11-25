@@ -148,3 +148,10 @@
 - **2.5 AI 课题生成器（90 分五维竞技）**（`src/modules/lab-v27-ai-topic-arena.js` + `src/styles/lab-v27-ai-topic-arena.css`）：作为「智能实验设计」默认首标签挂载，按需懒加载入 `modal-ai-review` 异步分包（零首屏体积膨胀），提供自然语言出题、AI 初版 vs 学生迭代双层五维 SVG 雷达图、SOP 逐行编辑、90 分强制准入编入自编题库与一键导入六步工坊。
 - **3.1 AI 导师对话 + 3.5 AI 安全督察**（`src/modules/lab-v28-ai-mentor.js` + `src/modules/lab-v28-safety-inspector.js` + `src/styles/lab-v28-ai-mentor-safety.css`）：对称居右下角 `#tcmV28AiDock`（与左下角可折叠 `● 扩展舱` 左右平衡、零重叠，移动端自适应紧凑排布）；修复 `TCMCloudAI.complete({ messages })` 参数契约使其真实直连线上智谱 GLM `/api/ai-proxy`（超时自动降级本地专业化学兜底），并增加懒代理安全守卫避免未加载 DIY 沙盒时同步读取异常。
 - **板块四（4.1~4.5 知识图谱与可视化探索中心 v29.4）**（`src/modules/lab-v29-explore-suite.js` + `src/styles/lab-v29-explore-suite.css`）：拆分为独立懒加载分包 `suite-explore`（`src/routes/explore-suite-chunk.js` + `src/routes/explore-suite-loader.js`），首屏零加载 90 KB 引擎，在左下角 `扩展舱` 与首页知识条均提供 1-click 直达，完整支持 4.1 知识图谱、4.2 极性三维宇宙、4.3 工艺流水线、4.4 导演时间轴与 4.5 136 味对比显微镜。
+
+
+### 2026-11-25 v30 精工去 AI 化设计、UI 与动效全面重构（UI UX Pro Max × Taste Skill × Hallmark × Open Design）
+- **视觉材质与排版重塑**（`src/styles/lab-v30-craft-deai.css` + `src/main.js`）：确立「本草典籍 × 精密实验仪器」设计语言，采用宣纸微暖白 `#f7f6f2`、纯白细线卡 `#ffffff`、`1px` 建筑级细线边框、宋体衬线主标题、矿物石青 `#0f4c3a` 与克制朱砂印章 `#9a4a24`（暗色模式同步深墨黑曜石 `#0c1412` + 柔和青玉 `#5fb89c`），全站科研指标与表格启用 `tabular-nums` 等宽数字对齐，并收紧全站卡片圆角（`16px` / `10px` / `6px` 印章）。
+- **彻底去 AI 化与矢量图标升级**（`src/modules/v19-bento-home.js`、`lab-v16-portal.js`、`src/modules/lab-v27-ai-topic-arena.js`、`src/routes/visual-suite-loader.js`、`src/modules/lab-v28-ai-mentor.js`、`src/modules/lab-v28-safety-inspector.js`、`cloud-ai.js`、`index.html`、`lab-v7-media-pro.js`）：清除脉冲圆点眉毛胶囊、彩虹标签拼盘、AI 模板高频话术（如「沉浸式」「完胜 AI」）以及主界面、导航、分段标签、下拉模板与悬浮双工具坞的原始 Emoji 杂讯，统一替换为 `14px` 单色线性 SVG 图标（`.craft-ico`）。
+- **Open Design 物理克制动效**：停用全屏 `#tcmInkVeil` 雾闪、按钮斜向扫光、鼠标追踪霓虹环、模糊路由转场与 Hero 持续漂浮，统一收束为 `180~190ms cubic-bezier(0.2, 0, 0, 1)` 物理微移与精准状态过渡。
+- **质量验证**：Hallmark 反 AI 味 DOM 审计主界面 0 Emoji、0 报错、6 个重型分包首屏零加载、移动端 `390×844` 零横向溢出零工具坞重叠；Lighthouse 达成 **Performance 87 (TBT 0 ms, CLS 0) / Accessibility 100 / Best Practices 100 / SEO 100**，全部 6 项功能回归通过。

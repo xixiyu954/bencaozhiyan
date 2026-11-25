@@ -118,7 +118,7 @@ function createMol3dRegistry() {
       return s.replace(COMBINED_MOL_RE, (match) => {
         const key = lookupKeyByToken(match);
         if (!key) return match;
-        return `<${tag} ${extraAttrs} class="tcm-mol3d-link" data-mol3d-open="${key}" title="点击查看 ${match} 3D 分子结构与官能团高亮"><span class="tcm-mol3d-link-ico" aria-hidden="true">🧬</span>${match}</${tag}>`;
+        return `<${tag} ${extraAttrs} class="tcm-mol3d-link" data-mol3d-open="${key}" title="点击查看 ${match} 三维分子结构与官能团高亮"><svg class="tcm-mol3d-link-ico" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 20 7 20 17 12 22 4 17 4 7 12 2"/></svg>${match}</${tag}>`;
       });
     }
   };
@@ -288,22 +288,23 @@ function bindGlobalMol3dLinkDelegation() {
 
 function mountBentoFabDock() {
   if (typeof document === 'undefined' || document.getElementById('tcmV22FabDock')) return;
+  const ico = (d) => `<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
   const dock = document.createElement('div');
   dock.id = 'tcmV22FabDock';
   dock.className = 'v22-fab-dock no-print';
   dock.innerHTML =
     '<div class="v22-fab-tray" id="v22FabTray" hidden>' +
-      '<button type="button" class="v22-fab-btn accent" id="v29BtnExplore">🔭 知识探索 (4.1~4.5)</button>' +
-      '<button type="button" class="v22-fab-btn accent" data-v22-open="vlab">🕹️ 3D 虚拟实验室</button>' +
-      '<button type="button" class="v22-fab-btn" data-v22-open="fluid">🌊 物理流体仿真</button>' +
-      '<button type="button" class="v22-fab-btn" data-v22-open="cockpit">📊 驾驶舱大屏</button>' +
-      '<button type="button" class="v22-fab-btn" data-kb-open="overview">📚 六科知识库</button>' +
-      '<button type="button" class="v22-fab-btn" data-v22-open="ar">📱 AR 药材卡</button>' +
-      '<button type="button" class="v22-fab-btn" id="v22BtnPresent">🖥️ 投影模式</button>' +
-      '<button type="button" class="v22-fab-btn" id="v24BtnOpenGrowth">🏆 段位图鉴</button>' +
+      `<button type="button" class="v22-fab-btn accent" id="v29BtnExplore">${ico('<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.6M8.2 13.2l7.6 4.6"/>')}<span>知识图谱探索</span></button>` +
+      `<button type="button" class="v22-fab-btn accent" data-v22-open="vlab">${ico('<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>')}<span>三维虚拟实验室</span></button>` +
+      `<button type="button" class="v22-fab-btn" data-v22-open="fluid">${ico('<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>')}<span>液液萃取流体仿真</span></button>` +
+      `<button type="button" class="v22-fab-btn" data-v22-open="cockpit">${ico('<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>')}<span>五维雷达驾驶舱</span></button>` +
+      `<button type="button" class="v22-fab-btn" data-kb-open="overview">${ico('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>')}<span>六大学科知识库</span></button>` +
+      `<button type="button" class="v22-fab-btn" data-v22-open="ar">${ico('<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>')}<span>AR 药材卡片</span></button>` +
+      `<button type="button" class="v22-fab-btn" id="v22BtnPresent">${ico('<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>')}<span>教学投影模式</span></button>` +
+      `<button type="button" class="v22-fab-btn" id="v24BtnOpenGrowth">${ico('<path d="M12 15l-3.5 2 .7-4-2.9-2.8 4-.6L12 6l1.7 3.6 4 .6-2.9 2.8.7 4z"/>')}<span>实验成长档案</span></button>` +
     '</div>' +
     '<button type="button" class="v22-fab-toggle" id="v22FabToggle" aria-expanded="false" aria-controls="v22FabTray">' +
-      '<span class="v22-fab-toggle-dot" aria-hidden="true"></span><span>扩展舱</span>' +
+      `<span class="v22-fab-toggle-dot" aria-hidden="true"></span>${ico('<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/>')}<span>实验工具舱</span>` +
     '</button>';
 
   const tray = dock.querySelector('#v22FabTray');

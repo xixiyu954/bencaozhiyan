@@ -178,6 +178,9 @@
     renderPanel();
   }
 
+  var ICO_SHIELD = '<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+  var ICO_CHAT = '<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+
   function ensureDockAndPanel() {
     var dock = document.getElementById("tcmV28AiDock");
     if (!dock) {
@@ -185,8 +188,8 @@
       dock.id = "tcmV28AiDock";
       dock.className = "no-print";
       dock.innerHTML =
-        '<button type="button" id="tcmV28SafetyFab" class="v28-fab v28-fab-safety" title="AI 安全督察实时状态">🛡️ 安全合规</button>' +
-        '<button type="button" id="tcmV28MentorFab" class="v28-fab v28-fab-mentor" title="随时提问当前实验原理、参数与安全">💬 问导师</button>';
+        '<button type="button" id="tcmV28SafetyFab" class="v28-fab v28-fab-safety" title="实验安全合规状态">' + ICO_SHIELD + '<span>安全合规</span></button>' +
+        '<button type="button" id="tcmV28MentorFab" class="v28-fab v28-fab-mentor" title="提问当前实验原理、参数与安全">' + ICO_CHAT + '<span>实验导师</span></button>';
       document.body.appendChild(dock);
 
       dock.querySelector("#tcmV28MentorFab").addEventListener("click", function () { togglePanel(); });
@@ -222,23 +225,23 @@
 
     panel.innerHTML =
       '<div class="v28-mentor-head">' +
-        '<div><strong>🎓 AI 导师对话</strong> <span style="font-size:11px;opacity:0.82;">上下文实时感知 · Esc关闭</span></div>' +
+        '<div><strong>实验导师对话</strong> <span style="font-size:11px;opacity:0.82;">上下文实时同步 · Esc 关闭</span></div>' +
         '<div style="display:flex;gap:6px;">' +
-          '<button type="button" id="v28ClearChat" style="border:none;background:rgba(255,255,255,0.16);color:#fff;border-radius:999px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;">清空</button>' +
-          '<button type="button" id="v28CloseMentor" style="border:none;background:rgba(255,255,255,0.2);color:#fff;border-radius:999px;padding:3px 9px;font-size:12px;font-weight:800;cursor:pointer;">×</button>' +
+          '<button type="button" id="v28ClearChat" style="border:none;background:rgba(255,255,255,0.16);color:#fff;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;">清空</button>' +
+          '<button type="button" id="v28CloseMentor" style="border:none;background:rgba(255,255,255,0.2);color:#fff;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:800;cursor:pointer;">×</button>' +
         "</div>" +
       "</div>" +
       '<div class="v28-mentor-ctx">' +
-        '<span>📍 ' + esc(ctx.routeLabel) + " · " + esc(ctx.herb) + " · " + esc(ctx.solvent) + " " + ctx.temp + "℃</span>" +
+        '<span>当前场景：' + esc(ctx.routeLabel) + " · " + esc(ctx.herb) + " · " + esc(ctx.solvent) + " " + ctx.temp + "℃</span>" +
       "</div>" +
       '<div class="v28-mentor-msgs" id="v28MsgList">' +
         displayMsgs.map(function (m, idx) {
           var copyBtn = m.role === "ai"
-            ? '<div class="v28-msg-foot"><button type="button" class="v28-copy-mini" data-v28-copy-msg="' + idx + '">📋 复制</button></div>'
+            ? '<div class="v28-msg-foot"><button type="button" class="v28-copy-mini" data-v28-copy-msg="' + idx + '">复制</button></div>'
             : "";
           return '<div class="v28-msg ' + (m.role === "user" ? "is-user" : "is-ai") + '">' + esc(m.text) + copyBtn + "</div>";
         }).join("") +
-        (isBusy ? '<div class="v28-msg is-ai">正在结合当前工艺参数思考解答...</div>' : "") +
+        (isBusy ? '<div class="v28-msg is-ai">正在结合当前工艺参数生成解答...</div>' : "") +
       "</div>" +
       '<div class="v28-quick-chips">' +
         quicks.map(function (q) {

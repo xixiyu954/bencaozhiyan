@@ -672,7 +672,7 @@
                 const itemProf = enrich ? enrich.getProfile(hydrated) : null;
                 const itemHas3d = enrich ? enrich.hasMol3d(hydrated) : false;
                 const cardSummary = hydrated.origin || hydrated.chemistry || `${item.latin ? item.latin + ' · ' : ''}主攻成分：${item.compound || '活性成分'}`;
-                const badgeText = item._isCustom ? '🤖 自定义/AI' : (item.isKbNew ? '📘 六科新增' : (item.group === 'class' ? '★ 高校经典' : '✨ 创新前沿'));
+                const badgeText = item._isCustom ? '自定义课题' : (item.isKbNew ? '六科新增' : (item.group === 'class' ? '高校经典' : '创新拓展'));
                 return `
                   <div class="v16-topic-card ${isSel ? 'selected' : ''}" data-v16-preview="${esc(item.id)}" role="button" tabindex="0">
                     <div class="v16-topic-head">
@@ -682,10 +682,10 @@
                         <button type="button" class="v27-fav-btn ${isFav ? 'on' : ''}" data-v27-fav="${esc(item.id)}" title="${isFav ? '取消收藏' : '收藏课题'}" aria-label="收藏课题">${isFav ? '★' : '☆'}</button>
                       </div>
                     </div>
-                    <div class="v16-topic-comp">🎯 ${window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(esc(item.compound || '核心活性成分'), { inlineSpan: true }) : esc(item.compound || '核心活性成分')}</div>
+                    <div class="v16-topic-comp">${window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(esc(item.compound || '核心活性成分'), { inlineSpan: true }) : esc(item.compound || '核心活性成分')}</div>
                     <div class="v27-card-micro-tags">
                       ${itemProf ? `<span class="v27-micro-pill">${esc(itemProf.biosyn)}</span>` : ''}
-                      ${itemHas3d ? '<span class="v27-micro-pill mint">🧬 3D构象</span>' : ''}
+                      ${itemHas3d ? '<span class="v27-micro-pill mint">3D 构象</span>' : ''}
                       ${hydrated.limitVal ? `<span class="v27-micro-pill">限度≥${esc(hydrated.limitVal)}${esc(hydrated.limitUnit || '%')}</span>` : ''}
                     </div>
                     <div class="v16-topic-note">${esc(cardSummary)}</div>
@@ -747,10 +747,10 @@
             </button>
             <div class="grid grid-cols-2 gap-2">
               <button type="button" class="v16-chip-btn justify-center py-2" data-v16-lock-topic="${esc(preview.id)}" data-v16-target-step="1">从第 1 步开始</button>
-              <button type="button" class="v16-chip-btn gold justify-center py-2" data-v16-ai-herb="${esc(preview.herb)}" data-v16-ai-comp="${esc(preview.compound)}">✨ 智能定制方案</button>
+              <button type="button" class="v16-chip-btn gold justify-center py-2" data-v16-ai-herb="${esc(preview.herb)}" data-v16-ai-comp="${esc(preview.compound)}">智能定制方案</button>
             </div>
-            <button type="button" class="v16-chip-btn justify-center py-2" style="width:100%;border-color:rgba(4,120,87,0.35);color:#065f46;background:rgba(236,253,245,0.65)" data-v16-to-translation="${esc(preview.id)}">
-              🏭 转入产业转化研究（剂型 / 放大 / 质控）→
+            <button type="button" class="v16-chip-btn justify-center py-2" style="width:100%;border-color:rgba(15,76,58,0.32);color:var(--craft-accent);background:var(--craft-accent-soft)" data-v16-to-translation="${esc(preview.id)}">
+              转入产业转化研究（剂型 / 放大 / 质控）→
             </button>
           </div>
         </aside>
@@ -790,11 +790,11 @@
       <div class="v16-subhero">
         <div class="v16-subhero-top">
           <div>
-            <h2>药材实验题库（${all.length} 项 · 六大学科全链路版）</h2>
-            <p>整合 6 大学科知识库、2025 版中国药典、PubChem 3D 分子与实践汇编；支持成分/生物合成途径检索、收藏对比与章节直达。</p>
+            <h2>药材实验题库（${all.length} 项 · 六大学科档案）</h2>
+            <p>整合 6 大学科知识库、2025 版《中国药典》、PubChem 三维分子与实践汇编；支持成分与生物合成途径检索、收藏对比与章节直达。</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button type="button" class="v16-chip-btn" style="border-color:rgba(16,185,129,0.45);color:#047857" data-kb-open="vol01">📚 六科知识库 ↗</button>
+            <button type="button" class="v16-chip-btn" style="border-color:rgba(15,76,58,0.32);color:var(--craft-accent)" data-kb-open="vol01">六科知识库 ↗</button>
             <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">自编课题审核</button>
             <button type="button" class="v16-chip-btn" data-v16-trigger="diy-herb">+ 新建自定义药材</button>
             <button type="button" class="v16-chip-btn" data-v16-trigger="compare">对比课题</button>
@@ -810,10 +810,10 @@
           <div class="v16-seg-bar">
             ${[
               ['all', `全部 (${all.length})`],
-              ['kbnew', `📘 六科新增 (${kbNewCount})`],
+              ['kbnew', `六科新增 (${kbNewCount})`],
               ['class', '经典必做'],
               ['innovative', '创新拓展'],
-              ['fav', `★ 收藏 (${favCount})`],
+              ['fav', `收藏 (${favCount})`],
               ['custom', `自编 (${(api()?.getCounts?.().approvedAi) || 0})`]
             ].map(([k, lbl]) => `<button type="button" class="v16-seg-btn ${bankState.tab === k ? 'active' : ''}" data-v16-bank-tab="${k}">${lbl}</button>`).join('')}
           </div>
@@ -826,12 +826,12 @@
           <div class="v16-pill-row">
             ${[
               ['all', '全部场景'],
-              ['mol3d', '🧬 含 3D 分子'],
-              ['undergrad', '🎓 本科经典'],
-              ['compound', '🏺 经典复方'],
-              ['green', '🌿 绿色工艺'],
-              ['process', '🔥 炮制对照'],
-              ['eastwest', '🔬 中西医对照']
+              ['mol3d', '含 3D 分子'],
+              ['undergrad', '本科经典'],
+              ['compound', '经典复方'],
+              ['green', '绿色工艺'],
+              ['process', '炮制对照'],
+              ['eastwest', '中西医对照']
             ].map(([sc, lbl]) => `<button type="button" class="v16-filter-pill ${bankState.scene === sc ? 'active' : ''}" data-v16-bank-scene="${sc}">${lbl}</button>`).join('')}
           </div>
         </div>
@@ -874,17 +874,18 @@
     if (!head || !extra) return;
 
     const curRouteMode = window.TCMCloudAI?.getRouteMode ? window.TCMCloudAI.getRouteMode() : 'auto';
-    const routeModeText = { auto: '✨ 三引擎自动混编', zhipu: '🌿 优先智谱 GLM', tencent: '☁️ 优先腾讯云 TokenHub', xunfei: '⚡ 优先讯飞星辰' }[curRouteMode] || '✨ 三引擎自动混编';
+    const routeModeText = { auto: '三引擎自动调度', zhipu: '优先智谱 GLM', tencent: '优先腾讯云 TokenHub', xunfei: '优先讯飞星辰' }[curRouteMode] || '三引擎自动调度';
+    const ico = (d) => `<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
 
     head.innerHTML = `
       <div class="v16-subhero">
         <div class="v16-subhero-top">
           <div>
             <h2>智能实验设计</h2>
-            <p>三引擎混合 AI（智谱 GLM · 腾讯云 TokenHub · 讯飞星辰）套用 5 套标准化中药化学模板，贯通 90 分课题竞技、全景方案编排、已有方案校核与流式助教答疑。</p>
+            <p>基于智谱 GLM、腾讯云 TokenHub 与讯飞星辰多模型协同，按 5 套标准化中药化学模板完成课题评审、方案编排、已有方案校核与助教答疑。</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button type="button" class="v16-chip-btn" id="v16AiEngineSwitchBtn" title="点击切换或体检三引擎通道">${esc(routeModeText)} ⚙</button>
+            <button type="button" class="v16-chip-btn" id="v16AiEngineSwitchBtn" title="切换或体检三引擎通道">${ico('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>')}<span>${esc(routeModeText)}</span></button>
             <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">自编课题审核（≥90分）</button>
             <button type="button" class="v16-chip-btn" data-v16-go="workflow">进入实验工坊</button>
             <button type="button" class="v16-chip-btn" data-v16-go="home">← 返回首页</button>
@@ -892,10 +893,10 @@
         </div>
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="v16-seg-bar">
-            <button type="button" class="v16-seg-btn ${aiSubTab === 'arena' ? 'active' : ''}" data-v16-ai-tab="arena">⚔️ AI 课题生成器（90分竞技）</button>
-            <button type="button" class="v16-seg-btn ${aiSubTab === 'compose' ? 'active' : ''}" data-v16-ai-tab="compose">📐 智能方案编排</button>
-            <button type="button" class="v16-seg-btn ${aiSubTab === 'plan' ? 'active' : ''}" data-v16-ai-tab="plan">🔍 已有方案校核</button>
-            <button type="button" class="v16-seg-btn ${aiSubTab === 'chat' ? 'active' : ''}" data-v16-ai-tab="chat">💬 实验助教答疑</button>
+            <button type="button" class="v16-seg-btn ${aiSubTab === 'arena' ? 'active' : ''}" data-v16-ai-tab="arena">${ico('<path d="M12 2l3 7h7l-5.5 4.5 2 7L12 16.5 5.5 20.5l2-7L2 9h7z"/>')}<span>课题评审竞技</span></button>
+            <button type="button" class="v16-seg-btn ${aiSubTab === 'compose' ? 'active' : ''}" data-v16-ai-tab="compose">${ico('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>')}<span>方案模板编排</span></button>
+            <button type="button" class="v16-seg-btn ${aiSubTab === 'plan' ? 'active' : ''}" data-v16-ai-tab="plan">${ico('<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>')}<span>已有方案校核</span></button>
+            <button type="button" class="v16-seg-btn ${aiSubTab === 'chat' ? 'active' : ''}" data-v16-ai-tab="chat">${ico('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>')}<span>实验助教答疑</span></button>
           </div>
           <span style="font-size:0.78rem;color:var(--ds-muted)">当前课题：<strong style="color:var(--ds-ink)">${esc(getCurrentTopic().herb)} · ${esc(getCurrentTopic().compound)}</strong></span>
         </div>
@@ -932,8 +933,8 @@
       extra.innerHTML = `
         <div class="space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <h3 style="margin:0;font-size:1.05rem;font-weight:850;color:var(--ds-ink)">🎯 精选场景灵感模板（点击自动填入上方指令框，按选定模板由三引擎定制生成）</h3>
-            <span style="font-size:0.76rem;color:var(--ds-muted)">支持切换 5 套标准化模板：本科4学时 / 大创正交 / 绿色无氯仿 / 2025药典 / 复方协同</span>
+            <h3 style="margin:0;font-size:1.02rem;font-weight:800;color:var(--ds-ink)">标准场景参考模板（点击填入上方指令框，按选定模板生成方案）</h3>
+            <span style="font-size:0.76rem;color:var(--ds-muted)">内置 5 套标准化模板：本科4学时 / 大创正交 / 绿色无氯仿 / 2025药典 / 复方协同</span>
           </div>
           <div class="v16-ai-template-grid">
             ${AI_TEMPLATES.map(tpl => `
@@ -947,35 +948,35 @@
         </div>
       `;
     } else if (aiSubTab === 'plan') {
-      const tplList = window.TCMCloudAI?.DESIGN_TEMPLATES || [{ id: 'undergrad_4h', label: '🎓 本科 4 学时标准模板' }];
+      const tplList = window.TCMCloudAI?.DESIGN_TEMPLATES || [{ id: 'undergrad_4h', label: '本科 4 学时标准模板' }];
       extra.innerHTML = `
-        <div class="v16-subhero" style="background:linear-gradient(135deg, rgba(236,253,245,0.65), var(--ds-surface))">
+        <div class="v16-subhero" style="background:var(--ds-surface)">
           <div class="v16-subhero-top">
             <div>
-              <h3 style="margin:0 0 6px;font-size:1.18rem;font-weight:900;color:var(--ds-ink)">🔍 三引擎方案校核 · 对照标准模板自动诊断并生成修订 SOP</h3>
-              <p>直接粘贴教材步骤、文献方法或自拟工艺，三引擎 AI 自动提取参数、排查热敏/安全/耗时隐患，并输出按标准模板修订后的 6 步量化 SOP。</p>
+              <h3 style="margin:0 0 6px;font-size:1.14rem;font-weight:850;color:var(--ds-ink)">方案模板校核与 SOP 修订</h3>
+              <p>粘贴教材步骤、文献方法或自拟工艺，对照所选模板解析参数、排查热敏与安全风险，并输出 6 步量化修订 SOP。</p>
             </div>
             <button type="button" class="v16-chip-btn" data-v16-trigger="user-plan">打开完整推演工作台 ↗</button>
           </div>
           <div class="space-y-2.5 pt-2">
             <div class="flex flex-wrap items-center gap-2 text-xs">
-              <span class="font-extrabold text-slate-600">📐 校核对标模板：</span>
-              <select id="v16InlinePlanTpl" class="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-800 text-xs font-bold">
+              <span class="font-bold text-slate-600">校核对标模板：</span>
+              <select id="v16InlinePlanTpl" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-800 text-xs font-bold">
                 ${tplList.map(t => `<option value="${esc(t.id)}">${esc(t.label)}</option>`).join('')}
               </select>
-              <button type="button" id="v16PlanSample1" class="px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-emerald-500 text-[11px] font-bold text-slate-700 transition">填入示例：黄芩沸水杀酶酸沉</button>
-              <button type="button" id="v16PlanSample2" class="px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-emerald-500 text-[11px] font-bold text-slate-700 transition">填入示例：川芎酸碱双相联产</button>
+              <button type="button" id="v16PlanSample1" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-emerald-700 text-[11px] font-bold text-slate-700 transition">示例：黄芩沸水杀酶酸沉</button>
+              <button type="button" id="v16PlanSample2" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-emerald-700 text-[11px] font-bold text-slate-700 transition">示例：川芎酸碱双相联产</button>
             </div>
-            <textarea id="v16InlinePlanText" rows="4" class="w-full p-3.5 rounded-2xl border border-slate-200 bg-white text-xs text-slate-800 leading-relaxed focus:outline-none focus:border-emerald-600" placeholder="粘贴你的已有实验步骤（含药材、溶剂、温度、料液比、纯化与检识方法）..."></textarea>
+            <textarea id="v16InlinePlanText" rows="4" class="w-full p-3.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 leading-relaxed focus:outline-none focus:border-emerald-700" placeholder="粘贴已有实验步骤（含药材、溶剂、温度、料液比、纯化与检识方法）..."></textarea>
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <span class="text-[11px] text-slate-500">支持将校核后的修订方案一键同步至六步工坊，或收录进「AI 自编题库」。</span>
-              <button type="button" id="v16InlinePlanRunBtn" class="v16-btn-cta-primary">🚀 三引擎按模板校核并生成修订 SOP →</button>
+              <span class="text-[11px] text-slate-500">支持将校核后的修订方案同步至六步工坊，或收录至自编题库。</span>
+              <button type="button" id="v16InlinePlanRunBtn" class="v16-btn-cta-primary">执行模板校核并生成修订 SOP →</button>
             </div>
           </div>
           <div class="v16-ai-template-grid pt-2">
-            <div class="v16-preview-block"><label>① 参数与极性提取</label><p>自动解析投料量、料液比、温度、提取次数与溶剂极性匹配度。</p></div>
-            <div class="v16-preview-block"><label>② 模板合规与安全诊断</label><p>识别高危溶剂、热敏降解、超 4 学时与乳化/拖尾等实验风险。</p></div>
-            <div class="v16-preview-block"><label>③ 一键输出修订 SOP</label><p>按选定模板生成可直接上实验台的 6 步量化 SOP 与四阶段现象预演。</p></div>
+            <div class="v16-preview-block"><label>01 参数与极性提取</label><p>解析投料量、料液比、温度、提取次数与溶剂极性匹配度。</p></div>
+            <div class="v16-preview-block"><label>02 模板合规与安全诊断</label><p>识别高危溶剂、热敏降解、超 4 学时与乳化或拖尾风险。</p></div>
+            <div class="v16-preview-block"><label>03 输出量化修订 SOP</label><p>按选定模板生成可直接上台操作的 6 步 SOP 与四阶段现象预演。</p></div>
           </div>
         </div>
       `;
@@ -999,7 +1000,7 @@
     } else {
       extra.innerHTML = `
         <div class="space-y-3">
-          <h3 style="margin:0;font-size:1.05rem;font-weight:850;color:var(--ds-ink)">💬 高频实验排障提问（点击自动填入上方流式助教对话，支持按 4 套模板结构化作答）</h3>
+          <h3 style="margin:0;font-size:1.02rem;font-weight:800;color:var(--ds-ink)">高频实验排障提问（点击填入上方助教对话，按 4 套结构化模板作答）</h3>
           <div class="v16-ai-template-grid">
             ${AI_CHAT_PROMPTS.map((q, idx) => `
               <button type="button" class="v16-ai-tpl" data-v16-fill-chat="${esc(q)}">
@@ -1018,13 +1019,14 @@
     const head = document.getElementById('v16DiyHeader');
     const tools = document.getElementById('v16DiyToolsPage');
     if (!head || !tools) return;
+    const ico = (d) => `<svg class="craft-ico" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
 
     head.innerHTML = `
       <div class="v16-subhero">
         <div class="v16-subhero-top">
           <div>
             <h2>DIY 创意实验室</h2>
-            <p>支持 136 药材 × 15 溶剂 × 8 装置自由配方沙盒、7 大经典实验失败分支与应急 CAPA 演练、复方配伍与薄层显色模拟、实操计算记录及 15 套交互仿真装置。</p>
+            <p>支持 136 药材 × 15 溶剂 × 8 装置自由配方推演、7 类实验失败分支与应急 CAPA 实训、复方配伍与薄层显色模拟及 15 套交互仿真装置。</p>
           </div>
           <div class="flex flex-wrap gap-2">
             <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">自编课题审核</button>
@@ -1033,9 +1035,9 @@
           </div>
         </div>
         <div class="v16-seg-bar">
-          <button type="button" class="v16-seg-btn ${diySubTab === 'formula' ? 'active' : ''}" data-v16-diy-tab="formula">🧪 自由配方沙盒</button>
-          <button type="button" class="v16-seg-btn ${diySubTab === 'failures' ? 'active' : ''}" data-v16-diy-tab="failures">⚠️ 失败分支实验室</button>
-          <button type="button" class="v16-seg-btn ${diySubTab === 'studio' ? 'active' : ''}" data-v16-diy-tab="studio">复方配伍 · 分层 · TLC 显色</button>
+          <button type="button" class="v16-seg-btn ${diySubTab === 'formula' ? 'active' : ''}" data-v16-diy-tab="formula">${ico('<path d="M9 3h6"/><path d="M10 3v5.4L5.6 16.5A3 3 0 0 0 8.2 21h7.6a3 3 0 0 0 2.6-4.5L14 8.4V3"/>')}<span>自由配方沙盒</span></button>
+          <button type="button" class="v16-seg-btn ${diySubTab === 'failures' ? 'active' : ''}" data-v16-diy-tab="failures">${ico('<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>')}<span>失败分支实训</span></button>
+          <button type="button" class="v16-seg-btn ${diySubTab === 'studio' ? 'active' : ''}" data-v16-diy-tab="studio">复方配伍与 TLC</button>
           <button type="button" class="v16-seg-btn ${diySubTab === 'mission' ? 'active' : ''}" data-v16-diy-tab="mission">实操工具与记录本</button>
           <button type="button" class="v16-seg-btn ${diySubTab === 'hub' ? 'active' : ''}" data-v16-diy-tab="hub">实验装置库（15 套）</button>
           <button type="button" class="v16-seg-btn ${diySubTab === 'tools' ? 'active' : ''}" data-v16-diy-tab="tools">专业计算工具</button>
@@ -1122,19 +1124,19 @@
     const stepNames = { 1: '01 选材档案', 2: '02 定题与参数', 3: '03 原理与方案', 4: '04 装置与流程', 5: '05 实验数据', 6: '06 A4 报告导出' };
     bar.innerHTML = `
       <div class="v16-crumb">
-        <button type="button" data-v16-go="home">🏠 首页</button>
+        <button type="button" data-v16-go="home">首页</button>
         <span>/</span>
-        <button type="button" data-v16-go="bank">📚 题库大厅</button>
+        <button type="button" data-v16-go="bank">题库大厅</button>
         <span>/</span>
         <strong>${esc(t.herb)} · ${esc(t.compound)}</strong>
-        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">${stepNames[s] || '实验工坊'}</span>
+        <span class="px-2 py-0.5 rounded-md text-[11px] font-bold" style="background:var(--craft-accent-soft);color:var(--craft-accent);border:1px solid rgba(15,76,58,0.22)">${stepNames[s] || '实验工坊'}</span>
       </div>
       <div class="v16-wf-actions">
-        <button type="button" class="v16-chip-btn" data-v16-go="bank">🔄 换药材</button>
-        <button type="button" class="v16-chip-btn" data-v16-to-translation="${esc(t.id)}">🏭 产业转化</button>
-        <button type="button" class="v16-chip-btn gold" data-v16-go="ai">✨ AI 编排与助教</button>
-        <button type="button" class="v16-chip-btn" data-v16-go="diy">🧩 DIY 实验室</button>
-        <button type="button" class="v16-chip-btn" data-v16-trigger="v15">◎ 体检</button>
+        <button type="button" class="v16-chip-btn" data-v16-go="bank">换药材</button>
+        <button type="button" class="v16-chip-btn" data-v16-to-translation="${esc(t.id)}">产业转化</button>
+        <button type="button" class="v16-chip-btn gold" data-v16-go="ai">智能设计与助教</button>
+        <button type="button" class="v16-chip-btn" data-v16-go="diy">DIY 实验室</button>
+        <button type="button" class="v16-chip-btn" data-v16-trigger="v15">方案体检</button>
       </div>
     `;
   }
