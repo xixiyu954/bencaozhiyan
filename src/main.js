@@ -4,6 +4,8 @@ import '../styles.css';
 import '../lab-v16-portal.css';
 import '../lab-v19-theme-guofeng.css';
 import '../lab-v22-visual-suite-pro.css';
+import './styles/lab-v23-motion.css';
+import './styles/lab-v24-solar-atmosphere.css';
 
 import './lib/lucide-lite.js';
 import './lib/lazy-vendors.js';
@@ -26,6 +28,8 @@ import './modules/cloud-drafts.js';
 import '../lab-v16-portal.js';
 import './routes/translation-loader.js';
 import './modules/v19-bento-home.js';
+import './modules/lab-v24-solar-atmosphere.js';
+import './modules/lab-v23-motion.js';
 import './routes/visual-suite-loader.js';
 import './routes/upgrade-suite-loader.js';
 import './routes/knowledge-hub-loader.js';

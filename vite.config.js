@@ -115,7 +115,13 @@ export default defineConfig({
           if (id.includes('lab-v18-translation') || id.includes('routes/translation-chunk')) {
             return 'route-translation';
           }
-          if (id.includes('lab-v12-diy-studio') || id.includes('lab-v13-mission-os') || id.includes('routes/diy-chunk')) {
+          if (
+            id.includes('lab-v12-diy-studio') ||
+            id.includes('lab-v13-mission-os') ||
+            id.includes('lab-v25-formula-sandbox') ||
+            id.includes('lab-v26-failure-branches') ||
+            id.includes('routes/diy-chunk')
+          ) {
             return 'route-diy';
           }
           if (id.includes('lab-v11-userplan') || id.includes('lab-v17-ai-review') || id.includes('routes/ai-review-chunk')) {

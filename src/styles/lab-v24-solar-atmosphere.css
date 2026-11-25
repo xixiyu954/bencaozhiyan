@@ -1,0 +1,562 @@
+/* ==========================================================================
+   本草智研 v24 · 1.10 天气与节气氛围系统（新中式沉浸版）
+   - 6 大核心节气视觉体系 + 24 节气全覆盖（到日期自动切换）
+   - 站内氛围色调联动（body[data-tcm-solar] 驱动背景微光、卡片主题色与插画）
+   - 新中式水墨矢量氛围插画 + 轻量 GPU 天气粒子（飘瓣 / 细雨 / 露珠 / 丹枫 / 飞雪）
+   - 节气药材化学特征推荐位（联动药材题库与 3D 分子结构库）
+   - 明暗双主题全适配 + 静默遵循系统 prefers-reduced-motion + 打印自动隐藏
+   ========================================================================== */
+
+:root {
+  --tcm-solar-accent: #0f766e;
+  --tcm-solar-accent-2: #10b981;
+  --tcm-solar-soft: rgba(16, 185, 129, 0.10);
+  --tcm-solar-border: rgba(15, 118, 110, 0.20);
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(255, 255, 255, 0.94) 0%, rgba(236, 253, 245, 0.88) 54%, rgba(209, 250, 229, 0.62) 100%);
+  --tcm-solar-page-aura: radial-gradient(760px circle at 84% 4%, rgba(16, 185, 129, 0.11), transparent 62%);
+}
+
+/* 6 大节气氛围配色变量（亮色） */
+body[data-tcm-solar="spring"] {
+  --tcm-solar-accent: #0f766e;
+  --tcm-solar-accent-2: #34d399;
+  --tcm-solar-soft: rgba(16, 185, 129, 0.11);
+  --tcm-solar-border: rgba(16, 185, 129, 0.24);
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(255, 255, 255, 0.96) 0%, rgba(236, 253, 245, 0.90) 56%, rgba(254, 243, 199, 0.50) 100%);
+  --tcm-solar-page-aura: radial-gradient(780px circle at 84% 4%, rgba(52, 211, 153, 0.14), transparent 62%);
+}
+
+body[data-tcm-solar="rain"] {
+  --tcm-solar-accent: #0e7490;
+  --tcm-solar-accent-2: #06b6d4;
+  --tcm-solar-soft: rgba(6, 182, 212, 0.11);
+  --tcm-solar-border: rgba(14, 116, 144, 0.24);
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(255, 255, 255, 0.96) 0%, rgba(236, 254, 255, 0.90) 54%, rgba(207, 250, 254, 0.56) 100%);
+  --tcm-solar-page-aura: radial-gradient(780px circle at 84% 4%, rgba(14, 165, 233, 0.13), transparent 62%);
+}
+
+body[data-tcm-solar="summer"] {
+  --tcm-solar-accent: #047857;
+  --tcm-solar-accent-2: #f59e0b;
+  --tcm-solar-soft: rgba(245, 158, 11, 0.12);
+  --tcm-solar-border: rgba(4, 120, 87, 0.24);
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(255, 255, 255, 0.96) 0%, rgba(236, 253, 245, 0.88) 50%, rgba(254, 243, 199, 0.68) 100%);
+  --tcm-solar-page-aura: radial-gradient(780px circle at 84% 4%, rgba(245, 158, 11, 0.14), transparent 62%);
+}
+
+body[data-tcm-solar="dew"] {
+  --tcm-solar-accent: #1d4ed8;
+  --tcm-solar-accent-2: #38bdf8;
+  --tcm-solar-soft: rgba(56, 189, 248, 0.12);
+  --tcm-solar-border: rgba(37, 99, 235, 0.22);
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(255, 255, 255, 0.96) 0%, rgba(239, 246, 255, 0.92) 55%, rgba(224, 242, 254, 0.62) 100%);
+  --tcm-solar-page-aura: radial-gradient(780px circle at 84% 4%, rgba(56, 189, 248, 0.14), transparent 62%);
+}
+
+body[data-tcm-solar="frost"] {
+  --tcm-solar-accent: #b45309;
+  --tcm-solar-accent-2: #ea580c;
+  --tcm-solar-soft: rgba(234, 88, 12, 0.11);
+  --tcm-solar-border: rgba(180, 83, 9, 0.24);
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 247, 237, 0.92) 55%, rgba(254, 215, 170, 0.56) 100%);
+  --tcm-solar-page-aura: radial-gradient(780px circle at 84% 4%, rgba(234, 88, 12, 0.13), transparent 62%);
+}
+
+body[data-tcm-solar="winter"] {
+  --tcm-solar-accent: #1e40af;
+  --tcm-solar-accent-2: #0284c7;
+  --tcm-solar-soft: rgba(56, 189, 248, 0.12);
+  --tcm-solar-border: rgba(30, 64, 175, 0.20);
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(255, 255, 255, 0.97) 0%, rgba(240, 249, 255, 0.92) 54%, rgba(224, 242, 254, 0.62) 100%);
+  --tcm-solar-page-aura: radial-gradient(780px circle at 84% 4%, rgba(14, 165, 233, 0.12), transparent 62%);
+}
+
+/* 暗色模式节气氛围适配 */
+body.dark-lab[data-tcm-solar="spring"] {
+  --tcm-solar-accent: #34d399;
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(9, 28, 23, 0.95) 0%, rgba(11, 45, 36, 0.92) 58%, rgba(22, 62, 46, 0.78) 100%);
+  --tcm-solar-border: rgba(52, 211, 153, 0.28);
+}
+body.dark-lab[data-tcm-solar="rain"] {
+  --tcm-solar-accent: #38bdf8;
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(9, 25, 34, 0.95) 0%, rgba(12, 42, 54, 0.92) 58%, rgba(14, 58, 74, 0.78) 100%);
+  --tcm-solar-border: rgba(56, 189, 248, 0.28);
+}
+body.dark-lab[data-tcm-solar="summer"] {
+  --tcm-solar-accent: #fbbf24;
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(10, 28, 22, 0.95) 0%, rgba(22, 44, 28, 0.92) 58%, rgba(58, 42, 14, 0.72) 100%);
+  --tcm-solar-border: rgba(251, 191, 36, 0.28);
+}
+body.dark-lab[data-tcm-solar="dew"] {
+  --tcm-solar-accent: #60a5fa;
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(11, 22, 38, 0.95) 0%, rgba(18, 36, 62, 0.92) 58%, rgba(24, 52, 82, 0.78) 100%);
+  --tcm-solar-border: rgba(96, 165, 250, 0.28);
+}
+body.dark-lab[data-tcm-solar="frost"] {
+  --tcm-solar-accent: #fb923c;
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(28, 18, 12, 0.95) 0%, rgba(52, 26, 14, 0.90) 58%, rgba(78, 36, 16, 0.74) 100%);
+  --tcm-solar-border: rgba(251, 146, 60, 0.30);
+}
+body.dark-lab[data-tcm-solar="winter"] {
+  --tcm-solar-accent: #7dd3fc;
+  --tcm-solar-card-bg: linear-gradient(128deg, rgba(10, 21, 34, 0.96) 0%, rgba(16, 36, 56, 0.92) 58%, rgba(26, 54, 78, 0.78) 100%);
+  --tcm-solar-border: rgba(125, 211, 252, 0.28);
+}
+
+/* 站内全局顶部微光氛围层（极轻不抢内容） */
+#tcmSolarPageAura {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: var(--tcm-solar-page-aura);
+  transition: background 420ms ease;
+}
+
+/* 隐藏旧版单行节气条，由 v24 节气氛围卡无缝接管 */
+#tcmV19BentoStrip {
+  display: none !important;
+}
+
+/* 节气氛围主卡片（融入 Apple Bento 磨砂玻璃体系） */
+#tcmV24SolarBanner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid var(--tcm-solar-border);
+  background: var(--tcm-solar-card-bg);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 12px 30px -16px rgba(7, 47, 41, 0.14);
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  transition:
+    background 380ms ease,
+    border-color 320ms ease,
+    box-shadow 320ms ease;
+}
+
+#v24SolarSlot #tcmV24SolarBanner {
+  margin-top: 2px;
+  margin-bottom: 20px;
+}
+
+body.dark-lab #tcmV24SolarBanner {
+  box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.55);
+}
+
+#tcmV24SolarBanner.is-collapsed {
+  padding: 10px 16px;
+}
+
+/* 右侧新中式水墨矢量氛围插画 */
+.v24-solar-art {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 340px;
+  max-width: 44%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.92;
+  transition: opacity 320ms ease, transform 380ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.v24-solar-art svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#tcmV24SolarBanner.is-collapsed .v24-solar-art,
+#tcmV24SolarBanner.is-collapsed .v24-solar-particles {
+  opacity: 0.25;
+}
+
+/* 天气氛围微粒子层（纯装饰 pointer-events: none） */
+.v24-solar-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.v24-particle {
+  position: absolute;
+  top: -14px;
+  left: var(--px, 50%);
+  opacity: var(--po, 0.55);
+  animation: v24FallDrift var(--pd, 6.5s) linear var(--pdelay, 0s) infinite;
+  will-change: transform, opacity;
+}
+
+.v24-particle.kind-petal {
+  width: 9px;
+  height: 6px;
+  border-radius: 80% 10% 80% 10%;
+  background: linear-gradient(135deg, #fda4af, #fb7185);
+}
+
+.v24-particle.kind-rain {
+  width: 1.5px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, transparent, rgba(14, 165, 233, 0.65));
+  animation-name: v24RainStreak;
+}
+
+.v24-particle.kind-firefly {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: #fbbf24;
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.85);
+  animation-name: v24FloatGlow;
+}
+
+.v24-particle.kind-dew {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #38bdf8);
+  animation-name: v24FloatGlow;
+}
+
+.v24-particle.kind-leaf {
+  width: 10px;
+  height: 7px;
+  border-radius: 75% 15% 75% 15%;
+  background: linear-gradient(135deg, #f97316, #dc2626);
+}
+
+.v24-particle.kind-snow {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(186,230,253,0.65) 100%);
+  box-shadow: 0 0 6px rgba(186, 230, 253, 0.7);
+}
+
+@keyframes v24FallDrift {
+  0%   { transform: translate3d(0, -10px, 0) rotate(0deg); opacity: 0; }
+  12%  { opacity: var(--po, 0.6); }
+  85%  { opacity: var(--po, 0.5); }
+  100% { transform: translate3d(var(--pdrift, 28px), 210px, 0) rotate(220deg); opacity: 0; }
+}
+
+@keyframes v24RainStreak {
+  0%   { transform: translate3d(0, -24px, 0) rotate(14deg); opacity: 0; }
+  15%  { opacity: 0.65; }
+  90%  { opacity: 0.45; }
+  100% { transform: translate3d(-34px, 220px, 0) rotate(14deg); opacity: 0; }
+}
+
+@keyframes v24FloatGlow {
+  0%   { transform: translate3d(0, 140px, 0) scale(0.7); opacity: 0; }
+  30%  { opacity: 0.75; }
+  70%  { opacity: 0.55; }
+  100% { transform: translate3d(var(--pdrift, 22px), -10px, 0) scale(1.15); opacity: 0; }
+}
+
+/* 内容布局 */
+.v24-solar-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.v24-solar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.v24-solar-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* 朱砂印章式节气徽章 */
+.v24-solar-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  background: var(--tcm-solar-accent);
+  box-shadow: 0 4px 12px -4px rgba(15, 23, 42, 0.28);
+}
+
+body.dark-lab .v24-solar-seal,
+body.dark-lab .v24-herb-go:hover {
+  color: #06211c !important;
+}
+
+.v24-solar-poem {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+body.dark-lab .v24-solar-poem {
+  color: #e2f5ee;
+}
+
+.v24-solar-date-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--tcm-solar-soft);
+  color: var(--tcm-solar-accent);
+  border: 1px solid var(--tcm-solar-border);
+}
+
+/* 节气快捷切换胶囊 + 前后翻页 */
+.v24-solar-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.v24-term-chip {
+  border: 1px solid var(--tcm-solar-border);
+  background: rgba(255, 255, 255, 0.78);
+  color: #334155;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+body.dark-lab .v24-term-chip {
+  background: rgba(15, 36, 32, 0.72);
+  color: #cbd5e1;
+}
+
+.v24-term-chip:hover {
+  border-color: var(--tcm-solar-accent);
+  color: var(--tcm-solar-accent);
+  transform: translateY(-1px);
+}
+
+.v24-term-chip.is-active,
+body.dark-lab .v24-term-chip.is-active {
+  background: var(--tcm-solar-accent);
+  color: #ffffff !important;
+  border-color: transparent;
+  box-shadow: 0 4px 10px -4px rgba(15, 23, 42, 0.3);
+}
+
+body.dark-lab .v24-term-chip.is-active {
+  color: #06211c !important;
+}
+
+.v24-mini-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid var(--tcm-solar-border);
+  background: rgba(255, 255, 255, 0.82);
+  color: #334155;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 160ms ease;
+}
+
+body.dark-lab .v24-mini-btn {
+  background: rgba(15, 36, 32, 0.8);
+  color: #e2e8f0;
+}
+
+.v24-mini-btn:hover {
+  border-color: var(--tcm-solar-accent);
+  color: var(--tcm-solar-accent);
+}
+
+/* 节气药材化学特征推荐卡片行 */
+.v24-solar-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.95fr);
+  gap: 14px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .v24-solar-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.v24-solar-brief {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.v24-solar-theme-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+body.dark-lab .v24-solar-theme-name {
+  color: #f1f5f9;
+}
+
+.v24-solar-desc {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #475569;
+  margin: 0;
+}
+
+body.dark-lab .v24-solar-desc {
+  color: #9fb8b0;
+}
+
+.v24-herb-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  .v24-herb-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.v24-herb-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 13px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid var(--tcm-solar-border);
+  backdrop-filter: blur(6px);
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms ease, box-shadow 200ms ease;
+}
+
+body.dark-lab .v24-herb-card {
+  background: rgba(8, 25, 22, 0.78);
+}
+
+.v24-herb-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--tcm-solar-accent);
+  box-shadow: 0 8px 18px -10px rgba(15, 23, 42, 0.22);
+}
+
+.v24-herb-info {
+  min-width: 0;
+}
+
+.v24-herb-name {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+body.dark-lab .v24-herb-name {
+  color: #f1f5f9;
+}
+
+.v24-herb-class {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--tcm-solar-soft);
+  color: var(--tcm-solar-accent);
+}
+
+.v24-herb-meta {
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.dark-lab .v24-herb-meta {
+  color: #94a3b8;
+}
+
+.v24-herb-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.v24-herb-go {
+  border: 1px solid var(--tcm-solar-border);
+  background: var(--tcm-solar-soft);
+  color: var(--tcm-solar-accent);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.v24-herb-go:hover {
+  background: var(--tcm-solar-accent);
+  color: #ffffff;
+}
+
+.v24-herb-mol {
+  border: none;
+  background: rgba(16, 185, 129, 0.14);
+  color: #047857;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+body.dark-lab .v24-herb-mol {
+  background: rgba(52, 211, 153, 0.18);
+  color: #6ee7b7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v24-solar-particles {
+    display: none !important;
+  }
+}
+
+@media print {
+  #tcmV24SolarBanner,
+  #tcmSolarPageAura {
+    display: none !important;
+  }
+}

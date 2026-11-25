@@ -177,6 +177,9 @@ function renderBentoHome() {
           </button>
         </section>
 
+        <!-- 1.5 二十四节气与新中式天气氛围推荐卡插槽（由 lab-v24-solar-atmosphere 同步挂载，零 CLS） -->
+        <div id="v24SolarSlot"></div>
+
         <!-- 2. 四列磨砂玻璃 Bento 微插画卡片矩阵（第 1 排：四大旗舰体验） -->
         <section class="v19-bento-grid" aria-label="核心实验模块">
           <!-- 卡 1：3D 分子解析 -->
@@ -276,7 +279,7 @@ function renderBentoHome() {
                 <span class="text-xs font-extrabold text-slate-500">${c.rigs} 装置</span>
               </div>
               <h3 class="v19-bento-title">DIY 虚拟实验室</h3>
-              <p class="v19-bento-sub">配伍分层、流体仿真与 15 套装置沙盒</p>
+              <p class="v19-bento-sub">自由配方沙盒 · 7 大失败分支 · TLC/装置</p>
             </div>
             <div class="v19-card-stage">
               <svg viewBox="0 0 180 100" class="w-44 h-24" aria-hidden="true">
@@ -288,7 +291,7 @@ function renderBentoHome() {
                 <circle cx="24" cy="82" r="5" fill="#10b981"/><circle cx="38" cy="82" r="5" fill="#f97316"/><circle cx="52" cy="82" r="5" fill="#3b82f6"/>
               </svg>
             </div>
-            <div class="v19-card-foot"><span>沙盒 · TLC · 流体/AR</span><span>进入 →</span></div>
+            <div class="v19-card-foot"><span>配方沙盒 · FMEA 应急 · 装置</span><span>进入 →</span></div>
           </button>
 
           <!-- 卡 5：八阶段产业转化 -->
@@ -310,7 +313,7 @@ function renderBentoHome() {
                 <div class="text-[10px] text-slate-500">9 维综合工艺最优 · 偏差 CAPA · 转化报告</div>
               </div>
             </div>
-            <div class="v19-card-foot"><span>4 大标杆 + 119 题导入</span><span>进入 →</span></div>
+            <div class="v19-card-foot"><span>4 大标杆 + ${c.topics} 题导入</span><span>进入 →</span></div>
           </button>
 
           <!-- 卡 6：交互式四谱工作站 -->

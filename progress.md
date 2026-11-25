@@ -136,3 +136,9 @@
 - **1.6**：新增四谱快捷键（`1~4` 切 UV/IR/NMR/MS、`+/-` 缩放、`0` 复位）与 `📸 导出谱图` PNG 一键下载。
 - **1.7**：全屏投影标题字号锁定 `30px` 高对比可读，新增 `📸 导出雷达` PNG 快照；同步补齐 `#tcmV21SpectraModal` 与 `#tcmV22Modal` 的 `body.dark-lab` 深色样式。
 - **归档**：已通过 `npm run build` 与冒烟回归（`0 pageerror`），生成零冲突累计升级包 `tcm-chemistry-lab-v1.2-v1.7-upgrade-pack.zip`（14 文件 + 标准补丁 + Antigravity 写入指南）。
+
+
+### 2026-11-25 增量升级整合：1.8 动效系统 v3 + 1.10 二十四节气天气氛围 + 2.1 自由配方沙盒 v2 + 2.2 七大失败分支与 FMEA 应急实训
+- **1.8 动效系统 v3**（`src/modules/lab-v23-motion.js` + `src/styles/lab-v23-motion.css`）：融合 Apple Bento `999px` 悬浮白胶囊单层滑块（亮色通透白胶囊 / 暗色玉翠玻璃胶囊）与悬停幽灵胶囊，扩展双层鼠标追踪镜面高光与聚光灯边框至 `.v19-bento-card`、丝绸扫光至 `.v19-cta-primary`，模态框弹簧入场覆盖 `#tcmKbModal` 与 `#tcmV26FailureModal`，静默遵循 `prefers-reduced-motion`。
+- **1.10 天气与节气氛围系统**（`src/modules/lab-v24-solar-atmosphere.js` + `src/styles/lab-v24-solar-atmosphere.css`）：覆盖 24 节气与 6 大新中式水墨氛围配色/天气微粒子，通过 `#v24SolarSlot` 无缝嵌合在 Apple Bento Hero 下方（零 CLS、不遮挡主视觉 LCP），暗色模式 `.v24-solar-seal` 与按钮采用深墨绿字对比度精修，药材推荐位直连题库与 3D 分子库。
+- **2.1 自由配方沙盒 v2 + 2.2 失败分支实验室 v2**（`src/modules/lab-v25-formula-sandbox.js` + `src/modules/lab-v26-failure-branches.js` 及配套样式）：**全量按需懒加载于 `route-diy` 分包**（`src/routes/diy-chunk.js` + `src/routes/interactive-loaders.js` + `vite.config.js`），首屏零增加 JS/CSS 体积；动态接入全站 **136 项药材课题**（16,320+ 组合空间）并支持目标成分直连 3D 分子模型。

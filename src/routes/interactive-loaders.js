@@ -111,6 +111,27 @@ if (typeof window !== 'undefined') {
       applyThemeSkin: makeProxy(loadDiyWorkspace, 'TCM_MISSION_OS', 'applyThemeSkin')
     };
   }
+  if (!window.TCM_V25_FORMULA_SANDBOX) {
+    window.TCM_V25_FORMULA_SANDBOX = {
+      __isLazyProxy: true,
+      render: makeProxy(loadDiyWorkspace, 'TCM_V25_FORMULA_SANDBOX', 'render'),
+      evaluateCurrent: makeProxy(loadDiyWorkspace, 'TCM_V25_FORMULA_SANDBOX', 'evaluateCurrent'),
+      getState: () => null
+    };
+  }
+  if (!window.TCM_V26_FAILURE_BRANCHES) {
+    window.TCM_V26_FAILURE_BRANCHES = {
+      __isLazyProxy: true,
+      render: makeProxy(loadDiyWorkspace, 'TCM_V26_FAILURE_BRANCHES', 'render'),
+      openReview: makeProxy(loadDiyWorkspace, 'TCM_V26_FAILURE_BRANCHES', 'openReview'),
+      closeReview: () => {
+        const m = document.getElementById('tcmV26FailureModal');
+        if (m) m.classList.remove('open');
+      },
+      matchFromSandbox: () => null,
+      getStats: () => null
+    };
+  }
   if (!window.TCM_USER_PLAN) {
     window.TCM_USER_PLAN = {
       __isLazyProxy: true,

@@ -1,0 +1,550 @@
+/* ==========================================================================
+   本草智研 v23 · 1.8 动效系统（v3 物理手感与精工质感版）
+   - 真单层弹性滑动导航胶囊（#tcmNavSlideIndicator）+ 悬停幽灵跟随胶囊（#tcmNavHoverPill）
+   - 空间方向感路由转场（左/右顺序滑入 + 顶部翠金进度光丝 + 极轻柔雾）
+   - 全 6 工作区定制零布局抖动（Zero-CLS）绝对定位高保真骨架屏
+   - Linear 级双层鼠标追踪镜面高光 + 边框聚光灯（RAF 节流，明暗双主题调优）
+   - 主按钮斜向丝绸扫光 + 底部悬浮坞弹性微浮 + Ctrl+K / 重型模态框弹簧入场
+   - 顶栏滚动景深霜化 + 静默遵循系统 @media (prefers-reduced-motion: reduce)（无多余开关）
+   ========================================================================== */
+
+:root {
+  --tcm-ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --tcm-ease-glide: cubic-bezier(0.22, 1, 0.36, 1);
+  --tcm-ease-spring: cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+
+/* 1. 顶部翠金细丝进度流光线 */
+#tcmRouteProgressBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2.5px;
+  width: 100%;
+  z-index: 9995;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, #059669 0%, #34d399 52%, #fbbf24 100%);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.55);
+}
+
+#tcmRouteProgressBar.is-running {
+  animation: tcmProgressSweep 360ms var(--tcm-ease-out-expo) forwards;
+}
+
+@keyframes tcmProgressSweep {
+  0%   { opacity: 1; transform: scaleX(0.06); }
+  62%  { opacity: 1; transform: scaleX(0.86); }
+  100% { opacity: 0; transform: scaleX(1); }
+}
+
+/* 2. 极轻柔雾水墨转场层（不遮挡阅读视线） */
+#tcmInkVeil {
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 26% 18%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 78% 70%, rgba(245, 158, 11, 0.05) 0%, transparent 46%);
+}
+
+#tcmInkVeil.is-wiping {
+  animation: tcmInkVeilPulse 280ms var(--tcm-ease-out-expo) forwards;
+}
+
+@keyframes tcmInkVeilPulse {
+  0%   { opacity: 0; }
+  32%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* 3. 空间方向感工作区入场（左滑 / 右滑 / 默认柔焦） */
+@keyframes tcmEnterFromRight {
+  0% {
+    opacity: 0;
+    transform: translate3d(14px, 4px, 0);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+@keyframes tcmEnterFromLeft {
+  0% {
+    opacity: 0;
+    transform: translate3d(-14px, 4px, 0);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+@keyframes tcmWorkspaceReveal {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+.tcm-route-entering {
+  animation: tcmWorkspaceReveal 300ms var(--tcm-ease-out-expo) both;
+}
+
+.tcm-enter-from-right {
+  animation: tcmEnterFromRight 300ms var(--tcm-ease-out-expo) both;
+}
+
+.tcm-enter-from-left {
+  animation: tcmEnterFromLeft 300ms var(--tcm-ease-out-expo) both;
+}
+
+/* 六步工坊步骤微过渡 */
+@keyframes tcmStepFade {
+  0%   { opacity: 0.45; transform: translateY(5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.tcm-step-switching {
+  animation: tcmStepFade 220ms var(--tcm-ease-out-expo) both;
+}
+
+/* 4. 真单层弹性滑动导航胶囊 + 悬停幽灵跟随胶囊（彻底消除双层重叠） */
+#workspaceZoneBar {
+  position: relative;
+}
+
+#workspaceZoneBar.tcm-nav-glide-ready .v16-route-tab {
+  position: relative;
+  z-index: 2;
+  transition: color 220ms ease;
+}
+
+#workspaceZoneBar.tcm-nav-glide-ready .v16-route-tab:hover {
+  background: transparent !important;
+}
+
+#workspaceZoneBar.tcm-nav-glide-ready .v16-route-tab.active {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+#tcmNavSlideIndicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-radius: 11px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  background: linear-gradient(135deg, #072f29 0%, #0f5c54 100%);
+  box-shadow:
+    0 8px 18px -6px rgba(7, 47, 41, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  transition:
+    transform 340ms var(--tcm-ease-glide),
+    width 340ms var(--tcm-ease-glide),
+    height 260ms var(--tcm-ease-glide),
+    opacity 180ms ease;
+}
+
+body.dark-lab #tcmNavSlideIndicator {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.28) 0%, rgba(15, 118, 110, 0.36) 100%);
+  border: 1px solid rgba(52, 211, 153, 0.42);
+  box-shadow:
+    0 8px 22px -6px rgba(16, 185, 129, 0.32),
+    inset 0 1px 0 rgba(167, 243, 208, 0.22);
+}
+
+#tcmNavHoverPill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-radius: 11px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  background: rgba(15, 92, 84, 0.08);
+  transition:
+    transform 240ms var(--tcm-ease-glide),
+    width 240ms var(--tcm-ease-glide),
+    height 200ms var(--tcm-ease-glide),
+    opacity 160ms ease;
+}
+
+body.dark-lab #tcmNavHoverPill {
+  background: rgba(52, 211, 153, 0.10);
+}
+
+/* 适配 v19 Apple Bento 极简悬浮白胶囊导航条：亮色滑块为通透白胶囊（配墨黑字），暗色为玉翠玻璃胶囊 */
+body.tcm-v19-guofeng:not(.dark-lab) #tcmNavSlideIndicator {
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow:
+    0 6px 16px -4px rgba(15, 23, 42, 0.14),
+    0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+body.tcm-v19-guofeng.dark-lab #tcmNavSlideIndicator,
+body.tcm-v19-guofeng #tcmNavHoverPill {
+  border-radius: 999px;
+}
+
+body.tcm-v19-guofeng:not(.dark-lab) #tcmNavHoverPill {
+  background: rgba(16, 185, 129, 0.09);
+}
+
+body.tcm-v19-guofeng #workspaceZoneBar.tcm-nav-glide-ready .v16-route-tab.active {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+/* 顶栏滚动景深霜化 */
+body.tcm-scrolled header,
+body.tcm-scrolled .v16-topbar {
+  box-shadow: 0 8px 28px -12px rgba(7, 47, 41, 0.14);
+}
+
+body.dark-lab.tcm-scrolled header,
+body.dark-lab.tcm-scrolled .v16-topbar {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.48);
+}
+
+/* 5. 卡片错峰浮现 + 双层鼠标追踪镜面高光与边框聚光灯 */
+@keyframes tcmCardSpringIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.tcm-card-anim {
+  animation: tcmCardSpringIn 380ms var(--tcm-ease-out-expo) both;
+  animation-delay: var(--tcm-stagger, 0ms);
+}
+
+.v16-branch-card,
+.v16-bento-card,
+.v16-topic-card,
+.v16-bank-card,
+.lab-card {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 240ms var(--tcm-ease-out-expo),
+    box-shadow 240ms var(--tcm-ease-out-expo),
+    border-color 220ms ease;
+}
+
+/* 内层翠玉柔光 */
+.v19-bento-card::before,
+.v16-branch-card::before,
+.v16-bento-card::before,
+.v16-topic-card::before,
+.v16-bank-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    260px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(16, 185, 129, 0.11),
+    transparent 68%
+  );
+  transition: opacity 240ms ease;
+  z-index: 0;
+}
+
+body.dark-lab .v19-bento-card::before,
+body.dark-lab .v16-branch-card::before,
+body.dark-lab .v16-bento-card::before,
+body.dark-lab .v16-topic-card::before,
+body.dark-lab .v16-bank-card::before {
+  background: radial-gradient(
+    260px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(52, 211, 153, 0.15),
+    transparent 68%
+  );
+}
+
+/* 外层聚光灯边框高光（Linear 质感） */
+.v19-bento-card::after,
+.v16-branch-card::after,
+.v16-bento-card::after,
+.v16-topic-card::after,
+.v16-bank-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    220px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(16, 185, 129, 0.55),
+    transparent 65%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  transition: opacity 240ms ease;
+  z-index: 1;
+}
+
+body.dark-lab .v19-bento-card::after,
+body.dark-lab .v16-branch-card::after,
+body.dark-lab .v16-bento-card::after,
+body.dark-lab .v16-topic-card::after,
+body.dark-lab .v16-bank-card::after {
+  background: radial-gradient(
+    220px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(52, 211, 153, 0.72),
+    transparent 65%
+  );
+}
+
+.v19-bento-card:hover::before,
+.v16-branch-card:hover::before,
+.v16-bento-card:hover::before,
+.v16-topic-card:hover::before,
+.v16-bank-card:hover::before,
+.v19-bento-card:hover::after,
+.v16-branch-card:hover::after,
+.v16-bento-card:hover::after,
+.v16-topic-card:hover::after,
+.v16-bank-card:hover::after {
+  opacity: 1;
+}
+
+.v16-topic-card:hover,
+.v16-bank-card:hover {
+  transform: translateY(-2.5px);
+  box-shadow: 0 14px 28px -12px rgba(6, 78, 59, 0.18);
+}
+
+body.dark-lab .v16-topic-card:hover,
+body.dark-lab .v16-bank-card:hover {
+  box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.52);
+}
+
+/* 6. 主按钮斜向丝绸扫光 + 底部悬浮坞弹性微浮 */
+.v19-cta-primary,
+.v16-btn-cta-primary,
+.v16-hero-cta,
+.v16-hero-resume-btn,
+.v22-fab-btn.accent {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 210ms var(--tcm-ease-spring),
+    box-shadow 220ms var(--tcm-ease-out-expo),
+    filter 180ms ease;
+}
+
+.v19-cta-primary::after,
+.v16-btn-cta-primary::after,
+.v16-hero-cta::after,
+.v16-hero-resume-btn::after,
+.v22-fab-btn.accent::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -68%;
+  width: 44%;
+  height: 140%;
+  transform: skewX(-24deg);
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+  transition: left 480ms var(--tcm-ease-out-expo);
+}
+
+.v19-cta-primary:hover::after,
+.v16-btn-cta-primary:hover::after,
+.v16-hero-cta:hover::after,
+.v16-hero-resume-btn:hover::after,
+.v22-fab-btn.accent:hover::after {
+  left: 128%;
+}
+
+.v22-fab-btn {
+  transition:
+    transform 220ms var(--tcm-ease-spring),
+    box-shadow 220ms var(--tcm-ease-out-expo),
+    border-color 180ms ease;
+}
+
+.v22-fab-btn:hover {
+  transform: translateY(-3px) scale(1.025);
+  box-shadow: 0 10px 22px -8px rgba(6, 78, 59, 0.24);
+}
+
+.v16-btn-cta-primary:hover,
+.v16-hero-cta:hover,
+.v16-hero-resume-btn:hover,
+.v16-chip-btn:hover,
+.step-chip:hover {
+  transform: translateY(-1.5px);
+}
+
+.v16-btn-cta-primary:active,
+.v16-hero-cta:active,
+.v16-hero-resume-btn:active,
+.v22-fab-btn:active,
+.v16-chip-btn:active,
+.v16-seg-btn:active,
+.v16-filter-pill:active,
+.step-chip:active {
+  transform: scale(0.962);
+  transition-duration: 85ms;
+}
+
+/* 7. 弹窗与 Ctrl+K 命令面板弹簧入场 */
+@keyframes tcmModalPopIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0) scale(0.968);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+#tcmV20VisualModal:not(.hidden) > div,
+#tcmV21SpectraModal:not(.hidden) > div,
+#tcmV22Modal:not(.hidden) > div,
+#tcmV22Modal.open > div,
+#tcmV26FailureModal.open > div,
+#tcmKbModal:not(.hidden) > div,
+#v17CmdOverlay:not(.hidden) > div,
+.v17-cmd-overlay:not(.hidden) > div {
+  animation: tcmModalPopIn 260ms var(--tcm-ease-out-expo) both;
+}
+
+/* 8. 全 6 工作区零布局抖动（Zero-CLS）绝对定位高保真骨架遮罩 */
+.tcm-skel-host {
+  position: relative;
+}
+
+.tcm-skel-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  border-radius: 22px;
+  padding: 20px;
+  background: rgba(246, 249, 247, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 1;
+  transition: opacity 200ms var(--tcm-ease-out-expo);
+}
+
+.tcm-skel-overlay.is-fading {
+  opacity: 0;
+}
+
+body.dark-lab .tcm-skel-overlay {
+  background: rgba(7, 24, 21, 0.94);
+}
+
+.tcm-skel-block {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #e5ecea 0%, #dbe5e2 100%);
+}
+
+body.dark-lab .tcm-skel-block {
+  background: linear-gradient(180deg, #122d28 0%, #0d221e 100%);
+}
+
+.tcm-skel-block::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.65) 48%,
+    transparent 100%
+  );
+  animation: tcmSkelWave 1.05s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.dark-lab .tcm-skel-block::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(52, 211, 153, 0.16) 48%,
+    transparent 100%
+  );
+}
+
+@keyframes tcmSkelWave {
+  100% { transform: translateX(100%); }
+}
+
+/* 9. 静默遵循系统减少动效偏好（无额外顶栏按钮干扰） */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  #tcmInkVeil,
+  #tcmRouteProgressBar,
+  #tcmNavHoverPill {
+    display: none !important;
+  }
+}
+
+body.tcm-reduce-motion *,
+body.tcm-reduce-motion *::before,
+body.tcm-reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+@media print {
+  #tcmInkVeil,
+  #tcmRouteProgressBar,
+  #tcmNavSlideIndicator,
+  #tcmNavHoverPill,
+  .tcm-skel-overlay {
+    display: none !important;
+  }
+}

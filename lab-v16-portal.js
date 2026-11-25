@@ -16,7 +16,7 @@
 
   let currentRoute = 'home'; // 'home' | 'bank' | 'ai' | 'diy' | 'workflow'
   let aiSubTab = 'compose';  // 'compose' | 'plan' | 'chat'
-  let diySubTab = 'studio';  // 'studio' | 'mission' | 'hub' | 'tools'
+  let diySubTab = 'formula';  // 'formula' | 'failures' | 'studio' | 'mission' | 'hub' | 'tools'
   let bankState = { tab: 'all', cat: '全部', scene: 'all', sort: 'default', detailTab: 'chem', query: '', previewId: '' };
   let extensions = [];
   let inited = false;
@@ -969,7 +969,7 @@
         <div class="v16-subhero-top">
           <div>
             <h2>DIY 创意实验室</h2>
-            <p>提供复方配伍与薄层显色模拟、实操计算与实验记录、15 套交互仿真装置以及常用化学计算工具。</p>
+            <p>支持 136 药材 × 15 溶剂 × 8 装置自由配方沙盒、7 大经典实验失败分支与应急 CAPA 演练、复方配伍与薄层显色模拟、实操计算记录及 15 套交互仿真装置。</p>
           </div>
           <div class="flex flex-wrap gap-2">
             <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">自编课题审核</button>
@@ -978,6 +978,8 @@
           </div>
         </div>
         <div class="v16-seg-bar">
+          <button type="button" class="v16-seg-btn ${diySubTab === 'formula' ? 'active' : ''}" data-v16-diy-tab="formula">🧪 自由配方沙盒</button>
+          <button type="button" class="v16-seg-btn ${diySubTab === 'failures' ? 'active' : ''}" data-v16-diy-tab="failures">⚠️ 失败分支实验室</button>
           <button type="button" class="v16-seg-btn ${diySubTab === 'studio' ? 'active' : ''}" data-v16-diy-tab="studio">复方配伍 · 分层 · TLC 显色</button>
           <button type="button" class="v16-seg-btn ${diySubTab === 'mission' ? 'active' : ''}" data-v16-diy-tab="mission">实操工具与记录本</button>
           <button type="button" class="v16-seg-btn ${diySubTab === 'hub' ? 'active' : ''}" data-v16-diy-tab="hub">实验装置库（15 套）</button>
@@ -986,11 +988,42 @@
       </div>
     `;
 
+    // 确保自由配方沙盒与失败分支实验室容器挂载在 #v16DiyPage 内部
+    let formulaBox = document.getElementById('v16DiyFormulaPage');
+    if (!formulaBox && tools.parentNode) {
+      formulaBox = document.createElement('div');
+      formulaBox.id = 'v16DiyFormulaPage';
+      tools.parentNode.insertBefore(formulaBox, tools);
+    }
+
+    let failBox = document.getElementById('v16DiyFailurePage');
+    if (!failBox && tools.parentNode) {
+      failBox = document.createElement('div');
+      failBox.id = 'v16DiyFailurePage';
+      tools.parentNode.insertBefore(failBox, tools);
+    }
+
     // 只显示当前激活的那个子模块，其他全部隐藏
     document.querySelectorAll('.wpanel').forEach(p => p.classList.add('hidden'));
     tools.classList.add('hidden');
+    if (formulaBox) formulaBox.classList.add('hidden');
+    if (failBox) failBox.classList.add('hidden');
 
-    if (diySubTab === 'studio') {
+    if (diySubTab === 'formula') {
+      if (formulaBox) {
+        formulaBox.classList.remove('hidden');
+        if (window.TCM_V25_FORMULA_SANDBOX && window.TCM_V25_FORMULA_SANDBOX.render) {
+          window.TCM_V25_FORMULA_SANDBOX.render(formulaBox);
+        }
+      }
+    } else if (diySubTab === 'failures') {
+      if (failBox) {
+        failBox.classList.remove('hidden');
+        if (window.TCM_V26_FAILURE_BRANCHES && window.TCM_V26_FAILURE_BRANCHES.render) {
+          window.TCM_V26_FAILURE_BRANCHES.render(failBox);
+        }
+      }
+    } else if (diySubTab === 'studio') {
       const p = document.getElementById('wpanel-diy');
       if (p) p.classList.remove('hidden');
       if (window.TCM_DIY_STUDIO && window.TCM_DIY_STUDIO.render) window.TCM_DIY_STUDIO.render();
