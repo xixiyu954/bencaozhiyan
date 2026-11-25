@@ -1,9 +1,9 @@
 // 放置路径：GitHub 仓库中的 functions/api/ai-proxy.js
-// Cloudflare Pages Functions 三引擎混合 AI 代理（智谱 GLM + 讯飞星辰 MaaS + 阿里云通义/兼容通道）
+// Cloudflare Pages Functions 三引擎混合 AI 代理（智谱 GLM + 腾讯云 TokenHub + 讯飞星辰 MaaS）
 // 所有 API 密钥均通过 Cloudflare Pages 加密环境变量注入，严禁硬编码到前端或仓库：
 //   - ZHIPU_API_KEY（主引擎：智谱 GLM，默认 glm-4-flash-250414 / 备选 glm-4.7-flash）
-//   - XUNFEI_API_KEY（辅助引擎 1：讯飞星辰 MaaS，默认 spark-x2.5-1.7b；可选 XUNFEI_BASE_URL / XUNFEI_MODEL）
-//   - ALIYUN_API_KEY（辅助引擎 2：阿里云通义/兼容网关，默认 qwen-plus / qwen-turbo；可选 ALIYUN_BASE_URL / ALIYUN_MODEL）
+//   - TENCENT_API_KEY（强推理引擎：腾讯云 TokenHub，默认 hy4-flash / 备选 deepseek-v4.1-flash；可选 TENCENT_BASE_URL / TENCENT_MODEL）
+//   - XUNFEI_API_KEY（极速辅助引擎：讯飞星辰 MaaS，默认 spark-x2.5-1.7b；可选 XUNFEI_BASE_URL / XUNFEI_MODEL）
 
 const ALLOWED_EXACT_ORIGINS = new Set([
   'https://xixiyu954.github.io'
@@ -16,9 +16,9 @@ const ZHIPU_FALLBACK_MODEL = 'glm-4.7-flash';
 const XUNFEI_DEFAULT_URL = 'https://maas-api.cn-huabei-1.xf-yun.com/v2/chat/completions';
 const XUNFEI_DEFAULT_MODEL = 'spark-x2.5-1.7b';
 
-const ALIYUN_DEFAULT_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
-const ALIYUN_DEFAULT_MODEL = 'qwen-plus';
-const ALIYUN_FALLBACK_MODEL = 'qwen-turbo';
+const TENCENT_DEFAULT_URL = 'https://tokenhub.tencentmaas.com/v1/chat/completions';
+const TENCENT_DEFAULT_MODEL = 'hy4-flash';
+const TENCENT_FALLBACK_MODEL = 'deepseek-v4.1-flash';
 
 const RATE_WINDOW_MS = 60_000;
 const RATE_LIMIT = 24;
@@ -128,13 +128,13 @@ function getProviderConfigs(env) {
       model: String(e.XUNFEI_MODEL || XUNFEI_DEFAULT_MODEL).trim(),
       fallbackModel: ''
     },
-    aliyun: {
-      id: 'aliyun',
-      name: '阿里云通义',
-      apiKey: String(e.ALIYUN_API_KEY || '').trim(),
-      url: normalizeChatUrl(e.ALIYUN_BASE_URL, ALIYUN_DEFAULT_URL),
-      model: String(e.ALIYUN_MODEL || ALIYUN_DEFAULT_MODEL).trim(),
-      fallbackModel: String(e.ALIYUN_FALLBACK_MODEL || ALIYUN_FALLBACK_MODEL).trim()
+    tencent: {
+      id: 'tencent',
+      name: '腾讯云 TokenHub',
+      apiKey: String(e.TENCENT_API_KEY || '').trim(),
+      url: normalizeChatUrl(e.TENCENT_BASE_URL, TENCENT_DEFAULT_URL),
+      model: String(e.TENCENT_MODEL || TENCENT_DEFAULT_MODEL).trim(),
+      fallbackModel: String(e.TENCENT_FALLBACK_MODEL || TENCENT_FALLBACK_MODEL).trim()
     }
   };
 }
@@ -156,7 +156,7 @@ function buildRoutePlan(configs, { routeMode, expectJson, totalChars, strictProv
     });
   };
 
-  const mode = ['auto', 'zhipu', 'xunfei', 'aliyun'].includes(routeMode) ? routeMode : 'auto';
+  const mode = ['auto', 'zhipu', 'tencent', 'xunfei'].includes(routeMode) ? routeMode : 'auto';
 
   if (strictProvider && mode !== 'auto') {
     push(mode);
@@ -166,14 +166,15 @@ function buildRoutePlan(configs, { routeMode, expectJson, totalChars, strictProv
   if (mode === 'xunfei') {
     push('xunfei');
     push('zhipu', configs.zhipu.model);
-    push('aliyun', configs.aliyun.model);
+    push('tencent', configs.tencent.model);
+    push('tencent', configs.tencent.fallbackModel);
     push('zhipu', configs.zhipu.fallbackModel);
     return candidates;
   }
 
-  if (mode === 'aliyun') {
-    push('aliyun', configs.aliyun.model);
-    if (configs.aliyun.fallbackModel) push('aliyun', configs.aliyun.fallbackModel);
+  if (mode === 'tencent') {
+    push('tencent', configs.tencent.model);
+    if (configs.tencent.fallbackModel) push('tencent', configs.tencent.fallbackModel);
     push('zhipu', configs.zhipu.model);
     push('xunfei');
     push('zhipu', configs.zhipu.fallbackModel);
@@ -183,23 +184,24 @@ function buildRoutePlan(configs, { routeMode, expectJson, totalChars, strictProv
   if (mode === 'zhipu') {
     push('zhipu', configs.zhipu.model);
     push('zhipu', configs.zhipu.fallbackModel);
-    push('aliyun', configs.aliyun.model);
+    push('tencent', configs.tencent.model);
     push('xunfei');
     return candidates;
   }
 
   // auto 场景智能混编：
-  // - 结构化 JSON / 长文方案设计：优先智谱主模型 -> 阿里云通义 -> 智谱备选 -> 讯飞星辰
-  // - 短对话 / 3.1 AI 导师即时答疑：优先智谱主模型 -> 讯飞星辰（极速响应）-> 阿里云通义 -> 智谱备选
+  // - 结构化 JSON / 长文方案设计：优先智谱主模型 -> 腾讯云混元4/DeepSeek-V4.1 -> 智谱备选 -> 讯飞星辰
+  // - 短对话 / 3.1 AI 导师即时答疑：优先智谱主模型 -> 腾讯云混元4-Flash -> 讯飞星辰 -> 智谱备选
   if (expectJson || totalChars > 900) {
     push('zhipu', configs.zhipu.model);
-    push('aliyun', configs.aliyun.model);
+    push('tencent', configs.tencent.fallbackModel); // DeepSeek-V4.1-Flash 强于结构化 JSON 与推理
+    push('tencent', configs.tencent.model);
     push('zhipu', configs.zhipu.fallbackModel);
     push('xunfei');
   } else {
     push('zhipu', configs.zhipu.model);
+    push('tencent', configs.tencent.model);
     push('xunfei');
-    push('aliyun', configs.aliyun.model);
     push('zhipu', configs.zhipu.fallbackModel);
   }
   return candidates;
@@ -220,6 +222,11 @@ function buildPayload(candidate, messages, expectJson, body, wantStream) {
   }
 
   if (candidate.provider === 'zhipu' && candidate.model === 'glm-4.7-flash') {
+    payload.thinking = { type: 'disabled' };
+  }
+
+  if (candidate.provider === 'tencent') {
+    // 腾讯云 TokenHub 的 hy4-flash / deepseek-v4.1-flash 须关闭隐藏思维链，确保极速且不截断 JSON
     payload.thinking = { type: 'disabled' };
   }
 
@@ -278,13 +285,13 @@ export async function onRequest(context) {
     const allowOrigin = isAllowedOrigin(origin, request.url) ? origin : '*';
     const providers = {
       zhipu: { configured: Boolean(configs.zhipu.apiKey), name: configs.zhipu.name, model: configs.zhipu.model },
-      xunfei: { configured: Boolean(configs.xunfei.apiKey), name: configs.xunfei.name, model: configs.xunfei.model },
-      aliyun: {
-        configured: Boolean(configs.aliyun.apiKey),
-        name: configs.aliyun.name,
-        model: configs.aliyun.model,
-        customBaseUrl: Boolean(env && env.ALIYUN_BASE_URL)
-      }
+      tencent: {
+        configured: Boolean(configs.tencent.apiKey),
+        name: configs.tencent.name,
+        model: configs.tencent.model,
+        fallbackModel: configs.tencent.fallbackModel
+      },
+      xunfei: { configured: Boolean(configs.xunfei.apiKey), name: configs.xunfei.name, model: configs.xunfei.model }
     };
     const activeProviders = Object.keys(providers).filter((k) => providers[k].configured);
     return json(

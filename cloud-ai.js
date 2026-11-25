@@ -18,8 +18,8 @@
   const PROVIDER_NAMES = {
     auto: '三引擎智能混编',
     zhipu: '智谱 GLM',
-    xunfei: '讯飞星辰 MaaS',
-    aliyun: '阿里云通义'
+    tencent: '腾讯云 TokenHub',
+    xunfei: '讯飞星辰 MaaS'
   };
 
   const PROVIDERS = {
@@ -33,13 +33,13 @@
   function getRouteMode() {
     try {
       const m = String(localStorage.getItem(ROUTE_MODE_STORAGE_KEY) || 'auto').trim();
-      if (['auto', 'zhipu', 'xunfei', 'aliyun'].includes(m)) return m;
+      if (['auto', 'zhipu', 'tencent', 'xunfei'].includes(m)) return m;
     } catch (_) {}
     return 'auto';
   }
 
   function setRouteMode(mode) {
-    const clean = ['auto', 'zhipu', 'xunfei', 'aliyun'].includes(mode) ? mode : 'auto';
+    const clean = ['auto', 'zhipu', 'tencent', 'xunfei'].includes(mode) ? mode : 'auto';
     try { localStorage.setItem(ROUTE_MODE_STORAGE_KEY, clean); } catch (_) {}
     return clean;
   }
@@ -458,7 +458,7 @@
     ]);
 
     const status = await getProxyStatus();
-    const providerIds = ['zhipu', 'xunfei', 'aliyun'];
+    const providerIds = ['zhipu', 'tencent', 'xunfei'];
     const checks = await Promise.all(
       providerIds.map(async (pid) => {
         const info = status?.providers?.[pid];
