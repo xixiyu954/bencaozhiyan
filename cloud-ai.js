@@ -6,7 +6,7 @@
   // 2. GitHub Pages (xixiyu954.github.io) / 本地预览 -> 自动在主站与备用 Cloudflare Pages 通道间容错切换
   // 后端支持三引擎混编：智谱 GLM + 讯飞星辰 MaaS + 阿里云通义/兼容网关（全自动故障切换）
   const CLOUDFLARE_SITE_URL = 'https://bencaozhiyan-xixiyu.pages.dev';
-  const CLOUDFLARE_BACKUP_URL = 'https://tcm-chemistry-lab.pages.dev';
+  const CLOUDFLARE_BACKUP_URL = 'https://bencaozhiyanxxy.pages.dev';
   const CF_PROXY_PATH = '/api/ai-proxy';
   const CUSTOM_PROXY_STORAGE_KEY = 'tcm_custom_ai_proxy';
   const ROUTE_MODE_STORAGE_KEY = 'tcm_ai_route_mode';

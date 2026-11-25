@@ -5,7 +5,7 @@
 本项目由个人独立设计与开发，**辽宁中医药大学专属**，仅限校内教学、实验预习与非商业学术交流使用，**禁止任何商业用途**（详见 [LICENSE](./LICENSE)）。
 
 - 在线访问：<https://bencaozhiyan-xixiyu.pages.dev/>
-- 备用地址：<https://tcm-chemistry-lab.pages.dev/>
+- 备用地址：<https://bencaozhiyanxxy.pages.dev/>
 
 ## 界面截图
 
