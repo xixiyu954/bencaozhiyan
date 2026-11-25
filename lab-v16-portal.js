@@ -15,7 +15,7 @@
   const esc = (v) => String(v == null ? '' : v).replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
 
   let currentRoute = 'home'; // 'home' | 'bank' | 'ai' | 'diy' | 'workflow'
-  let aiSubTab = 'compose';  // 'compose' | 'plan' | 'chat'
+  let aiSubTab = 'arena';    // 'arena' | 'compose' | 'plan' | 'chat'
   let diySubTab = 'formula';  // 'formula' | 'failures' | 'studio' | 'mission' | 'hub' | 'tools'
   let bankState = { tab: 'all', cat: '全部', scene: 'all', sort: 'default', detailTab: 'chem', query: '', previewId: '' };
   let extensions = [];
@@ -888,6 +888,7 @@
         </div>
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="v16-seg-bar">
+            <button type="button" class="v16-seg-btn ${aiSubTab === 'arena' ? 'active' : ''}" data-v16-ai-tab="arena">⚔️ AI 课题生成器（90分竞技）</button>
             <button type="button" class="v16-seg-btn ${aiSubTab === 'compose' ? 'active' : ''}" data-v16-ai-tab="compose">智能方案编排</button>
             <button type="button" class="v16-seg-btn ${aiSubTab === 'plan' ? 'active' : ''}" data-v16-ai-tab="plan">已有方案校核</button>
             <button type="button" class="v16-seg-btn ${aiSubTab === 'chat' ? 'active' : ''}" data-v16-ai-tab="chat">实验助教答疑</button>
@@ -899,14 +900,19 @@
 
     // 根据 AI 子标签控制 #qwenCommandBar / #qwenChatBox 显示状态，清爽不重叠
     if (qBar) {
-      qBar.style.display = (aiSubTab === 'plan') ? 'none' : '';
+      qBar.style.display = (aiSubTab === 'plan' || aiSubTab === 'arena') ? 'none' : '';
     }
     if (qChat && fromTabSwitch) {
       if (aiSubTab === 'chat') qChat.classList.remove('hidden');
-      else if (aiSubTab === 'compose') qChat.classList.add('hidden');
+      else if (aiSubTab === 'compose' || aiSubTab === 'arena') qChat.classList.add('hidden');
     }
 
-    if (aiSubTab === 'compose') {
+    if (aiSubTab === 'arena') {
+      extra.innerHTML = '<div id="v16AiArenaPage"></div>';
+      if (window.TCM_V27_AI_ARENA && window.TCM_V27_AI_ARENA.render) {
+        window.TCM_V27_AI_ARENA.render(document.getElementById('v16AiArenaPage'));
+      }
+    } else if (aiSubTab === 'compose') {
       extra.innerHTML = `
         <div class="space-y-3">
           <div class="flex items-center justify-between">

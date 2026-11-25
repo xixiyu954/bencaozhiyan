@@ -6,6 +6,7 @@ import '../lab-v19-theme-guofeng.css';
 import '../lab-v22-visual-suite-pro.css';
 import './styles/lab-v23-motion.css';
 import './styles/lab-v24-solar-atmosphere.css';
+import './styles/lab-v28-ai-mentor-safety.css';
 
 import './lib/lucide-lite.js';
 import './lib/lazy-vendors.js';
@@ -33,3 +34,6 @@ import './modules/lab-v23-motion.js';
 import './routes/visual-suite-loader.js';
 import './routes/upgrade-suite-loader.js';
 import './routes/knowledge-hub-loader.js';
+import './routes/explore-suite-loader.js';
+import './modules/lab-v28-ai-mentor.js';
+import './modules/lab-v28-safety-inspector.js';

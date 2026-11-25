@@ -293,6 +293,7 @@ function mountBentoFabDock() {
   dock.className = 'v22-fab-dock no-print';
   dock.innerHTML =
     '<div class="v22-fab-tray" id="v22FabTray" hidden>' +
+      '<button type="button" class="v22-fab-btn accent" id="v29BtnExplore">🔭 知识探索 (4.1~4.5)</button>' +
       '<button type="button" class="v22-fab-btn accent" data-v22-open="vlab">🕹️ 3D 虚拟实验室</button>' +
       '<button type="button" class="v22-fab-btn" data-v22-open="fluid">🌊 物理流体仿真</button>' +
       '<button type="button" class="v22-fab-btn" data-v22-open="cockpit">📊 驾驶舱大屏</button>' +
@@ -316,6 +317,13 @@ function mountBentoFabDock() {
   dock.addEventListener('click', (e) => {
     if (e.target.closest('#v22FabToggle')) {
       setOpen(tray.hidden);
+      return;
+    }
+    if (e.target.closest('#v29BtnExplore')) {
+      setOpen(false);
+      if (window.TCM_V29_EXPLORE && typeof window.TCM_V29_EXPLORE.open === 'function') {
+        window.TCM_V29_EXPLORE.open('kg');
+      }
       return;
     }
     if (e.target.closest('[data-kb-open]')) {

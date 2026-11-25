@@ -1,0 +1,562 @@
+/* ==========================================================================
+   本草智研 v29.2 · 板块四：知识图谱与可视化探索系统（4.1 ~ 4.5 深度优化版）
+   - 4.1 中药化学知识图谱（贝塞尔曲线联动 + 搜索定位 + 缩放控制 + 流动高亮）
+   - 4.2 极性宇宙探索器（分区网格 + 零重叠星图 + 黄金配比一键匹配 + 实时星标）
+   - 4.3 工艺流水线沙盘（2.5D 八工段管道 + 预设工况 + 瓶颈自动诊断）
+   - 4.4 实验时间轴导演模式（4 套 24 分镜剧本 + 参数徽章 + 持久化批注 + 课件导出）
+   - 4.5 对比显微镜（全题库双样本 + UV/动力学双谱切换 + 差异过滤 + 互换对比）
+   - 护眼暗色模式（body.dark-lab）全适配
+   ========================================================================== */
+
+#tcmV29ExploreModal {
+  position: fixed;
+  inset: 0;
+  z-index: 88;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 20, 18, 0.64);
+  backdrop-filter: blur(7px);
+  padding: 16px;
+}
+
+#tcmV29ExploreModal.is-open {
+  display: flex;
+}
+
+.v29-shell {
+  width: min(1340px, 97vw);
+  height: min(880px, 94vh);
+  background: #f8fafc;
+  color: #0f172a;
+  border-radius: 22px;
+  border: 1px solid rgba(15, 118, 110, 0.24);
+  box-shadow: 0 32px 76px rgba(0, 0, 0, 0.38);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+body.dark-lab .v29-shell {
+  background: #071613;
+  color: #e6f4ef;
+  border-color: rgba(52, 211, 153, 0.28);
+}
+
+.v29-header {
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #072f29, #0f5c54);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.v29-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.v29-tab {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.10);
+  color: #e2f5ee;
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.v29-tab:hover { background: rgba(255, 255, 255, 0.22); }
+
+.v29-tab.is-active {
+  background: #ffffff;
+  color: #072f29;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+}
+
+.v29-close {
+  border: none;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 5px 13px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.v29-close:hover { background: rgba(255, 255, 255, 0.30); }
+
+.v29-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 16px 18px;
+}
+
+/* 通用双栏与卡片 */
+.v29-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.58fr) minmax(0, 0.92fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 960px) { .v29-split { grid-template-columns: 1fr; } }
+
+.v29-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+
+body.dark-lab .v29-card {
+  background: #0b1f1b;
+  border-color: rgba(52, 211, 153, 0.18);
+}
+
+.v29-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.v29-pill {
+  border: 1px solid rgba(15, 118, 110, 0.24);
+  background: #f8fafc;
+  color: #1e293b;
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.v29-pill:hover { border-color: #0f766e; }
+body.dark-lab .v29-pill { background: #0f2923; color: #d1fae5; border-color: rgba(52, 211, 153, 0.24); }
+.v29-pill.is-active { background: #0f766e; color: #ffffff; border-color: transparent; }
+
+.v29-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 7px 13px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(135deg, #072f29, #0f766e);
+  color: #ffffff;
+  transition: opacity 140ms ease;
+}
+
+.v29-btn:hover { opacity: 0.92; }
+
+.v29-btn-ghost {
+  border: 1px solid rgba(15, 118, 110, 0.32);
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  color: #0f766e;
+  transition: background 140ms ease;
+}
+
+.v29-btn-ghost:hover { background: rgba(15, 118, 110, 0.08); }
+body.dark-lab .v29-btn-ghost { color: #6ee7b7; border-color: rgba(52, 211, 153, 0.35); }
+
+.v29-canvas-box {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: radial-gradient(circle at 28% 18%, #0b2924, #051311 78%);
+}
+
+/* 4.1 关联链路流动动画与右侧可点条目 */
+@keyframes v29EdgePulse {
+  to { stroke-dashoffset: -24; }
+}
+
+.v29-edge-hi {
+  stroke-dasharray: 8 4;
+  animation: v29EdgePulse 1.1s linear infinite;
+}
+
+.v29-kg-item {
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(16, 185, 129, 0.16);
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.08);
+  color: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.v29-kg-item:hover {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.45);
+}
+
+.v29-kg-item.is-focus {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: #10b981;
+  font-weight: 800;
+}
+
+.v29-zoom-bar {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  gap: 4px;
+  z-index: 4;
+}
+
+.v29-zoom-btn {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(7, 30, 26, 0.84);
+  color: #d1fae5;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.v29-zoom-btn:hover { background: rgba(16, 185, 129, 0.35); }
+
+/* 4.3 流水线管道动画 & 诊断框 */
+@keyframes v29PipeFlow {
+  to { stroke-dashoffset: -28; }
+}
+
+.v29-pipe-flow {
+  stroke-dasharray: 7 7;
+  animation: v29PipeFlow 0.9s linear infinite;
+}
+
+.v29-diag-box {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.10);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  font-size: 12px;
+  line-height: 1.55;
+  margin-top: 10px;
+}
+
+.v29-diag-box.is-danger {
+  background: rgba(225, 29, 72, 0.10);
+  border-color: rgba(225, 29, 72, 0.34);
+}
+
+/* 4.4 时间轴导演轨道与进度条 */
+.v29-tl-progress {
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.14);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.v29-tl-progress > div {
+  height: 100%;
+  background: linear-gradient(90deg, #0f766e, #10b981);
+  transition: width 240ms ease;
+}
+
+.v29-timeline-rail {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 820px) { .v29-timeline-rail { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.v29-shot-card {
+  padding: 9px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  background: #f8fafc;
+  color: #1e293b;
+  text-align: left;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+body.dark-lab .v29-shot-card { background: #0f2923; color: #d1fae5; border-color: rgba(52, 211, 153, 0.18); }
+
+.v29-shot-card.is-active {
+  background: linear-gradient(135deg, #072f29, #0f766e);
+  color: #ffffff;
+  border-color: transparent;
+  transform: translateY(-2px);
+}
+
+.v29-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 10px;
+}
+
+.v29-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  background: rgba(15, 118, 110, 0.11);
+  color: #0f766e;
+}
+
+body.dark-lab .v29-badge { background: rgba(52, 211, 153, 0.16); color: #6ee7b7; }
+
+/* 4.5 对比显微镜表格 */
+.v29-diff-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.v29-diff-table th,
+.v29-diff-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  text-align: left;
+  vertical-align: top;
+}
+
+body.dark-lab .v29-diff-table th,
+body.dark-lab .v29-diff-table td { border-color: rgba(52, 211, 153, 0.16); }
+
+.v29-diff-table tr.is-diff td {
+  background: rgba(244, 63, 94, 0.07);
+}
+
+body.dark-lab .v29-diff-table tr.is-diff td {
+  background: rgba(244, 63, 94, 0.14);
+}
+
+.v29-diff-tag {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  background: #ffe4e6;
+  color: #be123c;
+}
+
+body.dark-lab .v29-diff-tag { background: rgba(225, 29, 72, 0.28); color: #fda4af; }
+
+.v29-select,
+.v29-input {
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+body.dark-lab .v29-select,
+body.dark-lab .v29-input {
+  background: #0f2923;
+  color: #ecfdf5;
+  border-color: rgba(52, 211, 153, 0.28);
+}
+
+.v29-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 720px) { .v29-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.v29-kpi {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+body.dark-lab .v29-kpi { background: #0f2923; border-color: rgba(52, 211, 153, 0.18); }
+.v29-kpi span { display: block; font-size: 11px; color: #64748b; font-weight: 700; }
+body.dark-lab .v29-kpi span { color: #94b8ad; }
+.v29-kpi strong { display: block; font-size: 19px; font-weight: 900; margin-top: 2px; }
+
+/* ==================== v29.3 细节精雕样式 ==================== */
+.v29-svg-halo {
+  paint-order: stroke;
+  stroke: rgba(5, 19, 17, 0.92);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+}
+
+.v29-canvas-pan {
+  cursor: grab;
+  user-select: none;
+}
+
+.v29-canvas-pan:active {
+  cursor: grabbing;
+}
+
+.v29-ehs-bar {
+  padding: 7px 10px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  line-height: 1.45;
+  background: rgba(16, 185, 129, 0.10);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  color: #065f46;
+}
+
+body.dark-lab .v29-ehs-bar { color: #a7f3d0; }
+
+.v29-ehs-bar.is-warn {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.36);
+  color: #92400e;
+}
+
+body.dark-lab .v29-ehs-bar.is-warn { color: #fde68a; }
+
+.v29-mini-bars {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.v29-mini-bar {
+  border: none;
+  padding: 4px 2px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.05);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 800;
+  color: inherit;
+}
+
+body.dark-lab .v29-mini-bar { background: rgba(255, 255, 255, 0.05); }
+.v29-mini-bar.is-active { outline: 2px solid #0f766e; }
+
+.v29-mini-bar-fill {
+  width: 100%;
+  height: 26px;
+  border-radius: 4px;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(148, 163, 184, 0.18);
+  overflow: hidden;
+}
+
+.v29-mini-bar-fill > i {
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+  transition: height 200ms ease;
+}
+
+.v29-kbd-hint {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+body.dark-lab .v29-kbd-hint { color: #94b8ad; }
+
+/* ==================== v29.4 深度科学功能样式 ==================== */
+.v29-score-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(16, 185, 129, 0.06));
+  border: 1px solid rgba(15, 118, 110, 0.24);
+  margin-bottom: 10px;
+}
+
+.v29-score-num {
+  font-size: 22px;
+  font-weight: 900;
+  color: #059669;
+  line-height: 1;
+}
+
+.v29-delta {
+  font-size: 11px;
+  font-weight: 800;
+  margin-left: 6px;
+}
+
+.v29-delta.is-up { color: #059669; }
+.v29-delta.is-down { color: #e11d48; }
+
+.v29-cost-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(148, 163, 184, 0.2);
+  margin: 6px 0 4px;
+}
+
+.v29-qc-card {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(14, 165, 233, 0.09);
+  border: 1px solid rgba(14, 165, 233, 0.25);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.v29-coext-banner {
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  background: rgba(15, 118, 110, 0.09);
+  border: 1px solid rgba(15, 118, 110, 0.26);
+}
+
+.v29-coext-banner.is-split {
+  background: rgba(245, 158, 11, 0.11);
+  border-color: rgba(245, 158, 11, 0.34);
+}

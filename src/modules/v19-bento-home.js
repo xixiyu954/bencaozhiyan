@@ -228,7 +228,7 @@ function renderBentoHome() {
                 <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white text-[11px] font-black shadow-sm">AI</span>
               </div>
               <h3 class="v19-bento-title">AI 实验设计</h3>
-              <p class="v19-bento-sub">自然语言一键生成完整提取纯化路线</p>
+              <p class="v19-bento-sub">90 分课题竞技 · 智能编排与方案校核</p>
             </div>
             <div class="v19-card-stage">
               <div class="v19-mini-ide" aria-hidden="true">
@@ -247,7 +247,7 @@ function renderBentoHome() {
                 </div>
               </div>
             </div>
-            <div class="v19-card-foot"><span>方案编排 · 自编评审</span><span>进入 →</span></div>
+            <div class="v19-card-foot"><span>90分竞技 · 编排评审</span><span>进入 →</span></div>
           </button>
 
           <!-- 卡 3：智能题库 -->
@@ -400,6 +400,7 @@ function renderBentoHome() {
             <button type="button" class="v19-bento-pill" data-kb-open="vol06">06 制剂分析</button>
           </div>
           <div class="v19-bento-strip-actions">
+            <button type="button" class="v19-bento-pill" data-v16-ext="v29_explore" style="border-color:rgba(14,165,233,0.45);color:#0369a1">🔭 知识图谱探索 (4.1~4.5) ↗</button>
             <button type="button" class="v19-bento-pill" data-kb-open="overview" style="border-color:rgba(16,185,129,0.45);color:#047857">全文检索 8 册 · 60 速查表 →</button>
           </div>
         </section>

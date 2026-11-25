@@ -445,6 +445,7 @@ body.dark-lab .v16-bank-card:hover {
 #tcmV22Modal:not(.hidden) > div,
 #tcmV22Modal.open > div,
 #tcmV26FailureModal.open > div,
+#tcmV29ExploreModal.is-open > div,
 #tcmKbModal:not(.hidden) > div,
 #v17CmdOverlay:not(.hidden) > div,
 .v17-cmd-overlay:not(.hidden) > div {

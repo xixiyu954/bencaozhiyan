@@ -142,3 +142,9 @@
 - **1.8 动效系统 v3**（`src/modules/lab-v23-motion.js` + `src/styles/lab-v23-motion.css`）：融合 Apple Bento `999px` 悬浮白胶囊单层滑块（亮色通透白胶囊 / 暗色玉翠玻璃胶囊）与悬停幽灵胶囊，扩展双层鼠标追踪镜面高光与聚光灯边框至 `.v19-bento-card`、丝绸扫光至 `.v19-cta-primary`，模态框弹簧入场覆盖 `#tcmKbModal` 与 `#tcmV26FailureModal`，静默遵循 `prefers-reduced-motion`。
 - **1.10 天气与节气氛围系统**（`src/modules/lab-v24-solar-atmosphere.js` + `src/styles/lab-v24-solar-atmosphere.css`）：覆盖 24 节气与 6 大新中式水墨氛围配色/天气微粒子，通过 `#v24SolarSlot` 无缝嵌合在 Apple Bento Hero 下方（零 CLS、不遮挡主视觉 LCP），暗色模式 `.v24-solar-seal` 与按钮采用深墨绿字对比度精修，药材推荐位直连题库与 3D 分子库。
 - **2.1 自由配方沙盒 v2 + 2.2 失败分支实验室 v2**（`src/modules/lab-v25-formula-sandbox.js` + `src/modules/lab-v26-failure-branches.js` 及配套样式）：**全量按需懒加载于 `route-diy` 分包**（`src/routes/diy-chunk.js` + `src/routes/interactive-loaders.js` + `vite.config.js`），首屏零增加 JS/CSS 体积；动态接入全站 **136 项药材课题**（16,320+ 组合空间）并支持目标成分直连 3D 分子模型。
+
+
+### 2026-11-25 增量升级整合：2.5 AI 课题生成器（90分竞技）+ 3.1 AI 导师 + 3.5 AI 安全督察 + 板块四（4.1~4.5 知识图谱与可视化探索中心 v29.4）
+- **2.5 AI 课题生成器（90 分五维竞技）**（`src/modules/lab-v27-ai-topic-arena.js` + `src/styles/lab-v27-ai-topic-arena.css`）：作为「智能实验设计」默认首标签挂载，按需懒加载入 `modal-ai-review` 异步分包（零首屏体积膨胀），提供自然语言出题、AI 初版 vs 学生迭代双层五维 SVG 雷达图、SOP 逐行编辑、90 分强制准入编入自编题库与一键导入六步工坊。
+- **3.1 AI 导师对话 + 3.5 AI 安全督察**（`src/modules/lab-v28-ai-mentor.js` + `src/modules/lab-v28-safety-inspector.js` + `src/styles/lab-v28-ai-mentor-safety.css`）：对称居右下角 `#tcmV28AiDock`（与左下角可折叠 `● 扩展舱` 左右平衡、零重叠，移动端自适应紧凑排布）；修复 `TCMCloudAI.complete({ messages })` 参数契约使其真实直连线上智谱 GLM `/api/ai-proxy`（超时自动降级本地专业化学兜底），并增加懒代理安全守卫避免未加载 DIY 沙盒时同步读取异常。
+- **板块四（4.1~4.5 知识图谱与可视化探索中心 v29.4）**（`src/modules/lab-v29-explore-suite.js` + `src/styles/lab-v29-explore-suite.css`）：拆分为独立懒加载分包 `suite-explore`（`src/routes/explore-suite-chunk.js` + `src/routes/explore-suite-loader.js`），首屏零加载 90 KB 引擎，在左下角 `扩展舱` 与首页知识条均提供 1-click 直达，完整支持 4.1 知识图谱、4.2 极性三维宇宙、4.3 工艺流水线、4.4 导演时间轴与 4.5 136 味对比显微镜。

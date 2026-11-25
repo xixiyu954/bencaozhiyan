@@ -155,6 +155,14 @@ if (typeof window !== 'undefined') {
       evaluateLocally: makeProxy(loadAiReviewSuite, 'TCM_AI_REVIEW', 'evaluateLocally')
     };
   }
+  if (!window.TCM_V27_AI_ARENA) {
+    window.TCM_V27_AI_ARENA = {
+      __isLazyProxy: true,
+      render: makeProxy(loadAiReviewSuite, 'TCM_V27_AI_ARENA', 'render'),
+      generate: makeProxy(loadAiReviewSuite, 'TCM_V27_AI_ARENA', 'generate'),
+      getState: () => null
+    };
+  }
 
   if (!window.TCM_STUDIO_V8) {
     window.TCM_STUDIO_V8 = {

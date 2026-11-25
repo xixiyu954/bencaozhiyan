@@ -124,7 +124,12 @@ export default defineConfig({
           ) {
             return 'route-diy';
           }
-          if (id.includes('lab-v11-userplan') || id.includes('lab-v17-ai-review') || id.includes('routes/ai-review-chunk')) {
+          if (
+            id.includes('lab-v11-userplan') ||
+            id.includes('lab-v17-ai-review') ||
+            id.includes('lab-v27-ai-topic-arena') ||
+            id.includes('routes/ai-review-chunk')
+          ) {
             return 'modal-ai-review';
           }
           if (id.includes('lab-v8-studio') || id.includes('lab-v9-visuals') || id.includes('routes/workflow-visuals-chunk')) {
@@ -144,6 +149,9 @@ export default defineConfig({
           }
           if (id.includes('knowledge-hub-data') || id.includes('lab-v26-knowledge-hub')) {
             return 'suite-knowledge';
+          }
+          if (id.includes('lab-v29-explore-suite') || id.includes('routes/explore-suite-chunk')) {
+            return 'suite-explore';
           }
         }
       }

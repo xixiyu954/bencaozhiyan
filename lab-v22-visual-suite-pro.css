@@ -6,19 +6,20 @@
 
 .v22-fab-dock {
   position: fixed;
-  right: 20px;
-  bottom: 20px;
-  z-index: 36;
+  left: 20px;
+  right: auto;
+  bottom: 18px;
+  z-index: 62;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 8px;
 }
 
 .v22-fab-tray {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 7px;
   padding: 8px;
   border-radius: 20px;
@@ -105,6 +106,9 @@ body.tcm-v22-present-mode #leftSidebar,
 body.tcm-v22-present-mode #rightVisualDock,
 body.tcm-v22-present-mode #tcmV19BentoStrip,
 body.tcm-v22-present-mode .v22-fab-dock,
+body.tcm-v22-present-mode #tcmV28AiDock,
+body.tcm-v22-present-mode #tcmV28MentorPanel,
+body.tcm-v22-present-mode #tcmV28SafetyCard,
 body.tcm-v22-present-mode footer {
   display: none !important;
 }
@@ -149,8 +153,9 @@ body.dark-lab .v22-fab-btn:hover {
 
 @media (max-width: 768px) {
   .v22-fab-dock {
-    right: 12px;
-    bottom: 16px;
+    left: 12px;
+    right: auto;
+    bottom: 14px;
     gap: 6px;
   }
   .v22-fab-toggle {
