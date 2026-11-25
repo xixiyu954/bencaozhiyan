@@ -1,4 +1,4 @@
-# 本草智研（tcm-chemistry-lab）
+# 本草智研（bencaozhiyan）
 
 面向辽宁中医药大学药学、中药学、制药工程等相关专业课程教学与实验预习编写的在线工作台。平时主要用来查药材指标与药典限度、换算提取投料和溶剂比例、预习装置搭法、对照四谱与显色反应，以及排版导出实验报告；后面也加上了从小试提取到制剂处方、质量评价和中试放大的推演练习。
 
@@ -62,7 +62,7 @@
 - **边缘接口与存储**：Cloudflare Pages Functions、Cloudflare KV（`TCM_DRAFTS_KV`）/ 可选 D1
 
 ```text
-tcm-chemistry-lab/
+bencaozhiyan/
 ├── index.html                        # 页面骨架与工坊主体结构
 ├── manifest.webmanifest              # PWA 配置清单
 ├── vite.config.js                    # Vite 构建、分包规则与 sitemap 生成
@@ -105,8 +105,8 @@ tcm-chemistry-lab/
 环境要求：Node.js 18 及以上。
 
 ```bash
-git clone https://github.com/xixiyu954/tcm-chemistry-lab.git
-cd tcm-chemistry-lab
+git clone https://github.com/xixiyu954/bencaozhiyan.git
+cd bencaozhiyan
 npm install
 
 # 本地开发预览（http://localhost:5173）

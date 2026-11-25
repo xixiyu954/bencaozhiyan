@@ -297,7 +297,7 @@ export async function onRequest(context) {
     return json(
       {
         ok: true,
-        service: 'tcm-chemistry-lab-ai-proxy',
+        service: 'bencaozhiyan-ai-proxy',
         platform: 'cloudflare-pages-functions',
         hybridMode: true,
         provider: activeProviders.join('+') || 'none',

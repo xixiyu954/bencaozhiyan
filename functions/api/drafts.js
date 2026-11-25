@@ -204,7 +204,7 @@ export async function onRequest(context) {
     return json(
       {
         ok: true,
-        service: 'tcm-chemistry-lab-drafts',
+        service: 'bencaozhiyan-drafts',
         platform: 'cloudflare-pages-functions',
         backend,
         configured: backend !== 'unconfigured',

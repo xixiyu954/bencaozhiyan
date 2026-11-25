@@ -264,7 +264,7 @@
         <div class="v16-footer-col">
           <h3>开放资源</h3>
           <div class="v16-footer-links">
-            <a href="https://github.com/xixiyu954/tcm-chemistry-lab" target="_blank" rel="noopener noreferrer">GitHub 开源仓库 ↗</a>
+            <a href="https://github.com/xixiyu954/bencaozhiyan" target="_blank" rel="noopener noreferrer">GitHub 项目仓库 ↗</a>
             <a href="https://ydz.chp.org.cn/" target="_blank" rel="noopener noreferrer">《中国药典》2025 年版在线检索 ↗</a>
             <a href="https://www.ilab-x.com/" target="_blank" rel="noopener noreferrer">国家虚拟仿真实验平台 ↗</a>
             <button type="button" data-v16-trigger="feedback">意见反馈与标准勘误</button>

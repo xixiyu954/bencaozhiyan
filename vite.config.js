@@ -161,7 +161,7 @@ export default defineConfig({
     copyStaticAssetsPlugin(),
     visualizer({
       filename: 'bundle-report/stats.html',
-      title: 'tcm-chemistry-lab Bundle Visualizer',
+      title: 'bencaozhiyan Bundle Visualizer',
       template: 'treemap',
       gzipSize: true,
       brotliSize: false,
