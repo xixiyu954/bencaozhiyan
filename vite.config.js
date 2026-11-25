@@ -130,7 +130,7 @@ export default defineConfig({
           if (id.includes('lab-v22-vlab3d')) {
             return 'suite-vlab3d';
           }
-          if (id.includes('lab-v20-mol3d') || id.includes('lab-v21-spectra') || id.includes('lab-v22-visual-suite-pro.js') || id.includes('mol3d-pubchem-data') || id.includes('routes/visual-suite-chunk')) {
+          if (id.includes('lab-v20-mol3d') || id.includes('lab-v21-spectra') || id.includes('lab-v22-visual-suite-pro.js') || id.includes('lab-v22-fluid-sim') || id.includes('lab-v22-cockpit3d') || id.includes('mol3d-pubchem-data') || id.includes('routes/visual-suite-chunk')) {
             return 'suite-visuals';
           }
           if (id.includes('lab-v24-gamification') || id.includes('routes/upgrade-suite-chunk')) {

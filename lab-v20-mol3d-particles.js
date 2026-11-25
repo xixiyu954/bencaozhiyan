@@ -22,10 +22,11 @@
   }
 
   var PARTICLE_REACTIONS = [
-    { id: "hcl_mg", name: "盐酸-镁粉反应", target: "黄酮类 (芦丁/黄芩苷)", base: [254, 240, 138], targetRgb: [220, 38, 38], dropColor: "#e2e8f0", bubbles: true, precip: false, desc: "镁粉与盐酸产生氢气气泡，溶液由浅黄扩散渐变为樱红/深红色。" },
-    { id: "molish", name: "Molish 紫环反应", target: "糖与苷类 (多糖/芦丁)", base: [248, 250, 252], targetRgb: [126, 34, 206], dropColor: "#a855f7", bubbles: false, precip: true, desc: "浓硫酸沿壁缓加，界面处迅速富集紫红色扩散环。" },
-    { id: "fecl3", name: "FeCl₃ 酚羟基显色", target: "酚羟基 (绿原酸/丁香酚)", base: [253, 224, 71], targetRgb: [15, 118, 110], dropColor: "#d97706", bubbles: false, precip: false, desc: "铁离子与邻酚羟基络合，墨绿色粒子云由液面迅速向下扩散。" },
-    { id: "dragendorff", name: "改良碘化铋钾", target: "生物碱 (小檗碱/苦参碱)", base: [254, 249, 195], targetRgb: [194, 65, 12], dropColor: "#ea580c", bubbles: false, precip: true, desc: "滴入瞬间生成致密橘红色无定形微粒并向管底沉降。" }
+    { id: "hcl_mg", name: "盐酸-镁粉反应", reagent: "浓 HCl + 镁粉", target: "黄酮类 (黄芩苷 / 槲皮素 / 芦丁)", base: [254, 243, 199], targetRgb: [220, 38, 38], dropColor: "#e2e8f0", mode: "bubbles", mech: "Mg + 2HCl → MgCl₂ + H₂↑；新生 [H] 还原黄酮 4-位羰基生成花色素盐，溶液由浅黄渐变为樱红/紫红色。", desc: "镁粉与盐酸剧烈产生 H₂ 微泡上浮，樱红色羽流自液面扩散至全管。" },
+    { id: "molish", name: "Molish 紫环反应", reagent: "α-萘酚 + 浓 H₂SO₄", target: "糖与苷类 (黄芩苷 / 人参皂苷 / 多糖)", base: [241, 245, 249], targetRgb: [126, 34, 206], dropColor: "#c084fc", mode: "ring", mech: "浓 H₂SO₄ (ρ=1.84) 沉至管底，糖苷脱水成糠醛衍生物并与 α-萘酚在两液交界处缩合生成特征紫红环。", desc: "浓硫酸沿管壁缓加沉底，两液界面精准富集深紫红色扩散环。" },
+    { id: "fecl3", name: "FeCl₃ 酚羟基络合", reagent: "1% FeCl₃ 乙醇液", target: "邻二酚羟基 (绿原酸 / 丹酚酸 B / 槲皮素)", base: [254, 249, 195], targetRgb: [15, 118, 110], dropColor: "#d97706", mode: "cloud", mech: "Fe³⁺ 与邻二酚羟基发生配位螯合，形成深墨绿/蓝黑色稳定络合物，随对流涡旋迅速扩散。", desc: "铁离子液滴冲击液面炸开墨绿色涡旋粒子云，迅速向下扩散变色。" },
+    { id: "dragendorff", name: "改良碘化铋钾", reagent: "Dragendorff 试液", target: "生物碱类 (小檗碱 / 苦参碱)", base: [254, 249, 195], targetRgb: [234, 88, 12], dropColor: "#ea580c", mode: "precip", mech: "质子化生物碱阳离子与 [BiI₄]⁻ 结合，瞬时析出难溶性橘红色无定形复盐沉淀并向管底沉降堆积。", desc: "滴入瞬间析出致密橘红色沉淀颗粒，重力沉降并在管底形成沉淀层。" },
+    { id: "borntrager", name: "Bornträger 碱液显红", reagent: "5% NaOH 碱水", target: "游离羟基蒽醌 (大黄素 / 茜草素)", base: [253, 224, 71], targetRgb: [190, 18, 60], dropColor: "#fda4af", mode: "cloud", mech: "游离酚羟基在碱液中解离形成共轭酚氧负离子，体系由亮黄迅速转为鲜明樱红/紫红色。", desc: "滴加稀碱液后游离蒽醌解离显色，樱红色扩散云团席卷整管。" }
   ];
 
   var modalEl = null;
@@ -722,166 +723,426 @@
   function renderParticlesView(container) {
     stopLoops();
     var myRxnToken = ++rxnRenderToken;
-    var rxn = PARTICLE_REACTIONS[rxnIdx];
-    rxnState = { progress: 0, drops: [], particles: [], ripples: [], bubbles: [] };
+    var rxn = PARTICLE_REACTIONS[rxnIdx] || PARTICLE_REACTIONS[0];
+    rxnState = {
+      progress: 0,
+      stage: "ready",
+      paused: false,
+      showControl: true,
+      speed: 1,
+      dropCount: 0,
+      swirlEnergy: 0,
+      autoQueue: 0,
+      autoCooldown: 0,
+      sedimentH: 0,
+      ringAlpha: 0,
+      drops: [],
+      particles: [],
+      ripples: [],
+      bubbles: []
+    };
 
     var rxnBtns = PARTICLE_REACTIONS.map(function (r, i) {
       var on = i === rxnIdx;
-      return '<button type="button" data-v20-rxn="' + i + '" class="px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ' +
+      return '<button type="button" data-v20-rxn="' + i + '" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ' +
         (on ? 'bg-[#059669] text-white border-[#059669]' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#059669]') + '">' + r.name + "</button>";
     }).join("");
 
+    var baseCss = "rgb(" + rxn.base.join(",") + ")";
+    var targetCss = "rgb(" + rxn.targetRgb.join(",") + ")";
+
     container.innerHTML =
-      '<div class="space-y-4">' +
+      '<div class="space-y-3.5">' +
         '<div class="flex flex-wrap items-center justify-between gap-2">' +
           '<div class="flex flex-wrap gap-1.5">' + rxnBtns + "</div>" +
-          '<div class="flex gap-2">' +
-            '<button type="button" id="v20BtnDrop" class="px-4 py-1.5 rounded-xl bg-[#f97316] hover:bg-[#ea580c] text-white text-xs font-extrabold shadow-sm">💧 滴加检识试液</button>' +
-            '<button type="button" id="v20BtnResetRxn" class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold">↺ 清洗试管</button>' +
+          '<div class="flex flex-wrap items-center gap-1.5">' +
+            '<button type="button" id="v20BtnDrop" class="px-3 py-1.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-extrabold shadow-xs">💧 滴加试液</button>' +
+            '<button type="button" id="v20BtnSwirl" class="px-3 py-1.5 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-extrabold">🌀 轻摇混匀</button>' +
+            '<button type="button" id="v20BtnPauseRxn" class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-extrabold">⏸ 暂停</button>' +
+            '<button type="button" id="v20BtnReplayRxn" class="px-3 py-1.5 rounded-xl bg-[#064e3b] hover:bg-[#062922] text-white text-xs font-extrabold">↺ 重播</button>' +
+            '<button type="button" id="v20BtnSpeedRxn" class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold">1.0×</button>' +
+            '<button type="button" id="v20BtnCtrlTube" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-bold">🧪 双管对照</button>' +
           "</div>" +
         "</div>" +
-        '<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">' +
-          '<div class="lg:col-span-7 rounded-2xl bg-gradient-to-b from-[#071f1c] to-[#0b2d24] border border-emerald-400/25 overflow-hidden flex justify-center">' +
-            '<canvas id="v20RxnCanvas" width="460" height="340" class="w-full max-w-[460px] h-[320px] block"></canvas>' +
+        '<div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">' +
+          '<div class="lg:col-span-7 relative rounded-2xl bg-gradient-to-b from-[#071f1c] to-[#0b2d24] border border-emerald-400/25 overflow-hidden flex justify-center">' +
+            '<canvas id="v20RxnCanvas" width="480" height="360" class="w-full max-w-[480px] h-[340px] sm:h-[360px] block cursor-pointer" title="点击供试品试管可轻摇加速扩散"></canvas>' +
+            '<div class="pointer-events-none absolute top-2.5 left-3 right-3 flex items-center justify-between text-[11px] font-bold">' +
+              '<span id="v20RxnStagePill" class="px-2.5 py-1 rounded-lg bg-slate-950/75 border border-emerald-400/30 text-emerald-200">滴加 → 扩散 → 变色终点</span>' +
+              '<div class="flex items-center gap-1.5">' +
+                '<span id="v20DropCountBadge" class="px-2 py-1 rounded-lg bg-slate-950/75 border border-white/15 text-slate-200 font-mono">0 滴</span>' +
+                '<span id="v20RxnPauseBadge" class="hidden px-2 py-1 rounded-lg bg-amber-500/90 text-slate-950 font-extrabold">⏸ 已暂停</span>' +
+              '</div>' +
+            '</div>' +
           "</div>" +
-          '<div class="lg:col-span-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 space-y-3 text-xs">' +
-            '<span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 font-extrabold">' + rxn.target + "</span>" +
-            '<h4 class="text-base font-extrabold text-slate-900 dark:text-white">' + rxn.name + "</h4>" +
-            '<p class="text-slate-600 dark:text-slate-300 leading-relaxed">' + rxn.desc + "</p>" +
-            '<div class="p-3 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 space-y-1">' +
-              '<div class="font-extrabold text-slate-800 dark:text-slate-200">反应进程</div>' +
-              '<div class="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div id="v20RxnBar" class="h-full bg-[#059669] transition-all duration-200" style="width:0%"></div></div>' +
-              '<div id="v20RxnStatus" class="text-[11px] text-slate-600 dark:text-slate-400 pt-1">点击「滴加检识试液」观察液面冲击波与粒子扩散渐变。</div>' +
+          '<div class="lg:col-span-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 flex flex-col justify-between gap-3 text-xs">' +
+            '<div class="space-y-2.5">' +
+              '<div class="flex flex-wrap items-center gap-1.5">' +
+                '<span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 font-extrabold">' + rxn.target + "</span>" +
+                '<span class="inline-block px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 font-bold">试液：' + rxn.reagent + "</span>" +
+              '</div>' +
+              '<h4 class="text-base font-extrabold text-slate-900 dark:text-white">' + rxn.name + "</h4>" +
+              '<p class="text-slate-600 dark:text-slate-300 leading-relaxed">' + rxn.desc + "</p>" +
+              '<div class="p-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/35 border border-emerald-200/80 dark:border-emerald-800 text-[11.5px] text-emerald-950 dark:text-emerald-200 leading-relaxed">' +
+                '<strong>化学机理：</strong>' + rxn.mech +
+              '</div>' +
+              '<div class="grid grid-cols-3 gap-1.5 text-center text-[10.5px] font-bold">' +
+                '<div class="p-1.5 rounded-xl bg-[#f6f8f7] dark:bg-slate-900 border border-slate-200 dark:border-slate-700"><span class="inline-block w-4 h-4 rounded-full border border-slate-400 align-middle mr-1" style="background:' + baseCss + '"></span>空白对照</div>' +
+                '<div class="p-1.5 rounded-xl bg-[#f6f8f7] dark:bg-slate-900 border border-slate-200 dark:border-slate-700"><span id="v20CurColorDot" class="inline-block w-4 h-4 rounded-full border border-slate-400 align-middle mr-1" style="background:' + baseCss + '"></span>当前液色</div>' +
+                '<div class="p-1.5 rounded-xl bg-[#f6f8f7] dark:bg-slate-900 border border-slate-200 dark:border-slate-700"><span class="inline-block w-4 h-4 rounded-full border border-slate-400 align-middle mr-1" style="background:' + targetCss + '"></span>阳性终点</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="p-3 rounded-xl bg-[#f6f8f7] dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 space-y-2">' +
+              '<div class="flex justify-between font-extrabold text-slate-800 dark:text-slate-200">' +
+                '<span>显色转化进度</span><span id="v20RxnPct">0%</span>' +
+              '</div>' +
+              '<div class="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div id="v20RxnBar" class="h-full bg-[#059669] transition-all duration-150" style="width:0%"></div></div>' +
+              '<div class="grid grid-cols-3 gap-1 text-center text-[10.5px] font-bold pt-0.5">' +
+                '<span id="v20St1" class="py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500">1. 滴加</span>' +
+                '<span id="v20St2" class="py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500">2. 扩散</span>' +
+                '<span id="v20St3" class="py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500">3. 变色终点</span>' +
+              '</div>' +
+              '<div id="v20RxnStatus" class="text-[11px] text-slate-600 dark:text-slate-400">左侧空白对照管、右侧供试品管；点击试管或「轻摇混匀」可加速扩散。</div>' +
             "</div>" +
           "</div>" +
         "</div>" +
       "</div>";
 
     container.querySelectorAll("[data-v20-rxn]").forEach(function (b) {
-      b.addEventListener("click", function () { rxnIdx = Number(b.getAttribute("data-v20-rxn")); renderParticlesView(container); });
+      b.addEventListener("click", function () {
+        rxnIdx = Number(b.getAttribute("data-v20-rxn"));
+        renderParticlesView(container);
+      });
     });
 
     var canvas = container.querySelector("#v20RxnCanvas");
     var ctx = canvas.getContext("2d");
     var barEl = container.querySelector("#v20RxnBar");
+    var pctEl = container.querySelector("#v20RxnPct");
     var statusEl = container.querySelector("#v20RxnStatus");
+    var stagePill = container.querySelector("#v20RxnStagePill");
+    var dropBadge = container.querySelector("#v20DropCountBadge");
+    var pauseBadge = container.querySelector("#v20RxnPauseBadge");
+    var pauseBtn = container.querySelector("#v20BtnPauseRxn");
+    var speedBtn = container.querySelector("#v20BtnSpeedRxn");
+    var ctrlBtn = container.querySelector("#v20BtnCtrlTube");
+    var curColorDot = container.querySelector("#v20CurColorDot");
+    var st1 = container.querySelector("#v20St1");
+    var st2 = container.querySelector("#v20St2");
+    var st3 = container.querySelector("#v20St3");
 
-    function triggerDrop() {
-      rxnState.drops.push({ x: 230, y: 52, vy: 2.2 });
+    function getActiveTubeX() { return rxnState.showControl ? 268 : 185; }
+    var tw = 110, ty = 98, th = 224, liquidY = 166;
+
+    function syncStageUi() {
+      var pct = Math.round(rxnState.progress * 100);
+      if (barEl) barEl.style.width = pct + "%";
+      if (pctEl) pctEl.textContent = pct + "%";
+      if (dropBadge) dropBadge.textContent = rxnState.dropCount + " 滴";
+      var activeCls = "py-1 rounded-lg bg-[#059669] text-white border border-[#059669]";
+      var idleCls = "py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500";
+      if (st1) st1.className = (rxnState.dropCount > 0 || rxnState.drops.length > 0) ? activeCls : idleCls;
+      if (st2) st2.className = (rxnState.particles.length > 0 || pct >= 30) ? activeCls : idleCls;
+      if (st3) st3.className = pct >= 95 ? activeCls : idleCls;
+      if (stagePill) {
+        stagePill.textContent = pct >= 95
+          ? "✅ 阶段 3/3：显色终点达成（对比空白管）"
+          : (rxnState.particles.length > 0 ? "🌊 阶段 2/3：粒子对流扩散显色中" : (rxnState.drops.length > 0 ? "💧 阶段 1/3：检识试液滴加冲击液面" : "就绪：点击滴加或重播"));
+      }
+      if (pauseBadge) pauseBadge.classList.toggle("hidden", !rxnState.paused);
+      if (pauseBtn) pauseBtn.textContent = rxnState.paused ? "▶ 继续" : "⏸ 暂停";
     }
 
-    container.querySelector("#v20BtnDrop").addEventListener("click", triggerDrop);
-    container.querySelector("#v20BtnResetRxn").addEventListener("click", function () {
-      rxnState = { progress: 0, drops: [], particles: [], ripples: [], bubbles: [] };
-      if (barEl) barEl.style.width = "0%";
-      if (statusEl) statusEl.textContent = "试管已清洗，请重新滴加试剂。";
+    function spawnDrop() {
+      rxnState.stage = "drop";
+      rxnState.drops.push({ x: getActiveTubeX() + tw / 2, y: 54, vy: 58 });
+      syncStageUi();
+    }
+
+    function triggerSwirl() {
+      rxnState.swirlEnergy = 1.0;
+      rxnState.particles.forEach(function (pt) {
+        pt.vx += (Math.random() - 0.5) * 140;
+        pt.vy += (Math.random() - 0.5) * 90;
+      });
+      if (rxnState.progress > 0 && rxnState.progress < 1) {
+        rxnState.progress = Math.min(1, rxnState.progress + 0.08);
+        syncStageUi();
+      }
+    }
+
+    function replayReaction() {
+      rxnState.progress = 0;
+      rxnState.stage = "drop";
+      rxnState.paused = false;
+      rxnState.dropCount = 0;
+      rxnState.swirlEnergy = 0;
+      rxnState.sedimentH = 0;
+      rxnState.ringAlpha = 0;
+      rxnState.drops = [];
+      rxnState.particles = [];
+      rxnState.ripples = [];
+      rxnState.bubbles = [];
+      rxnState.autoQueue = 3;
+      rxnState.autoCooldown = 0.05;
+      if (statusEl) statusEl.textContent = "已重播：自动连续滴加 3 滴试液至显色终点，可随时暂停或轻摇混匀。";
+      syncStageUi();
+    }
+
+    container.querySelector("#v20BtnDrop").addEventListener("click", function () { rxnState.paused = false; spawnDrop(); });
+    container.querySelector("#v20BtnSwirl").addEventListener("click", triggerSwirl);
+    canvas.addEventListener("click", triggerSwirl);
+    pauseBtn.addEventListener("click", function () { rxnState.paused = !rxnState.paused; syncStageUi(); });
+    container.querySelector("#v20BtnReplayRxn").addEventListener("click", replayReaction);
+    speedBtn.addEventListener("click", function () {
+      rxnState.speed = rxnState.speed === 1 ? 2 : (rxnState.speed === 2 ? 0.5 : 1);
+      speedBtn.textContent = rxnState.speed.toFixed(1) + "×";
+    });
+    ctrlBtn.addEventListener("click", function () {
+      rxnState.showControl = !rxnState.showControl;
+      ctrlBtn.className = "px-2.5 py-1.5 rounded-xl text-xs font-bold border " + (rxnState.showControl ? "bg-emerald-50 border-emerald-300 text-emerald-900" : "bg-white border-slate-200 text-slate-600");
+      replayReaction();
     });
 
-    function drawRxn() {
+    replayReaction();
+
+    var lastTs = performance.now();
+
+    function drawTestTubeGlass(x, labelTxt) {
+      // Rim flange
+      ctx.strokeStyle = "rgba(226, 232, 240, 0.88)";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x - 6, ty); ctx.lineTo(x + tw + 6, ty);
+      ctx.stroke();
+
+      // Tube body outline
+      ctx.beginPath();
+      ctx.roundRect(x, ty, tw, th, [4, 4, 55, 55]);
+      ctx.stroke();
+
+      // Volumetric graduation ticks (2mL, 4mL, 6mL)
+      ctx.strokeStyle = "rgba(226, 232, 240, 0.45)";
+      ctx.lineWidth = 1;
+      ctx.fillStyle = "rgba(226, 232, 240, 0.65)";
+      ctx.font = "10px monospace";
+      [2, 4, 6].forEach(function (ml, idx) {
+        var gy = ty + th - 48 - idx * 44;
+        ctx.beginPath(); ctx.moveTo(x + tw - 12, gy); ctx.lineTo(x + tw, gy); ctx.stroke();
+        ctx.fillText(ml + "mL", x + tw - 34, gy + 3);
+      });
+
+      // Specular glass highlight streak
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.28)";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x + 10, ty + 14); ctx.lineTo(x + 10, ty + th - 58);
+      ctx.stroke();
+
+      // Bottom label
+      ctx.fillStyle = "#a7f3d0";
+      ctx.font = "bold 11.5px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(labelTxt, x + tw / 2, ty + th + 20);
+      ctx.textAlign = "left";
+    }
+
+    function drawRxn(ts) {
       if (myRxnToken !== rxnRenderToken) return;
+      rxnRaf = requestAnimationFrame(drawRxn);
+
+      var rawDt = Math.min(0.04, Math.max(0.001, (ts - lastTs) / 1000));
+      lastTs = ts;
+      var dt = rxnState.paused ? 0 : rawDt * rxnState.speed;
+      var tx = getActiveTubeX();
+
+      if (dt > 0 && rxnState.autoQueue > 0) {
+        rxnState.autoCooldown -= dt;
+        if (rxnState.autoCooldown <= 0) {
+          spawnDrop();
+          rxnState.autoQueue--;
+          rxnState.autoCooldown = 0.82;
+        }
+      }
+
+      if (dt > 0) {
+        rxnState.swirlEnergy = Math.max(0, rxnState.swirlEnergy - 1.4 * dt);
+
+        for (var d = rxnState.drops.length - 1; d >= 0; d--) {
+          var dr = rxnState.drops[d];
+          dr.vy += 430 * dt;
+          dr.y += dr.vy * dt;
+          if (dr.y >= liquidY) {
+            rxnState.drops.splice(d, 1);
+            rxnState.dropCount++;
+            rxnState.ripples.push({ rad: 4, alpha: 0.95 });
+            rxnState.progress = Math.min(1, rxnState.progress + 0.34);
+            rxnState.stage = rxnState.progress >= 0.95 ? "endpoint" : "diffuse";
+            if (rxn.mode === "ring") rxnState.ringAlpha = Math.min(1, rxnState.ringAlpha + 0.36);
+
+            for (var n = 0; n < 54; n++) {
+              rxnState.particles.push({
+                x: tx + tw / 2 + (Math.random() - 0.5) * 14,
+                y: liquidY + 4,
+                vx: (Math.random() - 0.5) * 95,
+                vy: rxn.mode === "ring" ? (55 + Math.random() * 55) : (38 + Math.random() * 105),
+                size: 2.2 + Math.random() * 3.6,
+                life: 1.0
+              });
+            }
+            if (statusEl) {
+              statusEl.textContent = rxnState.progress >= 0.95 ? "✅ 显色终点已达（与左侧空白管对比鲜明）：" + rxn.desc : "🌊 第 " + rxnState.dropCount + " 滴正在对流扩散显色（" + Math.round(rxnState.progress * 100) + "%）...";
+            }
+            syncStageUi();
+          }
+        }
+
+        var ifaceY = liquidY + 72;
+        for (var i = rxnState.particles.length - 1; i >= 0; i--) {
+          var pt = rxnState.particles[i];
+          if (rxn.mode === "ring") {
+            pt.vy += (ifaceY - pt.y) * 3.2 * dt;
+            pt.vx *= Math.pow(0.25, dt);
+            pt.vy *= Math.pow(0.18, dt);
+          } else if (rxn.mode === "precip") {
+            pt.vy = Math.min(115, pt.vy + 75 * dt);
+            pt.vx *= Math.pow(0.35, dt);
+          } else {
+            pt.vx += Math.sin(pt.y * 0.08 + i) * (32 + rxnState.swirlEnergy * 95) * dt;
+            pt.vx *= Math.pow(0.45, dt);
+            pt.vy *= Math.pow(0.55, dt);
+          }
+          pt.x += pt.vx * dt; pt.y += pt.vy * dt;
+          if (pt.x < tx + 8) { pt.x = tx + 8; pt.vx = Math.abs(pt.vx) * 0.6; }
+          if (pt.x > tx + tw - 8) { pt.x = tx + tw - 8; pt.vx = -Math.abs(pt.vx) * 0.6; }
+          if (pt.y > ty + th - 10) {
+            pt.y = ty + th - 10; pt.vy = 0; pt.vx *= 0.5;
+            if (rxn.mode === "precip") rxnState.sedimentH = Math.min(28, rxnState.sedimentH + 0.14);
+          }
+          pt.life -= 0.26 * dt;
+          if (pt.life <= 0) rxnState.particles.splice(i, 1);
+        }
+
+        if (rxn.mode === "bubbles" && rxnState.progress > 0.12 && Math.random() < 18 * dt) {
+          rxnState.bubbles.push({ x: tx + 16 + Math.random() * (tw - 32), y: ty + th - 16, vy: -(70 + Math.random() * 65), r: 1.8 + Math.random() * 2.5 });
+        }
+        for (var k = rxnState.bubbles.length - 1; k >= 0; k--) {
+          var bb = rxnState.bubbles[k];
+          bb.y += bb.vy * dt;
+          bb.x += Math.sin(bb.y * 0.12) * 14 * dt;
+          if (bb.y < liquidY) rxnState.bubbles.splice(k, 1);
+        }
+
+        for (var j = rxnState.ripples.length - 1; j >= 0; j--) {
+          var rp = rxnState.ripples[j];
+          rp.rad += 70 * dt; rp.alpha -= 1.3 * dt;
+          if (rp.alpha <= 0) rxnState.ripples.splice(j, 1);
+        }
+      }
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // 1) Optional Left Control Blank Tube (阴性空白对照管)
+      if (rxnState.showControl) {
+        var cx0 = 92;
+        ctx.save();
+        ctx.beginPath(); ctx.roundRect(cx0, ty, tw, th, [4, 4, 55, 55]); ctx.clip();
+        ctx.fillStyle = "rgb(" + rxn.base.join(",") + ")";
+        ctx.fillRect(cx0, liquidY, tw, ty + th - liquidY);
+        // Concave meniscus
+        ctx.strokeStyle = "rgba(255,255,255,0.55)"; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(cx0, liquidY); ctx.quadraticCurveTo(cx0 + tw / 2, liquidY + 6, cx0 + tw, liquidY); ctx.stroke();
+        ctx.restore();
+        drawTestTubeGlass(cx0, "空白对照管（未加试液）");
+      }
+
+      // 2) Glass dropper above active tube
+      var dropCenterX = tx + tw / 2;
       ctx.fillStyle = "#cbd5e1";
-      ctx.fillRect(222, 10, 16, 26);
+      ctx.fillRect(dropCenterX - 8, 12, 16, 26);
       ctx.beginPath();
-      ctx.moveTo(224, 36); ctx.lineTo(236, 36); ctx.lineTo(232, 52); ctx.lineTo(228, 52);
+      ctx.moveTo(dropCenterX - 6, 38); ctx.lineTo(dropCenterX + 6, 38); ctx.lineTo(dropCenterX + 2, 54); ctx.lineTo(dropCenterX - 2, 54);
       ctx.fill();
 
-      var tx = 165, ty = 95, tw = 130, th = 215, liquidY = 165;
+      // 3) Active Sample Reaction Tube (with gentle swirl offset)
+      var swirlDx = rxnState.swirlEnergy > 0.01 ? Math.sin(ts * 0.032) * rxnState.swirlEnergy * 6 : 0;
+      ctx.save();
+      ctx.translate(swirlDx, 0);
+
       var p = Math.min(1, rxnState.progress);
-      var r = Math.round(rxn.base[0] + (rxn.targetRgb[0] - rxn.base[0]) * p);
-      var g = Math.round(rxn.base[1] + (rxn.targetRgb[1] - rxn.base[1]) * p);
-      var b = Math.round(rxn.base[2] + (rxn.targetRgb[2] - rxn.base[2]) * p);
+      var r = Math.round(rxn.base[0] + (rxn.targetRgb[0] - rxn.base[0]) * (rxn.mode === "ring" ? p * 0.16 : p));
+      var g = Math.round(rxn.base[1] + (rxn.targetRgb[1] - rxn.base[1]) * (rxn.mode === "ring" ? p * 0.16 : p));
+      var b = Math.round(rxn.base[2] + (rxn.targetRgb[2] - rxn.base[2]) * (rxn.mode === "ring" ? p * 0.16 : p));
+      if (curColorDot) curColorDot.style.background = "rgb(" + r + "," + g + "," + b + ")";
 
       ctx.save();
-      ctx.beginPath();
-      ctx.roundRect(tx, ty, tw, th, [8, 8, 65, 65]);
-      ctx.clip();
+      ctx.beginPath(); ctx.roundRect(tx, ty, tw, th, [4, 4, 55, 55]); ctx.clip();
 
       ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
       ctx.fillRect(tx, liquidY, tw, ty + th - liquidY);
 
-      for (var i = rxnState.particles.length - 1; i >= 0; i--) {
-        var pt = rxnState.particles[i];
-        pt.x += pt.vx;
-        pt.y += pt.vy;
-        pt.vx *= 0.985;
-        pt.vy = rxn.precip ? Math.min(1.6, pt.vy + 0.03) : pt.vy * 0.985;
-        if (pt.x < tx + 8 || pt.x > tx + tw - 8) pt.vx *= -0.8;
-        if (pt.y > ty + th - 10) { pt.y = ty + th - 10; pt.vy = 0; pt.vx *= 0.6; }
-        pt.life -= 0.005;
-        ctx.fillStyle = "rgba(" + rxn.targetRgb[0] + "," + rxn.targetRgb[1] + "," + rxn.targetRgb[2] + "," + Math.max(0.15, pt.life) + ")";
-        ctx.beginPath();
-        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
-        ctx.fill();
-        if (pt.life <= 0) rxnState.particles.splice(i, 1);
+      if (rxn.mode === "ring" && rxnState.ringAlpha > 0.02) {
+        var ifaceY2 = liquidY + 72;
+        ctx.fillStyle = "rgba(226, 232, 240, 0.55)";
+        ctx.fillRect(tx, ifaceY2, tw, ty + th - ifaceY2);
+        var ringGrad = ctx.createLinearGradient(tx, ifaceY2 - 18, tx, ifaceY2 + 18);
+        ringGrad.addColorStop(0, "rgba(126,34,206,0)");
+        ringGrad.addColorStop(0.5, "rgba(126,34,206," + (rxnState.ringAlpha * 0.94) + ")");
+        ringGrad.addColorStop(1, "rgba(126,34,206,0)");
+        ctx.fillStyle = ringGrad;
+        ctx.fillRect(tx, ifaceY2 - 18, tw, 36);
       }
 
-      if (rxn.bubbles && p > 0.1 && Math.random() < 0.35) {
-        rxnState.bubbles.push({ x: tx + 20 + Math.random() * (tw - 40), y: ty + th - 15, vy: -1.4 - Math.random() * 1.2, r: 2 + Math.random() * 2.5 });
+      if (rxn.mode === "precip" && rxnState.sedimentH > 1) {
+        ctx.fillStyle = "rgba(194, 65, 12, 0.94)";
+        ctx.fillRect(tx, ty + th - rxnState.sedimentH, tw, rxnState.sedimentH);
       }
-      for (var k = rxnState.bubbles.length - 1; k >= 0; k--) {
-        var bb = rxnState.bubbles[k];
-        bb.y += bb.vy;
-        ctx.strokeStyle = "rgba(255,255,255,0.75)";
+
+      for (var pi = 0; pi < rxnState.particles.length; pi++) {
+        var pt2 = rxnState.particles[pi];
+        ctx.fillStyle = "rgba(" + rxn.targetRgb[0] + "," + rxn.targetRgb[1] + "," + rxn.targetRgb[2] + "," + Math.max(0.18, pt2.life * 0.9) + ")";
+        ctx.beginPath(); ctx.arc(pt2.x, pt2.y, pt2.size, 0, Math.PI * 2); ctx.fill();
+      }
+      for (var bi = 0; bi < rxnState.bubbles.length; bi++) {
+        var bb2 = rxnState.bubbles[bi];
+        ctx.strokeStyle = "rgba(255,255,255,0.85)"; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.arc(bb2.x, bb2.y, bb2.r, 0, Math.PI * 2); ctx.stroke();
+      }
+      for (var ri = 0; ri < rxnState.ripples.length; ri++) {
+        var rp2 = rxnState.ripples[ri];
+        ctx.strokeStyle = "rgba(255,255,255," + Math.max(0, rp2.alpha) + ")"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.ellipse(dropCenterX, liquidY + 2, rp2.rad, rp2.rad * 0.25, 0, 0, Math.PI * 2); ctx.stroke();
+      }
+      // Concave meniscus
+      ctx.strokeStyle = "rgba(255,255,255,0.65)"; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(tx, liquidY); ctx.quadraticCurveTo(tx + tw / 2, liquidY + 6, tx + tw, liquidY); ctx.stroke();
+      ctx.restore();
+
+      drawTestTubeGlass(tx, "供试品反应管");
+      if (p >= 0.30) {
+        var tagTxt = rxn.mode === "bubbles" ? "H₂↑ 气泡溢出"
+          : (rxn.mode === "ring" ? "界面紫红环 (浓H₂SO₄沉底)"
+          : (rxn.mode === "precip" ? "[BiI₄]⁻ 橘红沉淀层" : "络合/解离显色羽流"));
+        ctx.fillStyle = "rgba(6, 36, 32, 0.88)";
+        ctx.strokeStyle = "rgba(251, 191, 36, 0.8)";
         ctx.lineWidth = 1.2;
-        ctx.beginPath();
-        ctx.arc(bb.x, bb.y, bb.r, 0, Math.PI * 2);
-        ctx.stroke();
-        if (bb.y < liquidY) rxnState.bubbles.splice(k, 1);
-      }
-
-      for (var j = rxnState.ripples.length - 1; j >= 0; j--) {
-        var rp = rxnState.ripples[j];
-        rp.rad += 1.8;
-        rp.alpha -= 0.03;
-        ctx.strokeStyle = "rgba(255,255,255," + Math.max(0, rp.alpha) + ")";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.ellipse(230, liquidY + 2, rp.rad, rp.rad * 0.25, 0, 0, Math.PI * 2);
-        ctx.stroke();
-        if (rp.alpha <= 0) rxnState.ripples.splice(j, 1);
+        ctx.beginPath(); ctx.roundRect(tx - 16, ty + 20, tw + 32, 22, 8); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = "#fde68a";
+        ctx.font = "bold 10.5px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(tagTxt, tx + tw / 2, ty + 35);
+        ctx.textAlign = "left";
       }
       ctx.restore();
 
-      ctx.strokeStyle = "rgba(255,255,255,0.78)";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.roundRect(tx, ty, tw, th, [8, 8, 65, 65]);
-      ctx.stroke();
-
-      for (var d = rxnState.drops.length - 1; d >= 0; d--) {
-        var dr = rxnState.drops[d];
-        dr.vy += 0.25;
-        dr.y += dr.vy;
+      for (var di = 0; di < rxnState.drops.length; di++) {
+        var dr2 = rxnState.drops[di];
         ctx.fillStyle = rxn.dropColor;
-        ctx.beginPath();
-        ctx.arc(dr.x, dr.y, 4.5, 0, Math.PI * 2);
-        ctx.fill();
-        if (dr.y >= liquidY) {
-          rxnState.drops.splice(d, 1);
-          rxnState.ripples.push({ rad: 4, alpha: 0.9 });
-          rxnState.progress = Math.min(1, rxnState.progress + 0.34);
-          for (var n = 0; n < 48; n++) {
-            rxnState.particles.push({
-              x: 230 + (Math.random() - 0.5) * 16,
-              y: liquidY + 4,
-              vx: (Math.random() - 0.5) * 2.8,
-              vy: 0.6 + Math.random() * 2.4,
-              size: 2 + Math.random() * 3.5,
-              life: 1
-            });
-          }
-          if (barEl) barEl.style.width = Math.round(rxnState.progress * 100) + "%";
-          if (statusEl) {
-            statusEl.textContent = rxnState.progress >= 0.95 ? "✅ 显色终点已达：" + rxn.desc : "正在扩散显色，可继续滴加直至终点...";
-          }
-        }
+        ctx.beginPath(); ctx.arc(dr2.x, dr2.y, 4.8, 0, Math.PI * 2); ctx.fill();
       }
-
-      rxnRaf = requestAnimationFrame(drawRxn);
     }
-    drawRxn();
+
+    rxnRaf = requestAnimationFrame(drawRxn);
   }
 
   function registerIntegrations() {
@@ -902,7 +1163,8 @@
     openParticles: function () { openModal("particles"); },
     getMoleculeKeys: function () { return Object.keys(getMolecules()); },
     getCurrentFps: function () { return currentFps; },
-    getRotY: function () { return rotY; }
+    getRotY: function () { return rotY; },
+    getParticlesState: function () { return { rxnId: PARTICLE_REACTIONS[rxnIdx].id, rxnCount: PARTICLE_REACTIONS.length, progress: Number((rxnState.progress || 0).toFixed(2)), paused: !!rxnState.paused, speed: rxnState.speed || 1, particles: (rxnState.particles || []).length }; }
   };
 
   if (document.readyState === "loading") {

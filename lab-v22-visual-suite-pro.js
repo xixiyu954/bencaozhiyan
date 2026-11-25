@@ -9,6 +9,8 @@
   var activeTab = "vlab";
   var animId = null;
   var vlab3dInstance = null;
+  var fluidSimInstance = null;
+  var cockpitInstance = null;
 
   var vlab = {
     x: 240,
@@ -69,17 +71,18 @@
         '<div class="px-5 py-3.5 bg-gradient-to-r from-[#062922] via-[#0a4538] to-[#0f6b58] text-white flex items-center justify-between gap-3">' +
           '<div class="flex items-center gap-2.5">' +
             '<span class="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 text-[11px] font-extrabold">3D 视觉体验舱</span>' +
-            '<h3 class="text-sm sm:text-base font-extrabold">Three.js 第一人称 3D 实验室 · 流体仿真 · AR 药材卡</h3>' +
+            '<h3 class="text-sm sm:text-base font-extrabold">3D 虚拟实验室 · 物理流体仿真 · 驾驶舱大屏 · AR 药材卡</h3>' +
           '</div>' +
           '<button type="button" id="v22BtnClose" aria-label="关闭弹窗" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-lg leading-none">×</button>' +
         '</div>' +
         '<div class="px-5 pt-3 pb-2 border-b border-slate-100 bg-[#f6f8f7] flex flex-wrap items-center justify-between gap-2">' +
-          '<div class="inline-flex p-1 rounded-xl bg-white border border-slate-200 text-xs font-extrabold">' +
+          '<div class="inline-flex flex-wrap p-1 rounded-xl bg-white border border-slate-200 text-xs font-extrabold">' +
             '<button type="button" data-v22-tab="vlab" class="px-3.5 py-1.5 rounded-lg transition">🕹️ 第一人称 3D 实验室</button>' +
             '<button type="button" data-v22-tab="fluid" class="px-3.5 py-1.5 rounded-lg transition">🌊 物理流体仿真</button>' +
+            '<button type="button" data-v22-tab="cockpit" class="px-3.5 py-1.5 rounded-lg transition">📊 驾驶舱大屏</button>' +
             '<button type="button" data-v22-tab="ar" class="px-3.5 py-1.5 rounded-lg transition">📱 AR 药材卡</button>' +
           '</div>' +
-          '<span class="text-[11px] text-slate-500 font-semibold">Three.js 实景 3D · WASD / 拖拽环顾 · 冷却水安全互锁</span>' +
+          '<span class="text-[11px] text-slate-500 font-semibold">实时物理溶剂内核 · 3D 雷达投影 · 离线零外链</span>' +
         '</div>' +
         '<div id="v22Body" class="flex-1 overflow-y-auto p-4 sm:p-5"></div>' +
       '</div>';
@@ -118,6 +121,14 @@
       vlab3dInstance.destroy();
       vlab3dInstance = null;
     }
+    if (fluidSimInstance && typeof fluidSimInstance.destroy === "function") {
+      fluidSimInstance.destroy();
+      fluidSimInstance = null;
+    }
+    if (cockpitInstance && typeof cockpitInstance.destroy === "function") {
+      cockpitInstance.destroy();
+      cockpitInstance = null;
+    }
   }
 
   function stopCamera() {
@@ -152,6 +163,7 @@
     var body = modalEl.querySelector("#v22Body");
     if (activeTab === "vlab") renderVlab(body);
     else if (activeTab === "fluid") renderFluid(body);
+    else if (activeTab === "cockpit") renderCockpit(body);
     else renderArCard(body);
   }
 
@@ -314,6 +326,11 @@
   }
 
   function renderFluid(container) {
+    stopLoop();
+    if (window.TCM_V22_FLUID_SIM && typeof window.TCM_V22_FLUID_SIM.mount === "function") {
+      fluidSimInstance = window.TCM_V22_FLUID_SIM.mount(container);
+      return;
+    }
     container.innerHTML =
       '<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">' +
         '<div class="lg:col-span-7 rounded-2xl bg-[#091b18] border border-emerald-500/25 overflow-hidden flex justify-center">' +
@@ -409,6 +426,15 @@
       animId = requestAnimationFrame(drawFluid);
     }
     drawFluid();
+  }
+
+  function renderCockpit(container) {
+    stopLoop();
+    if (window.TCM_V22_COCKPIT && typeof window.TCM_V22_COCKPIT.mount === "function") {
+      cockpitInstance = window.TCM_V22_COCKPIT.mount(container);
+      return;
+    }
+    container.innerHTML = '<div class="p-6 text-center text-sm text-slate-500">驾驶舱数据大屏加载中...</div>';
   }
 
   function renderArCard(container) {
@@ -533,7 +559,9 @@
     version: "1.0.0",
     open: openModal,
     togglePresentMode: togglePresentMode,
-    getVlab3d: function () { return vlab3dInstance; }
+    getVlab3d: function () { return vlab3dInstance; },
+    getFluidSim: function () { return fluidSimInstance; },
+    getCockpit: function () { return cockpitInstance; }
   };
 
   if (document.readyState === "loading") {

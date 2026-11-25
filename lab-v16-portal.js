@@ -565,7 +565,7 @@
     }
 
     if (tab === 'analysis') {
-      const specCat = /生物碱/.test(preview.category || '') ? '生物碱' : (/蒽醌|醌/.test(preview.category || '') ? '蒽醌与醌类' : '黄酮');
+      const specCat = /生物碱/.test(preview.category || '') ? '生物碱' : (/蒽醌|醌/.test(preview.category || '') ? '蒽醌与醌类' : (/苯丙素|有机酸|酚酸/.test(preview.category || '') ? '酚酸类' : '黄酮'));
       return `
         <div class="v16-preview-block">
           <label>2025 版药典质控参考${preview.limitVal ? `（限度 ≥ ${esc(preview.limitVal)}${esc(preview.limitUnit || '%')}）` : ''}</label>

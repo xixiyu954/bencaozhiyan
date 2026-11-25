@@ -169,15 +169,47 @@ function injectMol3dLinkStyles() {
       background: rgba(16, 185, 129, 0.30);
     }
     body.dark-lab #tcmV20VisualModal > div,
+    body.dark-lab #tcmV21SpectraModal > div,
     body.dark-lab #tcmV22Modal > div {
       background: #0d1f1d !important;
       border-color: #1e3f3a !important;
       color: #e2f1ed !important;
     }
     body.dark-lab #tcmV20VisualModal [class*="bg-[#f6f8f7]"],
+    body.dark-lab #tcmV21SpectraModal [class*="bg-[#f6f8f7]"],
     body.dark-lab #tcmV22Modal [class*="bg-[#f6f8f7]"] {
       background: #122926 !important;
       border-color: #1e3f3a !important;
+    }
+    body.dark-lab #tcmV21SpectraModal .bg-white,
+    body.dark-lab #tcmV21SpectraModal .bg-slate-50,
+    body.dark-lab #tcmV21SpectraModal .bg-slate-100 {
+      background-color: #112a26 !important;
+      border-color: #244a44 !important;
+      color: #e2f1ed !important;
+    }
+    body.dark-lab #tcmV21SpectraModal [class*="bg-emerald-50"] {
+      background-color: rgba(16, 185, 129, 0.14) !important;
+      border-color: rgba(52, 211, 153, 0.35) !important;
+      color: #d1fae5 !important;
+    }
+    body.dark-lab #tcmV21SpectraModal [class*="bg-amber-50"] {
+      background-color: rgba(245, 158, 11, 0.14) !important;
+      border-color: rgba(251, 191, 36, 0.45) !important;
+      color: #fef3c7 !important;
+    }
+    body.dark-lab #tcmV21SpectraModal .text-slate-500,
+    body.dark-lab #tcmV21SpectraModal .text-slate-600 {
+      color: #94a3b8 !important;
+    }
+    body.dark-lab #tcmV21SpectraModal .text-slate-700,
+    body.dark-lab #tcmV21SpectraModal .text-slate-800 {
+      color: #e2f1ed !important;
+    }
+    body.dark-lab #tcmV21SpectraModal button:not([class*="bg-[#059669]"]):not([class*="bg-[#064e3b]"]):not([class*="bg-[#ea580c]"]):not([class*="bg-emerald-"]):not([class*="bg-amber-"]):not([class*="bg-white/10"]) {
+      background-color: #132c29 !important;
+      color: #e2e8f0 !important;
+      border-color: #244a44 !important;
     }
     body.dark-lab #tcmV20VisualModal button[data-v20-mol]:not([class*="bg-[#059669]"]),
     body.dark-lab #tcmV20VisualModal button[data-v20-mode]:not([class*="bg-[#ea580c]"]),
@@ -262,8 +294,9 @@ function mountBentoFabDock() {
   dock.innerHTML =
     '<div class="v22-fab-tray" id="v22FabTray" hidden>' +
       '<button type="button" class="v22-fab-btn accent" data-v22-open="vlab">🕹️ 3D 虚拟实验室</button>' +
+      '<button type="button" class="v22-fab-btn" data-v22-open="fluid">🌊 物理流体仿真</button>' +
+      '<button type="button" class="v22-fab-btn" data-v22-open="cockpit">📊 驾驶舱大屏</button>' +
       '<button type="button" class="v22-fab-btn" data-kb-open="overview">📚 六科知识库</button>' +
-      '<button type="button" class="v22-fab-btn" data-v22-open="fluid">🌊 流体仿真</button>' +
       '<button type="button" class="v22-fab-btn" data-v22-open="ar">📱 AR 药材卡</button>' +
       '<button type="button" class="v22-fab-btn" id="v22BtnPresent">🖥️ 投影模式</button>' +
       '<button type="button" class="v22-fab-btn" id="v24BtnOpenGrowth">🏆 段位图鉴</button>' +
@@ -340,7 +373,7 @@ function mountStepQuickButtons() {
     bar.innerHTML = '<button type="button" class="px-3.5 py-1.5 rounded-xl bg-[#059669] hover:bg-[#047857] text-white text-xs font-extrabold transition">🌈 启动交互式四谱缩放 & 猜峰小游戏 →</button>';
     bar.querySelector('button').addEventListener('click', () => {
       const catText = (document.getElementById('cfgCategory') && document.getElementById('cfgCategory').textContent) || '';
-      const cat = /生物碱/.test(catText) ? '生物碱' : (/蒽醌/.test(catText) ? '蒽醌与醌类' : '黄酮');
+      const cat = /生物碱/.test(catText) ? '生物碱' : (/蒽醌|醌/.test(catText) ? '蒽醌与醌类' : (/苯丙素|有机酸|酚酸/.test(catText) ? '酚酸类' : '黄酮'));
       window.TCM_V21_SPECTRA_LAB.open(cat);
     });
     s3Card.appendChild(bar);

@@ -321,7 +321,7 @@ function renderBentoHome() {
                 <span class="text-xs font-extrabold text-amber-700">猜峰挑战</span>
               </div>
               <h3 class="v19-bento-title">交互式四谱分析</h3>
-              <p class="v19-bento-sub">UV / IR / ¹H-NMR / MS 缩放与峰归属</p>
+              <p class="v19-bento-sub">UV 诊断位移 · NMR 积分 · MS 裂解与猜峰</p>
             </div>
             <div class="v19-card-stage">
               <svg viewBox="0 0 180 86" class="w-full h-20" aria-hidden="true">
