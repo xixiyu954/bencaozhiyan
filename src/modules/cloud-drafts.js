@@ -223,13 +223,13 @@ function updateStatusUi(mode, updatedAt = '', cloudId = '') {
   if (!badge) return;
   const tm = formatClock(updatedAt);
   if (mode === 'cloud' && cloudId) {
-    badge.textContent = `☁️ 云端已同步 ${cloudId}${tm ? ' · ' + tm : ''}`;
+    badge.textContent = `云端已同步 ${cloudId}${tm ? ' · ' + tm : ''}`;
     badge.className = 'text-[10px] font-semibold text-emerald-300 truncate';
   } else if (mode === 'local') {
-    badge.textContent = `💾 自动保存已开启（本地${tm ? ' · ' + tm : ''}）`;
+    badge.textContent = `自动保存已开启（本地${tm ? ' · ' + tm : ''}）`;
     badge.className = 'text-[10px] font-semibold text-teal-200/90 truncate';
   } else {
-    badge.textContent = '💾 自动保存已开启 · 刷新不丢失';
+    badge.textContent = '自动保存已开启 · 刷新不丢失';
     badge.className = 'text-[10px] font-semibold text-teal-200/80 truncate';
   }
 }
@@ -246,11 +246,11 @@ function mountSidebarControls() {
   bar.className = 'rounded-xl bg-white/5 border border-white/10 p-2 space-y-1.5';
   bar.innerHTML = `
     <div class="flex items-center justify-between gap-1">
-      <span id="cloudDraftStatus" class="text-[10px] font-semibold text-teal-200/80 truncate">💾 自动保存已开启 · 刷新不丢失</span>
+      <span id="cloudDraftStatus" class="text-[10px] font-semibold text-teal-200/80 truncate">自动保存已开启 · 刷新不丢失</span>
     </div>
     <div class="grid grid-cols-2 gap-1.5">
-      <button id="btnCloudSaveDraft" type="button" class="py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/30 text-[11px] font-bold text-emerald-100 transition">☁️ 云端保存</button>
-      <button id="btnCloudRestoreDraft" type="button" class="py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-medium text-teal-50 transition">📥 云端恢复</button>
+      <button id="btnCloudSaveDraft" type="button" class="py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/30 text-[11px] font-bold text-emerald-100 transition">云端保存</button>
+      <button id="btnCloudRestoreDraft" type="button" class="py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-medium text-teal-50 transition">云端恢复</button>
     </div>`;
   footerBox.insertBefore(bar, gridRow);
 

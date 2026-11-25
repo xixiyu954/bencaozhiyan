@@ -846,3 +846,86 @@ body.dark-lab .v27-btn-gen {
     font-size: 0.72rem !important;
   }
 }
+
+/* ---------- 9. v32 深度细节精修：工坊悬浮坞零遮挡、暗色雷达/沙盒对比度、移动端导航与键盘焦点 ---------- */
+
+/* 9.1 桌面端进入六步工坊时，左侧扩展舱自动右移避让 288px 配置单侧栏（不再遮挡直邮反馈按钮） */
+@media (min-width: 1024px) {
+  body[data-v16-route="workflow"] #tcmV22FabDock {
+    left: 304px !important;
+  }
+}
+
+/* 9.2 移动端进入六步工坊时，左右双工具坞整体上移 56px，完全避让底部步进条 #mobStepBar */
+@media (max-width: 1023px) {
+  body[data-v16-route="workflow"] #tcmV22FabDock,
+  body[data-v16-route="workflow"] #tcmV28AiDock {
+    bottom: 68px !important;
+  }
+}
+
+/* 9.3 底部安全滚动留白，确保右侧驾驶舱、DIY 结果卡与产业转化卡片可完整滚出悬浮坞区域 */
+#rightVisualDock,
+#v16DiyPage,
+#v16TranslationPage,
+#v16BankPage,
+#v16AiPage {
+  padding-bottom: 72px;
+}
+
+/* 9.4 暗色模式：六步工坊右侧五维工艺雷达 SVG 轴标签高对比度精修 */
+body.dark-lab #rightVisualDock svg text {
+  fill: #c8dcd3 !important;
+}
+
+body.dark-lab #rightVisualDock svg polygon,
+body.dark-lab #rightVisualDock svg line {
+  stroke-opacity: 0.45;
+}
+
+/* 9.5 暗色模式：DIY 自由配方沙盒已选中溶剂/装置芯片文字 AAA 对比度精修 */
+body.dark-lab .v25-opt-chip.is-active {
+  background: #0f4c3a !important;
+  border-color: #5fb89c !important;
+  color: #ffffff !important;
+}
+
+body.dark-lab .v25-opt-chip.is-active .v25-opt-name {
+  color: #ffffff !important;
+}
+
+body.dark-lab .v25-opt-chip.is-active .v25-opt-sub {
+  color: rgba(235, 242, 238, 0.86) !important;
+}
+
+body.dark-lab .v25-btn-primary {
+  background: #5fb89c !important;
+  color: #091713 !important;
+}
+
+/* 9.6 移动端顶部横向工作区导航增加边缘微淡出提示可横滑 */
+@media (max-width: 768px) {
+  .v16-nav {
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 90%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 0%, #000 90%, transparent 100%);
+    padding-right: 18px !important;
+  }
+}
+
+/* 9.7 键盘无障碍聚焦环（AAA 仪器级焦点反馈） */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--craft-accent) !important;
+  outline-offset: 2px;
+}
+
+body.dark-lab button:focus-visible,
+body.dark-lab a:focus-visible,
+body.dark-lab input:focus-visible,
+body.dark-lab select:focus-visible,
+body.dark-lab textarea:focus-visible {
+  outline-color: #5fb89c !important;
+}

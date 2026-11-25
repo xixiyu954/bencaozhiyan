@@ -166,3 +166,18 @@
   - **知识图谱与可视化探索中心 4.1~4.5**（`src/modules/lab-v29-explore-suite.js`）：4.1 图谱贯通全库 **136 项课题工艺链路（11 大类）** 并关联实证文献；4.2 极性宇宙扩至 **12 颗特征星**；4.3 流水线沙盘扩至 **6 套标杆预设**；4.4 导演时间轴开放 **4 旗舰 + 136 全题库（共 140 套可播/可导出脚本）**；4.5 对比显微镜接入真实 `defaultCfg` / TLC / 限度及 **关联实证文献对比行**。
   - **实验成长档案与收集图鉴**（`src/modules/lab-v24-gamification.js`、`src/modules/v19-bento-home.js`、`index.html`）：由截断演示升级为 **四库全集五标签**（`药材图鉴 0/136`、`三维分子 77`、`实验装置 15`、`实证文献 91`、`成就徽章 8`），全量支持检索与一键联动跳转。
 - **质量验证**：`npm run build`（3.73s）通过；Lighthouse **Accessibility 100 / Best Practices 100 / SEO 100 / Performance 86 (CLS 0, 首页传输 423 KB)**；全部 7 项端到端回归及扩展仓 E2E 校验通过，0 控制台报错、0 懒加载泄露。
+
+
+### 2026-11-25 v32 全站深度细节精修（布局避让、暗色 AAA 对比度、工坊 136 题对齐与首帧水合优化）
+- **六步工坊全端防遮挡与全题库对齐**（`src/styles/lab-v30-craft-deai.css`、`app.js`、`src/modules/cloud-drafts.js`）：
+  - 桌面端进入六步工坊时，左下角 `#tcmV22FabDock` 自动右移至 `left: 304px` 完全避让 `288px` 配置单侧栏（不再遮挡直邮反馈按钮）；
+  - 移动端（`≤1023px`）进入六步工坊时，左右双工具坞自动上移至 `bottom: 68px`，完全避让底部步进条 `#mobStepBar`（实测 `fabBottom 776 < barTop 783`）；
+  - 六步工坊 Step 1「全部题库」由 103 项补全为全站 **136 项**（与药材题库页 100% 同步），并清理工坊标签、卡片及云草稿栏残余原始 Emoji。
+- **暗色模式与移动端交互精修**（`src/styles/lab-v30-craft-deai.css`、`src/modules/lab-v25-formula-sandbox.js`、`lab-v18-translation.js`、`src/modules/lab-v29-explore-suite.js`）：
+  - 修复暗色模式下右侧五维工艺雷达 SVG 轴标签过暗问题（提升为 `#c8dcd3` 高对比度）及 DIY 沙盒选中溶剂/装置芯片对比度；
+  - 清理 DIY 自由配方沙盒与八阶段产业转化页全部残余原始 Emoji 及过期 `119` 计数注释；
+  - 移动端顶部横向工作区导航新增右缘淡出遮罩提示可横滑，并补齐全站键盘 `:focus-visible` 聚焦环。
+- **品牌图标矢量升级与首帧优化**（`index.html`、`manifest.webmanifest`、`app.js`）：
+  - 将站点 Favicon 与 PWA 清单图标由 Emoji `🌿` 升级为精绘几何烧瓶矢量 SVG；
+  - 首页初始路由将隐藏六步工坊的首次重绘让出至首帧之后执行，保障首屏 Hero 零阻塞绘制。
+- **质量验证**：`npm run build`（3.83s）通过；Lighthouse **Accessibility 100 / Best Practices 100 / SEO 100 / Performance 86（CLS 0，实测 CWV LCP 232 ms / CLS 0.0015）**；全站 7 项回归及 6 组亮/暗/移动端截图巡检全部通过，0 报错。

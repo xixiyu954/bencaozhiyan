@@ -10,13 +10,13 @@
   "orientation": "any",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20width='192'%20height='192'%20rx='40'%20fill='%23062420'/%3E%3Ctext%20y='.72em'%20x='50%25'%20font-size='120'%20text-anchor='middle'%20dominant-baseline='central'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20width='192'%20height='192'%20rx='42'%20fill='%230f4c3a'/%3E%3Cpath%20d='M72%2042h48M81%2042v39L51%20132a18%2018%200%200%200%2015.6%2027h58.8a18%2018%200%200%200%2015.6-27L111%2081V42'%20fill='none'%20stroke='%23ebf2ee'%20stroke-width='10'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Cpath%20d='M63%20123c15-7.5%2030%207.5%2048%200s18-3.6%2018-3.6'%20fill='none'%20stroke='%235fb89c'%20stroke-width='9'%20stroke-linecap='round'/%3E%3C/svg%3E",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20512%20512'%3E%3Crect%20width='512'%20height='512'%20rx='108'%20fill='%23062420'/%3E%3Ctext%20y='.72em'%20x='50%25'%20font-size='320'%20text-anchor='middle'%20dominant-baseline='central'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20512%20512'%3E%3Crect%20width='512'%20height='512'%20rx='112'%20fill='%230f4c3a'/%3E%3Cpath%20d='M192%20112h128M216%20112v104L136%20352a48%2048%200%200%200%2041.6%2072h156.8a48%2048%200%200%200%2041.6-72L296%20216V112'%20fill='none'%20stroke='%23ebf2ee'%20stroke-width='26'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Cpath%20d='M168%20328c40-20%2080%2020%20128%200s48-10%2048-10'%20fill='none'%20stroke='%235fb89c'%20stroke-width='24'%20stroke-linecap='round'/%3E%3C/svg%3E",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"

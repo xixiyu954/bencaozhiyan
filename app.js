@@ -2332,9 +2332,9 @@
       qInput.addEventListener('input', e => { state.step1Query = e.target.value; renderStep1(getTopicDef()); });
     }
 
-    const listIds = tab === 'class' ? CLASS_ORDER : tab === 'innovative' ? INNO_ORDER : [...INNO_ORDER, ...CLASS_ORDER, 'phellodendron', 'rheum', 'artemisia', 'ephedra'];
+    const listIds = tab === 'class' ? CLASS_ORDER : tab === 'innovative' ? INNO_ORDER : CATALOG_45.map(e => e.id);
     const seen = new Set();
-    const aiCustomList = Object.values(state.customTopics || {}).reverse(); const aiTabBtn = document.getElementById('btnStep1AiTab'); if (aiTabBtn) aiTabBtn.textContent = '🤖 AI/自建 (' + aiCustomList.length + ')'; const baseCards = tab === 'ai_custom' ? aiCustomList : listIds.filter(id => !seen.has(id) && seen.add(id)).map(id => FEATURED_PRESETS[id]).filter(Boolean);
+    const aiCustomList = Object.values(state.customTopics || {}).reverse(); const aiTabBtn = document.getElementById('btnStep1AiTab'); if (aiTabBtn) aiTabBtn.textContent = 'AI / 自建 (' + aiCustomList.length + ')'; const baseCards = tab === 'ai_custom' ? aiCustomList : listIds.filter(id => !seen.has(id) && seen.add(id)).map(id => FEATURED_PRESETS[id] || findTopicDef(id, state.customTopics)).filter(Boolean);
 
     const catPillsEl = document.getElementById('step1CatPills');
     if (catPillsEl) {
@@ -2359,9 +2359,9 @@
     setTxt('bannerRigPill', `${Object.keys(LAB_RIGS).length} 套动态实验装置`);
     setTxt('bannerLitPill', `${GLOBAL_LITERATURE.length + state.extraGlobalRefs.length} 篇实证文献`);
     setTxt('navHubCount', Object.keys(LAB_RIGS).length); setTxt('step4HubCnt', Object.keys(LAB_RIGS).length);
-    const tInno = document.querySelector('[data-s1-tab="innovative"]'); if (tInno) tInno.textContent = `✨ 创新拓展 (${innoCount}项)`;
-    const tClass = document.querySelector('[data-s1-tab="class"]'); if (tClass) tClass.textContent = `★ 经典精选 (${classCount}项)`;
-    const tAll = document.querySelector('[data-s1-tab="all"]'); if (tAll) tAll.textContent = `全部精编 (${allFeaturedCount}项)`;
+    const tInno = document.querySelector('[data-s1-tab="innovative"]'); if (tInno) tInno.textContent = `创新拓展 (${innoCount}项)`;
+    const tClass = document.querySelector('[data-s1-tab="class"]'); if (tClass) tClass.textContent = `经典精选 (${classCount}项)`;
+    const tAll = document.querySelector('[data-s1-tab="all"]'); if (tAll) tAll.textContent = `全部题库 (${CATALOG_45.length}项)`;
     const cards = baseCards.filter(p => (curCat === '全部' || p.category === curCat) && (!q || `${p.herb} ${p.compound} ${p.category} ${p.integrative || ''} ${RIG_SHORT[p.defaultRig] || ''}`.toLowerCase().includes(q)));
 
     el.innerHTML = cards.map(p => {
@@ -2379,7 +2379,7 @@
           <div class="text-xs text-slate-500 truncate">${p.compound}</div>
         </div>
         <div class="pt-1.5 mt-1 border-t border-slate-100 flex items-center justify-between gap-1.5 text-[10px] text-slate-500">
-          <span class="font-semibold text-[#0f5c54] truncate">⚗️ ${rigTag}</span>
+          <span class="font-semibold text-[#0f5c54] truncate">${rigTag}</span>
           <span class="shrink-0 whitespace-nowrap px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">常规可做</span>
         </div>
       </button>`;
@@ -4567,7 +4567,15 @@
     showToast
   };
 
-  renderAll();
+  // 首页首屏优化：若初始落在首页路由，先让出首帧给 Bento Hero 绘制，随后异步水合隐藏的六步工坊与图标
+  const initialOnHome = document.body && document.body.dataset.v16Route === 'home' && !/[?&]route=(workflow|diy|bank|ai|translation)/.test(window.location.search || '');
+  if (initialOnHome && typeof window.requestAnimationFrame === 'function') {
+    window.requestAnimationFrame(() => {
+      setTimeout(() => { renderAll(); }, 0);
+    });
+  } else {
+    renderAll();
+  }
   if (window.TCM_V7_MEDIA) {
     window.TCM_V7_MEDIA.initVideoHubModal();
     window.TCM_V7_MEDIA.initDarkMode();

@@ -1,6 +1,6 @@
 /**
  * 本草智研 v25 · 2.1 自由配方沙盒（v2 精工深度版）
- * - 真实接入全站 119 项药材题库 + SOLVENT_POLARITY_TABLE（15 溶剂）+ 8 提取装置 + REAGENT_MSDS_DB
+ * - 真实接入全站 136 项药材题库 + SOLVENT_POLARITY_TABLE（15 溶剂）+ 8 提取装置 + REAGENT_MSDS_DB
  * - 新增实时极性光谱匹配尺（p=0.1~10.2）、动态提取液现象预览瓶（丹红/酶解墨绿/氧化褐变/皂苷泡沫/暴沸气泡）、
  *   温时提取动力学曲线（实时展示高温长时热降解拐点）
  * - 局部 DOM 更新引擎：拖拽滑块 60fps 顺滑更新右侧遥测台，绝不重建左侧滑块丢焦点
@@ -327,13 +327,13 @@
     }
 
     var overallScore = Math.round(polarityScore * 0.36 + thermalScore * 0.32 + rigScore * 0.32);
-    var verdict = { level: "great", icon: "🟢", title: "工艺优选 · 高度可行", summary: "极性窗口、温控安全与装置传质高度匹配，可直接用于规范实验或放大验证。" };
+    var verdict = { level: "great", dotColor: "#10b981", title: "工艺优选 · 高度可行", summary: "极性窗口、温控安全与装置传质高度匹配，可直接用于规范实验或放大验证。" };
     if (overallScore < 45 || rigScore < 30 || polarityScore < 30) {
-      verdict = { level: "fail", icon: "🔴", title: "严重失配 · 实验易翻车", summary: "存在核心极性/安全/装置冲突，预计目标成分收率极低或触发安全风险，请按下方诊断修正。" };
+      verdict = { level: "fail", dotColor: "#ef4444", title: "严重失配 · 实验易翻车", summary: "存在核心极性/安全/装置冲突，预计目标成分收率极低或触发安全风险，请按下方诊断修正。" };
     } else if (overallScore < 70 || conflicts.length >= 2) {
-      verdict = { level: "warn", icon: "🟠", title: "存在隐患 · 建议调优", summary: "配方可勉强运行，但存在热损、酶解或溶剂环保短板，建议点击「一键智能优化」对照提升。" };
+      verdict = { level: "warn", dotColor: "#f59e0b", title: "存在隐患 · 建议调优", summary: "配方可勉强运行，但存在热损、酶解或溶剂环保短板，建议点击「一键智能优化」对照提升。" };
     } else if (overallScore < 85 || conflicts.length === 1) {
-      verdict = { level: "ok", icon: "🟡", title: "基本可行 · 有提升空间", summary: "主路线成立，微调料液比、温度或溶剂比例可进一步提高收率与绿色评分。" };
+      verdict = { level: "ok", dotColor: "#eab308", title: "基本可行 · 有提升空间", summary: "主路线成立，微调料液比、温度或溶剂比例可进一步提高收率与绿色评分。" };
     }
 
     return {
@@ -346,10 +346,10 @@
   }
 
   var PLAY_PRESETS = [
-    { id: "green_lonicera", label: "🌿 绿色优选 · 金银花低温超声", matchHerb: /金银花/, solventId: "etoh50", rigId: "ultrasonic", ratio: 12, temp: 42, time: 40, cycles: 2 },
-    { id: "polar_fail", label: "⚠️ 极性失配 · 纯水提丹参酮", matchHerb: /丹参/, solventId: "pure_9", rigId: "reflux", ratio: 10, temp: 95, time: 60, cycles: 1 },
-    { id: "enzyme_trap", label: "🧪 酶解陷阱 · 50℃温水泡黄芩", matchHerb: /黄芩/, solventId: "pure_9", rigId: "decoction", ratio: 10, temp: 50, time: 60, cycles: 1 },
-    { id: "alkali_fail", label: "🔥 热敏翻车 · 高温碱水提绿原酸", matchHerb: /金银花/, solventId: "alkali_water", rigId: "reflux", ratio: 14, temp: 95, time: 90, cycles: 2 }
+    { id: "green_lonicera", label: "绿色优选 · 金银花低温超声", matchHerb: /金银花/, solventId: "etoh50", rigId: "ultrasonic", ratio: 12, temp: 42, time: 40, cycles: 2 },
+    { id: "polar_fail", label: "极性失配 · 纯水提丹参酮", matchHerb: /丹参/, solventId: "pure_9", rigId: "reflux", ratio: 10, temp: 95, time: 60, cycles: 1 },
+    { id: "enzyme_trap", label: "酶解陷阱 · 50℃温水泡黄芩", matchHerb: /黄芩/, solventId: "pure_9", rigId: "decoction", ratio: 10, temp: 50, time: 60, cycles: 1 },
+    { id: "alkali_fail", label: "热敏翻车 · 高温碱水提绿原酸", matchHerb: /金银花/, solventId: "alkali_water", rigId: "reflux", ratio: 14, temp: 95, time: 90, cycles: 2 }
   ];
 
   var state = {
@@ -472,7 +472,7 @@
             '<div class="v25-ruler-scale"><span>0.1 石油醚(非极性)</span><span>5.2 乙醇</span><span>10.2 纯化水(强极性)</span></div>' +
           "</div>" +
           '<div class="v25-curve-box">' +
-            '<div class="v25-field-label" style="margin:0 0 2px;font-size:11px;"><span>提取动力学曲线（收率 vs 时间 · 当前 ' + state.time + ' min）</span><span style="color:' + barColor(res.estYield) + ';">' + (state.temp > res.prof.maxSafeTemp ? "⚠ 高温长时热降解" : "稳态溶出") + "</span></div>" +
+            '<div class="v25-field-label" style="margin:0 0 2px;font-size:11px;"><span>提取动力学曲线（收率 vs 时间 · 当前 ' + state.time + ' min）</span><span style="color:' + barColor(res.estYield) + ';">' + (state.temp > res.prof.maxSafeTemp ? "高温长时热降解" : "稳态溶出") + "</span></div>" +
             buildKineticCurveSvg(res) +
           "</div>" +
         "</div>" +
@@ -498,14 +498,14 @@
 
       '<div class="v25-verdict-banner lv-' + res.verdict.level + '">' +
         '<div>' +
-          '<div style="font-size:14px;font-weight:900;">' + res.verdict.icon + " " + esc(res.verdict.title) + "</div>" +
+          '<div style="font-size:14px;font-weight:900;display:flex;align-items:center;gap:7px;"><span style="width:9px;height:9px;border-radius:999px;display:inline-block;background:' + (res.verdict.dotColor || "#10b981") + ';flex-shrink:0;"></span><span>' + esc(res.verdict.title) + "</span></div>" +
           '<div style="font-size:12px;margin-top:3px;opacity:0.92;">' + esc(res.verdict.summary) + "</div>" +
         "</div>" +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
           (window.TCM_V26_FAILURE_BRANCHES && window.TCM_V26_FAILURE_BRANCHES.matchFromSandbox(res)
-            ? '<button type="button" class="v25-btn-ghost" id="v25BtnOpenFailure" style="border-color:rgba(225,29,72,0.45);color:#be123c;">🚨 事故复盘卡</button>'
+            ? '<button type="button" class="v25-btn-ghost" id="v25BtnOpenFailure" style="border-color:rgba(225,29,72,0.45);color:#be123c;">事故复盘卡</button>'
             : '') +
-          '<button type="button" class="v25-btn-primary" id="v25BtnAutoOpt">✨ 一键智能优化</button>' +
+          '<button type="button" class="v25-btn-primary" id="v25BtnAutoOpt">一键智能优化</button>' +
         '</div>' +
       "</div>" +
 
@@ -518,7 +518,7 @@
 
       '<div class="v25-diag-grid">' +
         '<div class="v25-diag-box">' +
-          '<h4>🔍 可行性冲突与化学诊断</h4>' +
+          '<h4>可行性冲突与化学诊断</h4>' +
           '<ul class="v25-diag-list">' +
             (res.conflicts.length
               ? res.conflicts.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("")
@@ -527,7 +527,7 @@
           "</ul>" +
         "</div>" +
         '<div class="v25-diag-box">' +
-          '<h4>🧪 副产物共溶与 MSDS 废液提示</h4>' +
+          '<h4>副产物共溶与 MSDS 废液提示</h4>' +
           '<ul class="v25-diag-list">' +
             res.byproducts.map(function (b) { return "<li>" + esc(b) + "</li>"; }).join("") +
             "<li><strong>废液去向：</strong>" + esc(res.wasteTip) + "</li>" +
@@ -536,9 +536,9 @@
       "</div>" +
 
       '<div class="v25-action-bar">' +
-        '<button type="button" class="v25-btn-primary" id="v25BtnSavePlan">📌 存入对比槽（' + state.savedPlans.length + '/4）</button>' +
-        '<button type="button" class="v25-btn-ghost" id="v25BtnImportWf">🚀 一键导入六步工坊</button>' +
-        '<button type="button" class="v25-btn-ghost" id="v25BtnCopyRecipe">📋 复制配方摘要</button>' +
+        '<button type="button" class="v25-btn-primary" id="v25BtnSavePlan">存入对比槽（' + state.savedPlans.length + '/4）</button>' +
+        '<button type="button" class="v25-btn-ghost" id="v25BtnImportWf">一键导入六步工坊</button>' +
+        '<button type="button" class="v25-btn-ghost" id="v25BtnCopyRecipe">复制配方摘要</button>' +
         (state.savedPlans.length ? '<button type="button" class="v25-btn-ghost" id="v25BtnClearPlans">清空对比槽</button>' : "") +
       "</div>" +
 
@@ -551,7 +551,7 @@
                   var isBest = idx === bestPlanIdx && state.savedPlans.length > 1;
                   return (
                     '<tr class="' + (isBest ? "is-best" : "") + '">' +
-                      "<td><strong>#" + (idx + 1) + (isBest ? " 🏆" : "") + "</strong></td>" +
+                      "<td><strong>#" + (idx + 1) + (isBest ? " [优]" : "") + "</strong></td>" +
                       "<td>" + esc(sp.herbShort) + "</td>" +
                       "<td>" + esc(sp.solventName) + " · " + esc(sp.rigName) + "</td>" +
                       "<td>1:" + sp.ratio + " · " + sp.temp + "℃ · " + sp.time + "m</td>" +
@@ -653,8 +653,8 @@
         if (window.TCM_LAB_API && typeof window.TCM_LAB_API.showToast === "function") {
           window.TCM_LAB_API.showToast("已复制自由配方评估摘要到剪贴板！");
         } else {
-          copyBtn.textContent = "✅ 已复制摘要";
-          setTimeout(function () { copyBtn.textContent = "📋 复制配方摘要"; }, 1800);
+          copyBtn.textContent = "已复制摘要";
+          setTimeout(function () { copyBtn.textContent = "复制配方摘要"; }, 1800);
         }
       });
     }
@@ -724,7 +724,7 @@
             PLAY_PRESETS.map(function (p) {
               return '<button type="button" class="v25-preset-btn" data-v25-preset="' + p.id + '">' + esc(p.label) + "</button>";
             }).join("") +
-            '<button type="button" class="v25-preset-btn is-random" id="v25BtnRandom">🎲 随机挑战配方</button>' +
+            '<button type="button" class="v25-preset-btn is-random" id="v25BtnRandom">随机挑战配方</button>' +
           "</div>" +
           '<span class="v25-space-badge">组合空间 ' + comboCount + '+ 种（' + topics.length + ' 药材 × ' + solvents.length + ' 溶剂 × ' + APPARATUSES.length + ' 装置）</span>' +
         "</div>" +
@@ -734,7 +734,7 @@
             '<h3 class="v25-sec-title"><span>1. 自由组合配方参数</span><span style="font-size:11.5px;font-weight:700;color:#0f766e;">实时 0-Token 物理化学演算</span></h3>' +
 
             '<div class="v25-field">' +
-              '<div class="v25-field-label"><span>目标药材（全库 ' + topics.length + ' 项可选）</span><span class="v25-val-pill">' + esc(topic.category || "中药化学") + "</span></div>" +
+              '<div class="v25-field-label"><span>目标药材（全库 ' + topics.length + ' 项可选）</span><span class="v25-val-pill">' + esc(topic.category || "现代本草") + "</span></div>" +
               '<div style="display:grid;grid-template-columns:140px 1fr;gap:8px;">' +
                 '<input type="text" class="v25-input" id="v25HerbFilter" placeholder="筛药材/成分..." value="' + esc(state.herbQuery) + '" />' +
                 '<select class="v25-select" id="v25HerbSelect">' +
@@ -744,7 +744,7 @@
                 "</select>" +
               "</div>" +
               '<div class="v25-herb-meta-box">' +
-                '<strong>🎯 目标成分：</strong>' + (window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(esc(topic.compound || "核心有效成分")) : esc(topic.compound || "核心有效成分")) +
+                '<strong>目标成分：</strong>' + (window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(esc(topic.compound || "核心有效成分")) : esc(topic.compound || "核心有效成分")) +
                 ' &nbsp;|&nbsp; <strong>理想极性窗：</strong>p = ' + res.prof.idealPMin + "~" + res.prof.idealPMax +
                 ' &nbsp;|&nbsp; <strong>耐热上限：</strong>' + res.prof.maxSafeTemp + "℃<br/>" +
                 '<span>' + esc(res.prof.chemNote) + "</span>" +

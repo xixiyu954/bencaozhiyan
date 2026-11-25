@@ -1831,8 +1831,8 @@
               <p class="tr-hero-sub">从实验室提取方案走向可验证、可放大、可评价、可合规申报的产品研究方案。保留现有教学实验工坊，按八大研发转化节点系统推演。</p>
             </div>
             <div class="tr-hero-actions">
-              <button type="button" class="tr-btn-light" data-tr-act="open-report">📄 药学研究与转化报告</button>
-              <button type="button" class="tr-btn-ghost" data-tr-act="open-regs">📜 法规与 2025 药典</button>
+              <button type="button" class="tr-btn-light" data-tr-act="open-report">药学研究与转化报告</button>
+              <button type="button" class="tr-btn-ghost" data-tr-act="open-regs">法规与 2025 药典</button>
               <button type="button" class="tr-btn-ghost" data-v16-go="workflow">← 返回六步实验工坊</button>
             </div>
           </div>
@@ -1846,7 +1846,7 @@
               </button>
             `).join('')}
             <select class="tr-bank-select" data-tr-import-bank="1" aria-label="从全站药材题库导入任意课题进入产业转化">
-              <option value="">＋ 导入题库药材（${bankTopics.length || 119} 项）…</option>
+              <option value="">＋ 导入题库药材（${bankTopics.length || 136} 项）…</option>
               ${bankTopics.map((t) => `<option value="${esc(t.id)}" ${proj.bankTopicId === t.id ? 'selected' : ''}>${esc(t.herb)} · ${esc(t.compound || t.category || '')}</option>`).join('')}
             </select>
           </div>
@@ -1887,7 +1887,7 @@
             当前产出：<strong>${esc(data.STAGES[curStageIdx]?.output || '')}</strong> · 本模块均为研究与小试模拟推演
           </div>
           <div>
-            ${nextStage ? `<button type="button" class="tr-btn tr-btn-primary" data-tr-stage="${esc(nextStage.id)}">下一步：${esc(nextStage.no)} ${esc(nextStage.name)} →</button>` : `<button type="button" class="tr-btn tr-btn-primary" data-tr-act="open-report">📄 预览并导出转化报告</button>`}
+            ${nextStage ? `<button type="button" class="tr-btn tr-btn-primary" data-tr-stage="${esc(nextStage.id)}">下一步：${esc(nextStage.no)} ${esc(nextStage.name)} →</button>` : `<button type="button" class="tr-btn tr-btn-primary" data-tr-act="open-report">预览并导出转化报告</button>`}
           </div>
         </div>
       </div>
