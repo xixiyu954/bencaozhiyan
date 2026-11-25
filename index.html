@@ -421,14 +421,16 @@
             <option value="常规教学溶剂体系">溶剂：常规教学体系</option>
             <option value="纯化水/极低有机溶剂">溶剂：纯化水优先</option>
           </select>
-          <select id="aiTemplateSelect" class="ai-precond-select" title="AI 结构化模板">
-            <option value="全板块一键贯通">模板：全板块贯通(1→6步)</option>
-            <option value="正交工艺优化对比">模板：工艺优化对比</option>
-            <option value="数据诊断与报告润色">模板：数据与报告强化</option>
+          <select id="aiTemplateSelect" class="ai-precond-select" title="AI 标准化设计模板">
+            <option value="undergrad_4h">模板：🎓 本科 4 学时标准教学</option>
+            <option value="innovation_ortho">模板：🧪 大创 / 正交工艺优化</option>
+            <option value="green_clean">模板：🌿 绿色无氯仿环保替代</option>
+            <option value="pharmacopoeia_2025">模板：📋 2025 药典质控标杆</option>
+            <option value="formula_synergy">模板：⚗️ 经典名方复方协同</option>
           </select>
-          <label class="inline-flex items-center gap-1.5 ml-auto px-2.5 py-1 rounded-lg bg-emerald-50/80 border border-emerald-200 text-emerald-900 font-bold cursor-pointer select-none" title="优先匹配内置经典题库与本地24h缓存，大幅节省AI消耗">
-            <input id="aiLocalFirstToggle" type="checkbox" checked class="accent-[#0a3630] rounded" />
-            <span>极速匹配（优先经典题库）</span>
+          <label class="inline-flex items-center gap-1.5 ml-auto px-2.5 py-1 rounded-lg bg-emerald-50/80 border border-emerald-200 text-emerald-900 font-bold cursor-pointer select-none" title="默认优先调用智谱+腾讯云+讯飞三引擎按模板实时定制；勾选后仅用本地精编题库 0 消耗秒出">
+            <input id="aiLocalFirstToggle" type="checkbox" class="accent-[#0a3630] rounded" />
+            <span>离线极速（仅本地精编库）</span>
           </label>
         </div>
 
@@ -459,18 +461,27 @@
         </div>
 
         <!-- 折叠式：AI 实验助教自由问答区 -->
-        <div id="qwenChatBox" class="hidden rounded-2xl bg-slate-50 border border-slate-200/90 p-3.5 space-y-2.5">
-          <div class="flex items-center justify-between text-[11px] text-slate-500">
-            <span>当前问答自动关联工作台上下文（所选药材、左侧参数与装置）</span>
+        <div id="qwenChatBox" class="hidden rounded-2xl bg-slate-50 border border-slate-200/90 p-3.5 sm:p-4 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+            <span>🎓 三引擎上下文感知助教（实时同步当前药材、参数、装置与统计数据）</span>
             <button id="btnClearQwenChat" type="button" class="text-slate-400 hover:text-rose-600 font-semibold">清空对话</button>
           </div>
-          <div id="aiChatTemplateChips" class="flex flex-wrap gap-1.5 pb-1"></div>
-          <div id="qwenChatMessages" class="max-h-52 overflow-y-auto custom-scroll space-y-2 text-xs">
-            <div class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-700">你好！我是本草智研中药化学实验助教。你可以问我收率偏低原因、TLC 展开剂调整、UV/NMR 谱图解析，或让我帮你润色实验讨论。</div>
+          <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
+            <span class="font-bold text-slate-500">📐 回答模板：</span>
+            <select id="aiChatModeSelect" class="px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-800 text-[11px] font-bold focus:outline-none focus:border-[#0f5c54]">
+              <option value="mechanism">🔬 机理与参数解析模板（结论 → 机理/参数 → 安全提醒）</option>
+              <option value="troubleshoot">🛠️ 异常排障 CAPA 模板（现象 → 根因 → 补救 → 预防）</option>
+              <option value="report">📝 A4 报告讨论润色模板（学术段落 + 误差 RSD 讨论）</option>
+              <option value="compare">📊 工艺路线对比表格模板（Markdown 多维对照表）</option>
+            </select>
+          </div>
+          <div id="aiChatTemplateChips" class="flex flex-wrap gap-1.5 pb-0.5"></div>
+          <div id="qwenChatMessages" class="max-h-80 overflow-y-auto custom-scroll space-y-2.5 text-xs">
+            <div class="p-3 rounded-xl bg-white border border-slate-200/80 text-slate-700 leading-relaxed">你好！我是本草智研三引擎实验助教（智谱 GLM · 腾讯云 TokenHub · 讯飞星辰协同驱动）。选择上方「回答模板」并提问，我将结合当前实验上下文按规范结构实时流式解答。</div>
           </div>
           <form id="qwenChatForm" class="flex gap-2">
-            <input id="qwenChatInput" type="text" placeholder="针对当前实验提问，如：为什么 TLC 斑点拖尾？如何写实验讨论？" class="flex-1 px-3 py-2 text-xs rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-[#0f5c54]" />
-            <button id="btnSendQwenChat" type="submit" class="px-3.5 py-2 rounded-xl bg-[#0a3630] text-white text-xs font-bold hover:bg-[#062420]">发送</button>
+            <input id="qwenChatInput" type="text" placeholder="针对当前实验提问，如：为什么 TLC 斑点拖尾？请按模板润色我的实验讨论..." class="flex-1 px-3.5 py-2.5 text-xs rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-[#0f5c54]" />
+            <button id="btnSendQwenChat" type="submit" class="px-4 py-2.5 rounded-xl bg-[#0a3630] text-white text-xs font-extrabold hover:bg-[#062420] transition">发送</button>
           </form>
         </div>
       </section>

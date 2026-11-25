@@ -270,6 +270,7 @@
 
   var state = {
     prompt: STARTER_PROMPTS[0],
+    templateId: "undergrad_4h",
     draft: null,
     aiInitialScore: 0,
     aiInitialDims: [],
@@ -277,8 +278,26 @@
     round: 1,
     history: [],
     committed: false,
-    wins: loadWins()
+    wins: loadWins(),
+    isGenerating: false,
+    isCritiquing: false,
+    engineLabel: "三引擎混编就绪（智谱 · 腾讯云 · 讯飞）",
+    aiCritique: ""
   };
+
+  function getTemplates() {
+    if (window.TCMCloudAI && Array.isArray(window.TCMCloudAI.DESIGN_TEMPLATES)) {
+      return window.TCMCloudAI.DESIGN_TEMPLATES;
+    }
+    return [
+      { id: "undergrad_4h", short: "本科4学时", label: "🎓 本科 4 学时标准模板", promptRule: "严格按本科 4 学时、安全绿色与 3 批 RSD 规范设计。" }
+    ];
+  }
+
+  function getActiveTemplate() {
+    var list = getTemplates();
+    return list.find(function (t) { return t.id === state.templateId; }) || list[0];
+  }
 
   function loadWins() {
     try { return Number(localStorage.getItem(STORAGE_WINS) || 0) || 0; } catch (_) { return 0; }
@@ -289,9 +308,8 @@
     try { localStorage.setItem(STORAGE_WINS, String(state.wins)); } catch (_) {}
   }
 
-  function startNewGeneration(promptText) {
-    state.prompt = promptText || state.prompt || STARTER_PROMPTS[0];
-    state.draft = generateAiInitialDraft(state.prompt);
+  function applyDraftToState(draftObj, engineLabel) {
+    state.draft = draftObj;
     var rev = evaluateFiveDimensions(state.draft);
     state.aiInitialScore = rev.score;
     state.aiInitialDims = rev.dimensions.map(function (d) { return Object.assign({}, d); });
@@ -299,6 +317,135 @@
     state.round = 1;
     state.history = [{ round: 1, label: "AI 初版", score: rev.score }];
     state.committed = false;
+    state.aiCritique = "";
+    if (engineLabel) state.engineLabel = engineLabel;
+  }
+
+  function startNewGeneration(promptText) {
+    state.prompt = promptText || state.prompt || STARTER_PROMPTS[0];
+    applyDraftToState(generateAiInitialDraft(state.prompt), "本地化学规则即时生成");
+  }
+
+  async function startCloudGeneration(promptText, container) {
+    state.prompt = (promptText || state.prompt || STARTER_PROMPTS[0]).trim();
+    if (!(window.TCMCloudAI && typeof window.TCMCloudAI.complete === "function")) {
+      startNewGeneration(state.prompt);
+      renderInto(container);
+      return;
+    }
+    state.isGenerating = true;
+    state.aiCritique = "";
+    renderInto(container);
+
+    var tpl = getActiveTemplate();
+    var localFallback = generateAiInitialDraft(state.prompt);
+    var sysPrompt =
+      "你是「本草智研」中药化学 90 分课题竞技场的 AI 出题与模板编排引擎。\n" +
+      "请严格套用以下标准化模板：" + tpl.label + "。" + (tpl.promptRule || "") + "\n" +
+      "请严格只输出一个合法 JSON 对象（不要 markdown 代码块、不要多余说明），同时包含：\n" +
+      "1）一个逼真的科研初稿（刻意保留 3~4 处典型新手短板：如 cycles=1、ph='待定'、tlcSystem 偏简略、integrative 偏简略，使初稿落点在 70~80 分，供学生按扣分点迭代超越）；\n" +
+      "2）一个完全达标（≥95 分）的模板标杆 _hints 字段供学生点击「参考修补」对照学习。\n" +
+      "JSON 字段模板：\n" +
+      '{"herb":"药材名","compound":"核心活性成分","category":"黄酮|生物碱|挥发油与萜类|蒽醌与醌类|皂苷与三萜|苯丙素与有机酸|多糖类",' +
+      '"formalTitle":"初稿简略题目","mass":50,"ratio":10,"temp":78,"time":60,"cycles":"1","solventType":"70%乙醇","mesh":"中粉(40目)","ph":"待定",' +
+      '"defaultRig":"reflux","chemistry":"55字以上化学母核与提取分离原理","tlcSystem":"常规硅胶板展开","pharmacopoeia":"参考药典测定含量","integrative":"记录得率并完成报告。",' +
+      '"sop":["1. 称取...","2. 浸润...","3. 提取浓缩...","4. 初步检识..."],' +
+      '"troubleshoot":[{"issue":"异常1","fix":"对策1"},{"issue":"异常2","fix":"对策2"}],' +
+      '"_hints":{"formalTitle":"规范学术课题全称（≥15字）","ratio":10,"temp":78,"cycles":"2","mesh":"中粉(40目)","ph":"具体数值如 pH 4.5",' +
+      '"chemistry":"60字以上完整机理（含极性/酸碱/杀酶/共沸关键词）","tlcSystem":"硅胶板+精确展开剂比例+254/365nm显色剂",' +
+      '"pharmacopoeia":"《中国药典》2025版定量限度与HPLC/UV指标","integrative":"含加沸石防暴沸、冷凝水下进上出、通风废液分类、3批平行RSD<3.5%及模板特色创新",' +
+      '"sop":["1. 量化步骤1","2. 含沸石/控温/2次提取","3. 抽滤旋蒸富集","4. TLC与显色交叉检识及RSD核算"]}}';
+
+    try {
+      var res = await window.TCMCloudAI.complete({
+        messages: [
+          { role: "system", content: sysPrompt },
+          { role: "user", content: "研究课题意向：" + state.prompt + "（请严格按「" + tpl.label + "」输出 JSON）" }
+        ],
+        expectJson: true,
+        useCache: false
+      });
+      var raw = res && (res.content || res.text || res);
+      var cleaned = window.TCMCloudAI.cleanJsonText ? window.TCMCloudAI.cleanJsonText(raw) : String(raw || "");
+      var parsed = JSON.parse(cleaned);
+      var h = parsed._hints && typeof parsed._hints === "object" ? parsed._hints : {};
+      var merged = Object.assign({}, localFallback, {
+        prompt: state.prompt,
+        herb: parsed.herb || localFallback.herb,
+        compound: parsed.compound || localFallback.compound,
+        category: parsed.category || localFallback.category,
+        formalTitle: parsed.formalTitle || localFallback.formalTitle,
+        mass: clamp(parsed.mass || localFallback.mass, 10, 500),
+        ratio: clamp(parsed.ratio || localFallback.ratio, 4, 24),
+        temp: clamp(parsed.temp || localFallback.temp, 20, 110),
+        time: clamp(parsed.time || localFallback.time, 15, 240),
+        cycles: String(parsed.cycles || "1"),
+        solventType: parsed.solventType || localFallback.solventType,
+        mesh: parsed.mesh || "中粉(40目)",
+        ph: parsed.ph || "待定",
+        defaultRig: parsed.defaultRig || localFallback.defaultRig,
+        chemistry: parsed.chemistry || localFallback.chemistry,
+        tlcSystem: parsed.tlcSystem || localFallback.tlcSystem,
+        pharmacopoeia: parsed.pharmacopoeia || localFallback.pharmacopoeia,
+        integrative: parsed.integrative || localFallback.integrative,
+        sop: Array.isArray(parsed.sop) && parsed.sop.length >= 3 ? parsed.sop : localFallback.sop,
+        troubleshoot: Array.isArray(parsed.troubleshoot) && parsed.troubleshoot.length >= 2 ? parsed.troubleshoot : localFallback.troubleshoot,
+        _hints: Object.assign({}, localFallback._hints, {
+          formalTitle: h.formalTitle || (parsed.herb || localFallback.herb) + "中" + (parsed.compound || localFallback.compound) + "的规范提取分离与质控检识实验",
+          ratio: clamp(h.ratio || 10, 6, 16),
+          temp: clamp(h.temp || parsed.temp || 75, 25, 100),
+          cycles: String(h.cycles || "2"),
+          mesh: h.mesh || "中粉(40目)",
+          ph: h.ph || "中性 pH 7.0",
+          chemistry: h.chemistry || parsed.chemistry || localFallback._hints.chemistry,
+          tlcSystem: h.tlcSystem || localFallback._hints.tlcSystem,
+          pharmacopoeia: h.pharmacopoeia || localFallback._hints.pharmacopoeia,
+          integrative: h.integrative || localFallback._hints.integrative,
+          sop: Array.isArray(h.sop) && h.sop.length >= 4 ? h.sop : localFallback._hints.sop
+        })
+      });
+      var hitLabel = (res && res.label) ? ("已由 " + res.label + " 套用「" + tpl.short + "」生成") : "三引擎云端生成完成";
+      applyDraftToState(merged, hitLabel);
+    } catch (_) {
+      applyDraftToState(localFallback, "云端繁忙 · 已切换站内化学规则兜底");
+    } finally {
+      state.isGenerating = false;
+      renderInto(container);
+    }
+  }
+
+  async function runCloudCritique(container) {
+    if (state.isCritiquing || !state.draft) return;
+    if (!(window.TCMCloudAI && typeof window.TCMCloudAI.complete === "function")) return;
+    state.isCritiquing = true;
+    renderInto(container);
+    var d = state.draft;
+    var rev = state.currentReview;
+    var tpl = getActiveTemplate();
+    try {
+      var res = await window.TCMCloudAI.complete({
+        messages: [
+          {
+            role: "system",
+            content: "你是本草智研中药化学评审教授。请对照【" + tpl.label + "】对学生的实验方案做 140~220 字精炼中文点评：①肯定1处优点；②指出最关键的 2 处工艺/安全/质控可提升细节；③给出可直接填入的改进建议。禁止废话。"
+          },
+          {
+            role: "user",
+            content: "题目：" + d.formalTitle + "\n药材与成分：" + d.herb + " / " + d.compound + "\n参数：" + d.solventType + "，1:" + d.ratio + "，" + d.temp + "℃×" + d.time + "min×" + d.cycles + "次，pH=" + d.ph + "\nTLC：" + d.tlcSystem + "\n药典：" + d.pharmacopoeia + "\n安全与拓展：" + d.integrative + "\n当前五维总分：" + rev.score + "/100"
+          }
+        ],
+        expectJson: false,
+        useCache: false
+      });
+      var text = (res && (res.content || res.text)) || "";
+      state.aiCritique = text.trim();
+      if (res && res.label) state.engineLabel = "点评命中：" + res.label;
+    } catch (_) {
+      state.aiCritique = "当前云端繁忙：请优先对照上方红色扣分漏洞逐项修补（重点关注提取次数 ≥2、明确 pH 数值、TLC 展开剂体积比及防暴沸安全条款）。";
+    } finally {
+      state.isCritiquing = false;
+      renderInto(container);
+    }
   }
 
   function applyGuidedFix(fixKey) {
@@ -348,7 +495,9 @@
     var rev = state.currentReview;
     var delta = rev.score - state.aiInitialScore;
     var beatAi = rev.passed && delta > 0;
-    var hasCloud = !!(window.TCMCloudAI && typeof window.TCMCloudAI.complete === "function");
+    var templates = getTemplates();
+    var activeTpl = getActiveTemplate();
+    var compBadge = window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(esc(d.compound || "")) : esc(d.compound || "");
 
     container.innerHTML =
       '<div class="v27-arena-shell">' +
@@ -356,16 +505,25 @@
           '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
             '<div>' +
               '<div style="font-size:16px;font-weight:900;">⚔️ AI 课题生成器 · 90 分五维评审竞技场</div>' +
-              '<div style="font-size:12.5px;color:#64748b;margin-top:2px;">输入“我想研究 XX 成分的提取”，AI 生成初版并强制过 90 分五维评审；按扣分点迭代修补，实时扩展你的翠绿五维雷达超越 AI！</div>' +
+              '<div style="font-size:12.5px;color:#64748b;margin-top:2px;">先选标准化模板，再输入任意药材/成分，三引擎云端 AI 套模板生成初版并强制过 90 分五维评审；按扣分点修补超越 AI！</div>' +
             "</div>" +
             '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' +
-              '<span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(15,118,110,0.10);color:#0f766e;">' + (hasCloud ? "☁️ 智谱/本地双引擎就绪" : "⚡ 本地化学引擎实时演算") + "</span>" +
+              '<span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(15,118,110,0.10);color:#0f766e;">☁️ ' + esc(state.engineLabel) + "</span>" +
               '<span style="font-size:12px;font-weight:800;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.14);color:#047857;">🏆 累计完胜 AI：' + state.wins + " 次</span>" +
             "</div>" +
           "</div>" +
+          '<div class="v27-tpl-row" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px;">' +
+            '<span style="font-size:11.5px;font-weight:800;color:#64748b;">📐 套用设计模板：</span>' +
+            templates.map(function (t) {
+              var on = t.id === state.templateId;
+              return '<button type="button" data-v27-tpl="' + esc(t.id) + '" class="v27-starter-chip' + (on ? " is-tpl-active" : "") + '" style="' +
+                (on ? "background:#059669;color:#ffffff;border-color:#059669;font-weight:800;" : "") + '">' + esc(t.label) + "</button>";
+            }).join("") +
+          "</div>" +
+          '<div style="font-size:11px;color:#0f766e;margin-top:5px;opacity:0.9;">当前模板规范：' + esc(activeTpl.desc || activeTpl.promptRule || "") + "</div>" +
           '<div class="v27-input-row">' +
-            '<input type="text" id="v27PromptInput" class="v27-prompt-input" value="' + esc(state.prompt) + '" placeholder="例如：我想研究黄芩中黄芩苷的提取与纯化..." />' +
-            '<button type="button" id="v27BtnGenerate" class="v27-btn-gen">✨ 生成全套方案并强制评审</button>' +
+            '<input type="text" id="v27PromptInput" class="v27-prompt-input" value="' + esc(state.prompt) + '" placeholder="支持输入任意药材与成分，如：我想研究青蒿素低温提取 / 葛根素大孔树脂纯化..." />' +
+            '<button type="button" id="v27BtnGenerate" class="v27-btn-gen"' + (state.isGenerating ? " disabled" : "") + '>' + (state.isGenerating ? "⏳ 三引擎按模板生成中..." : "✨ 三引擎套模板生成并评审") + "</button>" +
           "</div>" +
           '<div class="v27-starter-row">' +
             STARTER_PROMPTS.map(function (sp) {
@@ -395,7 +553,7 @@
 
         '<div class="v27-main-grid">' +
           '<div class="v27-card">' +
-            '<h3 class="v27-sec-title"><span>1. AI 生成全套方案（可按扣分点直接修订）</span><button type="button" class="v27-btn-ghost" id="v27BtnResetDraft" style="padding:4px 10px;font-size:11.5px;">🔄 重置回 AI 初版</button></h3>' +
+            '<h3 class="v27-sec-title"><span>1. AI 套模板生成方案（' + esc(d.herb) + ' · ' + compBadge + '）</span><button type="button" class="v27-btn-ghost" id="v27BtnResetDraft" style="padding:4px 10px;font-size:11.5px;">🔄 重置回 AI 初版</button></h3>' +
 
             '<div class="v27-field" style="margin-bottom:9px;">' +
               '<label>实验正式题目</label>' +
@@ -483,10 +641,18 @@
 
             '<div class="v27-btn-row">' +
               '<button type="button" class="v27-btn-gen" id="v27BtnReReview">⚖️ 提交修订并重新五维复审</button>' +
+              '<button type="button" class="v27-btn-ghost" id="v27BtnAiCritique"' + (state.isCritiquing ? " disabled" : "") + '>' + (state.isCritiquing ? "⏳ AI 教授评审中..." : "🤖 三引擎 AI 深度点评") + "</button>" +
               '<button type="button" class="v27-btn-pass" id="v27BtnCommit"' + (rev.passed ? "" : " disabled") + ">" + (state.committed ? "✅ 已编入自编题库" : "🏆 确认编入自编题库（≥90分）") + "</button>" +
               '<button type="button" class="v27-btn-ghost" id="v27BtnToWorkflow">🚀 导入六步工坊</button>' +
               '<button type="button" class="v27-btn-ghost" id="v27BtnCopyFramework">📋 复制报告框架</button>' +
             "</div>" +
+
+            (state.aiCritique
+              ? '<div class="v27-report-box" style="margin-top:10px;border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.08);">' +
+                  '<div style="font-weight:800;margin-bottom:4px;color:#059669;">🤖 三引擎 AI 评审教授点评（对照 ' + esc(activeTpl.short) + '）：</div>' +
+                  '<div style="white-space:pre-line;line-height:1.6;">' + esc(state.aiCritique) + "</div>" +
+                "</div>"
+              : "") +
 
             '<div style="margin-top:12px;font-size:11.5px;color:#64748b;">迭代轨迹：' +
               state.history.map(function (h) { return h.label + " " + h.score + "分"; }).join(" → ") +
@@ -525,10 +691,16 @@
       renderInto(container);
     }
 
+    container.querySelectorAll("[data-v27-tpl]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        state.templateId = this.getAttribute("data-v27-tpl") || "undergrad_4h";
+        renderInto(container);
+      });
+    });
+
     container.querySelector("#v27BtnGenerate").addEventListener("click", function () {
       var p = container.querySelector("#v27PromptInput").value.trim();
-      startNewGeneration(p || STARTER_PROMPTS[0]);
-      renderInto(container);
+      startCloudGeneration(p || STARTER_PROMPTS[0], container);
     });
 
     container.querySelector("#v27BtnResetDraft").addEventListener("click", function () {
@@ -536,10 +708,17 @@
       renderInto(container);
     });
 
+    var critBtn = container.querySelector("#v27BtnAiCritique");
+    if (critBtn) {
+      critBtn.addEventListener("click", function () {
+        syncFieldsToDraft();
+        runCloudCritique(container);
+      });
+    }
+
     container.querySelectorAll("[data-v27-starter]").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        startNewGeneration(this.getAttribute("data-v27-starter"));
-        renderInto(container);
+        startCloudGeneration(this.getAttribute("data-v27-starter"), container);
       });
     });
 

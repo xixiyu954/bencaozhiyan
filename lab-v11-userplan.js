@@ -147,41 +147,49 @@
   async function runAiSimulation(input, onStage) {
     onStage(1, '正在解析你的实验方案文本与关键参数...', 22);
     const localBase = buildLocalSimulation(input);
+    const tplMeta = window.TCMCloudAI?.getDesignTemplate
+      ? window.TCMCloudAI.getDesignTemplate(input.templateId || 'undergrad_4h')
+      : { label: '🎓 本科 4 学时标准模板', promptRule: '按本科 4 学时与安全绿色规范校核。' };
 
-    // 优先尝试云端智能深度推演，失败或离线时无缝使用高精度本地演算
-    if (window.TCMCloudAI && typeof window.TCMCloudAI.chat === 'function') {
+    // 优先调用三引擎云端深度推演（智谱 GLM / 腾讯云 DeepSeek-V4.1 / 讯飞星辰），失败或离线时无缝切换高精度本地演算
+    if (window.TCMCloudAI && typeof window.TCMCloudAI.complete === 'function') {
       try {
-        onStage(2, '正在由智能助手进行热力学校验与全流程现象推演...', 55);
-        const prompt = `你是中药化学实验工程专家。用户提交了一套自己设计的实验方案，请严格输出一个合法 JSON 对象（不要 markdown 代码块）进行全流程演算：
-方案标题：${input.title || '未命名'}
-药材：${input.herb || '请从方案识别'}
-目标成分：${input.compound || '请从方案识别'}
-方案原文：${input.text}
-
-请返回如下 JSON 字段：
+        onStage(2, `正在由三引擎 AI 对照「${tplMeta.short || tplMeta.label}」执行工艺、安全与药典校核...`, 52);
+        const sysPrompt = `你是「本草智研」中药化学实验工程审核专家。请严格对照以下标准化模板进行方案校核与修订：
+【校核模板】${tplMeta.label}
+【模板规范】${tplMeta.promptRule || ''}
+必须严格只输出一个合法 JSON 对象（不要 markdown 代码块、不要多余解释文字），包含以下字段：
 {
   "title": "规范化方案名称",
   "herb": "药材名",
   "compound": "目标活性成分",
-  "category": "黄酮/生物碱/挥发油与萜类/皂苷与三萜/蒽醌与醌类/香豆素与木脂素/多糖类/苯丙素与有机酸之一",
+  "category": "黄酮|生物碱|挥发油与萜类|皂苷与三萜|蒽醌与醌类|香豆素与木脂素|多糖类|苯丙素与有机酸",
   "score": 88,
-  "verdict": "一句话可行性总评",
-  "highlights": ["亮点1", "亮点2"],
-  "risks": ["潜在隐患与改进建议1", "潜在隐患与改进建议2"],
+  "verdict": "一句话可行性与模板合规总评",
+  "highlights": ["优势亮点1（含化学依据）", "优势亮点2"],
+  "risks": ["隐患与模板偏差改进建议1（含具体替代参数）", "隐患与改进建议2"],
   "stages": [
     {"stage":"① 前处理","title":"步骤名","phenomenon":"预期实验现象","qc":"关键质控点","tip":"避坑提示"},
     {"stage":"② 主体提取","title":"步骤名","phenomenon":"预期实验现象","qc":"关键质控点","tip":"避坑提示"},
     {"stage":"③ 分离纯化","title":"步骤名","phenomenon":"预期实验现象","qc":"关键质控点","tip":"避坑提示"},
     {"stage":"④ 检识验收","title":"步骤名","phenomenon":"预期实验现象","qc":"关键质控点","tip":"避坑提示"}
   ],
-  "summaryAdvice": "100字以内总结评语与优化方向"
+  "revisedSop": ["1. 按模板修订后的量化 SOP 步骤1", "2. 步骤2（含温度/料液比/防暴沸）", "3. 步骤3", "4. 步骤4（分离纯化）", "5. 步骤5（TLC/HPLC 检识）", "6. 步骤6（废液与 RSD 验收）"],
+  "summaryAdvice": "100字以内总结评语与按模板优化方向"
 }`;
-        const res = await window.TCMCloudAI.chat(
-          [{ role: 'user', content: prompt }],
-          { expectJson: true }
-        );
-        const parsed = JSON.parse(res.text);
-        onStage(3, '演算完成，正在组装全流程动态演示卡片...', 90);
+        const userPrompt = `方案标题：${input.title || '未命名'}\n药材：${input.herb || '请从方案识别'}\n目标成分：${input.compound || '请从方案识别'}\n方案原文：${input.text}`;
+        const res = await window.TCMCloudAI.complete({
+          messages: [
+            { role: 'system', content: sysPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+          expectJson: true,
+          useCache: false
+        });
+        const raw = res && (res.content || res.text || res);
+        const cleaned = window.TCMCloudAI.cleanJsonText ? window.TCMCloudAI.cleanJsonText(raw) : String(raw || '');
+        const parsed = JSON.parse(cleaned);
+        onStage(3, '三引擎校核完成，正在组装全流程演练与修订 SOP...', 92);
         return {
           ...localBase,
           title: parsed.title || localBase.title,
@@ -193,7 +201,10 @@
           highlights: Array.isArray(parsed.highlights) && parsed.highlights.length ? parsed.highlights : localBase.highlights,
           risks: Array.isArray(parsed.risks) && parsed.risks.length ? parsed.risks : localBase.risks,
           stages: Array.isArray(parsed.stages) && parsed.stages.length >= 3 ? parsed.stages : localBase.stages,
+          revisedSop: Array.isArray(parsed.revisedSop) && parsed.revisedSop.length ? parsed.revisedSop : null,
           summaryAdvice: parsed.summaryAdvice || localBase.summaryAdvice,
+          engineLabel: res?.label || '三引擎云端混编',
+          templateLabel: tplMeta.label,
           usedCloud: true
         };
       } catch {
@@ -201,8 +212,8 @@
       }
     }
     onStage(3, '正在生成四阶段实验现象预测与质控清单...', 88);
-    await new Promise(r => setTimeout(r, 320));
-    return localBase;
+    await new Promise(r => setTimeout(r, 260));
+    return { ...localBase, engineLabel: '站内化学规则引擎', templateLabel: tplMeta.label };
   }
 
   function renderSimResult(result, activeWalkIdx) {
@@ -228,6 +239,7 @@
             <span class="px-2.5 py-0.5 rounded-full bg-white/12">${p.mass}g · 1:${p.ratio}</span>
             <span class="px-2.5 py-0.5 rounded-full bg-white/12">${esc(p.solventType)} · ${p.temp}℃</span>
             <span class="px-2.5 py-0.5 rounded-full bg-white/12">总耗时约 ${p.totalMin} min</span>
+            ${result.engineLabel ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-400/20 border border-emerald-300/35 text-emerald-100 font-bold">☁️ ${esc(result.engineLabel)}</span>` : ''}
           </div>
         </div>
 
@@ -242,6 +254,15 @@
             ${result.risks.map(r => `<div class="text-xs text-amber-900/90 leading-relaxed">• ${esc(r)}</div>`).join('')}
           </div>
         </div>
+
+        ${Array.isArray(result.revisedSop) && result.revisedSop.length ? `
+        <div class="rounded-2xl bg-sky-50/85 border border-sky-200 p-3.5 space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-sky-900">📐 按模板修订后的标准 SOP（${esc(result.templateLabel || '标准规范')}）</span>
+            <button type="button" id="btnCopyRevisedSop" class="px-2.5 py-0.5 rounded-lg bg-white border border-sky-300 text-sky-800 text-[11px] font-bold hover:bg-sky-100 transition">📋 复制修订 SOP</button>
+          </div>
+          <div class="space-y-1 text-xs text-slate-800 leading-relaxed">${result.revisedSop.map(s => `<div>${esc(s)}</div>`).join('')}</div>
+        </div>` : ''}
 
         <!-- 四阶段全流程动态演算步进区 -->
         <div class="space-y-2.5">
@@ -286,6 +307,16 @@
         </div>
       </div>
     `;
+
+    const copySopBtn = mount.querySelector('#btnCopyRevisedSop');
+    if (copySopBtn && Array.isArray(result.revisedSop)) {
+      copySopBtn.addEventListener('click', () => {
+        const txt = `【${result.title} · 修订标准 SOP】\n` + result.revisedSop.join('\n');
+        if (navigator.clipboard?.writeText) navigator.clipboard.writeText(txt).catch(() => {});
+        copySopBtn.textContent = '✅ 已复制 SOP';
+        setTimeout(() => { copySopBtn.textContent = '📋 复制修订 SOP'; }, 1600);
+      });
+    }
 
     // 逐步动态演练动画
     const walkBtn = mount.querySelector('#btnPlayPlanWalkthrough');
@@ -455,6 +486,7 @@
           title: document.getElementById('upTitle').value,
           herb: document.getElementById('upHerb').value,
           compound: document.getElementById('upComp').value,
+          templateId: activeAuditTemplateId,
           text
         }, (step, msg, pct) => {
           pTxt.textContent = msg;
@@ -476,10 +508,30 @@
     return modal;
   }
 
+  let activeAuditTemplateId = 'undergrad_4h';
+
   function openModal() {
     const m = ensureModal();
     m.classList.remove('hidden');
     m.classList.add('flex');
+  }
+
+  function openWithText(opts) {
+    const o = opts || {};
+    openModal();
+    if (o.templateId) activeAuditTemplateId = o.templateId;
+    const tEl = document.getElementById('upTitle');
+    const hEl = document.getElementById('upHerb');
+    const cEl = document.getElementById('upComp');
+    const txtEl = document.getElementById('upText');
+    if (tEl && o.title != null) tEl.value = o.title;
+    if (hEl && o.herb != null) hEl.value = o.herb;
+    if (cEl && o.compound != null) cEl.value = o.compound;
+    if (txtEl && o.text != null) txtEl.value = o.text;
+    if (o.autoRun) {
+      const form = document.getElementById('userPlanForm');
+      if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
+    }
   }
 
   function closeModal() {
@@ -498,6 +550,7 @@
 
   window.TCM_USER_PLAN = {
     open: openModal,
+    openWithText,
     loadUserCases,
     saveUserCases,
     init: initTriggerButton

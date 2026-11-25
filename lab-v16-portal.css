@@ -1337,3 +1337,42 @@ body.dark-lab #dockBtnCompare {
 @media (prefers-reduced-motion: reduce) {
   .v16-page, .v16-branch-card, .v16-bento-card, .v16-topic-card { animation: none !important; transition: none !important; }
 }
+
+
+/* 暗色模式：智能实验设计四大板块新增控件精修 */
+body.dark-lab #v16InlinePlanTpl,
+body.dark-lab #v16InlinePlanText,
+body.dark-lab #aiChatModeSelect,
+body.dark-lab #aiRouteModeSelect {
+  background: #0d2621 !important;
+  color: #ecfdf5 !important;
+  border-color: rgba(52, 211, 153, 0.28) !important;
+}
+body.dark-lab #v16PlanSample1,
+body.dark-lab #v16PlanSample2 {
+  background: #102e28 !important;
+  color: #d1fae5 !important;
+  border-color: rgba(52, 211, 153, 0.28) !important;
+}
+body.dark-lab #v16PlanSample1:hover,
+body.dark-lab #v16PlanSample2:hover {
+  border-color: #34d399 !important;
+  color: #ffffff !important;
+}
+
+body.dark-lab #qwenCommandBar #btnToggleQwenChat,
+body.dark-lab #qwenCommandBar #btnOpenQwenCfgBar {
+  background: #102e28 !important;
+  color: #e2f1ed !important;
+  border-color: rgba(52, 211, 153, 0.28) !important;
+}
+body.dark-lab #qwenCommandBar #btnOpenUserPlanModal {
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #fde68a !important;
+  border-color: rgba(251, 191, 36, 0.42) !important;
+}
+body.dark-lab #qwenCommandBar #qwenStatusPill {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #6ee7b7 !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}

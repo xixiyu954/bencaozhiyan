@@ -3994,8 +3994,10 @@
         const pBox = document.getElementById('qwenProgressBox'); const pBar = document.getElementById('qwenProgressBar'); const pStage = document.getElementById('qwenProgressStageText'); const pTimer = document.getElementById('qwenProgressTimer'); const setStage = (idx, txt, pct) => { if (pStage) pStage.textContent = txt; if (pBar) pBar.style.width = pct + '%'; [1,2,3,4].forEach(n => { const s = document.getElementById('qwenStep' + n); if (s) s.className = n <= idx ? 'text-teal-700 font-bold' : 'text-slate-400'; }); }; if (pBox) pBox.classList.remove('hidden'); const t0 = Date.now(); if (pTimer) pTimer.textContent = '0.0s'; const pInt = setInterval(() => { if (pTimer) pTimer.textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's'; }, 100); setStage(1, '正在检索题库文献...', 20); const ragCtx = searchSiteKnowledge(prompt); setStage(2, '正在智能推演实验工艺与装置...', 38);
         const aiScene = document.getElementById('aiSceneSelect')?.value || '高校本科教学(3~4学时)';
         const aiGreen = document.getElementById('aiGreenSelect')?.value || '绿色无氯仿优先';
-        const aiTpl = document.getElementById('aiTemplateSelect')?.value || '全板块一键贯通';
-        const localFirst = document.getElementById('aiLocalFirstToggle')?.checked !== false;
+        const aiTplId = document.getElementById('aiTemplateSelect')?.value || 'undergrad_4h';
+        const tplMeta = window.TCMCloudAI?.getDesignTemplate ? window.TCMCloudAI.getDesignTemplate(aiTplId) : { label: aiTplId, promptRule: '' };
+        const aiTpl = tplMeta.label || aiTplId;
+        const localFirst = document.getElementById('aiLocalFirstToggle')?.checked === true;
         const forceCloud = autoForm.dataset.forceCloud === '1';
         autoForm.dataset.forceCloud = '0';
         const forceBtn = document.getElementById('btnForceCloudAi');
@@ -4051,7 +4053,7 @@
 
         try {
           if (isQwenReady()) {
-            const precondText = `【用户前置条件】实验场景：${aiScene}；绿色与溶剂约束：${aiGreen}；输出模板侧重：${aiTpl}。\n`;
+            const precondText = `【用户前置条件】实验场景：${aiScene}；绿色与溶剂约束：${aiGreen}；选定标准化设计模板：${aiTpl}。\n${tplMeta.promptRule ? '【模板硬性设计规范】' + tplMeta.promptRule + '\n' : ''}`;
             const ragText = precondText + '【站内检索题库】' + JSON.stringify(ragCtx.matchedTopics) + '\n【站内检索文献】' + JSON.stringify(ragCtx.matchedLit) + '\n';
             const sysPrompt = ragText + `你是“本草智研 · 中药化学智能实验设计工作台”的首席课程导师与排版编排引擎。你的输出将直接渲染到网站的 6 大结构化视觉模块（1.创新设计四宫格 2.动态流程图 3.双栏四步工艺详解卡 4.可勾选SOP规程 5.题库文献区 6.排障与导师结论卡），因此必须严格遵守以下内容深度与版面均衡规范：
 【硬性规范】
@@ -4259,26 +4261,68 @@
         const ws = getWorkState(t);
         const statsNow = computeStats(t, ws);
         const appRigsTxt = getApplicableRigs(t, ws).map(x => LAB_RIGS[x.key]?.title || x.key).join(' → ');
+        const chatMode = document.getElementById('aiChatModeSelect')?.value || 'mechanism';
+        const modeRules = {
+          mechanism: '严格按【机理与参数解析模板】作答：①核心结论（1~2句）；②### 化学机理与工艺参数（分点清单或紧凑表格）；③> 安全与质控提醒（1条）。',
+          troubleshoot: '严格按【异常排障 CAPA 诊断单模板】作答：①### ① 异常现象判定；②### ② 化学/工程根因剖析；③### ③ 现场应急补救（可执行数值步骤）；④### ④ 源头预防条款；⑤> 安全红线提醒。',
+          report: '严格按【A4 实验报告讨论润色模板】作答：①### 讨论正文（学术书面语、200~260字，不虚构未测数据，引用当前实测收率与RSD）；②### 误差来源与改进方向（3点）；③> 药典核对提醒。',
+          compare: '严格按【工艺路线对比表格模板】作答：①1句选型结论；②输出 1 张紧凑 Markdown 对比表格（列：工艺方案 | 溶剂/温度 | 预期收率优势 | 绿色安全 | 适用场景）；③> 本科实操推荐建议。'
+        };
         const ctx = `当前实验课题：${t.herb}（${t.compound}，类别：${t.category}）。适用装置：${appRigsTxt}。左侧参数：投料${ws.mass}g、料液比1:${ws.ratio}、溶剂${ws.solventType}、温度${ws.temp}℃、时间${ws.time}min、pH:${ws.ph}。薄层系统：${t.tlcSystem}。当前实测统计：批次数${statsNow.count}、平均粗提收率${statsNow.avgCrude.toFixed(2)}%、RSD=${statsNow.rsd.toFixed(2)}%。`;
         let ans = '';
+        let hitEngine = '';
         try {
           if (isQwenReady()) {
-            ans = await callQwenAPI([
-              { role: 'system', content: `你是“本草智研”中药化学智能实验工作台的指导教师。请严格按以下版面风格作答：①先用 1~2 句话给出核心结论；②用小标题（###）配合分点清单或紧凑 Markdown 表格展示工艺参数、化学机理或对比；③用 > 引用块给出 1 条实验安全或质控提醒；④语言专业精炼、不编造药典标准或文献。${ctx}` },
-              { role: 'user', content: q }
-            ], false, { signal: chatController.signal });
+            const waitEl = document.getElementById(waitId);
+            const resObj = await window.TCMCloudAI.complete({
+              messages: [
+                { role: 'system', content: `你是“本草智研”中药化学智能实验工作台的指导教师。${modeRules[chatMode] || modeRules.mechanism} 语言专业精炼，绝不编造虚假药典标准或文献。${ctx}` },
+                { role: 'user', content: q }
+              ],
+              expectJson: false,
+              useCache: false,
+              signal: chatController.signal,
+              onProgress: (_len, partial) => {
+                if (waitEl && partial) {
+                  waitEl.className = 'p-3 rounded-xl bg-white border border-slate-200/80 text-slate-800 mr-6 leading-relaxed space-y-0.5';
+                  waitEl.innerHTML = renderTutorMarkdown(partial);
+                  box.scrollTop = box.scrollHeight;
+                }
+              }
+            });
+            ans = resObj.content || '';
+            hitEngine = resObj.label || '三引擎云端混编';
+            lastAIProviderLabel = hitEngine;
+            updateQwenStatusUI();
           } else {
             await new Promise(r => setTimeout(r, 300));
             ans = localTutorAnswer(q, t, ws);
+            hitEngine = '站内知识库';
           }
         } catch (err) {
           ans = `${localTutorAnswer(q, t, ws)}\n\n（以上解答由站内中药化学知识库即时提供）`;
+          hitEngine = '站内知识库兜底';
         } finally {
           chatRunning = false;
           if (chatSubmit) chatSubmit.disabled = false;
         }
         const el = document.getElementById(waitId);
-        if (el) { el.className = 'p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-800 mr-6 leading-relaxed space-y-0.5'; el.innerHTML = renderTutorMarkdown(ans); }
+        if (el) {
+          el.className = 'p-3 rounded-xl bg-white border border-slate-200/80 text-slate-800 mr-6 leading-relaxed space-y-1.5';
+          el.innerHTML = renderTutorMarkdown(ans) +
+            `<div class="pt-1.5 mt-1.5 border-t border-slate-100 flex items-center justify-between gap-2 text-[10.5px] text-slate-400">` +
+              `<span>☁️ 引擎：${hitEngine}</span>` +
+              `<button type="button" data-copy-tutor="1" class="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 font-bold transition">📋 复制解答</button>` +
+            `</div>`;
+          const cBtn = el.querySelector('[data-copy-tutor]');
+          if (cBtn) {
+            cBtn.addEventListener('click', () => {
+              if (navigator.clipboard?.writeText) navigator.clipboard.writeText(ans).catch(() => {});
+              cBtn.textContent = '✅ 已复制';
+              setTimeout(() => { cBtn.textContent = '📋 复制解答'; }, 1500);
+            });
+          }
+        }
         box.scrollTop = box.scrollHeight;
       });
     }

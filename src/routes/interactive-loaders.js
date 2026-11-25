@@ -136,6 +136,7 @@ if (typeof window !== 'undefined') {
     window.TCM_USER_PLAN = {
       __isLazyProxy: true,
       open: makeProxy(loadAiReviewSuite, 'TCM_USER_PLAN', 'open'),
+      openWithText: makeProxy(loadAiReviewSuite, 'TCM_USER_PLAN', 'openWithText'),
       init: () => {},
       loadUserCases: () => {
         try { return JSON.parse(localStorage.getItem('tcm_user_archived_cases_v1') || '[]'); } catch (_) { return []; }

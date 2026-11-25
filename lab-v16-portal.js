@@ -873,14 +873,18 @@
     const qChat = document.getElementById('qwenChatBox');
     if (!head || !extra) return;
 
+    const curRouteMode = window.TCMCloudAI?.getRouteMode ? window.TCMCloudAI.getRouteMode() : 'auto';
+    const routeModeText = { auto: '✨ 三引擎自动混编', zhipu: '🌿 优先智谱 GLM', tencent: '☁️ 优先腾讯云 TokenHub', xunfei: '⚡ 优先讯飞星辰' }[curRouteMode] || '✨ 三引擎自动混编';
+
     head.innerHTML = `
       <div class="v16-subhero">
         <div class="v16-subhero-top">
           <div>
             <h2>智能实验设计</h2>
-            <p>输入研究目标自动规划提取、分离与检识路线，支持已有方案推演校核、实验排障答疑及 90 分自编课题审核。</p>
+            <p>三引擎混合 AI（智谱 GLM · 腾讯云 TokenHub · 讯飞星辰）套用 5 套标准化中药化学模板，贯通 90 分课题竞技、全景方案编排、已有方案校核与流式助教答疑。</p>
           </div>
           <div class="flex flex-wrap gap-2">
+            <button type="button" class="v16-chip-btn" id="v16AiEngineSwitchBtn" title="点击切换或体检三引擎通道">${esc(routeModeText)} ⚙</button>
             <button type="button" class="v16-chip-btn gold" data-v16-trigger="ai-review">自编课题审核（≥90分）</button>
             <button type="button" class="v16-chip-btn" data-v16-go="workflow">进入实验工坊</button>
             <button type="button" class="v16-chip-btn" data-v16-go="home">← 返回首页</button>
@@ -889,22 +893,34 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="v16-seg-bar">
             <button type="button" class="v16-seg-btn ${aiSubTab === 'arena' ? 'active' : ''}" data-v16-ai-tab="arena">⚔️ AI 课题生成器（90分竞技）</button>
-            <button type="button" class="v16-seg-btn ${aiSubTab === 'compose' ? 'active' : ''}" data-v16-ai-tab="compose">智能方案编排</button>
-            <button type="button" class="v16-seg-btn ${aiSubTab === 'plan' ? 'active' : ''}" data-v16-ai-tab="plan">已有方案校核</button>
-            <button type="button" class="v16-seg-btn ${aiSubTab === 'chat' ? 'active' : ''}" data-v16-ai-tab="chat">实验助教答疑</button>
+            <button type="button" class="v16-seg-btn ${aiSubTab === 'compose' ? 'active' : ''}" data-v16-ai-tab="compose">📐 智能方案编排</button>
+            <button type="button" class="v16-seg-btn ${aiSubTab === 'plan' ? 'active' : ''}" data-v16-ai-tab="plan">🔍 已有方案校核</button>
+            <button type="button" class="v16-seg-btn ${aiSubTab === 'chat' ? 'active' : ''}" data-v16-ai-tab="chat">💬 实验助教答疑</button>
           </div>
           <span style="font-size:0.78rem;color:var(--ds-muted)">当前课题：<strong style="color:var(--ds-ink)">${esc(getCurrentTopic().herb)} · ${esc(getCurrentTopic().compound)}</strong></span>
         </div>
       </div>
     `;
+    const engBtn = document.getElementById('v16AiEngineSwitchBtn');
+    if (engBtn) engBtn.addEventListener('click', () => document.getElementById('btnOpenQwenCfgTop')?.click());
 
-    // 根据 AI 子标签控制 #qwenCommandBar / #qwenChatBox 显示状态，清爽不重叠
+    // 按当前子标签精准控制 #qwenCommandBar / #qwenAutoForm / #qwenChatBox，确保每个板块专注清爽不重叠
+    const qForm = document.getElementById('qwenAutoForm');
     if (qBar) {
       qBar.style.display = (aiSubTab === 'plan' || aiSubTab === 'arena') ? 'none' : '';
+      // 在「实验助教答疑」分页下折叠上方编排表单与快捷灵感行，突出纯对话体验
+      const toggleFormVisibility = (showComposer) => {
+        if (qForm) qForm.style.display = showComposer ? '' : 'none';
+        qBar.querySelectorAll('#aiPrecondBar, [data-qwen-demo]').forEach(el => {
+          const row = el.id === 'aiPrecondBar' ? el : el.parentElement;
+          if (row && row !== qBar) row.style.display = showComposer ? '' : 'none';
+        });
+      };
+      toggleFormVisibility(aiSubTab === 'compose');
     }
-    if (qChat && fromTabSwitch) {
+    if (qChat) {
       if (aiSubTab === 'chat') qChat.classList.remove('hidden');
-      else if (aiSubTab === 'compose' || aiSubTab === 'arena') qChat.classList.add('hidden');
+      else if (fromTabSwitch || aiSubTab === 'compose' || aiSubTab === 'arena') qChat.classList.add('hidden');
     }
 
     if (aiSubTab === 'arena') {
@@ -915,9 +931,9 @@
     } else if (aiSubTab === 'compose') {
       extra.innerHTML = `
         <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 style="margin:0;font-size:1.05rem;font-weight:850;color:var(--ds-ink)">🎯 精选场景灵感模板（点击自动填入上方指令框）</h3>
-            <span style="font-size:0.76rem;color:var(--ds-muted)">支持直接修改文字后再点「生成研究 / 小试模拟方案」</span>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 style="margin:0;font-size:1.05rem;font-weight:850;color:var(--ds-ink)">🎯 精选场景灵感模板（点击自动填入上方指令框，按选定模板由三引擎定制生成）</h3>
+            <span style="font-size:0.76rem;color:var(--ds-muted)">支持切换 5 套标准化模板：本科4学时 / 大创正交 / 绿色无氯仿 / 2025药典 / 复方协同</span>
           </div>
           <div class="v16-ai-template-grid">
             ${AI_TEMPLATES.map(tpl => `
@@ -931,26 +947,59 @@
         </div>
       `;
     } else if (aiSubTab === 'plan') {
+      const tplList = window.TCMCloudAI?.DESIGN_TEMPLATES || [{ id: 'undergrad_4h', label: '🎓 本科 4 学时标准模板' }];
       extra.innerHTML = `
-        <div class="v16-subhero" style="background:linear-gradient(135deg, rgba(255,251,235,0.92), var(--ds-surface))">
+        <div class="v16-subhero" style="background:linear-gradient(135deg, rgba(236,253,245,0.65), var(--ds-surface))">
           <div class="v16-subhero-top">
             <div>
-              <h3 style="margin:0 0 6px;font-size:1.2rem;font-weight:900;color:var(--ds-ink)">提交已有实验路线进行推演与校核</h3>
-              <p>粘贴教材步骤、文献方法或自拟方案，系统将提取关键参数、评估工艺可行性与安全隐患，支持进一步提交 90 分评审。</p>
+              <h3 style="margin:0 0 6px;font-size:1.18rem;font-weight:900;color:var(--ds-ink)">🔍 三引擎方案校核 · 对照标准模板自动诊断并生成修订 SOP</h3>
+              <p>直接粘贴教材步骤、文献方法或自拟工艺，三引擎 AI 自动提取参数、排查热敏/安全/耗时隐患，并输出按标准模板修订后的 6 步量化 SOP。</p>
             </div>
-            <button type="button" class="v16-btn-cta-primary" data-v16-trigger="user-plan">打开方案推演器 →</button>
+            <button type="button" class="v16-chip-btn" data-v16-trigger="user-plan">打开完整推演工作台 ↗</button>
+          </div>
+          <div class="space-y-2.5 pt-2">
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <span class="font-extrabold text-slate-600">📐 校核对标模板：</span>
+              <select id="v16InlinePlanTpl" class="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-800 text-xs font-bold">
+                ${tplList.map(t => `<option value="${esc(t.id)}">${esc(t.label)}</option>`).join('')}
+              </select>
+              <button type="button" id="v16PlanSample1" class="px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-emerald-500 text-[11px] font-bold text-slate-700 transition">填入示例：黄芩沸水杀酶酸沉</button>
+              <button type="button" id="v16PlanSample2" class="px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-emerald-500 text-[11px] font-bold text-slate-700 transition">填入示例：川芎酸碱双相联产</button>
+            </div>
+            <textarea id="v16InlinePlanText" rows="4" class="w-full p-3.5 rounded-2xl border border-slate-200 bg-white text-xs text-slate-800 leading-relaxed focus:outline-none focus:border-emerald-600" placeholder="粘贴你的已有实验步骤（含药材、溶剂、温度、料液比、纯化与检识方法）..."></textarea>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-[11px] text-slate-500">支持将校核后的修订方案一键同步至六步工坊，或收录进「AI 自编题库」。</span>
+              <button type="button" id="v16InlinePlanRunBtn" class="v16-btn-cta-primary">🚀 三引擎按模板校核并生成修订 SOP →</button>
+            </div>
           </div>
           <div class="v16-ai-template-grid pt-2">
-            <div class="v16-preview-block"><label>参数提取与整理</label><p>自动解析方案中的投料量、料液比、温度、提取时间、次数与溶剂体系。</p></div>
-            <div class="v16-preview-block"><label>可行性与安全评估</label><p>提示热敏成分降解、易燃溶剂防护与乳化等常见实验风险。</p></div>
-            <div class="v16-preview-block"><label>工作台联动与评审</label><p>推演结果可直接同步到实验工坊演练，如需收录进自编库可申请 90 分评审。</p></div>
+            <div class="v16-preview-block"><label>① 参数与极性提取</label><p>自动解析投料量、料液比、温度、提取次数与溶剂极性匹配度。</p></div>
+            <div class="v16-preview-block"><label>② 模板合规与安全诊断</label><p>识别高危溶剂、热敏降解、超 4 学时与乳化/拖尾等实验风险。</p></div>
+            <div class="v16-preview-block"><label>③ 一键输出修订 SOP</label><p>按选定模板生成可直接上实验台的 6 步量化 SOP 与四阶段现象预演。</p></div>
           </div>
         </div>
       `;
+      const s1 = document.getElementById('v16PlanSample1');
+      const s2 = document.getElementById('v16PlanSample2');
+      const txtEl = document.getElementById('v16InlinePlanText');
+      const runBtn = document.getElementById('v16InlinePlanRunBtn');
+      if (s1 && txtEl) s1.addEventListener('click', () => { txtEl.value = '称取黄芩粗粉 50 g，先投入 10 倍量沸水（100℃）中杀酶 10 min，保持微沸煎煮提取 2 次，每次 60 min，合并滤液并减压浓缩至 100 mL。80℃ 下滴加稀盐酸调 pH 至 1.5~2.0，保温静置 1 h 后冷却析出黄色沉淀，布氏漏斗减压抽滤，以 70% 乙醇重结晶精制，最后采用硅胶 G 板 TLC（乙酸乙酯-丁酮-甲酸-水 5:3:1:1）与 278 nm 紫外标曲测定含量。'; });
+      if (s2 && txtEl) s2.addEventListener('click', () => { txtEl.value = '取川芎粗粉 100 g，加 10 倍量 70% 乙醇 75℃ 热回流提取 2 次，每次 90 min，合并滤液 50℃ 旋蒸回收乙醇至浸膏。加水分散后调 pH 至 9.5，乙酸乙酯萃取 3 次分取川芎嗪相；水相再以稀盐酸调 pH 至 2.0，乙酸乙酯萃取 3 次分取阿魏酸相。两相分别脱水浓缩，进行 365 nm 蓝荧光 TLC 鉴别与 322 nm 紫外定量。'; });
+      if (runBtn && txtEl) {
+        runBtn.addEventListener('click', () => {
+          const text = txtEl.value.trim();
+          const tplId = document.getElementById('v16InlinePlanTpl')?.value || 'undergrad_4h';
+          if (window.TCM_USER_PLAN?.openWithText) {
+            window.TCM_USER_PLAN.openWithText({ text, templateId: tplId, autoRun: text.length >= 10 });
+          } else if (window.TCM_USER_PLAN?.open) {
+            window.TCM_USER_PLAN.open();
+          }
+        });
+      }
     } else {
       extra.innerHTML = `
         <div class="space-y-3">
-          <h3 style="margin:0;font-size:1.05rem;font-weight:850;color:var(--ds-ink)">💬 高频实验排障提问（点击自动填入上方助教对话）</h3>
+          <h3 style="margin:0;font-size:1.05rem;font-weight:850;color:var(--ds-ink)">💬 高频实验排障提问（点击自动填入上方流式助教对话，支持按 4 套模板结构化作答）</h3>
           <div class="v16-ai-template-grid">
             ${AI_CHAT_PROMPTS.map((q, idx) => `
               <button type="button" class="v16-ai-tpl" data-v16-fill-chat="${esc(q)}">
