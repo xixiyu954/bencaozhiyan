@@ -145,7 +145,7 @@
             '<div class="min-w-0 flex-1">' +
               '<div class="flex flex-wrap items-center gap-2">' +
                 '<span class="px-2 py-0.5 rounded-md bg-emerald-400/20 text-emerald-200 text-xs font-bold">五维雷达驾驶舱</span>' +
-                '<span class="text-xs text-emerald-300/80 font-semibold">3D 五维雷达 × 基准线框对照 × 136 课题实时联动</span>' +
+                '<span class="text-xs text-emerald-300/80 font-semibold">3D 五维雷达 × 基准线框对照 × ' + ((window.TCM_LAB_API && window.TCM_LAB_API.getCounts) ? window.TCM_LAB_API.getCounts().topics : 144) + ' 课题实时联动</span>' +
               '</div>' +
               '<div class="flex flex-wrap items-center gap-2.5 mt-1.5">' +
                 '<h3 id="v22CpHerbTitle" class="text-base sm:text-lg font-extrabold text-white truncate">' + params.herb + '</h3>' +

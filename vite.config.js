@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 
 /**
- * 将 Cloudflare Pages 静态文件与本地 vendor 原样复制到 dist/，
+ * 将 Cloudflare Pages 静态配置文件复制到 dist/ 并生成 robots.txt / sitemap.xml，
  * 保证构建产物可直接用于 Cloudflare Pages 部署与本地预览。
  */
 function copyStaticAssetsPlugin() {
@@ -58,24 +58,6 @@ function copyStaticAssetsPlugin() {
         ''
       ].join('\n');
       fs.writeFileSync(path.resolve(distDir, 'sitemap.xml'), sitemapXml, 'utf8');
-
-      const vendorSrc = path.resolve(rootDir, 'vendor');
-      const vendorDest = path.resolve(distDir, 'vendor');
-      const skippedVendors = new Set([
-        'tailwindcss-3.4.17.min.js',
-        'chart-4.4.1.umd.min.js',
-        'html2canvas-1.4.1.min.js',
-        'lucide-0.460.0.min.js'
-      ]);
-      if (fs.existsSync(vendorSrc)) {
-        const remaining = fs.readdirSync(vendorSrc).filter((e) => !skippedVendors.has(e));
-        if (remaining.length > 0) {
-          fs.mkdirSync(vendorDest, { recursive: true });
-          for (const entry of remaining) {
-            fs.copyFileSync(path.join(vendorSrc, entry), path.join(vendorDest, entry));
-          }
-        }
-      }
     }
   };
 }

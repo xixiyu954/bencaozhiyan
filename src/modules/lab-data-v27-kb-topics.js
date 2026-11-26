@@ -648,6 +648,318 @@ export const V27_PRESETS = {
     troubleshoot: [
       { issue: '同一针 HPLC 无法同时测出冰片与丹参酮', cause: '冰片为饱和双环单萜醇，无共轭双键，在常规紫外检测器下几乎无吸收。', fix: '严格按《05 仪器分析》选型逻辑：冰片改用毛细管 GC-FID 测定。' }
     ]
+  },
+
+  liao_schisandra_vinegar: {
+    id: 'liao_schisandra_vinegar',
+    isInnovative: true,
+    isKbNew: true,
+    isLiaoyao: true,
+    featured: true,
+    sourceTag: '辽药道地 · 辽宁中医药大学炮制特色',
+    herb: '辽五味（醋五味子炮制与木脂素群落）',
+    compound: '五味子醇甲 / 五味子甲素 / 五味子乙素',
+    latin: 'Schisandra chinensis (Turcz.) Baill.',
+    category: '香豆素与木脂素',
+    defaultRig: 'reflux',
+    applicableRigs: ['reflux', 'ultrasonic', 'resin', 'hplc', 'tlc'],
+    defaultExtract: 'etoh',
+    defaultSep: 'macroporous',
+    formulas: ['diffusion', 'qc'],
+    defaultCfg: { mass: 50, ratio: 10, temp: 78, time: 60, mesh: '捣碎(连仁粗粉)', cycles: '2', solventType: '70%乙醇', ph: '醋蒸对照 pH 4.5' },
+    limitVal: 0.40,
+    limitUnit: '%',
+    crudeUnit: 'g',
+    mpRef: '五味子醇甲 131~133℃',
+    origin: '木兰科五味子干燥成熟果实，主产辽宁本溪桓仁、抚顺新宾与宽甸，习称“辽五味”（“辽药新六味”之首），收敛固涩、益气生津、补肾宁心。',
+    chemistry: '种仁富含联苯环辛烯型木脂素（五味子醇甲、醇乙、甲素、乙素、酯甲），具联苯紫外共轭特征；果肉富含柠檬酸、苹果酸与五味子多糖。米醋蒸制后细胞壁溶胀破裂，促进脂溶性木脂素溶出并降低有机酸对胃黏膜刺激。',
+    pharmacopoeia: '《中国药典》2025 年版一部规定：五味子及醋五味子按干燥品计，含五味子醇甲（C₂₄H₃₂O₇）均不得少于 0.40%（HPLC 法，250 nm）。',
+    integrative: '辽宁中医药大学代表性综合实验：平行对比生辽五味与醋蒸辽五味（每 100 kg 加米醋 20 kg 蒸至黑润）中 4 种木脂素溶出度及果肉多糖分级联产，阐明“入肺肾收敛宜生用、入肝补益宜醋蒸”的物质基础。',
+    scaling: { auxName: '药用米醋/AB-8树脂', auxFactor: 0.2, auxUnit: 'mL', yieldLow: 0.015, yieldHigh: 0.032, yieldUnit: 'g' },
+    tlcSystem: '硅胶 GF254 板，石油醚(30~60℃)-甲酸乙酯-甲酸 (15:5:1) 上层溶液展开，254 nm 紫外灯下检视暗斑。',
+    tlcDefault: { front: 8.0, sample: 4.6, ref: 4.6 },
+    steps: [
+      { stage: '提取', title: '生辽五味 vs 醋五味子捣碎连仁 80% 乙醇回流', principle: '木脂素集中分布于种子（种仁与种皮），实验前必须将果实连核捣碎，否则整粒提取收率不足 30%。', operation: '取桓仁产辽五味生品与醋蒸品各 25 g 捣碎过 20 目筛，80% 乙醇 10 倍量 78℃ 回流提取 2 次，每次 60 min。', qc: '严禁未破核整果投料；冷凝水保持通畅。' },
+      { stage: '分离', title: '石油醚脱除种子脂肪油与 AB-8 大孔树脂富集', principle: '五味子种仁含约 30% 脂肪油易干扰结晶与柱效，浓缩除醇后先低极性脱脂或上 AB-8 树脂梯度分离。', operation: '减压回收乙醇至无醇味，上 AB-8 树脂柱，先水洗收集果肉有机酸/多糖段，30% 乙醇除杂，75% 乙醇洗脱总木脂素。', qc: '75% 乙醇洗脱液蒸干呈浅棕黄色澄明稠膏。' },
+      { stage: '纯化', title: '硅胶柱层析或甲醇重结晶精制五味子醇甲', principle: '五味子醇甲分子具 C-7 羟基，极性大于脱氧五味子素（甲素）和五味子乙素，在正相硅胶柱后洗脱。', operation: '石油醚-乙酸乙酯 (8:2 → 6:4) 梯度洗脱，收集五味子醇甲流分，甲醇-水重结晶得白色棱柱晶。', qc: 'TLC 单一暗斑与五味子醇甲对照品 Rf 一致。' },
+      { stage: '检识', title: '变色酸浓硫酸亚甲二氧基检识与 HPLC 四木脂素同测', principle: '五味子乙素等含亚甲二氧基（-OCH₂O-），与变色酸-浓硫酸共热释放甲醛显紫红色；HPLC 250 nm 梯度同测醇甲/醇乙/甲素/乙素。', operation: 'C18 柱以甲醇-水梯度洗脱（250 nm），外标法核算生品与醋品五味子醇甲含量。', qc: '五味子醇甲 ≥ 0.40%，理论塔板数 ≥ 3000。' }
+    ],
+    troubleshoot: [
+      { issue: '五味子醇甲提取测定结果远低于 0.40%', cause: '果实仅打碎果肉而坚硬种核未破碎，木脂素无法溶出。', fix: '粉碎时必须确认淡黄色种仁完全破碎成粗粉，并采用甲醇超声或 80% 乙醇回流彻底提尽。' }
+    ]
+  },
+
+  liao_gentiana_qingyuan: {
+    id: 'liao_gentiana_qingyuan',
+    isInnovative: true,
+    isKbNew: true,
+    isLiaoyao: true,
+    featured: true,
+    sourceTag: '辽药道地 · 抚顺清原道地品种',
+    herb: '关龙胆（清原龙胆苦苷提取与酸碱稳定性）',
+    compound: '龙胆苦苷 / 獐牙菜苦苷',
+    latin: 'Gentiana scabra Bge.',
+    category: '萜类内酯与环烯醚萜',
+    defaultRig: 'ultrasonic',
+    applicableRigs: ['ultrasonic', 'reflux', 'resin', 'hplc', 'tlc'],
+    defaultExtract: 'etoh',
+    defaultSep: 'macroporous',
+    formulas: ['diffusion', 'qc'],
+    defaultCfg: { mass: 40, ratio: 12, temp: 50, time: 40, mesh: '中粉(40目)', cycles: '2', solventType: '70%乙醇', ph: '中性微酸 pH 6.0' },
+    limitVal: 3.0,
+    limitUnit: '%',
+    crudeUnit: 'g',
+    mpRef: '龙胆苦苷 191℃（无水物）',
+    origin: '龙胆科粗糙龙胆或条叶龙胆干燥根和根茎，主产辽宁抚顺清原（国家地理标志“清原龙胆”），苦寒清肝胆实火、泻下焦湿热，品质冠绝全国。',
+    chemistry: '核心成分龙胆苦苷属裂环环烯醚萜苷（Secoiridoid glycoside），具半缩醛苷键、δ-内酯环与共轭烯醇醚结构；极易溶于水和甲醇，对强酸、强碱及高温敏感（酸水解脱糖后苷元迅速聚合变深棕色，遇氨水转化为含氮龙胆碱）。',
+    pharmacopoeia: '《中国药典》2025 年版一部规定：龙胆药材含龙胆苦苷（C₁₆H₂₀O₉）不得少于 3.0%，龙胆饮片不得少于 1.5%（HPLC 法，270 nm）。',
+    integrative: '结合清原道地关龙胆高含量优势（实测常达 4.5%~6.5%），设计低温超声/微波提取及 pH 2 / pH 7 / pH 10 三组稳定性破坏对照实验，直观理解裂环环烯醚萜苷的提取保护策略。',
+    scaling: { auxName: 'D101大孔树脂/甲醇', auxFactor: 0.5, auxUnit: 'g', yieldLow: 0.04, yieldHigh: 0.07, yieldUnit: 'g' },
+    tlcSystem: '硅胶 GF254 板，乙酸乙酯-甲醇-水 (20:3:2)，254 nm 紫外灯下检视特征暗斑。',
+    tlcDefault: { front: 8.0, sample: 4.2, ref: 4.2 },
+    steps: [
+      { stage: '提取', title: '清原关龙胆 70% 乙醇 50℃ 低温超声提取', principle: '龙胆苦苷含多羟基糖基与内酯环，70% 乙醇在 50℃ 超声空化下兼具高溶出率与低热分解损失。', operation: '取清原关龙胆中粉 40 g，加 12 倍量 70% 乙醇于 50℃ 超声提取 2 次，每次 40 min，抽滤合并。', qc: '严禁加碱水或 >85℃ 长时间沸煮，防内酯开环与半缩醛降解。' },
+      { stage: '分离', title: '50℃ 减压浓缩与 D101 大孔吸附树脂纯化', principle: '水洗除去龙胆三糖等强极性寡糖，30% 乙醇选择性洗脱富集龙胆苦苷。', operation: '滤液 ≤50℃ 减压除醇，上 D101 树脂柱，3 BV 纯水除糖后以 30% 乙醇洗脱收集核心流分。', qc: 'Molish 反应监控水洗终点至无游离糖。' },
+      { stage: '纯化', title: '酸、碱、氨水三路化学稳定性破坏对照', principle: '稀酸加热致苷键水解生深色沉淀；NaOH 开内酯环；浓氨水亲核取代内酯氧生成吡啶环生物碱（龙胆碱）。', operation: '取浓缩液三份分别加 1 mol/L HCl、0.5 mol/L NaOH 与浓氨试液，60℃ 保温 30 min 对比颜色与 HPLC 峰衰减。', qc: '记录氨水反应液在改良碘化铋钾下的伪生物碱阳性现象！' },
+      { stage: '检识', title: 'HPLC 270 nm 测定龙胆苦苷与道地品质评价', principle: '龙胆苦苷 C3=C4-C=O 共轭体系在 270 nm 具强紫外吸收，甲醇-水 (25:75) 等度洗脱分离良好。', operation: '注入对照品与供试品各 10 μL，外标法计算清原样品龙胆苦苷百分含量。', qc: '药材 ≥ 3.0% 合格，道地清原统货常高于 4.5%。' }
+    ],
+    troubleshoot: [
+      { issue: '提取浓缩过程中溶液由浅黄迅速变黑褐且含量骤降', cause: '旋蒸水浴温度超过 75℃ 或器皿残留酸/碱引发裂环环烯醚萜开环聚合。', fix: '器皿用纯水冲至中性，减压浓缩严格控温 ≤ 50℃。' }
+    ]
+  },
+
+  liao_asarum_safety: {
+    id: 'liao_asarum_safety',
+    isInnovative: true,
+    isKbNew: true,
+    isLiaoyao: true,
+    featured: true,
+    sourceTag: '辽药道地 · 药效挥发油与肾毒双控',
+    herb: '辽细辛（桓仁北细辛挥发油与马兜铃酸Ⅰ双控）',
+    compound: '甲基丁香酚 / 细辛脂素（严控马兜铃酸Ⅰ）',
+    latin: 'Asarum heterotropoides Fr. Schmidt var. mandshuricum',
+    category: '挥发油与萜类',
+    defaultRig: 'steam',
+    applicableRigs: ['steam', 'ultrasonic', 'hplc', 'tlc'],
+    defaultExtract: 'steam',
+    defaultSep: 'phase_sep',
+    formulas: ['diffusion', 'qc'],
+    defaultCfg: { mass: 60, ratio: 10, temp: 100, time: 180, mesh: '切段(根及根茎)', cycles: '1', solventType: '纯化水', ph: '中性水蒸气共沸' },
+    limitVal: 2.0,
+    limitUnit: '%(mL/g)',
+    crudeUnit: 'mL',
+    mpRef: '细辛脂素 121~123℃',
+    origin: '马兜铃科北细辛干燥根和根茎，道地产区为辽宁本溪桓仁、抚顺新宾（习称“辽细辛”）；祛风散寒、通窍止痛、温肺化饮。自 2005 版药典起严格限定仅用“根和根茎”入药，剔除含高马兜铃酸的地上叶片。',
+    chemistry: '药效部位为挥发油（主含甲基丁香酚、黄樟醚、优葛缕酮，密度略大于水或接近水）及木脂素细辛脂素（≥0.050%）；安全监控指标为菲类硝基羧酸马兜铃酸Ⅰ（具不可逆肾小管毒性，主要富集于地上果叶，根部极微）。',
+    pharmacopoeia: '《中国药典》2025 年版一部规定：细辛挥发油不得少于 2.0%（mL/g），细辛脂素不得少于 0.050%，且马兜铃酸Ⅰ限量不得过 0.001%（10 ppm，HPLC 法）。',
+    integrative: '辽宁中医药大学安全质控教学典范：同一批辽细辛样本同步演练通则 2204 挥发油测定器（重油/混合油读数）+ 根部 vs 残存叶片中马兜铃酸Ⅰ超痕量 HPLC 对比，深刻落实药用部位净制减毒法规。',
+    scaling: { auxName: '无水硫酸钠/乙酸乙酯', auxFactor: 0.05, auxUnit: 'g', yieldLow: 1.2, yieldHigh: 2.1, yieldUnit: 'mL' },
+    tlcSystem: '硅胶 G 板，石油醚(60~90℃)-乙酸乙酯 (3:1)，喷 1% 香草醛硫酸试液 105℃ 加热显紫红斑点（细辛脂素）。',
+    tlcDefault: { front: 8.0, sample: 4.5, ref: 4.5 },
+    steps: [
+      { stage: '提取', title: '净制去地上部位与通则 2204 挥发油水蒸气共沸蒸馏', principle: '辽细辛挥发油含甲基丁香酚（ρ≈1.03）等苯丙素衍生物，采用乙型（重油型）或二甲苯增溶测定管共沸收集。', operation: '确认彻底拣除残留叶片与果柄，称取辽细辛根及根茎 60 g，加 10 倍量纯水连接挥发油测定器微沸保持 3 h 至油量不再增加。', qc: '读取挥发油体积，折算含油率须 ≥ 2.0%（mL/g）。' },
+      { stage: '分离', title: '乙酸乙酯辅助收集与无水硫酸钠脱水精制', principle: '甲基丁香酚密度与水接近易成乳浊液珠挂壁，少量乙酸乙酯润洗后无水 Na₂SO₄ 脱水可得澄明芳油。', operation: '停止加热静置 15 min 放油，无水硫酸钠干燥过滤得淡黄色具辛辣麻舌香气的辽细辛挥发油。', qc: '密封棕色瓶冷暗处保存防氧化。' },
+      { stage: '纯化', title: '70% 甲醇超声备样测定细辛脂素与马兜铃酸Ⅰ', principle: '药渣或平行饮片粉用 70% 甲醇超声同时溶出四氢呋喃木脂素（细辛脂素）与痕量马兜铃酸Ⅰ。', operation: '精密称取细粉 0.5 g，加 70% 甲醇 25 mL 超声 45 min，0.22 μm 滤膜过滤备 HPLC 进样。', qc: '严防实验室交叉污染。' },
+      { stage: '检识', title: 'HPLC 双指标效-毒同步评价（细辛脂素 ≥0.050% · 马兜铃酸Ⅰ <0.001%）', principle: '287 nm 定量细辛脂素，315 nm / LC-MS 高灵敏监测马兜铃酸Ⅰ残留。', operation: '对比净制根茎与掺叶样品谱图，核算效-毒双控合规结论。', qc: '马兜铃酸Ⅰ必须严格低于 0.001%（10 μg/g）红线！' }
+    ],
+    troubleshoot: [
+      { issue: '挥发油测定管内油珠悬浮于水柱中部不聚拢分层', cause: '辽细辛挥发油中单萜烃（ρ<1）与甲基丁香酚/黄樟醚（ρ>1）混合后综合密度接近 1.00。', fix: '严格按药典法在测定管水面上预先精密加入 1.00 mL 二甲苯，蒸毕总油体积减去 1.00 mL 即得准确油量。' }
+    ]
+  },
+
+  liao_ginseng_huanren: {
+    id: 'liao_ginseng_huanren',
+    isInnovative: true,
+    isKbNew: true,
+    isLiaoyao: true,
+    featured: true,
+    sourceTag: '辽药道地 · 本溪桓仁山参蒸制转化',
+    herb: '桓仁林下山参（蒸制红参稀有皂苷 Rg3/Rh2 转化）',
+    compound: '人参皂苷 Rg1 / Re / Rb1 → 稀有皂苷 Rg3',
+    latin: 'Panax ginseng C. A. Mey. (Huanren Forest-grown)',
+    category: '皂苷与三萜',
+    defaultRig: 'reflux',
+    applicableRigs: ['reflux', 'resin', 'hplc', 'tlc'],
+    defaultExtract: 'etoh',
+    defaultSep: 'macroporous',
+    formulas: ['diffusion', 'qc'],
+    defaultCfg: { mass: 30, ratio: 10, temp: 80, time: 90, mesh: '粗粉(20目)', cycles: '2', solventType: '70%乙醇', ph: '蒸制微酸转化 pH 4.8' },
+    limitVal: 0.30,
+    limitUnit: '%',
+    crudeUnit: 'g',
+    mpRef: '20(S)-人参皂苷 Rg3 298℃',
+    origin: '五加科人参于辽宁本溪桓仁长白山余脉阔叶林下自然生长 ≥15 年的林下山参（国家地理标志产品），大补元气、复脉固脱；经高压/常压蒸制即得红参。',
+    chemistry: '生晒山参富含达玛烷型四环三萜原型皂苷（原人参二醇型 Rb1/Rc/Rd 与原人参三醇型 Rg1/Re）；蒸制受热与内源有机酸催化使 C-20 位糖基选择性水解并发生差向异构，定向生成高抗肿瘤活性稀有皂苷 20(S)/20(R)-Rg3、Rk1、Rg5 与 Rh2。',
+    pharmacopoeia: '《中国药典》2025 年版一部规定：人参含 Rg1+Re ≥ 0.30%、Rb1 ≥ 0.20%；红参含 Rg1+Re ≥ 0.25%、Rb1 ≥ 0.20%（HPLC 203 nm 梯度法）。',
+    integrative: '串联生晒山参 vs 蒸制红参化学转化机制：量化测定蒸制前无 Rg3 峰、蒸制 3 h 后新生一对 20(S)/20(R)-Rg3 差向异构体双峰的色谱铁证！',
+    scaling: { auxName: '水饱和正丁醇/D101树脂', auxFactor: 0.8, auxUnit: 'mL', yieldLow: 0.03, yieldHigh: 0.06, yieldUnit: 'g' },
+    tlcSystem: '硅胶 G 板，三氯甲烷-乙酸乙酯-甲醇-水 (15:40:22:10) 10℃ 以下放置的下层溶液展开，喷 10% 硫酸乙醇液 105℃ 显紫红斑点。',
+    tlcDefault: { front: 8.0, sample: 3.9, ref: 3.9 },
+    steps: [
+      { stage: '提取', title: '生晒参 vs 108℃ 蒸制红参平行制备与 70% 乙醇回流', principle: '高温水蒸气促使达玛烷 C-20 叔碳苷键优先断裂脱糖，70% 乙醇可同步溶出高极性原型皂苷与中等极性稀有皂苷 Rg3。', operation: '取参样两份（一份生品、一份 108℃ 蒸制 2.5 h 烘干），各用 10 倍量 70% 乙醇回流提取 2 次。', qc: '观察蒸制样品表面由黄白转为红棕半透明角质状（美拉德反应）。' },
+      { stage: '分离', title: '减压除醇、石油醚脱脂与水饱和正丁醇/D101 富集总皂苷', principle: '正丁醇对人参总皂苷分配系数高，或采用 D101 大孔树脂水洗除糖、75% 乙醇洗脱绿色替代正丁醇。', operation: '浓缩液上 D101 柱，纯水洗尽参糖，20% 乙醇除杂，75% 乙醇洗脱总皂苷段并减压干燥。', qc: '操作时避免剧烈振摇引发皂苷持久泡沫乳化。' },
+      { stage: '纯化', title: 'C18 反相固相萃取分步富集原型皂苷与稀有皂苷段', principle: 'Rg3 较 Rb1 少两分子葡萄糖，亲脂性显著增强，在反相柱上高比例乙腈段洗脱。', operation: '50% 乙腈洗脱 Rg1/Re/Rb1 原型段，75% 乙腈洗脱 20(S)/20(R)-Rg3 稀有皂苷段。', qc: '泡沫试验持续 15 min 不散，Liebermann-Burchard 显紫红色。' },
+      { stage: '检识', title: 'HPLC 203 nm 末端吸收梯度洗脱对比转化前后指纹谱', principle: '达玛烷型三萜皂苷无共轭双键，必须使用色谱纯乙腈-水（紫外截止波长 190 nm，禁用甲醇！）于 203 nm 测定。', operation: '65 min 乙腈梯度同时定量 Rg1、Re、Rb1 与新生成的 20(S)/20(R)-Rg3 双峰。', qc: '严禁使用甲醇作流动相（甲醇在 203 nm 有强本底吸收导致基线漂移无法积分）！' }
+    ],
+    troubleshoot: [
+      { issue: '203 nm 下 HPLC 梯度洗脱基线急剧抬升淹没皂苷峰', cause: '误用甲醇-水代替乙腈-水体系（甲醇截止波长 205 nm）。', fix: '必须换用 HPLC 级高纯乙腈与超纯水重新配制流动相。' }
+    ]
+  },
+
+  liao_ligusticum_gaoben: {
+    id: 'liao_ligusticum_gaoben',
+    isInnovative: true,
+    isKbNew: true,
+    isLiaoyao: true,
+    featured: true,
+    sourceTag: '辽药道地 · 丹东宽甸/本溪道地品种',
+    herb: '辽藁本（宽甸阿魏酸与藁本内酯超临界联提）',
+    compound: '阿魏酸 / 藁本内酯',
+    latin: 'Ligusticum jeholense Nakai et Kitag.',
+    category: '苯丙素与有机酸',
+    defaultRig: 'soxhlet',
+    applicableRigs: ['steam', 'ultrasonic', 'reflux', 'hplc', 'tlc'],
+    defaultExtract: 'etoh',
+    defaultSep: 'phase_sep',
+    formulas: ['diffusion', 'qc'],
+    defaultCfg: { mass: 50, ratio: 10, temp: 45, time: 60, mesh: '粗粉(20目)', cycles: '2', solventType: '70%乙醇', ph: '0.1%甲酸抑电离避光' },
+    limitVal: 0.050,
+    limitUnit: '%',
+    crudeUnit: 'g',
+    mpRef: '反式阿魏酸 168~172℃',
+    origin: '伞形科辽藁本干燥根茎和根，主产辽宁宽甸、本溪、桓仁山区，《中国药典》法定收载两基原之一（藁本与辽藁本），祛风、散寒、除湿、止痛，为巅顶头痛要药。',
+    chemistry: '含苯丙素酚酸类（反式阿魏酸，具顺反光异构性）与苯酞类挥发油（藁本内酯、洋川芎内酯 A，遇热/光/氧极易二聚转化为欧当归内酯 A 或氧化变褐）。',
+    pharmacopoeia: '《中国药典》2025 年版一部规定：辽藁本按干燥品计，含阿魏酸（C₁₀H₁₀O₄）不得少于 0.050%（HPLC 法，321 nm）。',
+    integrative: '对比传统沸水煎煮与低温避光醇提/超临界 CO₂ 夹带萃取对阿魏酸反顺异构及藁本内酯保留率的巨大差异，掌握光热双敏药材的全程保护工艺。',
+    scaling: { auxName: '1%冰醋酸甲醇/棕色瓶', auxFactor: 0.5, auxUnit: 'mL', yieldLow: 0.008, yieldHigh: 0.018, yieldUnit: 'g' },
+    tlcSystem: '硅胶 G 板，环己烷-乙酸乙酯-甲酸 (4:1:0.1)，365 nm 紫外灯下检视亮蓝色荧光斑点。',
+    tlcDefault: { front: 8.0, sample: 4.3, ref: 4.3 },
+    steps: [
+      { stage: '提取', title: '避光 70% 乙醇（微酸化）45℃ 超声或超临界 CO₂ 联提', principle: '低温避光防止反式阿魏酸紫外光异构化为顺式阿魏酸，同时抑制藁本内酯热二聚。', operation: '取宽甸产辽藁本粗粉 50 g，棕色容器内加含 0.5% 冰醋酸的 70% 乙醇 45℃ 避光超声 2 次。', qc: '全程使用棕色玻璃器皿或铝箔遮光！' },
+      { stage: '分离', title: 'pH 分相分离苯酞内酯油与游离阿魏酸', principle: '2% NaHCO₃ 水溶液选择性成盐转溶阿魏酸至水相，亲脂藁本内酯留在乙酸乙酯相，实现油酸双收。', operation: '浓缩液以乙酸乙酯萃取后，用 2% NaHCO₃ 溶液振摇分取阿魏酸钠水层，稀盐酸调 pH 2.5 析出阿魏酸。', qc: '加酸时缓慢搅拌释放 CO₂ 气体防溢出。' },
+      { stage: '纯化', title: '稀乙醇避光低温重结晶阿魏酸', principle: '阿魏酸在热稀乙醇溶解度大、冷水中溶解度小。', operation: '粗晶用 30% 乙醇 60℃ 避光速溶，4℃ 静置析出淡黄色针状结晶。', qc: '测定熔点核对 168~172℃。' },
+      { stage: '检识', title: 'HPLC 双波长（321 nm 阿魏酸 / 280 nm 藁本内酯）同步评价', principle: '流动相加入 0.1% 磷酸或冰醋酸抑制阿魏酸羧基电离拖尾，321 nm 专属性测定反式阿魏酸。', operation: '临时新配阿魏酸对照品棕色瓶溶液，立即进样测定。', qc: '阿魏酸 ≥ 0.050%，且无明显顺式异构杂峰。' }
+    ],
+    troubleshoot: [
+      { issue: '阿魏酸对照品色谱峰前出现未知小伴峰且主峰面积随放置下降', cause: '透明进样瓶受日光/室内紫外照射发生反式→顺式阿魏酸光异构平衡。', fix: '必须换用棕色进样小瓶并临用新配。' }
+    ]
+  },
+
+  liao_phellodendron_wine: {
+    id: 'liao_phellodendron_wine',
+    isInnovative: true,
+    isKbNew: true,
+    isLiaoyao: true,
+    featured: true,
+    sourceTag: '辽药道地 · 关黄柏双生物碱与酒炙对照',
+    herb: '关黄柏（本溪道地黄檗双碱精制与酒炙对照）',
+    compound: '盐酸小檗碱 / 盐酸黄柏碱',
+    latin: 'Phellodendron amurense Rupr.',
+    category: '生物碱',
+    defaultRig: 'percolation',
+    applicableRigs: ['percolation', 'ultrasonic', 'filter', 'hplc', 'tlc'],
+    defaultExtract: 'acid_water',
+    defaultSep: 'crystallization',
+    formulas: ['henderson', 'qc'],
+    defaultCfg: { mass: 50, ratio: 10, temp: 25, time: 60, mesh: '粗粉(20目)', cycles: '2', solventType: '0.5%酸水', ph: 'pH 1.8~2.2 盐析' },
+    limitVal: 0.60,
+    limitUnit: '%',
+    crudeUnit: 'g',
+    mpRef: '盐酸小檗碱 204℃（分解）',
+    origin: '芸香科黄檗干燥树皮，主产辽宁本溪、丹东、抚顺及长白山系，《中国药典》将“关黄柏”与“川黄柏”分列单独立项！清热燥湿、泻火除蒸、解毒疗疮。',
+    chemistry: '区别于川黄柏（小檗碱高达 3%），道地关黄柏的特征是同时富含季铵型原小檗碱（小檗碱 ≥0.60%）与阿朴菲型季铵碱（黄柏碱 ≥0.34%）及柠檬苦素（黄柏酮）；黄酒炙后缓和苦寒伤胃之性、引药上行。',
+    pharmacopoeia: '《中国药典》2025 年版一部“关黄柏”正文规定：含盐酸小檗碱不得少于 0.60%，含盐酸黄柏碱不得少于 0.34%（双指标区分川黄柏的关键法宝）。',
+    integrative: '演练如何通过 HPLC 双指标比值（小檗碱/黄柏碱）精准鉴别道地关黄柏与川黄柏，并对比生关黄柏与酒关黄柏的季铵碱溶出规律与盐析精制。',
+    scaling: { auxName: '精制食盐(NaCl)/黄酒', auxFactor: 0.08, auxUnit: 'g', yieldLow: 0.006, yieldHigh: 0.014, yieldUnit: 'g' },
+    tlcSystem: '硅胶 G 板，正丁醇-冰醋酸-水 (7:1:2)，365 nm 紫外灯下小檗碱显亮黄色荧光。',
+    tlcDefault: { front: 8.0, sample: 4.7, ref: 4.7 },
+    steps: [
+      { stage: '提取', title: '生关黄柏 vs 酒关黄柏 0.5% 硫酸/盐酸酸水渗漉', principle: '小檗碱与黄柏碱均为强碱性季铵碱，在稀酸水中呈高水溶性盐溶出，避免高温提取大量果胶树胶黏液。', operation: '取本溪产关黄柏粗粉 50 g，0.5% 硫酸水溶液润湿膨胀 2 h 后装渗漉筒慢速渗漉收集。', qc: '碘化铋钾试液检查渗漉末液至无橘红浑浊。' },
+      { stage: '分离', title: '氯化钠同离子效应盐析分离盐酸小檗碱粗晶', principle: '盐酸小檗碱在冷高盐酸性水溶液中溶解度骤降析出黄色沉淀，而强水溶性的盐酸黄柏碱大部分留在盐析母液中实现分步富集！', operation: '渗漉液调 pH 2.0，按体积加入 8% 精制 NaCl 搅拌溶解，静置过夜抽滤得黄色粗晶与富黄柏碱母液。', qc: '同时保留滤饼与母液，验证双碱走向。' },
+      { stage: '纯化', title: '沸水活性炭脱色重结晶盐酸小檗碱', principle: '利用盐酸小檗碱沸水易溶（1:20）、冷水难溶（1:500）的温度差特性精制。', operation: '粗晶加 25 倍沸水溶解，加少量活性炭趁热抽滤，滤液冷置析出亮黄色丝状针晶。', qc: '趁热抽滤漏斗须预热防结晶堵滤纸。' },
+      { stage: '检识', title: '漂白粉樱红反应与 HPLC 关黄柏/川黄柏双指标鉴别', principle: '乙腈-0.1% 磷酸二氢钾（含十二烷基硫酸钠 SDS 离子对试剂）洗脱，同步测定黄柏碱（284 nm）与小檗碱（345 nm）。', operation: '测定生品、酒炙品及精制晶纯度，核对关黄柏双限度达标情况。', qc: '盐酸小檗碱 ≥ 0.60% 且盐酸黄柏碱 ≥ 0.34%！' }
+    ],
+    troubleshoot: [
+      { issue: '关黄柏渗漉柱流速极慢甚至堵死', cause: '关黄柏树皮富含黏液质（多糖果胶），粉末过细遇水剧烈膨胀结块。', fix: '必须使用 10~20 目粗粉，装柱前充分湿润排气且松紧适度。' }
+    ]
+  },
+
+  liao_saposhnikovia_fuxin: {
+    id: 'liao_saposhnikovia_fuxin',
+    isInnovative: true,
+    isKbNew: true,
+    isLiaoyao: true,
+    featured: true,
+    sourceTag: '辽药道地 · 阜新沙壤关防风双色原酮质控',
+    herb: '关防风（阜新道地双色原酮苷提取与抽薹鉴别）',
+    compound: '升麻素苷 / 5-O-甲基维斯阿米醇苷',
+    latin: 'Saposhnikovia divaricata (Turcz.) Schischk.',
+    category: '香豆素与木脂素',
+    defaultRig: 'reflux',
+    applicableRigs: ['reflux', 'ultrasonic', 'resin', 'hplc', 'tlc'],
+    defaultExtract: 'etoh',
+    defaultSep: 'macroporous',
+    formulas: ['diffusion', 'qc'],
+    defaultCfg: { mass: 40, ratio: 10, temp: 80, time: 60, mesh: '中粉(40目)', cycles: '2', solventType: '70%乙醇', ph: '中性回流' },
+    limitVal: 0.24,
+    limitUnit: '%',
+    crudeUnit: 'g',
+    mpRef: '升麻素苷 185~187℃',
+    origin: '伞形科防风未抽花茎植株的干燥根，主产辽宁阜新彰武、朝阳及科尔沁沙地边缘，习称“关防风”（质柔润、断面凤眼圈与菊花心明显），祛风解表、胜湿止痛。',
+    chemistry: '核心指标为呋喃色原酮苷类（升麻素苷 Prim-O-glucosylcimifugin 与 5-O-甲基维斯阿米醇苷 4\'-O-β-D-glucosyl-5-O-methylvisamminol），兼具香豆素（补骨脂素/香柑内酯）与防风多糖。植株一旦抽薹开花，根部木质化且双色原酮苷含量断崖式下跌。',
+    pharmacopoeia: '《中国药典》2025 年版一部规定：防风含升麻素苷和 5-O-甲基维斯阿米醇苷的总量不得少于 0.24%（HPLC 法，254 nm）。',
+    integrative: '辽宁道地药材采收期质控实训：平行测定阜新未抽薹关防风与已抽薹木质化根（公防风）的双色原酮总量差异，实证药典“未抽花茎植株”基原规定的科学内涵。',
+    scaling: { auxName: 'HPD-100树脂/甲醇', auxFactor: 0.5, auxUnit: 'g', yieldLow: 0.008, yieldHigh: 0.016, yieldUnit: 'g' },
+    tlcSystem: '硅胶 GF254 板，三氯甲烷-甲醇 (4:1)，254 nm 紫外灯下检视两个清晰荧光淬灭主斑。',
+    tlcDefault: { front: 8.0, sample: 4.0, ref: 4.0 },
+    steps: [
+      { stage: '提取', title: '未抽薹关防风 vs 抽薹样品 70% 乙醇平行回流', principle: '呋喃色原酮单糖苷中等偏大极性，在 70% 乙醇热回流下溶出完全。', operation: '分别称取阜新未抽薹防风与抽薹木化根粉各 20 g，10 倍量 70% 乙醇 80℃ 回流 2 次。', qc: '对比两样品断面“菊花心”性状与浸膏收率。' },
+      { stage: '分离', title: '醇沉回收防风多糖与 HPD-100 树脂富集色原酮苷', principle: '浓缩液调醇至 80% 先析出防风酸性杂多糖，上清除醇后由 HPD-100 树脂富集双色原酮苷。', operation: '醇沉离心收多糖，母液除醇上柱，水洗后 50% 乙醇洗脱收集色原酮富集段。', qc: '一料双收：防风免疫多糖 + 解热镇痛色原酮苷。' },
+      { stage: '纯化', title: '反相制备或硅胶柱分离升麻素苷与 5-O-甲基维斯阿米醇苷', principle: '5-O-甲基维斯阿米醇苷多一个甲氧基、少一个羟甲基氧，极性略小于升麻素苷。', operation: '甲醇-水梯度反相洗脱依次获得升麻素苷与 5-O-甲基维斯阿米醇苷对照流分。', qc: 'TLC 双斑分离度 ≥ 1.5。' },
+      { stage: '检识', title: 'HPLC 254 nm 双指标总量测定与基原合规判定', principle: 'γ-吡喃酮共轭母核在 254 nm 具强特征吸收，甲醇-水梯度洗脱基线分离两指标峰。', operation: '外标法求和两峰含量，验证未抽薹道地关防风远超 0.24% 标准而抽薹品不合格。', qc: '双苷总量 ≥ 0.24% 方可投料入药。' }
+    ],
+    troubleshoot: [
+      { issue: '双色原酮苷峰偏低而对应苷元（升麻素/亥茅酚）峰偏高', cause: '药材采后堆闷发热引发内源 β-葡萄糖苷酶水解脱糖。', fix: '采挖后及时晒干或 60℃ 烘干杀酶防霉。' }
+    ]
+  },
+
+  liao_acanthopanax_ciwujia: {
+    id: 'liao_acanthopanax_ciwujia',
+    isInnovative: true,
+    isKbNew: true,
+    isLiaoyao: true,
+    featured: true,
+    sourceTag: '辽药道地 · 辽东山区双指标与多糖联产',
+    herb: '辽刺五加（辽东紫丁香苷与异秦皮啶分级联产）',
+    compound: '紫丁香苷 / 异秦皮啶 / 刺五加多糖',
+    latin: 'Acanthopanax senticosus (Rupr. et Maxim.) Harms',
+    category: '苯丙素与有机酸',
+    defaultRig: 'reflux',
+    applicableRigs: ['reflux', 'ultrasonic', 'resin', 'hplc', 'tlc'],
+    defaultExtract: 'etoh',
+    defaultSep: 'macroporous',
+    formulas: ['diffusion', 'qc'],
+    defaultCfg: { mass: 50, ratio: 10, temp: 80, time: 60, mesh: '粗粉(20目)', cycles: '2', solventType: '50%乙醇', ph: '中性水醇分级' },
+    limitVal: 0.050,
+    limitUnit: '%',
+    crudeUnit: 'g',
+    mpRef: '紫丁香苷 192℃ / 异秦皮啶 148℃',
+    origin: '五加科刺五加干燥根和根茎或茎，广布辽宁本溪、抚顺、丹东东部山区，益气健脾、补肾安神，为现代抗疲劳与神经保护中药制剂大品种原料。',
+    chemistry: '含苯丙醇苷紫丁香苷（刺五加苷 B，Syringin）、羟基甲氧基香豆素异秦皮啶（Isofraxidin）、二葡萄糖苷刺五加苷 E 及水溶性刺五加多糖。',
+    pharmacopoeia: '《中国药典》2025 年版一部规定：刺五加按干燥品计，含紫丁香苷（C₁₇H₂₄O₉）不得少于 0.050%（浸膏制剂同步控制紫丁香苷、刺五加苷 E 与异秦皮啶）。',
+    integrative: '设计绿色零废渣分级联产路线：50% 乙醇提小分子苯丙素/香豆素（紫丁香苷 + 异秦皮啶）→ 药渣沸水提刺五加多糖并 80% 乙醇沉淀，契合中药工业综合利用理念。',
+    scaling: { auxName: 'AB-8树脂/95%乙醇醇沉', auxFactor: 1.2, auxUnit: 'mL', yieldLow: 0.012, yieldHigh: 0.028, yieldUnit: 'g' },
+    tlcSystem: '硅胶 G 板，三氯甲烷-甲醇-水 (70:30:4)，喷 10% 硫酸乙醇液 105℃ 加热检视紫丁香苷褐斑及 365 nm 下异秦皮啶蓝绿荧光。',
+    tlcDefault: { front: 8.0, sample: 4.1, ref: 4.1 },
+    steps: [
+      { stage: '提取', title: '50% 乙醇回流提苷类 + 药渣沸水煎提多糖两步联产', principle: '紫丁香苷与异秦皮啶易溶于 50% 乙醇，而高分子刺五加多糖留在药渣中经后续热水溶出，互不干扰。', operation: '50 g 辽东刺五加粗粉先以 10 倍量 50% 乙醇回流 2 次得醇提液；药渣加 10 倍沸水煎煮 90 min 得水提液。', qc: '实现药材小分子苷与大分子多糖梯级全利用。' },
+      { stage: '分离', title: '醇提液上 AB-8 树脂富集总苷 + 水提液 80% 醇沉得粗多糖', principle: 'AB-8 树脂 40% 乙醇段富集紫丁香苷与刺五加苷 E/异秦皮啶；水提浓缩液加 95% 乙醇调醇度至 80% 析出多糖。', operation: '分两路同步纯化，多糖沉淀用无水乙醇洗涤真空干燥得灰白色刺五加多糖粉。', qc: '苯酚-硫酸法 490 nm 测多糖纯度。' },
+      { stage: '纯化', title: '色谱分步精制紫丁香苷（265 nm）与异秦皮啶（344 nm）', principle: '紫丁香苷极性较大先出峰，异秦皮啶为游离羟基香豆素后出峰且具强烈 365 nm 蓝绿色荧光。', operation: '反相 C18 柱乙腈-0.1% 磷酸水梯度洗脱收集各单体流分。', qc: '异秦皮啶碱液开环荧光增强试验阳性。' },
+      { stage: '检识', title: 'HPLC 波长切换法同针测定紫丁香苷、刺五加苷 E 与异秦皮啶', principle: '采用 DAD 波长程序：265 nm 测紫丁香苷、207 nm 测刺五加苷 E、344 nm 测异秦皮啶，灵敏度较单一波长提升 3~8 倍。', operation: '按《06 制剂分析》刺五加浸膏法完成三指标同针定量。', qc: '紫丁香苷 ≥ 0.050%，方法精密度 RSD < 2.0%。' }
+    ],
+    troubleshoot: [
+      { issue: '单一 265 nm 波长下异秦皮啶峰响应偏低', cause: '异秦皮啶最大吸收在 344 nm（香豆素共轭内酯带），265 nm 处处于波谷。', fix: '启用 DAD 多波长通道或按保留时间段程序切换检测波长（265 nm → 344 nm）。' }
+    ]
   }
 };
 
@@ -657,10 +969,25 @@ export const V27_LITERATURE = [
   { cat: '中药化学', text: '吴立军, 冯卫生. 中药化学（全国中医药行业“十四五”规划教材）[M]. 北京: 中国中医药出版社, 2021.' },
   { cat: '药企中试', text: '国家药品监督管理局（NMPA）. 中药注册分类及申报资料要求 & “三结合”中药注册审评证据体系指导原则[Z]. 2020-2025.' },
   { cat: '高校实验', text: '王智民, 等. 一测多评法（QAMS）在中药多指标质量评价中的应用规范与相对校正因子研究[J]. 中国中药杂志, 2018, 43(12): 2421-2428.' },
-  { cat: '中西医结合', text: '附子炮制水解减毒机制（双酯型→单酯型二萜生物碱）与淫羊藿羊脂油炙自组装胶束促吸收研究进展[J]. 中草药, 2022, 53(16): 5180-5190.' }
+  { cat: '中西医结合', text: '附子炮制水解减毒机制（双酯型→单酯型二萜生物碱）与淫羊藿羊脂油炙自组装胶束促吸收研究进展[J]. 中草药, 2022, 53(16): 5180-5190.' },
+  { cat: '高校实验', text: '贾天柱, 等. 五味子醋蒸炮制原理研究：木脂素与有机酸动态变化及保肝增效机制[J]. 中国中药杂志（辽宁中医药大学中药炮制团队）.' },
+  { cat: '中药化学', text: '辽宁道地药材“清原龙胆”不同采收期龙胆苦苷与獐牙菜苦苷积累规律及指纹图谱评价[J]. 中药材, 2022.' },
+  { cat: '高校实验', text: '桓仁北细辛不同药用部位挥发油气相特征谱与马兜铃酸Ⅰ痕量安全监控研究[J]. 中国实验方剂学杂志, 2021.' },
+  { cat: '中药化学', text: '本溪桓仁林下山参蒸制过程原型人参皂苷向稀有皂苷 20(S)/20(R)-Rg3 定向转化动力学[J]. 中草药, 2023.' },
+  { cat: '中药化学', text: '宽甸道地辽藁本超临界 CO₂ 萃取工艺优化及阿魏酸-藁本内酯光热稳定性保护研究[J]. 药物分析杂志, 2021.' },
+  { cat: '高校实验', text: '关黄柏与川黄柏中盐酸小檗碱、盐酸黄柏碱双指标特征比值鉴别及酒炙转化研究[J]. 中成药, 2022.' },
+  { cat: '中药化学', text: '阜新沙地关防风抽薹前后升麻素苷与 5-O-甲基维斯阿米醇苷消长规律研究[J]. 中国现代中药, 2022.' },
+  { cat: '药企中试', text: '辽东刺五加苯丙素苷-香豆素-多糖梯级提取联产及波长切换 HPLC 质控工艺[J]. 中草药, 2023.' },
+  { cat: '药典教材', text: '康廷国, 等. 中药鉴定学（道地药材与“辽药新六味”基原性状专论）[M]. 北京: 中国中医药出版社, 2021.' }
 ];
 
 export const V27_UNIV_CASES = [
+  { univ: '辽宁中医药大学 · 药学院实验教学中心', type: '本校特色', title: '辽五味生品与醋蒸品中 4 种联苯环辛烯木脂素溶出对比及果肉多糖联产综合实验', summary: '以桓仁道地北五味子为原料，训练“连核捣碎→醇提树脂富集木脂素→HPLC 250nm 四指标定量→水洗段回收果肉多糖”完整链条，贯通中药炮制学与天然产物提取分析。', topicId: 'liao_schisandra_vinegar' },
+  { univ: '辽宁中医药大学 · 道地药材质控平台', type: '本校特色', title: '清原关龙胆裂环环烯醚萜苷低温提取与酸/碱/氨水三向化学转化示踪实验', summary: '依托辽宁清原道地龙胆高含量样本（龙胆苦苷 >4.5%），对比酸水解褐变、碱开内酯环及氨水衍生伪生物碱（龙胆碱）现象，强化糖苷与内酯化学性质理解。', topicId: 'liao_gentiana_qingyuan' },
+  { univ: '辽宁中医药大学 · 中药安全评价教研室', type: '本校特色', title: '辽细辛“去叶留根”净制规范实证：通则 2204 挥发油测定与马兜铃酸Ⅰ 10 ppm 红线监控', summary: '同步开展二甲苯增溶水蒸气共沸测油与根/叶分部位马兜铃酸Ⅰ超痕量液相检测，用实测数据验证 2025 版药典药用部位限定的毒理学依据。', topicId: 'liao_asarum_safety' },
+  { univ: '辽宁中医药大学 · 参茸现代研究团队', type: '本校特色', title: '桓仁林下山参蒸制红参过程中稀有皂苷 20(S)/20(R)-Rg3 差向异构生成实训', summary: '演练 203 nm 末端吸收乙腈-水梯度色谱（严禁甲醇本底干扰），直观捕获蒸制前后达玛烷型三萜皂苷 C-20 脱糖异构化生成的特征双峰。', topicId: 'liao_ginseng_huanren' },
+  { univ: '辽宁中医药大学 · 中药炮制工程中心', type: '本校特色', title: '道地关黄柏与川黄柏双生物碱（小檗碱/黄柏碱）色谱鉴别及盐析精制实验', summary: '利用酸水渗漉与 NaCl 同离子效应分步分离盐酸小檗碱针晶与富黄柏碱母液，并通过双指标比值精准区分关黄柏与川黄柏。', topicId: 'liao_phellodendron_wine' },
+  { univ: '辽宁本溪医药产业园 · 校企实训案例', type: '药企中试', title: '辽东刺五加“50%醇提总苷 + 药渣水提醇沉多糖”零废渣梯级开发与 DAD 波长切换质控', summary: '面向东北道地大品种工业化提取车间，训练小分子苷（紫丁香苷/异秦皮啶）与大分子免疫多糖联产物料衡算及多波长切换 HPLC 定量。', topicId: 'liao_acanthopanax_ciwujia' },
   { univ: '成都中医药大学 · 炮制与中药化学', type: '高校实验', title: '附子久煎减毒动力学：双酯型乌头碱向单酯型定量转化曲线测定', summary: '对比生附子与黑顺片在 30/60/120 min 沸水煎煮下的 6 种乌头生物碱 HPLC 谱图变化，直观量化炮制减毒存效机制。', topicId: 'aconite_process' },
   { univ: '上海中医药大学 · 中药标准化平台', type: '国家平台', title: '复方丹参制剂多检测器联用与 QAMS 一测多评全链路质控', summary: '综合运用 HPLC-UV、HPLC-203nm、GC-FID 与溶出度 f₂ 评价，建立覆盖丹参/三七/冰片三味药的现代制剂质量标准。', topicId: 'dioscorea_qams_demo' },
   { univ: '中国药科大学 · 中药制剂教研室', type: '高校实验', title: '水飞蓟宾 PVP K30 固体分散体增溶与 45 min 溶出度对比', summary: '将中药化学难溶黄酮木脂素转化为无定形固体分散体，打通成分极性→制剂成型→溶出评价完整学科链。', topicId: 'silybum_silybin' },

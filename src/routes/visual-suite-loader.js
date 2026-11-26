@@ -63,11 +63,11 @@ function forwardVisual(globalName, method) {
   };
 }
 
-// 1.2 全题库 136 味药材 × 65 项 PubChem 3D 分子映射注册表（首屏轻量化常驻，点击任意成分名即时按需水合 3D 分子库）
+// 1.2 全题库 144 味药材 × 77 项 PubChem 3D 分子映射注册表（首屏轻量化常驻，点击任意成分名即时按需水合 3D 分子库）
 const MOL3D_ENTRIES = [
   { key: 'tanshinone', label: '丹参酮IIA', pattern: /丹参酮[ⅡI]{1,2}A|丹参酮IIA|丹参酮/g, herbRe: /丹参(?!.*水溶)/ },
   { key: 'baicalin', label: '黄芩苷', pattern: /黄芩苷|黄芩甙|黄芩素/g, herbRe: /黄芩|黄连解毒汤/ },
-  { key: 'berberine', label: '小檗碱', pattern: /盐酸小檗碱|小檗碱|黄连素|巴马汀/g, herbRe: /黄连|黄柏|三颗针/ },
+  { key: 'berberine', label: '小檗碱', pattern: /盐酸小檗碱|小檗碱|黄连素|盐酸巴马汀|巴马汀/g, herbRe: /黄连|黄柏|三颗针/ },
   { key: 'menthol', label: '薄荷脑', pattern: /左旋薄荷脑|薄荷脑|薄荷醇/g, herbRe: /薄荷|逍遥散/ },
   { key: 'chlorogenic', label: '绿原酸', pattern: /绿原酸/g, herbRe: /金银花|杜仲叶|茵陈/ },
   { key: 'quercetin', label: '槲皮素', pattern: /槲皮素苷元|槲皮素/g, herbRe: /银杏叶|槲皮|流苏石斛/ },
@@ -82,7 +82,7 @@ const MOL3D_ENTRIES = [
   { key: 'eugenol', label: '丁香酚', pattern: /(?<!甲基)丁香酚/g, herbRe: /^丁香/ },
   { key: 'methyleugenol', label: '甲基丁香酚', pattern: /甲基丁香酚|黄樟醚/g, herbRe: /细辛/ },
   { key: 'cinnamaldehyde', label: '桂皮醛', pattern: /桂皮醛|肉桂醛/g, herbRe: /肉桂/ },
-  { key: 'ligustilide', label: '藁本内酯', pattern: /藁本内酯/g, herbRe: /当归(?!.*阿魏酸)/ },
+  { key: 'ligustilide', label: '藁本内酯', pattern: /藁本内酯/g, herbRe: /当归(?!.*阿魏酸)|藁本/ },
   { key: 'patchoulol', label: '百秋李醇', pattern: /百秋李醇|广藿香醇/g, herbRe: /广藿香/ },
   { key: 'curcumol', label: '莪术醇', pattern: /莪术醇/g, herbRe: /莪术/ },
   { key: 'paeonol', label: '丹皮酚', pattern: /丹皮酚|牡丹酚/g, herbRe: /牡丹皮/ },
@@ -94,7 +94,7 @@ const MOL3D_ENTRIES = [
   { key: 'geniposide', label: '栀子苷', pattern: /栀子苷|西红花苷/g, herbRe: /栀子|西红花/ },
   { key: 'andrographolide', label: '穿心莲内酯', pattern: /穿心莲内酯/g, herbRe: /穿心莲/ },
   { key: 'ginkgolide_b', label: '银杏内酯B', pattern: /银杏内酯[A-C\s/]*/g, herbRe: /银杏内酯/ },
-  { key: 'gentiopicroside', label: '龙胆苦苷', pattern: /龙胆苦苷/g, herbRe: /龙胆/ },
+  { key: 'gentiopicroside', label: '龙胆苦苷', pattern: /龙胆苦苷|獐牙菜苦苷/g, herbRe: /龙胆/ },
   { key: 'oridonin', label: '冬凌草甲素', pattern: /冬凌草甲素/g, herbRe: /冬凌草/ },
   { key: 'paeoniflorin', label: '芍药苷', pattern: /芍药苷/g, herbRe: /白芍/ },
   { key: 'triptolide', label: '雷公藤甲素', pattern: /雷公藤甲素/g, herbRe: /雷公藤/ },
@@ -118,23 +118,23 @@ const MOL3D_ENTRIES = [
   { key: 'chrysophanol', label: '大黄酚', pattern: /大黄酚|橙黄决明素/g, herbRe: /决明子/ },
   { key: 'resveratrol', label: '白藜芦醇', pattern: /白藜芦醇|虎杖苷/g, herbRe: /虎杖/ },
   { key: 'shikonin', label: '紫草素', pattern: /左旋紫草素|紫草素/g, herbRe: /紫草/ },
-  { key: 'esculin', label: '秦皮甲素', pattern: /秦皮甲素|秦皮乙素|七叶苷/g, herbRe: /秦皮/ },
+  { key: 'esculin', label: '秦皮甲素', pattern: /秦皮甲素|秦皮乙素|异秦皮啶|七叶苷/g, herbRe: /秦皮|刺五加/ },
   { key: 'osthole', label: '蛇床子素', pattern: /蛇床子素/g, herbRe: /蛇床子/ },
   { key: 'psoralen', label: '补骨脂素', pattern: /异补骨脂素|补骨脂素/g, herbRe: /补骨脂/ },
-  { key: 'imperatorin', label: '欧前胡素', pattern: /异欧前胡素|欧前胡素|白花前胡甲素/g, herbRe: /白芷|前胡/ },
-  { key: 'schisandrin', label: '五味子醇甲', pattern: /五味子醇甲|五味子乙素/g, herbRe: /五味子/ },
-  { key: 'phillyrin', label: '连翘苷', pattern: /连翘酯苷\s*A|连翘苷|松脂醇二葡萄糖苷/g, herbRe: /连翘|杜仲(?!叶)/ },
+  { key: 'imperatorin', label: '欧前胡素', pattern: /异欧前胡素|欧前胡素|白花前胡甲素/g, herbRe: /白芷|前胡|防风/ },
+  { key: 'schisandrin', label: '五味子醇甲', pattern: /五味子醇甲|五味子甲素|五味子乙素/g, herbRe: /五味子|辽五味/ },
+  { key: 'phillyrin', label: '连翘苷', pattern: /连翘酯苷\s*A|连翘苷|细辛脂素|松脂醇二葡萄糖苷/g, herbRe: /连翘|杜仲(?!叶)/ },
   { key: 'magnolol', label: '厚朴酚', pattern: /和厚朴酚|厚朴酚/g, herbRe: /厚朴/ },
   { key: 'arctigenin', label: '牛蒡苷元', pattern: /牛蒡苷元|牛蒡苷/g, herbRe: /牛蒡子/ },
-  { key: 'ferulic', label: '阿魏酸', pattern: /阿魏酸|滨蒿内酯/g, herbRe: /阿魏酸/ },
+  { key: 'ferulic', label: '阿魏酸', pattern: /阿魏酸|滨蒿内酯/g, herbRe: /阿魏酸|辽藁本/ },
   { key: 'curcumin', label: '姜黄素', pattern: /去甲氧基姜黄素|姜黄素/g, herbRe: /姜黄/ },
   { key: 'shikimic', label: '莽草酸', pattern: /莽草酸/g, herbRe: /八角茴香/ },
-  { key: 'gastrodin', label: '天麻素', pattern: /天麻素|红景天苷/g, herbRe: /天麻|红景天/ },
+  { key: 'gastrodin', label: '天麻素', pattern: /天麻素|红景天苷|紫丁香苷/g, herbRe: /天麻|红景天/ },
   { key: 'rosmarinic', label: '迷迭香酸', pattern: /迷迭香酸|丹酚酸\s*B/g, herbRe: /夏枯草|丹参\(水溶/ },
   { key: 'aspirin', label: '乙酰水杨酸', pattern: /乙酰水杨酸|水杨苷|阿司匹林/g, herbRe: /柳树皮/ },
   { key: 'gallic', label: '没食子酸', pattern: /没食子酸|五倍子鞣酸|茶多酚/g, herbRe: /五倍子/ },
   { key: 'glycyrrhetinic', label: '甘草次酸', pattern: /甘草酸单铵盐|甘草酸|甘草次酸/g, herbRe: /甘草/ },
-  { key: 'protopanaxadiol', label: '原人参二醇', pattern: /人参皂苷\s*Rg1|三七总皂苷|西洋参皂苷|原人参二醇/g, herbRe: /人参|三七|西洋参/ },
+  { key: 'protopanaxadiol', label: '原人参二醇', pattern: /人参皂苷\s*(?:Rg1|Re|Rb1)|三七总皂苷|西洋参皂苷|原人参二醇/g, herbRe: /人参|山参|三七|西洋参/ },
   { key: 'ursolic', label: '熊果酸', pattern: /熊果酸|柴胡皂苷|桔梗皂苷D|茯苓酸|灵芝酸A/g, herbRe: /柴胡|桔梗|茯苓|灵芝/ },
   { key: 'cycloastragenol', label: '环黄芪醇', pattern: /黄芪甲苷|环黄芪醇/g, herbRe: /黄芪(?!\(多糖)/ },
   { key: 'diosgenin', label: '薯蓣皂苷元', pattern: /薯蓣皂苷元|重楼皂苷|麦冬皂苷D|知母皂苷/g, herbRe: /穿山龙|重楼|麦冬|知母/ },
@@ -496,25 +496,26 @@ function initVisualProxies() {
   }
 
   if (window.TCM_V16_PORTAL && typeof window.TCM_V16_PORTAL.registerExtension === 'function') {
+    const cnt = window.TCM_LAB_API?.getCounts ? window.TCM_LAB_API.getCounts() : { topics: 144, literature: 100 };
     window.TCM_V16_PORTAL.registerExtension({
       id: 'v20_mol3d',
       icon: '3D',
       title: '三维分子结构与显色实验室',
-      desc: '内置 65 项 PubChem 实测 3D 构象并全量贯通 136 味题库药材、91 篇文献与 12 项粒子显色反应。',
+      desc: `内置 77 项 PubChem 实测 3D 构象并贯通 ${cnt.topics} 味题库药材、${cnt.literature} 篇文献与 12 项粒子显色反应。`,
       onOpen: () => window.TCM_V20_VISUALS.openMol3d('tanshinone')
     });
     window.TCM_V16_PORTAL.registerExtension({
       id: 'v21_spectra',
       icon: 'UV',
       title: '交互式四谱工作站与猜峰训练',
-      desc: '覆盖 11 大类中药成分的 UV / IR / ¹H-NMR / MS 交互谱图，直连 136 味药材药典波长与实证文献。',
+      desc: `覆盖 11 大类中药成分的 UV / IR / ¹H-NMR / MS 交互谱图，直连 ${cnt.topics} 味药材药典波长与实证文献。`,
       onOpen: () => window.TCM_V21_SPECTRA_LAB.open('黄酮')
     });
     window.TCM_V16_PORTAL.registerExtension({
       id: 'v22_visual_suite',
       icon: 'LAB',
       title: '三维虚拟实验室、流体仿真与驾驶舱',
-      desc: '基于 Three.js 构建 10m×8m 实景 3D 实验室与多课题 SOP，内置液液萃取流体仿真与 136 题五维雷达驾驶舱。',
+      desc: `基于 Three.js 构建实景 3D 实验室（回流提取 / 减压旋蒸 / HPLC 三套 7 步流程）、液液萃取仿真与 ${cnt.topics} 题五维雷达驾驶舱。`,
       onOpen: () => window.TCM_V22_VISUAL_SUITE.open('vlab')
     });
   }

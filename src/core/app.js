@@ -1723,6 +1723,7 @@
           isInnovative: !!preset.isInnovative,
           isClassGroup: !!preset.isClassGroup,
           isKbNew: true,
+          isLiaoyao: !!preset.isLiaoyao,
           featured: true,
           herb: preset.herb,
           compound: preset.compound,

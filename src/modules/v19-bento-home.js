@@ -54,7 +54,7 @@ function getCounts() {
   if (typeof window !== 'undefined' && window.TCM_LAB_API?.getCounts) {
     return window.TCM_LAB_API.getCounts();
   }
-  return { topics: 119, rigs: 15, literature: 85, univCases: 38 };
+  return { topics: 144, rigs: 15, literature: 100, univCases: 48 };
 }
 
 function jumpToBankWithHerb(herbName) {
@@ -200,7 +200,7 @@ function renderBentoHome() {
                 </svg>
               </div>
               <h3 class="v19-bento-title">三维分子与显色</h3>
-              <p class="v19-bento-sub">77 项 PubChem 实测构象、136 味全库映射与 12 项显色</p>
+              <p class="v19-bento-sub">77 项 PubChem 实测构象、${c.topics} 味全库映射与 12 项显色</p>
             </div>
             <div class="v19-card-stage">
               <svg viewBox="0 0 180 100" class="w-40 h-24" aria-hidden="true">
@@ -303,7 +303,7 @@ function renderBentoHome() {
             <div>
               <div class="v19-bento-card-head">
                 <span class="v19-pill-tag v19-pill-mint">05 产业转化</span>
-                <span class="text-xs font-bold" style="color:var(--craft-accent)">丹参标杆</span>
+                <span class="text-xs font-bold" style="color:var(--craft-accent)">丹参 · 辽五味</span>
               </div>
               <h3 class="v19-bento-title">产业转化训练</h3>
               <p class="v19-bento-sub">定位 → 炮制 → 工艺 → 剂型 → 中试放大</p>
@@ -317,7 +317,7 @@ function renderBentoHome() {
                 <div class="text-[10px]" style="color:var(--craft-muted)">9 维综合工艺最优 · 偏差 CAPA · 转化报告</div>
               </div>
             </div>
-            <div class="v19-card-foot"><span>4 大标杆 · ${c.topics} 题导入</span><span>进入 →</span></div>
+            <div class="v19-card-foot"><span>5 大标杆 · ${c.topics} 题导入</span><span>进入 →</span></div>
           </button>
 
           <!-- 卡 6：交互式四谱工作站 -->
@@ -328,7 +328,7 @@ function renderBentoHome() {
                 <span class="text-xs font-bold" style="color:var(--craft-seal)">归属训练</span>
               </div>
               <h3 class="v19-bento-title">交互式四谱分析</h3>
-              <p class="v19-bento-sub">全部 11 大类成分 UV/IR/NMR/MS 谱图与 136 题联动</p>
+              <p class="v19-bento-sub">全部 11 大类成分 UV/IR/NMR/MS 谱图与 ${c.topics} 题联动</p>
             </div>
             <div class="v19-card-stage">
               <svg viewBox="0 0 180 86" class="w-full h-20" aria-hidden="true">

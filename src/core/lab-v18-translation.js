@@ -612,16 +612,18 @@
     const h = ranked.length * 46 + 18;
     const rows = ranked.map((item, idx) => {
       const y = 14 + idx * 46;
-      const wComp = Math.max(8, (item.score / maxScore) * 320);
-      const wTrans = Math.max(8, (item.transferScore / maxScore) * 320);
+      const wComp = Math.max(8, (item.score / maxScore) * 296);
+      const wTrans = Math.max(8, (item.transferScore / maxScore) * 296);
       const isTop = idx === 0;
+      const rawName = String(item.route.name || '').replace(/（推荐）|\(推荐\)/g, '');
+      const dispName = rawName.length > 18 ? `${rawName.slice(0, 18)}…` : rawName;
       return `
-        <text x="0" y="${y + 11}" font-size="11.5" font-weight="${isTop ? '800' : '600'}" fill="currentColor">${esc(item.route.name.slice(0, 22))}</text>
-        <rect x="210" y="${y + 1}" width="320" height="10" rx="5" fill="rgba(15,92,84,0.10)" />
-        <rect x="210" y="${y + 1}" width="${wComp}" height="10" rx="5" fill="${isTop ? '#0f5c54' : '#3b82f6'}" />
+        <text x="0" y="${y + 11}" font-size="11" font-weight="${isTop ? '800' : '600'}" fill="currentColor">${esc(dispName)}</text>
+        <rect x="234" y="${y + 1}" width="296" height="10" rx="5" fill="rgba(15,92,84,0.10)" />
+        <rect x="234" y="${y + 1}" width="${wComp}" height="10" rx="5" fill="${isTop ? '#0f5c54' : '#3b82f6'}" />
         <text x="538" y="${y + 10}" font-size="11" font-weight="800" fill="${isTop ? '#0f5c54' : 'currentColor'}">综合 ${item.score}</text>
-        <rect x="210" y="${y + 16}" width="320" height="7" rx="3.5" fill="rgba(201,146,44,0.12)" />
-        <rect x="210" y="${y + 16}" width="${wTrans}" height="7" rx="3.5" fill="#d97706" />
+        <rect x="234" y="${y + 16}" width="296" height="7" rx="3.5" fill="rgba(201,146,44,0.12)" />
+        <rect x="234" y="${y + 16}" width="${wTrans}" height="7" rx="3.5" fill="#d97706" />
         <text x="538" y="${y + 23}" font-size="10" fill="#b45309">转移率 ${item.transferScore}</text>
       `;
     }).join('');
@@ -2236,10 +2238,12 @@
     const found = all.find((x) => x.id === topicId);
     if (!found) return;
 
-    // 若命中 4 个精编标杆药材，优先使用深度标杆项目
-    const herbMap = { '丹参': 'danshen', '黄芩': 'huangqin', '薄荷': 'bohe', '延胡索': 'yanhusuo' };
-    if (herbMap[found.herb] && data.PROJECTS[herbMap[found.herb]]) {
-      state.projectId = herbMap[found.herb];
+    // 若命中 5 个精编标杆药材，优先使用深度标杆项目
+    const herbKey = /五味子|辽五味/.test(found.herb)
+      ? 'liaowuweizi'
+      : ({ '丹参': 'danshen', '黄芩': 'huangqin', '薄荷': 'bohe', '延胡索': 'yanhusuo' }[found.herb] || '');
+    if (herbKey && data.PROJECTS[herbKey]) {
+      state.projectId = herbKey;
     } else {
       const dyn = buildDynamicProject(found);
       state.dynamicProjects[dyn.id] = dyn;

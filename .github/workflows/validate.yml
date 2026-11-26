@@ -1,42 +1,68 @@
-name: Validate site scripts
+name: Build and Validate
 
 on:
   push:
   pull_request:
 
 jobs:
-  syntax:
+  build-and-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Check JavaScript syntax
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check Cloudflare Pages Functions syntax
         run: |
-          node --check app.js
-          node --check cloud-ai.js
-          node --check lab-data-extra.js
-          node --check lab-data-v3.js
-          node --check lab-tools-v3.js
-          node --check lab-v4-spectroscopy.js
-          node --check lab-v5-encyclopedia.js
-          node --check lab-v6-pro.js
-          node --check lab-v7-media-pro.js
-          node --check lab-v8-studio.js
-          node --check lab-v9-data.js
-          node --check lab-v9-visuals.js
-          node --check lab-v10-sandbox.js
-          node --check lab-v11-userplan.js
-          node --check lab-v12-diy-studio.js
-          node --check lab-v13-mission-os.js
-          node --check lab-v14-course-diagrams.js
-          node --check lab-v15-insight.js
-          node --check lab-v16-portal.js
-          node --check lab-v17-ai-review.js
-          node --check lab-v18-translation-data.js
-          node --check lab-v18-translation.js
-          node --input-type=module --check < functions/api/ai-proxy.js
+          node --check functions/api/ai-proxy.js
+          node --check functions/api/drafts.js
+
       - name: Reject embedded provider secrets
         run: |
-          ! grep -R -E "SHARED_QWEN_KEY|atob\(['\"]sk-|apiKey:[[:space:]]*['\"]sk-" --include='*.js' --include='*.html' .
+          ! grep -R -E "SHARED_QWEN_KEY|atob\(['\"]sk-|apiKey:[[:space:]]*['\"]sk-" \
+            --include='*.js' --include='*.html' \
+            --exclude-dir=node_modules --exclude-dir=dist .
+
+      - name: Build Vite production bundle
+        run: npm run build
+
+      - name: Verify build output and lazy chunks
+        run: |
+          node -e "
+            const fs = require('node:fs');
+            const requiredFiles = [
+              'dist/index.html',
+              'dist/_headers',
+              'dist/manifest.webmanifest',
+              'dist/robots.txt',
+              'dist/sitemap.xml'
+            ];
+            for (const f of requiredFiles) {
+              if (!fs.existsSync(f)) throw new Error('Missing build artifact: ' + f);
+            }
+            const assets = fs.readdirSync('dist/assets');
+            const requiredChunks = [
+              'index-',
+              'vendor-three-',
+              'suite-vlab3d-',
+              'suite-visuals-',
+              'suite-knowledge-',
+              'suite-explore-',
+              'route-diy-',
+              'route-translation-'
+            ];
+            for (const prefix of requiredChunks) {
+              if (!assets.some((a) => a.startsWith(prefix))) {
+                throw new Error('Missing expected chunk with prefix: ' + prefix);
+              }
+            }
+            console.log('Verified', requiredFiles.length, 'root artifacts and', assets.length, 'bundled assets.');
+          "

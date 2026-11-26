@@ -608,6 +608,76 @@
         { stage: 'quality', title: '多指标与药效关联', points: ['延胡索乙素与总生物碱', '镇痛药效与溶出相关性'], out: '评价指标树' },
         { stage: 'register', title: '转化报告', points: ['汇总炮制增效证据链'], out: '《药学研究与小试转化报告》' }
       ]
+    },
+
+    liaowuweizi: {
+      id: 'liaowuweizi', herb: '辽五味', latin: 'Schisandra chinensis (Turcz.) Baill.', badge: '辽药道地', focus: '醋蒸增效 · 木脂素与多糖联产',
+      title: '辽五味（醋五味子）· 护肝安神木脂素颗粒小试与中试转化',
+      claim: '收敛固涩，益气生津，补肾宁心；醋蒸增强入肝经保肝降酶与宁心安神作用。',
+      source: '木兰科植物五味子 Schisandra chinensis (Turcz.) Baill. 的干燥成熟果实，道地产区为辽宁本溪桓仁、抚顺新宾（国家地理标志“辽五味”）。秋季果实成熟时采摘，晒干或蒸后晒干。',
+      regions: '辽宁桓仁、新宾、宽甸为公认核心道地产区，粒大肉厚、油润光泽、种仁五味子醇甲含量高且稳定。',
+      markers: [
+        { key: 'schA', name: '五味子醇甲', type: '联苯环辛烯木脂素', limit: '≥ 0.40%', default: 0.68, k90: 0.04, ea: 55, light: false, volatile: false },
+        { key: 'totLig', name: '总木脂素（醇甲＋醇乙＋甲素＋乙素）', type: '木脂素群', limit: '内控 ≥ 1.20%', default: 1.65, k90: 0.05, ea: 55, light: false, volatile: false }
+      ],
+      herbQc: [
+        { item: '性状、显微、薄层鉴别', limit: '紫红或暗红油润，果肉气微酸，种子破碎有香气、味辛微苦', src: 'pharm' },
+        { item: '水分', limit: '≤ 16.0%', src: 'pharm' },
+        { item: '总灰分', limit: '≤ 7.0%', src: 'pharm' },
+        { item: '杂质', limit: '≤ 1.0%', src: 'pharm' },
+        { item: '五味子醇甲（药材及醋五味子）', limit: '≥ 0.40%（HPLC 250 nm）', src: 'pharm' }
+      ],
+      processing: {
+        intro: '辽宁中医药大学中药炮制特色研究证明：五味子经米醋拌蒸至表面黑润后，种皮角质层松散利于木脂素溶出，同时降低游离有机酸刺激性并提高保肝活性部位转移率。',
+        options: [
+          { id: 'raw', name: '生辽五味（连核捣碎）', desc: '长于敛肺止咳，果肉有机酸含量高。', effects: [{ m: '有机酸溶出', t: '↑', n: '酸度高' }, { m: '五味子醇甲溶出', t: '≈', n: '基准' }] },
+          { id: 'vinegar_steam', name: '醋蒸辽五味（20%米醋闷润蒸至黑润）', desc: '药典法定炮制品，入肝补益、增强保肝降酶。', effects: [{ m: '五味子醇甲转移率', t: '↑', n: '细胞壁破裂促溶' }, { m: '五味子乙素比例', t: '↑', n: '保肝活性增强' }] },
+          { id: 'wine_steam', name: '酒蒸五味子', desc: '传统补肾温阳炮制对照。', effects: [{ m: '醇溶木脂素', t: '↑', n: '与醋蒸对照评价' }] },
+          { id: 'unbroken', name: '未破核整粒投料（反面工艺对照）', desc: '种皮致密阻隔，种仁木脂素极难溶出！', effects: [{ m: '五味子醇甲转移率', t: '↓', n: '损失逾 65%' }] }
+        ]
+      },
+      routes: [
+        { id: 'etoh_resin', name: '连核粉碎＋75%乙醇回流＋AB-8树脂富集（推荐）', desc: '木脂素转移率高，且水洗段可同步联产果肉五味子多糖，脱除种子脂肪油后制粒不返油。', s: { transfer: 9, yieldFit: 9, stability: 9, repro: 9, energy: 7, cost: 7, operability: 8, green: 8, formFit: 9 } },
+        { id: 'sfe_co2', name: '超临界 CO₂ 萃取（加乙醇夹带剂）', desc: '低温无溶剂残留，但五味子约 30% 种子脂肪油同步萃出，固体颗粒成型较难（更适软胶囊）。', s: { transfer: 8, yieldFit: 7, stability: 9, repro: 8, energy: 7, cost: 5, operability: 6, green: 9, formFit: 5 } },
+        { id: 'water_decoct', name: '传统纯水煎煮', desc: '仅溶出果肉有机酸与多糖，强亲脂木脂素转移率不足 20%，不适于木脂素护肝定位。', s: { transfer: 3, yieldFit: 4, stability: 8, repro: 7, energy: 6, cost: 9, operability: 8, green: 9, formFit: 6 } }
+      ],
+      scaleStages: [
+        { name: '连核破碎与 75% 乙醇回流', solvent: 'ethanol', label: '75% 乙醇', ratios: [8, 6], hours: [1.5, 1.0], temp: 78, eff: { schA: 0.82, totLig: 0.79 } }
+      ],
+      extractYield: 18,
+      herbPrice: 85,
+      dosagePreset: { volatile: 1, solubility: 1, thermo: 2, hygro: 2, daily: 1.5, bitter: 2, population: 'adult', onset: 'normal', route: 'oral' },
+      qcMatrix: [
+        { level: '药材／饮片', items: [['五味子醇甲', '≥ 0.40%', 'pharm'], ['连核破碎度过筛检查', '种仁破碎率 ≥ 95%', 'user'], ['醋蒸外观与水分', '黑润光泽，水分 ≤ 14.0%', 'pharm']] },
+        { level: '中间体', items: [['AB-8 树脂 75% 醇洗脱固含物', '五味子醇甲 ≥ 2.5%', 'calc'], ['残留脂肪油控制', '防压片/制粒返油粘冲', 'lit']] },
+        { level: '成品', items: [['五味子醇甲每袋含量', '标示量 ±10% 以上下限设定', 'calc'], ['4 木脂素特征图谱相似度', '≥ 0.92', 'lit'], ['颗粒剂通则 0104（溶化性/水分≤8.0%）', '符合规定', 'pharm']] }
+      ],
+      batch: [
+        { name: '纯化干膏得率', unit: '%', vals: [8.4, 8.7, 8.5], rsd: 5 },
+        { name: '五味子醇甲转移率', unit: '%', vals: [78.6, 81.2, 79.5], rsd: 5 },
+        { name: '总木脂素含量', unit: 'mg/g', vals: [64.2, 66.8, 65.1], rsd: 5 }
+      ],
+      similarity: [0.98, 0.97, 0.96],
+      efficacy: {
+        aim: '以 CCl₄ 或酒精性肝损伤模型对比生五味子与醋蒸辽五味纯化物，验证保肝降酶（ALT/AST）与抗氧化活性优势。',
+        tree: [
+          { g: '主要药效', items: ['血清 ALT / AST 活性显著降低', '肝组织 MDA 降低、SOD 与 GSH-Px 升高'] },
+          { g: '镇静安神协同', items: ['延长戊巴比妥钠睡眠时间试验'] },
+          { g: '安全性', items: ['最大耐受量试验与胃肠道刺激性对比（验证醋蒸减酸护胃）'] }
+        ],
+        controls: [['空白对照', '正常生理盐水组'], ['模型对照', '肝损伤模型组'], ['阳性对照', '联苯双酯或水飞蓟宾组'], ['炮制工艺对照', '生辽五味组 vs 醋蒸辽五味低/中/高剂量组']]
+      },
+      risks: [
+        { item: '前处理粉碎', fail: '仅破果肉未碎种核', eff: '木脂素转移率跌破 35%', S: 5, O: 3, D: 2, ctl: '双辊破碎机设定间距并抽检种仁破碎率 ≥ 95%' },
+        { item: '纯化制粒', fail: '种子脂肪油未脱净', eff: '颗粒返油、软化粘连', S: 3, O: 3, D: 2, ctl: 'AB-8 大孔树脂选择性吸附木脂素或微粉硅胶吸附' },
+        { item: '干燥工序', fail: '果肉糖酸残留吸湿', eff: '颗粒结块超水分限度', S: 3, O: 3, D: 2, ctl: '水洗除净糖酸，车间 RH ≤ 50% 铝塑复合膜包装' }
+      ],
+      benchmark: [
+        { stage: 'herb', title: '道地选材与醋蒸连核破碎', points: ['辽宁桓仁道地统货', '20% 米醋蒸至黑润，连核破碎率 ≥95%'], out: '醋五味子炮制与粉碎记录' },
+        { stage: 'extract', title: '醇提树脂富集与多糖联产', points: ['75% 乙醇回流提木脂素', 'AB-8 水洗段回收果肉多糖'], out: '综合利用工艺平衡表' },
+        { stage: 'quality', title: '四木脂素特征图谱与三批一致性', points: ['HPLC 250 nm 同测醇甲/醇乙/甲素/乙素', '三批 RSD < 3%'], out: '质量标准草案' },
+        { stage: 'register', title: '输出辽药转化研究报告', points: ['整合道地产地、醋蒸机制与放大风险控制'], out: '《药学研究与小试转化报告》' }
+      ]
     }
   };
 

@@ -158,7 +158,7 @@
             '<button type="button" data-v20-tab="mol3d" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition">' + ICO_MOL + '<span>三维分子结构库 (' + molTotal + ')</span></button>' +
             '<button type="button" data-v20-tab="particles" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition">' + ICO_FLASK + '<span>粒子显色实验室 (' + PARTICLE_REACTIONS.length + ')</span></button>' +
           '</div>' +
-          '<span id="v20HeaderMeta" class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">PubChem 真实 3D 构象 · 悬停/点击官能团高亮 · 直连 91 篇实证文献</span>' +
+          '<span id="v20HeaderMeta" class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">PubChem 真实 3D 构象 · 悬停/点击官能团高亮 · 直连 ' + ((window.TCM_LAB_API && window.TCM_LAB_API.getCounts) ? window.TCM_LAB_API.getCounts().literature : 100) + ' 篇实证文献</span>' +
         '</div>' +
         '<div id="v20Body" class="flex-1 overflow-y-auto p-3.5 sm:p-5"></div>' +
       '</div>';
@@ -294,7 +294,7 @@
 
     function buildMolBtnHtml(filteredKeys) {
       if (!filteredKeys.length) {
-        return '<div class="text-xs text-slate-500 py-2 px-1">未匹配到分子，可清空关键词或从右侧「136 味题库直选」切换。</div>';
+        return '<div class="text-xs text-slate-500 py-2 px-1">未匹配到分子，可清空关键词或从右侧「' + (allTopics.length || 144) + ' 味题库直选」切换。</div>';
       }
       return filteredKeys.map(function (k) {
         var on = k === molKey;
@@ -353,7 +353,7 @@
       '<div class="space-y-3">' +
         '<div class="p-3 rounded-xl bg-[#f7f6f2] dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 space-y-2">' +
           '<div class="flex flex-wrap items-center gap-2">' +
-            '<input type="text" id="v20MolSearch" value="' + escHtml(molSearchQuery) + '" placeholder="检索 77 项分子 / 136 味药材 / 分子式 / CID..." class="flex-1 min-w-[200px] px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-[#0f4c3a]" />' +
+            '<input type="text" id="v20MolSearch" value="' + escHtml(molSearchQuery) + '" placeholder="检索 ' + keys.length + ' 项分子 / ' + (allTopics.length || 144) + ' 味药材 / 分子式 / CID..." class="flex-1 min-w-[200px] px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-[#0f4c3a]" />' +
             '<select id="v20TopicJumpSelect" class="max-w-[260px] px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200">' + topicOptionsHtml + '</select>' +
             '<div class="flex flex-wrap items-center gap-1">' +
               modeBtns +
@@ -432,7 +432,7 @@
 
               (relLit.length ? (
                 '<div class="p-2.5 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-700 space-y-1">' +
-                  '<div class="font-extrabold text-slate-800 dark:text-slate-200 text-[11px]">关联实证文献（91 篇文献库匹配）</div>' +
+                  '<div class="font-extrabold text-slate-800 dark:text-slate-200 text-[11px]">关联实证文献（' + ((window.TCM_LAB_API && window.TCM_LAB_API.getCounts) ? window.TCM_LAB_API.getCounts().literature : 100) + ' 篇文献库匹配）</div>' +
                   relLit.map(function (lit) {
                     return '<div class="text-[10.5px] text-slate-600 dark:text-slate-300 leading-snug pl-2 border-l-2 border-[#0f4c3a]/40">' + escHtml(lit.text) + '</div>';
                   }).join("") +

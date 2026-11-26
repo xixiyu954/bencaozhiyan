@@ -548,7 +548,7 @@
     var relLit = (window.TCM_LAB_API && window.TCM_LAB_API.findLiteratureForTopic)
       ? window.TCM_LAB_API.findLiteratureForTopic(matchedTopic || { category: curCat }, 2)
       : [];
-    var topicOptsHtml = '<option value="">按全题库 136 味药材联动定位四谱...</option>' +
+    var topicOptsHtml = '<option value="">按全题库 ' + (allTopics.length || 144) + ' 味药材联动定位四谱...</option>' +
       allTopics.map(function (t) {
         var sel = matchedTopic && matchedTopic.id === t.id ? " selected" : "";
         return '<option value="' + t.id + '"' + sel + '>' + t.herb + ' · ' + (t.compound || t.category) + '</option>';

@@ -1,8 +1,8 @@
 // DIY 创意实验室 + 自由配方沙盒 + 失败分支实训 + 实验任务舱 独立异步 Chunk（按需水合，首屏零加载）
 import '../styles/lab-v25-formula-sandbox.css';
 import '../styles/lab-v26-failure-branches.css';
-import '../../lab-v12-diy-studio.js';
-import '../../lab-v13-mission-os.js';
+import '../core/lab-v12-diy-studio.js';
+import '../core/lab-v13-mission-os.js';
 import '../modules/lab-v25-formula-sandbox.js';
 import '../modules/lab-v26-failure-branches.js';
 

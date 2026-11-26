@@ -73,7 +73,7 @@
             '<button type="button" data-v22-tab="fluid" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition">' + ico('<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>') + '<span>液液萃取流体仿真</span></button>' +
             '<button type="button" data-v22-tab="cockpit" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition">' + ico('<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>') + '<span>五维雷达驾驶舱</span></button>' +
           '</div>' +
-          '<span class="text-[11px] text-slate-500 font-semibold">全题库 136 课题联动 · 真实物理溶剂内核 · 离线零外链</span>' +
+          '<span class="text-[11px] text-slate-500 font-semibold">全题库 ' + ((window.TCM_LAB_API && window.TCM_LAB_API.getCounts) ? window.TCM_LAB_API.getCounts().topics : 144) + ' 课题联动 · 三套 3D 实操流程 · 离线零外链</span>' +
         '</div>' +
         '<div id="v22Body" class="flex-1 overflow-y-auto p-4 sm:p-5"></div>' +
       '</div>';
@@ -469,7 +469,7 @@
         id: "v22_visual_suite",
         icon: "LAB",
         title: "三维虚拟实验室、流体仿真与驾驶舱",
-        desc: "包含第一人称 3D 实验室、液液萃取物理流体仿真与 136 课题五维雷达驾驶舱。",
+        desc: "包含第一人称 3D 实验室（回流/旋蒸/液相）、液液萃取物理流体仿真与 " + ((window.TCM_LAB_API && window.TCM_LAB_API.getCounts) ? window.TCM_LAB_API.getCounts().topics : 144) + " 课题五维雷达驾驶舱。",
         onOpen: function () { openModal("vlab"); }
       });
     }

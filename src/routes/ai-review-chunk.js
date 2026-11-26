@@ -1,7 +1,7 @@
 // 自有方案演练 + AI 自编课题评审 + 2.5 AI 课题生成器（90分竞技）独立异步 Chunk（按需水合，首屏零加载）
 import '../styles/lab-v27-ai-topic-arena.css';
-import '../../lab-v11-userplan.js';
-import '../../lab-v17-ai-review.js';
+import '../core/lab-v11-userplan.js';
+import '../core/lab-v17-ai-review.js';
 import '../modules/lab-v27-ai-topic-arena.js';
 
 export default {

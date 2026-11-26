@@ -1150,7 +1150,7 @@
         dim: "关联实证文献",
         a: (window.TCM_LAB_API && window.TCM_LAB_API.findLiteratureForTopic ? (window.TCM_LAB_API.findLiteratureForTopic(tA, 1)[0]?.text || "参见平台文献库") : "参见平台文献库"),
         b: (window.TCM_LAB_API && window.TCM_LAB_API.findLiteratureForTopic ? (window.TCM_LAB_API.findLiteratureForTopic(tB, 1)[0]?.text || "参见平台文献库") : "参见平台文献库"),
-        reason: "对照平台 91 篇实证文献库提供工艺与质控实验依据。"
+        reason: "对照平台 " + ((window.TCM_LAB_API && window.TCM_LAB_API.getCounts) ? window.TCM_LAB_API.getCounts().literature : 100) + " 篇实证文献库提供工艺与质控实验依据。"
       }
     ];
 

@@ -181,3 +181,16 @@
   - 将站点 Favicon 与 PWA 清单图标由 Emoji `🌿` 升级为精绘几何烧瓶矢量 SVG；
   - 首页初始路由将隐藏六步工坊的首次重绘让出至首帧之后执行，保障首屏 Hero 零阻塞绘制。
 - **质量验证**：`npm run build`（3.83s）通过；Lighthouse **Accessibility 100 / Best Practices 100 / SEO 100 / Performance 86（CLS 0，实测 CWV LCP 232 ms / CLS 0.0015）**；全站 7 项回归及 6 组亮/暗/移动端截图巡检全部通过，0 报错。
+
+
+### 2026-11-26 v33 后续计划全面落地：Three.js 三场景实操、辽药道地专题、src/ 目录规整与 GitHub Actions 构建校验
+- **Three.js 三维虚拟实验室三套完整 7 步实操场景**（`src/modules/lab-v22-vlab3d.js`）：
+  - 在原有「01 丹参 95% 乙醇避光回流提取」基础上，新增 **「02 丹参醇提液 50℃ 减压旋转蒸发浓缩」**（三维升降导轨、数显恒温水浴锅、45° 斜置匀速旋转成膜蒸发瓶、蛇形冷凝管、乙醇接收瓶、`-0.085 MPa` 真空泵数显表与顶部 PTFE 放气阀）与 **「03 HPLC-DAD 丹参酮 IIA 外标法含量测定」**（四元储液瓶托盘、在线脱气机、高压梯度泵、自动进样器、30℃ 柱温箱、270 nm DAD 检测器及实时绘制 `tR = 11.42 min, N = 6840` 洗脱峰的三维宽屏工作站）。
+  - 全室贯通 5 项真实安全与质控互锁：`safety_no_water`（回流未通冷凝水禁加热）、`safety_rv_no_water`（旋蒸未通冷却水禁抽真空）、`safety_rv_backsuck`（旋蒸未先放气恢复常压严禁直接停泵防倒吸）、`safety_lc_no_purge`（液相未排气泡禁升压）、`safety_lc_unbalanced`（基线未平衡禁进样）。
+- **辽宁中医药大学道地药材（辽药道地）与课程案例扩充**（`src/modules/lab-data-v27-kb-topics.js`、`src/modules/lab-v27-bank-enrich.js`、`src/core/lab-v16-portal.js`、`src/core/lab-v18-translation-data.js`、`src/core/lab-v18-translation.js`、`src/routes/visual-suite-loader.js`）：
+  - 新增 8 组辽产道地药材实验课题（辽五味醋炙木脂素、清原关龙胆、桓仁辽细辛挥发油与马兜铃酸 I 双控、桓仁林下山参稀有皂苷转化、宽甸辽藁本、本溪关黄柏酒炙双碱、阜新关防风双色原酮、辽东刺五加多苷），全站题库扩至 **144 项**、实证文献扩至 **100 篇**、院校与药企案例扩至 **48 项**；
+  - 药材题库新增「辽药道地」场景筛选标签（命中 15 项东北/辽宁道地课题，本校特色课题置顶展示），八阶段产业转化训练新增第 5 个示范项目 **「辽五味 · 醋五味子护肝安神木脂素颗粒」**。
+- **根目录历史遗留脚本规整与 CI 自动构建升级**（`src/core/*`、`src/styles/*`、`src/main.js`、`src/routes/*`、`tailwind.config.js`、`vite.config.js`、`.github/workflows/validate.yml`）：
+  - 清理根目录 3 个废弃重复脚本与未使用的旧版 `vendor/` 文件夹，将全部 23 个核心脚本与 6 个样式文件分别归入 `src/core/` 与 `src/styles/`；
+  - 升级 `.github/workflows/validate.yml`，在每次推送与 PR 时自动执行 Node 22 依赖安装、Cloudflare Functions 语法检查、明文密钥拦截、Vite 生产构建及全部异步分包完整性校验。
+- **质量验证**：`npm run build`（3.80s）通过；三套三维场景 21 步全流程与 5 项安全互锁 E2E 校验全部通过；Lighthouse **Accessibility 100 / Best Practices 100 / SEO 100 / Performance 86（TBT 0 ms, CLS 0）**，7 项全站回归测试全部通过，0 报错。

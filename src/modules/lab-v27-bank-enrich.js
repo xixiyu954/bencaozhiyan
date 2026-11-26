@@ -235,6 +235,14 @@ export function isEastWestCompare(topic) {
   return /中西医|阿司匹林|柳树皮|紫杉醇|红豆杉|达菲|莽草酸|青蒿素|长春花|薯蓣|麻黄/.test(hay);
 }
 
+export function isLiaoningHerb(topic) {
+  if (!topic) return false;
+  if (topic.isLiaoyao) return true;
+  const hay = `${topic.id || ''} ${topic.herb || ''} ${topic.sourceTag || ''}`;
+  if (/西洋参/.test(hay)) return false;
+  return /^liao_|辽五味|五味子|关龙胆|清原龙胆|龙胆|辽细辛|细辛|桓仁|辽藁本|关黄柏|关防风|刺五加|人参|穿山龙|满山红|鹿茸|威灵仙/.test(hay);
+}
+
 export function getExternalSearchUrls(topic) {
   const herb = String(topic?.herb || '').replace(/[（(].*?[）)]/g, '').trim() || '中药';
   const comp = String(topic?.compound || '').split(/[、/·→]/)[0].trim();
@@ -282,6 +290,7 @@ if (typeof window !== 'undefined') {
     toggleFavorite: toggleBankFavorite,
     hasMol3d: hasMol3dMatch,
     isEastWest: isEastWestCompare,
+    isLiaoyao: isLiaoningHerb,
     getSearchUrls: getExternalSearchUrls,
     findRelatedLit: findRelatedLiterature
   };

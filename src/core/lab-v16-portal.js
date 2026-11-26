@@ -498,6 +498,7 @@
         if (bankState.scene === 'process' && !/炮制|醋炙|炙|炒|杀酶|对照|减毒|砂烫/.test(hay)) return false;
         if (bankState.scene === 'mol3d' && !(enrich && enrich.hasMol3d(hydrated))) return false;
         if (bankState.scene === 'eastwest' && !(enrich && enrich.isEastWest(hydrated))) return false;
+        if (bankState.scene === 'liaoyao' && !(enrich && enrich.isLiaoyao && enrich.isLiaoyao(hydrated))) return false;
       }
       if (q) {
         const hydrated = (api() && api().getTopicById) ? api().getTopicById(item.id) : item;
@@ -517,6 +518,9 @@
     }
     if (bankState.sort === 'name') {
       return [...matched].sort((a, b) => String(a.herb || '').localeCompare(String(b.herb || ''), 'zh-CN'));
+    }
+    if (bankState.scene === 'liaoyao' && bankState.sort === 'default') {
+      return [...matched].sort((a, b) => (b.isLiaoyao ? 1 : 0) - (a.isLiaoyao ? 1 : 0));
     }
     return matched;
   }
@@ -625,9 +629,9 @@
       ` : ''}
       <div class="v16-preview-block"><label>基原与性味</label><p>${esc(preview.origin || '暂未填写')}</p></div>
       <div class="v16-preview-block">
-        <label>核心化学成分（点击 🧬 成分名看 3D 构象）</label>
+        <label>核心化学成分（点击成分芯片查看 3D 构象）</label>
         <p>${linkedChem}</p>
-        ${molMatches.length ? `<div class="flex flex-wrap gap-1.5 pt-2">${molMatches.map(m => `<button type="button" class="tcm-mol3d-link" data-mol3d-open="${m.key}" style="padding:3px 9px;font-size:0.74rem">🧬 查看 ${esc(m.label)} 3D 模型 →</button>`).join('')}</div>` : ''}
+        ${molMatches.length ? `<div class="flex flex-wrap gap-1.5 pt-2">${molMatches.map(m => `<button type="button" class="tcm-mol3d-link" data-mol3d-open="${m.key}" style="padding:3px 9px;font-size:0.74rem"><svg class="tcm-mol3d-link-ico" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 20 7 20 17 12 22 4 17 4 7 12 2"/></svg><span>查看 ${esc(m.label)} 3D 模型 →</span></button>`).join('')}</div>` : ''}
       </div>
       <div class="v16-preview-block">
         <label>01 中药化学 · 生物合成（${esc(prof.biosyn)}）与分离推导</label>
@@ -672,7 +676,11 @@
                 const itemProf = enrich ? enrich.getProfile(hydrated) : null;
                 const itemHas3d = enrich ? enrich.hasMol3d(hydrated) : false;
                 const cardSummary = hydrated.origin || hydrated.chemistry || `${item.latin ? item.latin + ' · ' : ''}主攻成分：${item.compound || '活性成分'}`;
-                const badgeText = item._isCustom ? '自定义课题' : (item.isKbNew ? '六科新增' : (item.group === 'class' ? '高校经典' : '创新拓展'));
+                const badgeText = item._isCustom
+                  ? '自定义课题'
+                  : ((enrich && enrich.isLiaoyao && enrich.isLiaoyao(hydrated))
+                    ? '辽药道地 · 本校特色'
+                    : (item.isKbNew ? '六科新增' : (item.group === 'class' ? '高校经典' : '创新拓展')));
                 return `
                   <div class="v16-topic-card ${isSel ? 'selected' : ''}" data-v16-preview="${esc(item.id)}" role="button" tabindex="0">
                     <div class="v16-topic-head">
@@ -684,6 +692,7 @@
                     </div>
                     <div class="v16-topic-comp">${window.TCM_MOL3D_REGISTRY ? window.TCM_MOL3D_REGISTRY.linkifyHtml(esc(item.compound || '核心活性成分'), { inlineSpan: true }) : esc(item.compound || '核心活性成分')}</div>
                     <div class="v27-card-micro-tags">
+                      ${(enrich && enrich.isLiaoyao && enrich.isLiaoyao(hydrated)) ? '<span class="v27-micro-pill" style="background:rgba(154,74,36,0.10);color:#9a4a24;border-color:rgba(154,74,36,0.28)">辽药道地</span>' : ''}
                       ${itemProf ? `<span class="v27-micro-pill">${esc(itemProf.biosyn)}</span>` : ''}
                       ${itemHas3d ? '<span class="v27-micro-pill mint">3D 构象</span>' : ''}
                       ${hydrated.limitVal ? `<span class="v27-micro-pill">限度≥${esc(hydrated.limitVal)}${esc(hydrated.limitUnit || '%')}</span>` : ''}
@@ -826,6 +835,7 @@
           <div class="v16-pill-row">
             ${[
               ['all', '全部场景'],
+              ['liaoyao', '辽药道地'],
               ['mol3d', '含 3D 分子'],
               ['undergrad', '本科经典'],
               ['compound', '经典复方'],

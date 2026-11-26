@@ -2,9 +2,9 @@
 import '../data/mol3d-pubchem-data.js';
 import '../modules/lab-v22-fluid-sim.js';
 import '../modules/lab-v22-cockpit3d.js';
-import '../../lab-v20-mol3d-particles.js';
-import '../../lab-v21-spectra-lab.js';
-import '../../lab-v22-visual-suite-pro.js';
+import '../core/lab-v20-mol3d-particles.js';
+import '../core/lab-v21-spectra-lab.js';
+import '../core/lab-v22-visual-suite-pro.js';
 
 export default {
   v20: typeof window !== 'undefined' ? window.TCM_V20_VISUALS : null,
